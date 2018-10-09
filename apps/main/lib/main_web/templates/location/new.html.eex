@@ -1,0 +1,8 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">New Location</div>
+            <%= render "_form.html", data: @changeset, action: team_location_path(@conn, :create, @team_id), conn: @conn, errors: @errors %>
+        </div>
+    </div>
+</div>

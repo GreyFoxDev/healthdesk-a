@@ -1,0 +1,8 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">Edit Team</div>
+            <%= render "_form.html", data: @changeset, action: team_path(@conn, :update, @changeset.data), conn: @conn, errors: @errors %>
+        </div>
+    </div>
+</div>
