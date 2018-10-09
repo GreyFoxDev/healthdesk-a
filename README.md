@@ -1,4 +1,4 @@
-# HealthdeskAi
+# Healthdesk, Inc.
 
 **TODO: Add description**
 
