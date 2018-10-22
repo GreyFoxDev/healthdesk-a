@@ -1,6 +1,5 @@
 defmodule Data.Location do
-
-  alias Data.Commands
+  alias Data.Commands.Location
 
   @roles ["admin"]
 
@@ -10,33 +9,32 @@ defmodule Data.Location do
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> Commands.SelectLocation.run()
+      |> Location.get()
       |> Data.Schema.Location.changeset()
 
     {:ok, changeset}
   end
 
   def all(%{role: role}) when role in @roles,
-    do: Commands.ListLocations.run()
+    do: Location.all()
 
-  def all(_), do: {:error, :invalid_permissions}
+  def all(_),
+    do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: Commands.SelectLocation.run(id)
+    do: Location.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
   def get_by_team_id(%{role: role}, id) when role in @roles,
-    do: Commands.SelectLocationByTeamId.run(id)
-
-  def get_by_team_id(_, _), do: {:error, :invalid_permissions}
+    do: Location.all(id)
 
   def create(params),
-    do: Commands.WriteLocation.run(params)
+    do: Location.write(params)
 
   def update(id, params) do
     id
-    |> Commands.SelectLocation.run()
-    |> Commands.WriteLocation.run(params)
+    |> Location.get()
+    |> Location.write(params)
   end
 end

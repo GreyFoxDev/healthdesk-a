@@ -1,0 +1,89 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Child Care Hours for <%= @location.location_name %></h1>
+    </div>
+</div><!--/.row-->
+
+<div class="row">
+    <div class="fixed-table-container">
+        <div class="fixed-table-header">
+            <table>
+            </table>
+        </div>
+        <div class="fixed-table-body">
+            <div class="fixed-table-loading" style="top: 37px; display: none;">
+                Loading, please wait…
+            </div>
+            <table data-toggle="table" data-url="tables/data1.json" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true" data-sort-name="name" data-sort-order="desc" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="bs-checkbox " style="width: 36px; ">
+                            <div class="th-inner ">
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                Day of Week
+                                <span class="order">
+                                    <span class="caret" style="margin: 10px 5px;"></span>
+                                </span>
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                AM Open
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                AM Close
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                PM Open
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                PM Close
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <%= if assigns[:current_user].role == "admin" do %> 
+                                <a href="<%= team_location_child_care_hour_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-success">New</a>
+                            <% end %>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%= if @hours == [] do %>
+                        <tr class="no-records-found">
+                            <td colspan="5">No matching records found</td>
+                        </tr>
+                    <% end %>
+                    <%= for child_care <- @hours do %>
+                        <tr>
+                            <td></td>
+                            <td><%= child_care.day_of_week %></td>
+                            <td><%= child_care.morning_open_at %></td>
+                            <td><%= child_care.morning_close_at %></td>
+                            <td><%= child_care.afternoon_open_at %></td>
+                            <td><%= child_care.afternoon_close_at %></td>
+                            <td>
+                                <%= link "Delete", to: team_location_child_care_hour_path(@conn, :delete, @location.team_id, @location.id, child_care.id), method: "delete", class: "btn btn-danger" %>
+                                <a href="<%= team_location_child_care_hour_path(@conn, :edit, @location.team_id, @location.id, child_care.id) %>" class="btn btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

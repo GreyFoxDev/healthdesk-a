@@ -1,0 +1,30 @@
+<div class="panel-body">
+    <div class="col-md-6">
+        <%= form_for @data, @action, fn f -> %>
+        <div class="form-group">
+            <label>Day of Week</label>
+            <%=
+            select f,
+            :day_of_week,
+            ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            class: "form-control"
+            %>
+        </div>
+
+        <div class="form-group">
+            <label>Open</label>
+            <%= text_input f, :open_at, class: "form-control" %>
+            <label>Close</label>
+            <%= text_input f, :close_at, class: "form-control" %>
+        </div>
+
+    </div>
+    <div class="col-md-8">
+        <div class="form-group">
+            <%= submit "Save", class: "btn btn-primary" %>
+            <%= link "Cancel", to: team_location_normal_hour_path(@conn, :index, @location.team_id, @location.id)  %>
+        </div>
+        <% end %>
+    </div>
+</div>
+ 

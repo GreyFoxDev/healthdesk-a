@@ -22,7 +22,7 @@ defmodule Data.Schema.Team do
 
     field(:deleted_at, :utc_datetime)
 
-    has_many :locations, Data.Schema.Location
+    has_many(:locations, Data.Schema.Location)
 
     timestamps()
   end

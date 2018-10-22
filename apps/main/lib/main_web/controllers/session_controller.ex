@@ -3,6 +3,7 @@ defmodule MainWeb.SessionController do
 
   alias Data.User, as: Query
   alias MainWeb.Auth
+  alias Chatbot.Client.Twilio
 
   action_fallback MainWeb.FallbackController
 
@@ -24,7 +25,7 @@ defmodule MainWeb.SessionController do
 
   def create(conn, %{"session" => %{"verification_code" => code, "phone_number" => phone_number}}) do
     with {:ok, user} <- Query.authorize(phone_number),
-         "1234" <- code,
+         :ok <- Twilio.check(phone_number, code),
          {:role, "admin"} <- {:role, user.role} do
 
       redirect_to(conn, user, "/admin/teams")
@@ -38,12 +39,18 @@ defmodule MainWeb.SessionController do
   end
 
   def create(conn, %{"session" => %{"phone_number" => phone_number}}) do
-    with {:ok, user} <- Query.authorize(phone_number) do
+    with {:ok, user} <- Query.authorize(phone_number),
+         :ok <- Twilio.verify(phone_number) do
       conn
       |> put_layout(:login)
       |> put_flash(:success, "Please verify the phone number #{user.first_name}!")
       |> render("verify.html")
     else
+      {:error, :error_sending_verification} ->
+        conn
+        |> put_layout(:login)
+        |> put_flash(:error, "Unable to send verification code. Please try again later.")
+        |> render("new.html")
       _ ->
         conn
         |> put_layout(:login)

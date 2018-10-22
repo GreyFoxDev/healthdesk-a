@@ -19,8 +19,8 @@ defmodule Chatbot do
 
   """
   def send(%{provider: _, from: from, to: to, body: body})
-  when is_nil(from) or is_nil(to) or is_nil(body),
-    do: {:error, :missing_params}
+      when is_nil(from) or is_nil(to) or is_nil(body),
+      do: {:error, :missing_params}
 
   def send(params),
     do: GenServer.cast(Chatbot, {:inbound, params})
@@ -30,10 +30,10 @@ defmodule Chatbot do
          {:ok, pid} when is_pid(pid) <- MessageSupervisor.send_message(params) do
     else
       error ->
-        IO.inspect error
-        Logger.error("Unable to send message for: #{inspect params}")
+        IO.inspect(error)
+        Logger.error("Unable to send message for: #{inspect(params)}")
     end
+
     {:noreply, state}
   end
-
 end

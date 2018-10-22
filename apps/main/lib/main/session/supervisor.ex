@@ -1,35 +1,33 @@
-defmodule Session do
-  defstruct phone_number: nil,
-    verification_code: nil,
-    ttl: nil
+defmodule Session.Handler.Supervisor do
+  use Supervisor
 
-  alias Session.{Supervisor, Handler}
+  @moduledoc false
 
-  def start(request) do
+  require Logger
+
+  def start_link,
+    do: Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
+
+  def init(:ok) do
+    children = [
+      worker(Session.Handler, [], restart: :transient)
+    ]
+
+    supervise(children, strategy: :simple_one_for_one)
+  end
+
+  def start_or_update_session(request) do
     with [{pid, _}] <- find_session(request) do
-      {:ok, pid}
+      GenServer.cast(pid, {:update_session, request})
     else
-      [] ->
-        DynamicSupervisor.start_child(Supervisor, {Handler, request})
-
+      []  ->
+        Supervisor.start_child(__MODULE__, [request])
       _ ->
         {:error, :internal}
     end
   end
 
-  def validate_session(request) do
-    with [{pid, _}] <- find_session(request) do
-      GenServer.cast(pid, :keep_alive)
-      {:ok, pid}
-    else
-      [] ->
-        {:error, :invalid_session}
+  defp find_session(%{from: phone_number}),
+    do: Registry.match(Session.Registry, :member_number, phone_number)
 
-      _ ->
-        {:error, :internal}
-    end
-  end
-
-  defp find_session(%{phone_number: phone_number}),
-    do: Registry.match(Session.Registry, :phone_number, phone_number)
 end

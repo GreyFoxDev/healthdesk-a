@@ -1,0 +1,28 @@
+<div class="panel-body">
+    <div class="col-md-6">
+        <%= form_for @data, @action, fn f -> %>
+            <div class="form-group">
+                <label>Daily?</label>
+                <%= checkbox f, :has_daily, class: "form-control" %>
+                <%= text_input f, :daily, class: "form-control" %>
+            </div>
+            <div class="form-group">
+                <label>Weekly?</label>
+                <%= checkbox f, :has_weekly, class: "form-control" %>
+                <%= text_input f, :weekly, class: "form-control" %>
+            </div>
+            <div class="form-group">
+                <label>Monthly?</label>
+                <%= checkbox f, :has_monthly, class: "form-control" %>
+                <%= text_input f, :monthly, class: "form-control" %>
+            </div>
+
+    </div>
+    <div class="col-md-8">
+        <div class="form-group">
+            <%= submit "Save", class: "btn btn-primary" %>
+            <%= link "Cancel", to: team_location_pricing_plan_path(@conn, :index, @location.team_id, @location.id)  %>
+        </div>
+        <% end %>
+    </div>
+</div>
