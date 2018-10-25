@@ -31,7 +31,13 @@ defmodule MainWeb.Router do
     delete "/logout/:id", SessionController, :delete
 
     resources "/teams", TeamController do
-      resources "/locations", LocationController
+      resources "/locations", LocationController do
+        resources "/holiday-hours", HolidayHourController
+        resources "/normal-hours", NormalHourController
+        resources "/child-care-hours", ChildCareHourController
+        resources "/wifi-network", WifiNetworkController
+        resources "/pricing-plans", PricingPlanController
+      end
     end
 
     resources "/users", UserController

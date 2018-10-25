@@ -6,6 +6,8 @@ defmodule Main.Application do
 
     children = [
       supervisor(MainWeb.Endpoint, []),
+      worker(Registry, [:duplicate, Session.Registry]),
+      supervisor(Session.Handler.Supervisor, [])
     ]
 
     opts = [strategy: :one_for_one, name: Main.Supervisor]

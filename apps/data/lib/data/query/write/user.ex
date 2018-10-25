@@ -10,6 +10,12 @@ defmodule Data.Query.WriteOnly.User do
     |> Repo.insert_or_update!()
   end
 
+  def write(original, params) do
+    original
+    |> User.changeset(params)
+    |> Repo.insert_or_update!()
+  end
+
   def delete(%{id: _id} = params) do
     params
     |> Map.put(:deleted_at, DateTime.utc_now())

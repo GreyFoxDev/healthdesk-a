@@ -1,0 +1,84 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Pricing Plans for <%= @location.location_name %></h1>
+    </div>
+</div><!--/.row-->
+
+<div class="row">
+    <div class="fixed-table-container">
+        <div class="fixed-table-header">
+            <table>
+            </table>
+        </div>
+        <div class="fixed-table-body">
+            <div class="fixed-table-loading" style="top: 37px; display: none;">
+                Loading, please wait…
+            </div>
+            <table data-toggle="table" data-url="tables/data1.json" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true" data-sort-name="name" data-sort-order="desc" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="bs-checkbox " style="width: 36px; ">
+                            <div class="th-inner ">
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                Daily
+                                <span class="order">
+                                    <span class="caret" style="margin: 10px 5px;"></span>
+                                </span>
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                Weekly
+                                <span class="order">
+                                    <span class="caret" style="margin: 10px 5px;"></span>
+                                </span>
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                Monthly
+                                <span class="order">
+                                    <span class="caret" style="margin: 10px 5px;"></span>
+                                </span>
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <%= if assigns[:current_user].role == "admin" do %> 
+                                <a href="<%= team_location_pricing_plan_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-success">New</a>
+                            <% end %>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%= if @pricing_plans == [] do %>
+                        <tr class="no-records-found">
+                            <td colspan="5">No matching records found</td>
+                        </tr>
+                    <% end %>
+                    <%= for pricing_plan <- @pricing_plans do %>
+                        <tr>
+                            <td></td>
+                            <td><%= pricing_plan.has_daily %></td>
+                            <td><%= pricing_plan.has_weekly %></td>
+                            <td><%= pricing_plan.has_monthly %></td>
+                            <td>
+                                <%= link "Delete", to: team_location_pricing_plan_path(@conn, :delete, @location.team_id, @location.id, pricing_plan.id), method: "delete", class: "btn btn-danger" %>
+                                <a href="<%= team_location_pricing_plan_path(@conn, :edit, @location.team_id, @location.id, pricing_plan.id) %>" class="btn btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+
+
+            <a href="<%= team_location_path(@conn, :index, @location.team_id) %>" class="btn btn-primary">Locations</a>
+        </div>
+    </div>
+</div>

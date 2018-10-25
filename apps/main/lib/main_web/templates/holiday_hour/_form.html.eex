@@ -1,0 +1,27 @@
+<div class="panel-body">
+    <div class="col-md-6">
+        <%= form_for @data, @action, fn f -> %>
+        <div class="form-group">
+            <label>Holiday Name</label>
+            <%= text_input f, :holiday_name, class: "form-control" %>
+            <!-- <label>Date</label> -->
+            <%#= date_input f, :holiday_date, class: "form-control" %>
+        </div>
+
+        <div class="form-group">
+            <label>Open</label>
+            <%= text_input f, :open_at, class: "form-control" %>
+            <label>Close</label>
+            <%= text_input f, :close_at, class: "form-control" %>
+        </div>
+
+    </div>
+    <div class="col-md-8">
+        <div class="form-group">
+            <%= submit "Save", class: "btn btn-primary" %>
+            <%= link "Cancel", to: team_location_holiday_hour_path(@conn, :index, @location.team_id, @location.id)  %>
+        </div>
+        <% end %>
+    </div>
+</div>
+ 

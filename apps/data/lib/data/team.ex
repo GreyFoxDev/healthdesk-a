@@ -1,6 +1,5 @@
 defmodule Data.Team do
-
-  alias Data.Commands
+  alias Data.Commands.Team
 
   @roles ["admin"]
 
@@ -10,28 +9,28 @@ defmodule Data.Team do
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> Commands.SelectTeam.run()
+      |> Team.get()
       |> Data.Schema.Team.changeset()
 
     {:ok, changeset}
   end
 
   def all(%{role: role}) when role in @roles,
-    do: Commands.ListTeams.run()
+    do: Team.all()
 
   def all(_), do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: Commands.SelectTeam.run(id)
+    do: Team.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
   def create(params),
-    do: Commands.WriteTeam.run(params)
+    do: Team.write(params)
 
   def update(id, params) do
     id
-    |> Commands.SelectTeam.run()
-    |> Commands.WriteTeam.run(params)
+    |> Team.get()
+    |> Team.write(params)
   end
 end

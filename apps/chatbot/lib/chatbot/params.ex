@@ -1,5 +1,4 @@
 defmodule Chatbot.Params do
-
   @moduledoc """
 
   This module is used to build the chatbot params used to send a message.
@@ -21,18 +20,16 @@ defmodule Chatbot.Params do
   ]
 
   def build(%{provider: provider} = params)
-  when provider in @providers do
+      when provider in @providers do
     {:ok,
      %Chatbot.Params{
        provider: provider,
        from: params[:from],
        to: params[:to],
-       body: params[:body],
-     }
-    }
+       body: params[:body]
+     }}
   end
 
   def build(_params),
     do: {:error, :unknown_provider}
-
 end

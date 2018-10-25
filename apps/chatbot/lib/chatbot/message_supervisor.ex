@@ -22,5 +22,4 @@ defmodule Chatbot.MessageSupervisor do
 
   def send_message(params),
     do: Supervisor.start_child(@supervisor, [params])
-
 end

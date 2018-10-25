@@ -31,7 +31,7 @@ defmodule Data.Schema.Location do
 
     field(:deleted_at, :utc_datetime)
 
-    belongs_to :team, Data.Schema.Team
+    belongs_to(:team, Data.Schema.Team)
 
     # has_many(:team_members)
     # has_many(:users, through: [:team_members, :users])

@@ -32,7 +32,7 @@ defmodule Chatbot.MessageHandler do
   end
 
   def handle_info(_, state) do
-    Logger.error "Unkown provider in message: #{inspect state}"
+    Logger.error("Unkown provider in message: #{inspect(state)}")
     {:stop, :normal, state}
   end
 end
