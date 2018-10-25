@@ -84,6 +84,9 @@
                     <% end %>
                 </tbody>
             </table>
+
+
+            <a href="<%= team_location_path(@conn, :index, @location.team_id) %>" class="btn btn-primary">Locations</a>
         </div>
     </div>
 </div>

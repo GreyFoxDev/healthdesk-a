@@ -4,8 +4,8 @@
         <div class="form-group">
             <label>Holiday Name</label>
             <%= text_input f, :holiday_name, class: "form-control" %>
-            <label>Date</label>
-            <%= date_input f, :holiday_date, class: "form-control" %>
+            <!-- <label>Date</label> -->
+            <%#= date_input f, :holiday_date, class: "form-control" %>
         </div>
 
         <div class="form-group">
