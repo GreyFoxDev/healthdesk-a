@@ -43,8 +43,10 @@ defmodule WitClient.MessageHandler do
   end
 
   def get_intent(%{"intent" => [%{"value" => value}|_]}), do: value
+  def get_intent(%{"thanks" => [%{"value" => "true"}|_]}), do: "getMessageGeneric"
   def get_intent(_response), do: :unknown
 
+  def get_args(%{"thanks" => [%{"value" => "true"}|_]}), do: "thanks"
   def get_args(%{"datetime" => [%{"type" => "value", "value" => value}|_]}), do: value
   def get_args(%{"datetime" => [%{"type" => "interval", "from" => %{"value" => from}, "to" => %{"value" => to}}|_]}), do: {from, to}
   def get_args(_response), do: ""

@@ -17,7 +17,7 @@ defmodule Data.Intent do
          plans <- PricingPlan.all(l.id),
            [%{daily: daily}] <- Enum.filter(plans, &(&1.has_daily == true))
       do
-      daily
+      "Day passes are #{daily}"
       else
         _ ->
           @default_error
@@ -29,7 +29,7 @@ defmodule Data.Intent do
          plans <- PricingPlan.all(l.id),
            [%{weekly: weekly}] <- Enum.filter(plans, &(&1.has_weekly == true))
       do
-      weekly
+      "Week passes are #{weekly}"
       else
         _ ->
           @default_error
@@ -41,11 +41,15 @@ defmodule Data.Intent do
          plans <- PricingPlan.all(l.id),
            [%{monthly: monthly}] <- Enum.filter(plans, &(&1.has_monthly == true))
       do
-      monthly
+      "Month passes are #{monthly}"
       else
         _ ->
           @default_error
     end
+  end
+
+  def get_message({"getMessageGeneric", "thanks"}, _phone_number) do
+    "Your welcome! Thank you for being a valued customer"
   end
 
   def get_message({"getAddress", _args}, phone_number) do
