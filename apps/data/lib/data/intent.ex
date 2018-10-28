@@ -50,8 +50,10 @@ defmodule Data.Intent do
 
   def get_message({"getAddress", _args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number) do
-      [l.address_1, l.address_2, "#{l.city},", l.state, l.postal_code]
+      address = [l.address_1, l.address_2, "#{l.city},", l.state, l.postal_code]
       |> Enum.join(" ")
+
+      "We are located at #{address}"
     else
       nil ->
         @default_error
@@ -89,7 +91,7 @@ defmodule Data.Intent do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
          [wifi] <- WifiNetwork.all(l.id)
       do
-      ["Network: ", wifi.network_name, " Password: ", wifi.network_pword] |> Enum.join()
+      ["Here's the Wifi Info\nNetwork: ", wifi.network_name, " Password: ", wifi.network_pword] |> Enum.join()
       else
         _ ->
           @default_error
