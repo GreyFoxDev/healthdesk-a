@@ -49,7 +49,7 @@ defmodule Data.Intent do
   end
 
   def get_message({"getMessageGeneric", "thanks"}, _phone_number) do
-    "Your welcome! Thank you for being a valued customer"
+    "You're welcome! Thank you for being a valued customer"
   end
 
   def get_message({"getAddress", _args}, phone_number) do
