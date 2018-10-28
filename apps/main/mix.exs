@@ -45,7 +45,8 @@ defmodule Main.Mixfile do
       {:cowboy, "~> 1.0"},
       {:guardian, "~> 1.0"},
       {:data, in_umbrella: true},
-      {:chatbot, in_umbrella: true}
+      {:chatbot, in_umbrella: true},
+      {:wit_client, in_umbrella: true}
     ]
   end
 end

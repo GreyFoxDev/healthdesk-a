@@ -3,12 +3,14 @@ defmodule Data.Intent do
   alias Data.Commands.{
     Location,
     NormalHours,
+    HolidayHours,
     WifiNetwork,
     PricingPlan,
     ChildCareHours
   }
 
   @default_error "Not sure about that. Give me a minute..."
+  @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
   def get_message({"getDayPass", _args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
@@ -72,9 +74,10 @@ defmodule Data.Intent do
   end
 
   def get_message({"getHours", args}, phone_number) do
+
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
-         hours <- NormalHours.all(l.id),
-         [hours] <- Enum.filter(hours, fn(hour) -> hour.day_of_week == args end)
+         day_of_week <- convert_to_day(args),
+         [hours] <- get_hours(l, day_of_week)
       do
         [hours.open_at, hours.close_at] |> Enum.join(" - ")
       else
@@ -92,6 +95,32 @@ defmodule Data.Intent do
         _ ->
           @default_error
     end
+  end
+
+  defp convert_to_day(<< year :: binary-size(4), "-", month :: binary-size(2), "-", day :: binary-size(2), _rest :: binary >>) do
+    {String.to_integer(year), String.to_integer(month), String.to_integer(day)} |> get_day_of_week()
+  end
+
+  defp get_hours(location, {:normal, day_of_week}) do
+    location.id
+    |> NormalHours.all()
+    |> Enum.filter(fn(hour) -> hour.day_of_week == day_of_week end)
+  end
+
+  defp get_hours(location, {:holiday, holiday}) do
+    location.id
+    |> HolidayHours.all()
+    |> Enum.filter(fn(hour) -> hour.holiday_name == holiday end)
+  end
+
+  defp get_day_of_week({_year, 12, 25}), do: {:holiday, "Christmas"}
+  defp get_day_of_week({_year, 12, 31}), do: {:holiday, "New Year's Eve"}
+  defp get_day_of_week({_year, 1, 1}), do: {:holiday, "New Year's Day"}
+  defp get_day_of_week({_year, 7, 4}), do: {:holiday, "4th of July"}
+
+  defp get_day_of_week({year, month, day}) do
+    index = Calendar.ISO.day_of_week(year, month, day) |> Kernel.-(1)
+    {:normal, Enum.at(@days_of_week, index)}
   end
 
 end

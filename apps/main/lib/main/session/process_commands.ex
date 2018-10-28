@@ -18,8 +18,6 @@ defmodule Session.ProcessCommand do
   Handle messages when session is open and not in a current command state
   """
   def call(%Session{request: request} = session, deps \\ @deps) do
-    Logger.info inspect(deps)
-    Logger.info inspect(request)
     log(session, "INBOUND", deps)
 
     alert_admins(request, deps)
@@ -30,7 +28,6 @@ defmodule Session.ProcessCommand do
   end
 
   defp process_command(command, %Session{request: request} = session, deps \\ @deps) do
-    Logger.info "COMMAND: #{inspect command}"
     command
     |> deps.storage.get_message(request.to)
     |> build_message(request)

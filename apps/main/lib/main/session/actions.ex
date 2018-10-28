@@ -6,18 +6,16 @@ defmodule Session.Actions do
 
   @admin_url Application.get_env(:session, :admin_url, "http://example.com")
 
-  def ask_question(body) do
-    # WitClient.MessageSupervisor.ask_question(self(), body)
-    # receive do
-    #   {:response, :unknown} ->
-    #     "HELP"
-    #   {:response, command} ->
-    #     String.upcase(command)
-    #   {:error, error} ->
-    #     Logger.info error
-    #     "HELP"
-    # end
-    {"getHours", "Monday"}
+  def ask_question(question) do
+    WitClient.MessageSupervisor.ask_question(self(), question)
+    receive do
+      {:response, :unknown} ->
+        "HELP"
+      {:response, response} ->
+        response
+      {:error, error} ->
+        "HELP"
+    end
   end
 
   @doc """
@@ -43,7 +41,6 @@ defmodule Session.Actions do
     do: deps.chatbot.send(response)
 
   def alert_admins(request, deps) do
-    Logger.info "Admin URL is #{inspect @admin_url}"
     body = """
     Message From: #{request.from}
     #{request.body}
