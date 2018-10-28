@@ -97,6 +97,8 @@ defmodule Data.Intent do
     end
   end
 
+  def get_message({:unknown, _args}, _), do: @default_error
+
   defp convert_to_day(<< year :: binary-size(4), "-", month :: binary-size(2), "-", day :: binary-size(2), _rest :: binary >>) do
     {String.to_integer(year), String.to_integer(month), String.to_integer(day)} |> get_day_of_week()
   end
