@@ -32,7 +32,7 @@
                             <div class="fht-cell"></div>
                         </th>
                         <th style="">
-                            <%= if assigns[:current_user].role == "admin" do %> 
+                            <%= if assigns[:current_user].role == "admin" && @networks == [] do %> 
                                 <a href="<%= team_location_wifi_network_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-success">New</a>
                             <% end %>
                         </th>
