@@ -33,6 +33,6 @@ defmodule Session.ProcessCommand do
     |> build_message(request)
     |> send_message(deps)
 
-    {:ok, Map.merge(session, %{current_command: command})}
+    {:ok, session}
   end
 end

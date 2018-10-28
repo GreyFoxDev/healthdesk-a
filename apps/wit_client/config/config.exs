@@ -1,4 +1,4 @@
 use Mix.Config
 
 config :wit_client,
-  access_token: "36K6CN24NZI7Q355TMMDCVV2AO67LU67"
+  access_token: Map.fetch!(System.get_env(), "WIT_ACCESS_TOKEN")
