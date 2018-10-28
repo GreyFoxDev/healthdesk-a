@@ -74,15 +74,14 @@ defmodule Data.Intent do
   end
 
   def get_message({"getHours", args}, phone_number) do
-
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
-         day_of_week <- convert_to_day(args),
-         [hours] <- get_hours(l, day_of_week)
-      do
-        [hours.open_at, hours.close_at] |> Enum.join(" - ")
-      else
-        _ ->
-          @default_error
+         {_, day} = day_of_week <- convert_to_day(args),
+           [hours] <- get_hours(l, day_of_week) do
+
+      "On #{day}, the hours are #{hours.open_at} to #{hours.close_at}"
+    else
+      _ ->
+        @default_error
     end
   end
 
