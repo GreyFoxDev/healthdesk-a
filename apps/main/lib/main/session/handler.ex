@@ -38,7 +38,6 @@ defmodule Session.Handler do
       |> Map.put(:ttl, reset_ttl(self(), state))
       |> Session.ProcessCommand.call()
 
-    {:ok, _log} = Actions.log(new_state, "INBOUND", @deps)
     {:noreply, new_state}
   end
 
