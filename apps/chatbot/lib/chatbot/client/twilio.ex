@@ -7,6 +7,8 @@ defmodule Chatbot.Client.Twilio do
 
   """
 
+  require Logger
+
   def call(%Chatbot.Params{provider: :twilio} = params) do
     ExTwilio.Message.create(
       from: params.from,
@@ -22,7 +24,8 @@ defmodule Chatbot.Client.Twilio do
     |> case do
          %{status_code: 200} ->
            :ok
-         _error ->
+         error ->
+           Logger.error inspect(error)
            {:error, :error_sending_verification}
        end
   end
@@ -40,7 +43,8 @@ defmodule Chatbot.Client.Twilio do
     |> case do
          %{status_code: 200} ->
            :ok
-         _error ->
+         error ->
+           Logger.error inspect(error)
            {:error, :unauthorized}
        end
   end
