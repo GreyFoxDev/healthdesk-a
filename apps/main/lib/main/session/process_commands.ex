@@ -20,8 +20,6 @@ defmodule Session.ProcessCommand do
   def call(%Session{request: request} = session, deps \\ @deps) do
     log(session, "INBOUND", deps)
 
-    alert_admins(request, deps)
-
     request.body
     |> ask_question()
     |> process_command(session)
