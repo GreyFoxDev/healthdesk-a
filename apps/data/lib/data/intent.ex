@@ -66,8 +66,9 @@ defmodule Data.Intent do
 
   def get_message({"getChildCareHours", args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
+         {_, day} = day_of_week <- convert_to_day(args),
          hours <- ChildCareHours.all(l.id),
-           [hours] <- Enum.filter(hours, fn(hour) -> hour.day_of_week == args end)
+           [hours] <- Enum.filter(hours, fn(hour) -> hour.day_of_week == day end)
       do
       [
         "Morning hours are: #{hours.morning_open_at} - #{hours.morning_close_at}\n",
