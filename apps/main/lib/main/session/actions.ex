@@ -31,7 +31,8 @@ defmodule Session.Actions do
       from: request.from,
       to: request.to
     }
-    |> deps.storage.log_request()
+    |> inspect()
+    |> Logger.info()
   end
 
   @doc """
