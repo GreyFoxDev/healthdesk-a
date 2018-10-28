@@ -8,3 +8,12 @@ config :main, MainWeb.Endpoint,
   secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE")
 
 config :logger, level: :info
+
+config :main, MainWeb.Auth.Guardian,
+  issuer: "MainWeb",
+  ttl: {1, :days},
+  secret_key:  Map.fetch!(System.get_env(), "SECRET_KEY_BASE")
+
+config :main, MainWeb.Auth.AuthAccessPipeline,
+  module: MainWeb.Auth.Guardian,
+  error_handler: MainWeb.Auth.AuthErrorHandler
