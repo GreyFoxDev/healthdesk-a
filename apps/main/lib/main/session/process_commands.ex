@@ -15,7 +15,7 @@ defmodule Session.ProcessCommand do
   @doc """
   Handle messages when session is open and not in a current command state
   """
-  def call(%Session{request: request} = session, deps \\ @deops) do
+  def call(%Session{request: request} = session, deps \\ @deps) do
     log(session, "INBOUND", deps)
 
     alert_admins(request, deps)

@@ -7,16 +7,17 @@ defmodule Session.Actions do
   @admin_url Application.get_env(:session, :admin_url, "http://example.com")
 
   def ask_question(body) do
-    # DialogFlow.MessageSupervisor.ask_question(self(), body)
-    receive do
-      {:response, :unknown} ->
-        "HELP"
-      {:response, {intent, args}} ->
-        {intent, args}
-      {:error, error} ->
-        Logger.info error
-        "HELP"
-    end
+    # WitClient.MessageSupervisor.ask_question(self(), body)
+    # receive do
+    #   {:response, :unknown} ->
+    #     "HELP"
+    #   {:response, command} ->
+    #     String.upcase(command)
+    #   {:error, error} ->
+    #     Logger.info error
+    #     "HELP"
+    # end
+    {"getHours", "Monday"}
   end
 
   @doc """
@@ -45,19 +46,13 @@ defmodule Session.Actions do
     body = """
     Message From: #{request.from}
     #{request.body}
-
-    https://elixir-chatbot.herokuapp.com
-
     """
 
-    deps.storage.admin_numbers
-    |> Enum.map(fn(number) ->
-      send_message(%{
-            provider: request.provider,
-            body: body,
-            to: number,
-            from: request.to}, deps)
-    end)
+    send_message(%{
+          provider: request.provider,
+          body: body,
+          to: "9042392310",
+          from: request.to}, deps)
   end
 
   @doc """
