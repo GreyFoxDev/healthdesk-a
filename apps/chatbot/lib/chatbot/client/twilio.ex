@@ -18,7 +18,7 @@ defmodule Chatbot.Client.Twilio do
   end
 
   def verify(phone_number) do
-    [authy_url(), "via=sms&phone_number=", phone_number, "&country_code=1"]
+    [authy_url(), "via=sms&code_length=6&phone_number=", phone_number, "&country_code=1"]
     |> Enum.join
     |> HTTPoison.post!("", authy_header())
     |> case do
