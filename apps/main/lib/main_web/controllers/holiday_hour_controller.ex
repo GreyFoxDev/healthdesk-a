@@ -38,6 +38,9 @@ defmodule MainWeb.HolidayHourController do
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- HolidayHours.get_changeset(id, user) do
 
+      date = convert_date(changeset.data.holiday_date)
+      data = Map.merge(changeset.data, %{holiday_date: date})
+      changeset = Map.merge(changeset, %{data: data})
       render(conn, "edit.html",
         changeset: changeset,
         location: location,
@@ -98,6 +101,9 @@ defmodule MainWeb.HolidayHourController do
            |> render_page("index.html", team_id, location_id)
        end
   end
+
+  defp convert_date(date) when date in ["", nil], do: ""
+  defp convert_date(date), do: Date.to_string(date)
 
   defp render_page(conn, page, changeset, errors \\ []) do
     render(conn, page,
