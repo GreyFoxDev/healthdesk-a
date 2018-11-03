@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">Teams</h1>
+        <h1 class="page-header">Team Members for <%= @team.team_name %></h1>
     </div>
 </div><!--/.row-->
 
@@ -24,7 +24,7 @@
                         </th>
                         <th style="">
                             <div class="th-inner sortable">
-                                Team Name
+                                Team Member
                                 <span class="order">
                                     <span class="caret" style="margin: 10px 5px;"></span>
                                 </span>
@@ -33,71 +33,43 @@
                         </th>
                         <th style="">
                             <div class="th-inner sortable">
-                                Website
+                                Phone Number
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                Email
                             </div>
                             <div class="fht-cell"></div>
                         </th>
                         <th style="">
                             <%= if assigns[:current_user].role == "admin" do %> 
-                                <a href="<%= team_path(@conn, :new) %>" class="btn btn-success">New</a>
+                                <a href="<%= team_team_member_path(@conn, :new, @team.id) %>" class="btn btn-success">New</a>
                             <% end %>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <%= if @teams == [] do %>
+                    <%= if @team_members == [] do %>
                         <tr class="no-records-found">
                             <td colspan="5">No matching records found</td>
                         </tr>
                     <% end %>
-                    <%= for team <- @teams do %>
+                    <%= for team_member <- @team_members do %>
                         <tr>
                             <td></td>
-                            <td><%= team.team_name %></td>
-                            <td><%= team.website %></td>
+                            <td><%= Enum.join([team_member.user.first_name, team_member.user.last_name], " ") %></td>
+                            <td><%= team_member.user.phone_number %></td>
+                            <td><%= team_member.user.email %></td>
                             <td>
-                                <%= link "Delete", to: team_path(@conn, :delete, team.id), method: "delete", class: "btn btn-danger" %>
-                                <a href="<%= team_path(@conn, :edit, team.id) %>" class="btn btn-primary">Edit</a>
-                                <a href="<%= team_location_path(@conn, :index, team.id) %>" class="btn btn-primary">Locations</a>
-                                <a href="<%= team_team_member_path(@conn, :index, team.id) %>" class="btn btn-primary">Team Members</a>
+                                <%= link "Delete", to: team_team_member_path(@conn, :delete, @team.id, team_member.id), method: "delete", class: "btn btn-danger" %>
+                                <a href="<%= team_team_member_path(@conn, :edit, @team.id, team_member.id) %>" class="btn btn-primary">Edit</a>
                             </td>
                         </tr>
                     <% end %>
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade"
-     id="viewModal"
-     tabindex="-1"
-     role="dialog"
-     aria-hidden="true">
-
-    <div class="modal-dialog" role="document" data-bind="visible: true, with: gym">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h3 class="modal-title">Gym Details</h4>
-                <br />
-            </div>
-            <div class="modal-body">
-                <dl class="dl-horizontal">
-                    <dt>Name:</dt>
-                    <dd data-bind="text: name"></dd>
-                </dl>
-                <dl class="dl-horizontal">
-                    <dt>Phone Number:</dt>
-                    <dd data-bind="text: phone_number"></dd>
-                </dl>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
         </div>
     </div>
 </div>

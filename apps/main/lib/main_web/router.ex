@@ -38,6 +38,7 @@ defmodule MainWeb.Router do
         resources "/wifi-network", WifiNetworkController
         resources "/pricing-plans", PricingPlanController
       end
+      resources "/team-members", TeamMemberController
     end
 
     resources "/users", UserController

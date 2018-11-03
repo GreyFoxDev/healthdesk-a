@@ -1,0 +1,32 @@
+<div class="panel-body">
+    <div class="col-md-6">
+        <%= form_for @data, @action, fn f -> %>
+        <div class="form-group">
+            <label>Location</label>
+            <%= select f, :location_id, @locations, class: "form-control" %>
+        </div>
+
+        <%= inputs_for f, :user, fn u -> %> 
+            <div class="form-group">
+                <label>First Name</label>
+                <%= text_input u, :first_name, class: "form-control" %>
+                <label>Last Name</label>
+                <%= text_input u, :last_name, class: "form-control" %>
+                <label>Phone Number</label>
+                <%= text_input u, :phone_number, class: "form-control" %>
+                <label>Email</label>
+                <%= text_input u, :email, class: "form-control" %>
+            </div>
+        <% end %> 
+
+
+
+    </div>
+    <div class="col-md-8">
+        <div class="form-group">
+            <%= submit "Save", class: "btn btn-primary" %>
+            <%= link "Cancel", to: team_team_member_path(@conn, :index, @team_id)  %>
+        </div>
+        <% end %>
+    </div>
+</div>

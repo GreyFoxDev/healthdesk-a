@@ -33,8 +33,8 @@ defmodule Data.Schema.Location do
 
     belongs_to(:team, Data.Schema.Team)
 
-    # has_many(:team_members)
-    # has_many(:users, through: [:team_members, :users])
+    has_many(:team_members, Data.Schema.TeamMember)
+    has_many(:users, through: [:team_members, :users])
 
     timestamps()
   end

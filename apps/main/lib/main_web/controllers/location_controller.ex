@@ -5,8 +5,6 @@ defmodule MainWeb.LocationController do
 
   def index(conn, %{"team_id" => team_id} = params) do
 
-    IO.inspect params
-
     team =
       conn
       |> current_user()
@@ -15,7 +13,6 @@ defmodule MainWeb.LocationController do
     locations =
       conn
       |> current_user()
-      |> IO.inspect
       |> Location.get_by_team_id(team_id)
 
     render conn, "index.html", locations: locations, team: team
