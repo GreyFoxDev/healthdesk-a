@@ -58,7 +58,7 @@
                     <% end %>
                     <%= for team_member <- @team_members do %>
                         <tr>
-                            <td></td>
+                            <td><img src="<%= team_member.avatar %>" heigh="40" width="40" </td>
                             <td><%= Enum.join([team_member.user.first_name, team_member.user.last_name], " ") %></td>
                             <td><%= team_member.user.phone_number %></td>
                             <td><%= team_member.user.email %></td>

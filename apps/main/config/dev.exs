@@ -32,3 +32,8 @@ config :main, MainWeb.Auth.Guardian,
 config :main, MainWeb.Auth.AuthAccessPipeline,
   module: MainWeb.Auth.Guardian,
   error_handler: MainWeb.Auth.AuthErrorHandler
+
+config :ex_aws,
+  access_key_id: System.get_env("HD_AWS_ACCESS_KEY"),
+  secret_access_key: System.get_env("HD_AWS_SECRET_ACCESS_KEY"),
+  bucket: System.get_env("HD_AWS_BUCKET")

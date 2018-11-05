@@ -52,6 +52,29 @@ defmodule MainWeb.TeamMemberController do
     end
   end
 
+  def create(conn, %{"team_member" => %{"image" => _} = team_member, "team_id" => team_id} = params) do
+    with {:ok, _pid} <- User.create(team_member["user"]),
+         {:ok, %Data.Schema.User{} = user} <- User.get_by_phone(team_member["user"]["phone_number"]),
+         {:ok, avatar} <- Uploader.upload_image(team_member["image"].path),
+         {:ok, _pid} <- TeamMember.create(%{location_id: team_member["location_id"], user_id: user.id, team_id: team_id, avatar: avatar}) do
+      conn
+      |> put_flash(:success, "Team Member created successfully.")
+      |> redirect(to: team_team_member_path(conn, :index, team_id))
+    else
+      {:error, changeset} ->
+
+        locations =
+          conn
+          |> current_user()
+          |> Location.get_by_team_id(team_id)
+          |> Enum.map(&{&1.location_name, &1.id})
+
+        conn
+        |> put_flash(:error, "Team Member failed to create")
+        |> render("new.html", changeset: changeset, locations: locations, team_id: team_id, errors: changeset.errors)
+    end
+  end
+
   def create(conn, %{"team_member" => team_member, "team_id" => team_id} = params) do
     with {:ok, _pid} <- User.create(team_member["user"]),
          {:ok, %Data.Schema.User{} = user} <- User.get_by_phone(team_member["user"]["phone_number"]),
@@ -71,6 +94,29 @@ defmodule MainWeb.TeamMemberController do
         conn
         |> put_flash(:error, "Team Member failed to create")
         |> render("new.html", changeset: changeset, locations: locations, team_id: team_id, errors: changeset.errors)
+    end
+  end
+
+  def update(conn, %{"id" => id, "team_member" => %{"image" => _} = team_member, "team_id" => team_id}) do
+    with %Data.Schema.TeamMember{} = member <- TeamMember.get(current_user(conn), id),
+         {:ok, avatar} <- Uploader.upload_image(team_member["image"].path),
+         {:ok, _pid} <- TeamMember.update(id, %{location_id: team_member["location_id"], avatar: avatar}),
+         {:ok, _pid} <- User.update(member.user_id, team_member["user"]) do
+
+      conn
+      |> put_flash(:success, "Team Member deleted successfully.")
+      |> redirect(to: team_team_member_path(conn, :index, team_id))
+    else
+      {:error, changeset} ->
+        locations =
+          conn
+          |> current_user()
+          |> Location.get_by_team_id(team_id)
+          |> Enum.map(&{&1.location_name, &1.id})
+
+        conn
+        |> put_flash(:error, "Team Member failed to delete")
+        |> render("edit.html", changeset: changeset, locations: locations, team_id: team_id, errors: changeset.errors)
     end
   end
 

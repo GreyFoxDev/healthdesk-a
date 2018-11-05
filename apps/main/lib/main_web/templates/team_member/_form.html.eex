@@ -1,12 +1,12 @@
 <div class="panel-body">
     <div class="col-md-6">
-        <%= form_for @data, @action, fn f -> %>
+        <%= form_for @data, @action, [id: "team_form", multipart: true], fn f -> %>
         <div class="form-group">
             <label>Location</label>
             <%= select f, :location_id, @locations, class: "form-control" %>
         </div>
 
-        <%= inputs_for f, :user, fn u -> %> 
+        <%= inputs_for f, :user, fn u -> %>
             <div class="form-group">
                 <label>First Name</label>
                 <%= text_input u, :first_name, class: "form-control" %>
@@ -19,8 +19,17 @@
             </div>
         <% end %> 
 
+        <div class="form-group">
 
+            <%= if @data.data.avatar && @data.data.avatar != "" do %> 
+                <img id="avatar" src="<%= @data.data.avatar %>" height="40" width="40" >
+                <a id="removeImage" href="#">Remove</a>
+            <% end %>
 
+            <br />
+            <%= label f, :image, class: "control-label" %>
+            <%= file_input f, :image, class: "form-control" %>
+        </div>
     </div>
     <div class="col-md-8">
         <div class="form-group">
@@ -30,3 +39,20 @@
         <% end %>
     </div>
 </div>
+
+
+<script>
+ $("#removeImage").click(function(e) {
+     e.preventDefault(); // prevent default action of link
+
+     $.ajax({
+         url: '/api/remove-avatar',
+         type: 'PUT',
+         data: "id=<%= @data.data.id %>",
+         success: function(data) {
+             $("#avatar").toggle();
+             $("#removeImage").toggle();
+         }
+     });
+ });
+</script>

@@ -46,7 +46,12 @@ defmodule Main.Mixfile do
       {:guardian, "~> 1.0"},
       {:data, in_umbrella: true},
       {:chatbot, in_umbrella: true},
-      {:wit_client, in_umbrella: true}
+      {:wit_client, in_umbrella: true},
+      {:ex_aws, "~> 2.1"},
+      {:ex_aws_s3, "~> 2.0"},
+      {:hackney, "~> 1.9"},
+      {:sweet_xml, "~> 0.6"},
+      {:uuid, "~> 1.1"}
     ]
   end
 end

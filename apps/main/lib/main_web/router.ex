@@ -50,5 +50,6 @@ defmodule MainWeb.Router do
     pipe_through :api
 
     post "/sms/twilio", TwilioController, :create
+    put "/remove-avatar", AvatarController, :remove_avatar
   end
 end
