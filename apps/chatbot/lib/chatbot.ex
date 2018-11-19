@@ -26,8 +26,10 @@ defmodule Chatbot do
     do: GenServer.cast(Chatbot, {:inbound, params})
 
   def handle_cast({:inbound, params}, state) do
+    Logger.info "sending message..."
     with {:ok, params} <- Params.build(params),
          {:ok, pid} when is_pid(pid) <- MessageSupervisor.send_message(params) do
+      Logger.info "message sent..."
     else
       error ->
         IO.inspect(error)

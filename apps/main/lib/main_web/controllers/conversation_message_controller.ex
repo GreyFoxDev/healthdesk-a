@@ -3,6 +3,8 @@ defmodule MainWeb.ConversationMessageController do
 
   alias Data.{ConversationMessages, Conversations, Location, TeamMember}
 
+  require Logger
+
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
   def index(conn, %{"location_id" => location_id, "conversation_id" => conversation_id} = params) do
@@ -53,10 +55,12 @@ defmodule MainWeb.ConversationMessageController do
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-           @chatbot.send(%{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["converstation_message"]["message"]})
-           put_flash(conn, :success, "Holiday Hours created successfully.")
+           message = %{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
+           Logger.info "Message created ************* #{inspect @chatbot} #{inspect message}"
+           @chatbot.send(message)
+           put_flash(conn, :success, "Sending message was successful")
          {:error, changeset} ->
-           put_flash(conn, :error, "Holiday Hours failed to create")
+           put_flash(conn, :error, "Sending message failed")
        end
 
     redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, conversation.id))
