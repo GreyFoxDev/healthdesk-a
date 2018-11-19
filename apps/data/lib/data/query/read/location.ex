@@ -32,10 +32,11 @@ defmodule Data.Query.ReadOnly.Location do
     )
     |> Repo.all()
     |> case do
-         [] ->
-           nil
-         [location] ->
-           location
-       end
+      [] ->
+        nil
+
+      [location] ->
+        location
+    end
   end
 end

@@ -32,6 +32,7 @@ defmodule Data.Schema.HolidayHour do
 
   def changeset(model, params \\ %{}) do
     params = convert_date(params)
+
     model
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
@@ -39,7 +40,12 @@ defmodule Data.Schema.HolidayHour do
 
   defp convert_date(%{"holiday_date" => ""} = params), do: params
 
-  defp convert_date(%{"holiday_date" => << _y :: binary-size(4), "-", _m :: binary-size(2), "-", _d :: binary-size(2) >> = date} = params) do
+  defp convert_date(
+         %{
+           "holiday_date" =>
+             <<_y::binary-size(4), "-", _m::binary-size(2), "-", _d::binary-size(2)>> = date
+         } = params
+       ) do
     Map.merge(params, %{"holiday_date" => "#{date} 00:00:00Z"})
   end
 

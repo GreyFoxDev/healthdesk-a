@@ -30,7 +30,7 @@ defmodule Data.User do
       {:ok, user}
     else
       nil ->
-        if attempt == 1  do
+        if attempt == 1 do
           :timer.sleep(100)
           get_by_phone(phone_number, 2)
         else

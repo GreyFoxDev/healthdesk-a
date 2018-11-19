@@ -14,5 +14,4 @@ defmodule WitClient.MessageSupervisor do
 
   def ask_question(pid, question),
     do: Supervisor.start_child(@supervisor, [pid, question])
-
 end

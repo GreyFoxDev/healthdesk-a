@@ -7,6 +7,7 @@ defmodule WitClient.Application do
     children = [
       {WitClient.MessageSupervisor, []}
     ]
+
     opts = [strategy: :one_for_one, name: WitClient.Supervisor]
     Supervisor.start_link(children, opts)
   end

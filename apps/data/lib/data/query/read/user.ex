@@ -20,10 +20,11 @@ defmodule Data.Query.ReadOnly.User do
     )
     |> Repo.all()
     |> case do
-         [] ->
-           nil
-         [location] ->
-           location
-       end
+      [] ->
+        nil
+
+      [location] ->
+        location
+    end
   end
 end

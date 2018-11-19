@@ -4,6 +4,8 @@ defmodule Session.Actions do
 
   require Logger
 
+  @default_error "Not sure about that. Give me a minute...\n"
+
   def ask_question(question) do
     WitClient.MessageSupervisor.ask_question(self(), question)
     receive do
@@ -29,6 +31,8 @@ defmodule Session.Actions do
     }
     |> inspect()
     |> Logger.info()
+
+    session
   end
 
   @doc """
@@ -50,5 +54,62 @@ defmodule Session.Actions do
       """,
       to: from,
       from: to}
+  end
+
+  def start_or_update_conversation(%Session{request: request} = session) do
+    with nil <- Data.Commands.Conversations.get_by_phone(request.from),
+         %Data.Schema.Location{} = location <- Data.Commands.Location.get_by_phone(request.to) do
+      %{
+        "location_id" => location.id,
+        "original_number" => request.from,
+        "status" => "open",
+        "started_at" => DateTime.utc_now()
+      }
+      |> Data.Commands.Conversations.write()
+
+      :timer.sleep(1000)
+
+      conversation = Data.Commands.Conversations.get_by_phone(request.from)
+
+      %{
+        "phone_number" => request.from,
+        "message" => request.body,
+        "sent_at" => DateTime.utc_now(),
+        "conversation_id" => conversation.id} |> Data.Commands.ConversationMessages.write()
+
+      conversation
+    else
+      %Data.Schema.Conversation{} = conversation ->
+        %{
+          "phone_number" => request.from,
+          "message" => request.body,
+          "sent_at" => DateTime.utc_now(),
+          "conversation_id" => conversation.id} |> Data.Commands.ConversationMessages.write()
+      conversation
+    end
+  end
+
+  def update_conversation(%{body: body} = message, conversation) when body == @default_error do
+    IO.inspect body, label: "DEFAULT ERROR"
+    %{
+      "phone_number" => message.from,
+      "message" => @default_error,
+      "sent_at" => DateTime.utc_now(),
+      "conversation_id" => conversation.id} |> Data.Commands.ConversationMessages.write()
+
+    message
+  end
+
+  def update_conversation(%{body: body, from: from} = message, conversation) do
+    IO.inspect body, label: "NOT DEFAULT"
+    %{
+      "phone_number" => from,
+      "message" => body,
+      "sent_at" => DateTime.utc_now(),
+      "conversation_id" => conversation.id} |> Data.Commands.ConversationMessages.write()
+
+    Data.Commands.Conversations.write(conversation, %{"status" => "closed"})
+
+    message
   end
 end

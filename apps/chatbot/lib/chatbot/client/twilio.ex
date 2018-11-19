@@ -10,6 +10,8 @@ defmodule Chatbot.Client.Twilio do
   require Logger
 
   def call(%Chatbot.Params{provider: :twilio} = params) do
+    Logger.info("SENDING TO TWILIO: #{inspect params}")
+
     ExTwilio.Message.create(
       from: params.from,
       to: params.to,
@@ -19,15 +21,16 @@ defmodule Chatbot.Client.Twilio do
 
   def verify(phone_number) do
     [authy_url(), "via=sms&code_length=6&phone_number=", phone_number, "&country_code=1"]
-    |> Enum.join
+    |> Enum.join()
     |> HTTPoison.post!("", authy_header())
     |> case do
-         %{status_code: 200} ->
-           :ok
-         error ->
-           Logger.error inspect(error)
-           {:error, :error_sending_verification}
-       end
+      %{status_code: 200} ->
+        :ok
+
+      error ->
+        Logger.error(inspect(error))
+        {:error, :error_sending_verification}
+    end
   end
 
   def check(phone_number, verification_code) do
@@ -38,15 +41,16 @@ defmodule Chatbot.Client.Twilio do
       "&country_code=1&verification_code=",
       verification_code
     ]
-    |> Enum.join
+    |> Enum.join()
     |> HTTPoison.get!(authy_header())
     |> case do
-         %{status_code: 200} ->
-           :ok
-         error ->
-           Logger.error inspect(error)
-           {:error, :unauthorized}
-       end
+      %{status_code: 200} ->
+        :ok
+
+      error ->
+        Logger.error(inspect(error))
+        {:error, :unauthorized}
+    end
   end
 
   defp authy_key,

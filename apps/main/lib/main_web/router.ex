@@ -32,6 +32,11 @@ defmodule MainWeb.Router do
 
     resources "/teams", TeamController do
       resources "/locations", LocationController do
+        resources "/conversations", ConversationController do
+          resources "/conversation-messages", ConversationMessageController
+          put "/close", ConversationController, :close
+          put "/open", ConversationController, :open
+        end
         resources "/holiday-hours", HolidayHourController
         resources "/normal-hours", NormalHourController
         resources "/child-care-hours", ChildCareHourController
@@ -51,5 +56,6 @@ defmodule MainWeb.Router do
 
     post "/sms/twilio", TwilioController, :create
     put "/remove-avatar", AvatarController, :remove_avatar
+    put "/assign-team-member", AssignTeamMemberController, :assign
   end
 end

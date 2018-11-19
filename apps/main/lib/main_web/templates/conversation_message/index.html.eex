@@ -1,0 +1,147 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Messages from <%= @conversation.original_number %></h1>
+    </div>
+    <%= if @conversation.status == "open" do %>
+        <div class="col-lg-12">
+            Assign Conversation to: <select id="assigned_id">
+            <option value="">Select Team Member</option>
+            <%= for team_member <- @team_members do %>
+                <%= if @conversation.team_member_id == team_member.id do %>
+                    <option value="<%= team_member.id %>" selected><%= team_member.user.first_name %> <%= team_member.user.last_name %></option>
+                <% else %>
+                    <option value="<%= team_member.id %>"><%= team_member.user.first_name %> <%= team_member.user.last_name %></option>
+                <% end %>
+            <% end %>
+            </select>
+            <input type="button" value="Assign" id="assign_team_member">
+            <script>
+             $("#assign_team_member").click(function(e) {
+                 e.preventDefault(); // prevent default action of link
+                 val = $("#assigned_id").val(); 
+
+                 if (val == "") {
+                     alert("Please select a team member before trying to assign.");
+                 } else {
+                     $.ajax({
+                         url: '/api/assign-team-member',
+                         type: 'PUT',
+                         data: "id=<%=  @conversation.id %>&location_id=<%= @location.id %>&team_member_id=" + val,
+                         success: function(data) {
+                             alert("Assigned")
+                         }
+                     });
+                 };
+
+             });
+            </script>
+        </div>
+    <% end %>
+</div><!--/.row-->
+
+<div class="row">
+    <div class="fixed-table-container">
+        <div class="fixed-table-header">
+            <table>
+            </table>
+        </div>
+        <div class="fixed-table-body">
+            <div class="fixed-table-loading" style="top: 37px; display: none;">
+                Loading, please wait…
+            </div>
+
+            <table data-toggle="table" data-url="tables/data1.json" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true" data-sort-name="name" data-sort-order="desc" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="bs-checkbox " style="width: 36px; ">
+                            <div class="th-inner ">
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                From
+                                <span class="order">
+                                    <span class="caret" style="margin: 10px 5px;"></span>
+                                </span>
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                Message
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                Sent at
+
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <%= if @conversation.status == "open" do %>
+                                <div class="th-inner sortable">
+                                    <%= link "Close", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @conversation.id), method: "put", class: "btn btn-danger" %>
+                                </div>
+                                <div class="fht-cell"></div>
+                            <% else %>
+                                <div class="th-inner sortable">
+                                    <%= link "Open", to: team_location_conversation_conversation_path(@conn, :open, @location.team_id, @location.id, @conversation.id), method: "put", class: "btn btn-danger" %>
+                                </div>
+                                <div class="fht-cell"></div>
+                            <% end %>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%= if @messages == [] do %>
+                        <tr class="no-records-found">
+                            <td colspan="5">No matching records found</td>
+                        </tr>
+                    <% end %>
+                    <%= for message <- @messages do %>
+                        <tr>
+                            <td></td>
+                            <td><%= message.phone_number %></td>
+                            <td><%= message.message %></td>
+                            <td><%= message.sent_at %></td>
+                            <td></td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+
+            <%= if @conversation.status == "open" do %>
+                <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Send Reply to <%= @conversation.original_number %></div>
+                        <div class="panel-body">
+                            <%= form_for @changeset, team_location_conversation_conversation_message_path(@conn, :create, @location.team_id, @location.id, @conversation.id), fn f -> %>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <%= textarea f, :message, class: "form-control", height: 150 %>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <%= submit "Send", class: "btn btn-primary" %>
+                                    </div>
+                                </div>
+                            <% end %>
+                        </div>
+
+                    </div>
+                </div>
+
+            <% end %>
+            </div>
+
+
+
+            <a href="<%= team_location_conversation_path(@conn, :index, @location.team_id, @location.id) %>" class="btn btn-primary">Conversations</a>
+        </div>
+    </div>
+</div>

@@ -18,6 +18,12 @@ defmodule Data.TeamMember do
   def all(%{role: role}) when role in @roles,
     do: TeamMember.all()
 
+  def all(%{role: role}, location_id) when role in @roles,
+    do: TeamMember.get_by_location(location_id)
+
+  def all(_, _),
+    do: {:error, :invalid_permissions}
+
   def all(_),
     do: {:error, :invalid_permissions}
 

@@ -38,17 +38,22 @@ defmodule Data.Query.ReadOnly.TeamMember do
     )
     |> Repo.all()
     |> case do
-         [] ->
-           nil
-         [team_member] ->
-           team_member
-       end
+      [] ->
+        nil
+
+      [team_member] ->
+        team_member
+    end
   end
 
   def get_by_location(location_id) do
     from(t in TeamMember,
-      where: is_nil(t.deleted_at),
-      where: t.location_id == ^location_id
-    ) |> Repo.all()
+      join: u in User,
+      where: t.user_id == u.id,
+      where: is_nil(u.deleted_at),
+      where: t.location_id == ^location_id,
+      preload: [:location, :user]
+    )
+    |> Repo.all()
   end
 end

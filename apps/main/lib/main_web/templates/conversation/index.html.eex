@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">Locations for <%= @team.team_name %></h1>
+        <h1 class="page-header">Conversations for <%= @location.location_name %></h1>
     </div>
 </div><!--/.row-->
 
@@ -24,7 +24,7 @@
                         </th>
                         <th style="">
                             <div class="th-inner sortable">
-                                Location Name
+                                From
                                 <span class="order">
                                     <span class="caret" style="margin: 10px 5px;"></span>
                                 </span>
@@ -33,47 +33,53 @@
                         </th>
                         <th style="">
                             <div class="th-inner sortable">
-                                Phone Number
+                                Status
                             </div>
                             <div class="fht-cell"></div>
                         </th>
                         <th style="">
-                            <%= if assigns[:current_user].role == "admin" do %> 
-                                <a href="<%= team_location_path(@conn, :new, @team.id) %>" class="btn btn-success">New</a>
-                            <% end %>
+                            <div class="th-inner sortable">
+                                Started
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
+                            <div class="th-inner sortable">
+                                Assigned to
+                            </div>
+                            <div class="fht-cell"></div>
+                        </th>
+                        <th style="">
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <%= if @locations == [] do %>
+                    <%= if @conversations == [] do %>
                         <tr class="no-records-found">
                             <td colspan="5">No matching records found</td>
                         </tr>
                     <% end %>
-                    <%= for location <- @locations do %>
+                    <%= for conversation <- @conversations do %>
                         <tr>
                             <td></td>
-                            <td><%= location.location_name %></td>
-                            <td><%= location.phone_number %></td>
+                            <td><%= conversation.original_number %></td>
+                            <td><%= conversation.status %></td>
+                            <td><%= conversation.started_at %></td>
+                            <%= if conversation.team_member do %> 
+                                <td><img src="<%= conversation.team_member.avatar %>" alt="<%= conversation.team_member.user.last_name %>"></td>
+                            <% else %>
+                                <td>Bot</td>
+                            <% end %>
                             <td>
-                                <%= link "Delete", to: team_location_path(@conn, :delete, @team.id, location.id), method: "delete", class: "btn btn-danger" %>
-                                <a href="<%= team_location_path(@conn, :edit, @team.id, location.id) %>" class="btn btn-primary">Edit</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td colspan="3">
-                                <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="btn btn-primary">Hours</a>
-                                <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="btn btn-primary">Holiday Hrs</a>
-                                <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="btn btn-primary">Child Care Hrs</a>
-                                <a href="<%= team_location_wifi_network_path(@conn, :index, location.team_id, location.id) %>" class="btn btn-primary">Wifi</a>
-                                <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="btn btn-primary">Pricing Plan</a>
-                                <a href="<%= team_location_conversation_path(@conn, :index, location.team_id, location.id) %>" class="btn btn-primary">Conversations</a>
+                                <a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, conversation.id) %>" class="btn btn-primary">Messages</a>
                             </td>
                         </tr>
                     <% end %>
                 </tbody>
             </table>
+
+
+            <a href="<%= team_location_path(@conn, :index, @location.team_id) %>" class="btn btn-primary">Locations</a>
         </div>
     </div>
 </div>

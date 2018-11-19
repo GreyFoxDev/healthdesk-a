@@ -1,5 +1,4 @@
 defmodule Data.Intent do
-
   alias Data.Commands.{
     Location,
     NormalHours,
@@ -15,36 +14,33 @@ defmodule Data.Intent do
   def get_message({"getDayPass", _args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
          plans <- PricingPlan.all(l.id),
-           [%{daily: daily}] <- Enum.filter(plans, &(&1.has_daily == true))
-      do
+         [%{daily: daily}] <- Enum.filter(plans, &(&1.has_daily == true)) do
       "Day passes are #{daily}"
-      else
-        _ ->
-          @default_error
+    else
+      _ ->
+        "Unfortunately, we don't offer a day pass."
     end
   end
 
   def get_message({"getWeekPass", _args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
          plans <- PricingPlan.all(l.id),
-           [%{weekly: weekly}] <- Enum.filter(plans, &(&1.has_weekly == true))
-      do
+         [%{weekly: weekly}] <- Enum.filter(plans, &(&1.has_weekly == true)) do
       "Week passes are #{weekly}"
-      else
-        _ ->
-          @default_error
+    else
+      _ ->
+        "Unfortunately, we don't offer a week pass."
     end
   end
 
   def get_message({"getMonthPass", _args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
          plans <- PricingPlan.all(l.id),
-           [%{monthly: monthly}] <- Enum.filter(plans, &(&1.has_monthly == true))
-      do
+         [%{monthly: monthly}] <- Enum.filter(plans, &(&1.has_monthly == true)) do
       "Month passes are #{monthly}"
-      else
-        _ ->
-          @default_error
+    else
+      _ ->
+        "Unfortunately, we don't offer a month pass."
     end
   end
 
@@ -54,8 +50,9 @@ defmodule Data.Intent do
 
   def get_message({"getAddress", _args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number) do
-      address = [l.address_1, l.address_2, "#{l.city},", l.state, l.postal_code]
-      |> Enum.join(" ")
+      address =
+        [l.address_1, l.address_2, "#{l.city},", l.state, l.postal_code]
+        |> Enum.join(" ")
 
       "We are located at #{address}"
     else
@@ -68,23 +65,22 @@ defmodule Data.Intent do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
          {_, day} = day_of_week <- convert_to_day(args),
          hours <- ChildCareHours.all(l.id),
-           [hours] <- Enum.filter(hours, fn(hour) -> hour.day_of_week == day end)
-      do
+         [hours] <- Enum.filter(hours, fn hour -> hour.day_of_week == day end) do
       [
         "Morning hours are: #{hours.morning_open_at} - #{hours.morning_close_at}\n",
         "Afternoon hours are: #{hours.afternoon_open_at} - #{hours.afternoon_close_at}"
-      ] |> Enum.join
-      else
-        _ ->
-          @default_error
+      ]
+      |> Enum.join()
+    else
+      _ ->
+        @default_error
     end
   end
 
   def get_message({"getHours", args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
          {_, day} = day_of_week <- convert_to_day(args),
-           [hours] <- get_hours(l, day_of_week) do
-
+         [hours] <- get_hours(l, day_of_week) do
       "On #{day}, the hours are #{hours.open_at} to #{hours.close_at}"
     else
       _ ->
@@ -94,31 +90,35 @@ defmodule Data.Intent do
 
   def get_message({"getWifi", _args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
-         [wifi] <- WifiNetwork.all(l.id)
-      do
-      ["Here's the Wifi Info\nNetwork: ", wifi.network_name, " Password: ", wifi.network_pword] |> Enum.join()
-      else
-        _ ->
-          @default_error
+         [wifi] <- WifiNetwork.all(l.id) do
+      ["Here's the Wifi Info\nNetwork: ", wifi.network_name, " Password: ", wifi.network_pword]
+      |> Enum.join()
+    else
+      _ ->
+        "Unfortunately, we don't offer free WiFi."
     end
   end
 
   def get_message({:unknown, _args}, _), do: @default_error
 
-  defp convert_to_day(<< year :: binary-size(4), "-", month :: binary-size(2), "-", day :: binary-size(2), _rest :: binary >>) do
-    {String.to_integer(year), String.to_integer(month), String.to_integer(day)} |> get_day_of_week()
+  defp convert_to_day(
+         <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2),
+           _rest::binary>>
+       ) do
+    {String.to_integer(year), String.to_integer(month), String.to_integer(day)}
+    |> get_day_of_week()
   end
 
   defp get_hours(location, {:normal, day_of_week}) do
     location.id
     |> NormalHours.all()
-    |> Enum.filter(fn(hour) -> hour.day_of_week == day_of_week end)
+    |> Enum.filter(fn hour -> hour.day_of_week == day_of_week end)
   end
 
   defp get_hours(location, {:holiday, holiday}) do
     location.id
     |> HolidayHours.all()
-    |> Enum.filter(fn(hour) -> hour.holiday_name == holiday end)
+    |> Enum.filter(fn hour -> hour.holiday_name == holiday end)
   end
 
   defp get_day_of_week({_year, 12, 25}), do: {:holiday, "Christmas"}
@@ -130,5 +130,4 @@ defmodule Data.Intent do
     index = Calendar.ISO.day_of_week(year, month, day) |> Kernel.-(1)
     {:normal, Enum.at(@days_of_week, index)}
   end
-
 end

@@ -12,23 +12,28 @@ defmodule Session.ProcessCommand do
     chatbot: @chatbot,
     commands: @commands,
     storage: @storage
+
   }
 
   @doc """
   Handle messages when session is open and not in a current command state
   """
   def call(%Session{request: request} = session, deps \\ @deps) do
-    log(session, "INBOUND", deps)
+    conversation =
+      session
+      |> log("INBOUND", deps)
+      |> start_or_update_conversation()
 
     request.body
     |> ask_question()
-    |> process_command(session)
+    |> process_command(session, conversation)
   end
 
-  defp process_command(command, %Session{request: request} = session, deps \\ @deps) do
+  defp process_command(command, %Session{request: request} = session, conversation, deps \\ @deps) do
     command
     |> deps.storage.get_message(request.to)
     |> build_message(request)
+    |> update_conversation(conversation)
     |> send_message(deps)
 
     {:ok, session}
