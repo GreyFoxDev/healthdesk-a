@@ -26,7 +26,7 @@ defmodule Data.Conversations do
   def get(_, _), do: {:error, :invalid_permissions}
 
   def create(params),
-    do: Conversations.write(params)
+    do: Data.Query.WriteOnly.Conversation.write(params)
 
   def update(%{"id" => id} = params) do
     id

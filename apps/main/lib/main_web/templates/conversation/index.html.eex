@@ -1,85 +1,155 @@
-<div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">Conversations for <%= @location.location_name %></h1>
-    </div>
-</div><!--/.row-->
-
-<div class="row">
-    <div class="fixed-table-container">
-        <div class="fixed-table-header">
-            <table>
-            </table>
+<header class="page-title-bar">
+    <div class="d-flex justify-content-between">
+        <h1 class="page-title"> Conversations for <%= @location.location_name %></h1>
+        <div class="btn-toolbar">
+            <%= if assigns[:current_user].role == "admin" do %> 
+                <a href="<%= team_location_conversation_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-primary">
+                    <i class="fas fa-plus">&nbsp;</i> 
+                    New Conversation
+                </a>
+            <% end %>
         </div>
-        <div class="fixed-table-body">
-            <div class="fixed-table-loading" style="top: 37px; display: none;">
-                Loading, please wait…
+    </div>
+</header>
+
+<div class="page-section">
+    <section class="card card-fluid">
+        <header class="card-header nav-scroller">
+            <!-- .nav-tabs -->
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active show" data-toggle="tab" href="#project-assigned">Me (0)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#project-open">Open (<%= Enum.count(@conversations, fn(c) -> c.status == "open" end) %>)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#project-closed">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>
+                </li>
+            </ul><!-- /.nav-tabs -->
+        </header>
+
+        <div class="card-body">
+            <!-- grid row -->
+            <div class="row">
+                <!-- .col -->
+                <div class="col">
+                    <!-- .input-group -->
+                    <div class="input-group has-clearable">
+                        <button type="button" class="close" aria-label="Close"><span aria-hidden="true"><i class="fa fa-times-circle"></i></span></button>
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><span class="oi oi-magnifying-glass"></span></span>
+                        </div><input type="text" class="form-control" placeholder="Search">
+                    </div><!-- /.input-group -->
+                </div><!-- /.col -->
+                <!-- .col -->
+                <div class="col-auto d-none d-sm-flex">
+                    <!-- .dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last updated <span class="fa fa-caret-down"></span></button>
+                        <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
+                        <div class="dropdown-menu dropdown-menu-right stop-propagation">
+                            <h6 class="dropdown-header"> Sort By </h6><label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="0"> <span class="custom-control-label">Name</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="1"> <span class="custom-control-label">Name <span class="text-muted">(Decs)</span></span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="2" checked=""> <span class="custom-control-label">Last updated</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="3"> <span class="custom-control-label">Oldest updated</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="4"> <span class="custom-control-label">Last created</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="5"> <span class="custom-control-label">Oldest created</span></label>
+                        </div><!-- /.dropdown-menu -->
+                    </div><!-- /.dropdown -->
+                </div><!-- /.col -->
+            </div><!-- /grid row -->
+        </div>
+
+        <div class="text-muted px-3 mb-2">&nbsp;</div>
+
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="project-assigned" role="tabpanel" aria-labelledby="project-assigned-tab">
+                <%= if Enum.count(@conversations, &(&1.team_member_id == assigns[:current_user].id)) == 0 do %>
+                    <div class="alert alert-warning mx-3"> You have no assigned conversations for this location. </div>
+                <% end %>
             </div>
-            <table data-toggle="table" data-url="tables/data1.json" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true" data-sort-name="name" data-sort-order="desc" class="table table-hover">
-                <thead>
-                    <tr>
-                        <th class="bs-checkbox " style="width: 36px; ">
-                            <div class="th-inner ">
+            <div class="tab-pane fade" id="project-closed" role="tabpanel" aria-labelledby="project-closed-tab">
+                <%= if Enum.count(@conversations, &(&1.status == "closed")) == 0 do %>
+                    <div class="alert alert-warning mx-3"> There are no closed conversations for this location. </div>
+                <% end %>
+
+                <%= for c <- Enum.filter(@conversations, &(&1.status == "closed")) do %>
+                    <% team_member = (c.team_member || default_user()) %>
+                    <div class="list-group-item">
+                        <div class="list-group-item-figure">
+                            <a href="#" class="user-avatar user-avatar-md"><img src="<%= team_member.avatar  %>" alt=""></a>
+                        </div>
+                        <div class="list-group-item-body">
+                            <div class="d-sm-flex justify-content-sm-between align-items-sm-center">
+                                <div class="team">
+                                    <h4 class="list-group-item-title">
+                                        <b><%= team_member.user.first_name %> <%= team_member.user.last_name %></b>
+                                    </h4>
+                                    <p class="list-group-item-text"><%= String.replace(team_member.user.role, "_", " ") |> String.capitalize() %></p>
+                                </div>
+                                <div class="team">
+                                    <div class="list-group-item-title">
+                                        <b>+1 <%= format_phone(c.original_number) %></b>
+                                    </div>
+                                    <p class="list-group-item-text"><%= List.last(c.conversation_messages).message |> String.slice(0..100) %>...</p>
+                                </div>
+                                <div class="team">
+                                    <p class="list-group-item-text">
+                                        <%= List.last(c.conversation_messages).sent_at |> format_date() %>
+                                    </p>
+                                </div>
                             </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                From
-                                <span class="order">
-                                    <span class="caret" style="margin: 10px 5px;"></span>
-                                </span>
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                Status
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                Started
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                Assigned to
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%= if @conversations == [] do %>
-                        <tr class="no-records-found">
-                            <td colspan="5">No matching records found</td>
-                        </tr>
-                    <% end %>
-                    <%= for conversation <- @conversations do %>
-                        <tr>
-                            <td></td>
-                            <td><%= conversation.original_number %></td>
-                            <td><%= conversation.status %></td>
-                            <td><%= conversation.started_at %></td>
-                            <%= if conversation.team_member do %> 
-                                <td><img src="<%= conversation.team_member.avatar %>" alt="<%= conversation.team_member.user.last_name %>"></td>
-                            <% else %>
-                                <td>Bot</td>
-                            <% end %>
-                            <td>
-                                <a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, conversation.id) %>" class="btn btn-primary">Messages</a>
-                            </td>
-                        </tr>
-                    <% end %>
-                </tbody>
-            </table>
+                        </div>
+                        <div class="list-group-item-figure">
+                            <a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, c.id) %>" class="btn btn-sm btn-icon btn-secondary stop-propagation">...</a>
+                        </div>
+                    </div><!-- /.list-group-item -->
+                <% end %>
 
 
-            <a href="<%= team_location_path(@conn, :index, @location.team_id) %>" class="btn btn-primary">Locations</a>
+            </div>
+
+            <div class="tab-pane fade" id="project-open" role="tabpanel" aria-labelledby="project-open-tab">
+                <!-- .list-group -->
+                <div class="list-group list-group-flush list-group-divider">
+                        <!-- .list-group-item -->
+
+                    <%= if Enum.count(@conversations, &(&1.status == "open")) == 0 do %>
+                        <div class="alert alert-warning mx-3"> There are no open conversations for this location. </div>
+                    <% end %>
+
+                    <%= for c <- Enum.filter(@conversations, &(&1.status == "open")) do %>
+                        <% team_member = (c.team_member || default_user()) %>
+                        <div class="list-group-item">
+                            <div class="list-group-item-figure">
+                                <a href="#" class="user-avatar user-avatar-md"><img src="<%= team_member.avatar  %>" alt=""></a>
+                            </div>
+                            <div class="list-group-item-body">
+                                <div class="d-sm-flex justify-content-sm-between align-items-sm-center">
+                                    <div class="team">
+                                        <h4 class="list-group-item-title">
+                                            <b><%= team_member.user.first_name %> <%= team_member.user.last_name %></b>
+                                        </h4>
+                                        <p class="list-group-item-text"><%= String.replace(team_member.user.role, "_", " ") |> String.capitalize() %></p>
+                                    </div>
+                                    <div class="team">
+                                        <div class="list-group-item-title">
+                                            <b>+1 <%= format_phone(c.original_number) %></b>
+                                        </div>
+                                        <p class="list-group-item-text"><%= List.last(c.conversation_messages).message |> String.slice(0..100) %>...</p>
+                                    </div>
+                                    <div class="team">
+                                        <p class="list-group-item-text">
+                                            <%= List.last(c.conversation_messages).sent_at |> format_date() %>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group-item-figure">
+                                <a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, c.id) %>" class="btn btn-sm btn-icon btn-secondary stop-propagation">...</a>
+                            </div>
+                        </div><!-- /.list-group-item -->
+                    <% end %>
+
+                </div><!-- /.list-group -->
+            </div>
         </div>
-    </div>
+
+    </section>
 </div>

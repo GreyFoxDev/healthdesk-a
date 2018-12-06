@@ -13,6 +13,7 @@ defmodule Data.Schema.ChildCareHour do
   morning_close_at
   afternoon_open_at
   afternoon_close_at
+  active
   deleted_at
   |a
 
@@ -24,6 +25,7 @@ defmodule Data.Schema.ChildCareHour do
     field(:morning_close_at, :string)
     field(:afternoon_open_at, :string)
     field(:afternoon_close_at, :string)
+    field(:active, :boolean)
 
     field(:deleted_at, :utc_datetime)
 

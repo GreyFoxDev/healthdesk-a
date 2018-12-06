@@ -66,6 +66,7 @@ defmodule MainWeb.SessionController do
   end
 
   defp redirect_to(conn, user, page) do
+    IO.inspect user
     conn
     |> Auth.login(user)
     |> put_flash(:success, "Welcome back #{user.first_name}!")

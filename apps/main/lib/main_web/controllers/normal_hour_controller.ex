@@ -14,7 +14,7 @@ defmodule MainWeb.NormalHourController do
       |> current_user()
       |> NormalHours.all(location_id)
 
-    render conn, "index.html", location: location, hours: hours
+    render conn, "index.html", location: location, hours: hours, teams: teams(conn)
   end
 
   def new(conn, %{"location_id" => location_id}) do

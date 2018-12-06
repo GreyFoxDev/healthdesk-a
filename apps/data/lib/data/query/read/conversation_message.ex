@@ -17,6 +17,10 @@ defmodule Data.Query.ReadOnly.ConversationMessage do
     |> Repo.all()
   end
 
+  def testing_boo(message) do
+    "My number is #{message.phone_number}"
+  end
+
   def get(id),
     do: Repo.get(Conversation, id)
 end

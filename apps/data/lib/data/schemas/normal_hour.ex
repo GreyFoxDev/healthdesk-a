@@ -11,6 +11,7 @@ defmodule Data.Schema.NormalHour do
   day_of_week
   open_at
   close_at
+  active
   deleted_at
   |a
 
@@ -21,6 +22,7 @@ defmodule Data.Schema.NormalHour do
     field(:open_at, :string)
     field(:close_at, :string)
 
+    field(:active, :boolean)
     field(:deleted_at, :utc_datetime)
 
     belongs_to(:location, Data.Schema.Location)

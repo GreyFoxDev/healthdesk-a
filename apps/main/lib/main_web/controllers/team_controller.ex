@@ -4,12 +4,7 @@ defmodule MainWeb.TeamController do
   alias Data.Team
 
   def index(conn, _params) do
-    teams =
-      conn
-      |> current_user()
-      |> Team.all()
-
-    render conn, "index.html", teams: teams
+    render conn, "index.html", teams: teams(conn), location: nil
   end
 
   def show(conn, %{"id" => id}) do
@@ -21,13 +16,24 @@ defmodule MainWeb.TeamController do
     render conn, "show.json", data: team
   end
 
-  def new(conn, _params),
-    do: render_page conn, "new.html", Team.get_changeset()
+  def new(conn, _params) do
+
+    render(conn, "new.html",
+      changeset: Team.get_changeset(),
+      location: nil,
+      teams: teams(conn),
+      errors: [])
+  end
 
   def edit(conn, %{"id" => id}) do
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- Team.get_changeset(id, user) do
-      render_page conn, "edit.html", changeset
+
+      render(conn, "edit.html",
+        changeset: changeset,
+        location: nil,
+        teams: teams(conn),
+        errors: [])
     end
   end
 

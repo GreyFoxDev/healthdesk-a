@@ -1,45 +1,68 @@
 <div class="panel-body">
-    <div class="col-md-6">
-        <%= form_for @data, @action, [id: "team_form", multipart: true], fn f -> %>
-        <div class="form-group">
-            <label>Location</label>
-            <%= select f, :location_id, @locations, class: "form-control" %>
-        </div>
+    <section class="card">
+        <div class="card-body">
+            <%= form_for @data, @action, [id: "team_form", multipart: true], fn f -> %>
+                <div class="list-group list-group-flush list-group-bordered">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <fieldset>
+                            <div class="form-group">
+                                <label>Location</label>
+                                <%= select f, :location_id, @locations, class: "custom-select" %>
+                            </div>
 
-        <%= inputs_for f, :user, fn u -> %>
-            <div class="form-group">
-                <label>First Name</label>
-                <%= text_input u, :first_name, class: "form-control" %>
-                <label>Last Name</label>
-                <%= text_input u, :last_name, class: "form-control" %>
-                <label>Phone Number</label>
-                <%= text_input u, :phone_number, class: "form-control" %>
-                <label>Email</label>
-                <%= text_input u, :email, class: "form-control" %>
-            </div>
-        <% end %> 
+                            <%= inputs_for f, :user, fn u -> %>
+                                <div class="form-group">
+                                    <span>First Name</span>
+                                    <span>
+                                        <%= text_input u, :first_name, class: "form-control" %>
+                                    </span>
+                                </div>
+                                <div class="form-group">
+                                    <span>Last Name</span>
+                                    <span>
+                                        <%= text_input u, :last_name, class: "form-control" %>
+                                    </span>
+                                </div>
+                                <div class="form-group">
+                                    <span>Phone Number</span>
+                                    <span>
+                                        <%= text_input u, :phone_number, class: "form-control" %>
+                                    </span>
+                                </div>
+                                <div class="form-group">
+                                    <span>Email</span>
+                                    <span>
+                                        <%= text_input u, :email, class: "form-control" %>
+                                    </span>
+                                </div>
+                            <% end %>
 
-        <div class="form-group">
+                            <span>
+                                <%= if @data.data.avatar && @data.data.avatar != "" do %> 
+                                    <img id="avatar" src="<%= @data.data.avatar %>" height="40" width="40" >
+                                    <a id="removeImage" href="#">Remove</a>
+                                <% end %>
+                                <div class="form-group">
+                                    <%= label f, :image, "Avatar", class: "control-label" %>
+                                    <div class="custom-file">
 
-            <%= if @data.data.avatar && @data.data.avatar != "" do %> 
-                <img id="avatar" src="<%= @data.data.avatar %>" height="40" width="40" >
-                <a id="removeImage" href="#">Remove</a>
+                                        <%= file_input f, :image, class: "custom-file-input", multiple: "" %> <label class="custom-file-label" for="tf3">Choose file</label>
+                                    </div>
+                                </div>
+
+
+                            </span>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <%= submit "Save", class: "btn btn-primary" %> &nbsp;
+                    <%= link "Cancel", to: team_team_member_path(@conn, :index, @team_id), class: "btn btn-secondary" %>
+                </div>
             <% end %>
-
-            <br />
-            <%= label f, :image, class: "control-label" %>
-            <%= file_input f, :image, class: "form-control" %>
         </div>
-    </div>
-    <div class="col-md-8">
-        <div class="form-group">
-            <%= submit "Save", class: "btn btn-primary" %>
-            <%= link "Cancel", to: team_team_member_path(@conn, :index, @team_id)  %>
-        </div>
-        <% end %>
-    </div>
+    </section>
 </div>
-
 
 <script>
  $("#removeImage").click(function(e) {

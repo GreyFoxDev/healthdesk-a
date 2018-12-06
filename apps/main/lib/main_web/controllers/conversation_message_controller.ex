@@ -28,12 +28,12 @@ defmodule MainWeb.ConversationMessageController do
       |> current_user()
       |> ConversationMessages.all(conversation_id)
 
-
     render conn, "index.html",
       location: location,
       conversation: conversation,
       messages: messages,
       team_members: team_members,
+      teams: teams(conn),
       changeset: ConversationMessages.get_changeset()
   end
 

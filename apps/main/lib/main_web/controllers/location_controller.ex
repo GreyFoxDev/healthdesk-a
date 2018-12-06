@@ -4,7 +4,6 @@ defmodule MainWeb.LocationController do
   alias Data.{Location, Team}
 
   def index(conn, %{"team_id" => team_id} = params) do
-
     team =
       conn
       |> current_user()
@@ -15,7 +14,11 @@ defmodule MainWeb.LocationController do
       |> current_user()
       |> Location.get_by_team_id(team_id)
 
-    render conn, "index.html", locations: locations, team: team
+    render conn, "index.html",
+      location: nil,
+      locations: locations,
+      team: team,
+      teams: teams(conn)
   end
 
   def show(conn, %{"id" => id}) do
@@ -31,6 +34,8 @@ defmodule MainWeb.LocationController do
     render(conn, "new.html",
       changeset: Location.get_changeset(),
       team_id: team_id,
+      location: nil,
+      teams: teams(conn),
       errors: [])
   end
 
@@ -41,6 +46,8 @@ defmodule MainWeb.LocationController do
       render(conn, "edit.html",
         changeset: changeset,
         team_id: team_id,
+        teams: teams(conn),
+        location: changeset.data,
         errors: [])
     end
   end

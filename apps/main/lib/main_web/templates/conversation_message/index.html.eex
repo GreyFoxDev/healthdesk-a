@@ -1,147 +1,241 @@
-<div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">Messages from <%= @conversation.original_number %></h1>
-    </div>
-    <%= if @conversation.status == "open" do %>
-        <div class="col-lg-12">
-            Assign Conversation to: <select id="assigned_id">
-            <option value="">Select Team Member</option>
-            <%= for team_member <- @team_members do %>
-                <%= if @conversation.team_member_id == team_member.id do %>
-                    <option value="<%= team_member.id %>" selected><%= team_member.user.first_name %> <%= team_member.user.last_name %></option>
-                <% else %>
-                    <option value="<%= team_member.id %>"><%= team_member.user.first_name %> <%= team_member.user.last_name %></option>
-                <% end %>
+<article class="message">
+
+    <header class="message-header">
+        <div class="d-flex">
+            <a class="btn btn-light btn-icon" href="<%= team_location_conversation_path(@conn, :index, @location.team_id, @location.id) %>"><i class="fa fa-flip-horizontal fa-share"></i></a>
+        </div>
+
+        &nbsp;
+        &nbsp;
+        <div class="team">
+            <h4 class="list-group-item-title">
+                Message from <strong>+1 <%= format_phone(@conversation.original_number) %></strong>
+            </h4>
+            <%= if @conversation.team_member_id do %>
+                <p class="list-group-item-text">
+                    Assigned to:
+                    <%= @conversation.team_member.user.first_name %>
+                    <%= @conversation.team_member.user.last_name %>
+                </p>
+            <% else %>
+                <p class="list-group-item-text">
+                    Assigned to: Bot
+                </p>
             <% end %>
-            </select>
-            <input type="button" value="Assign" id="assign_team_member">
-            <script>
-             $("#assign_team_member").click(function(e) {
-                 e.preventDefault(); // prevent default action of link
-                 val = $("#assigned_id").val(); 
-
-                 if (val == "") {
-                     alert("Please select a team member before trying to assign.");
-                 } else {
-                     $.ajax({
-                         url: '/api/assign-team-member',
-                         type: 'PUT',
-                         data: "id=<%=  @conversation.id %>&location_id=<%= @location.id %>&team_member_id=" + val,
-                         success: function(data) {
-                             alert("Assigned")
-                         }
-                     });
-                 };
-
-             });
-            </script>
         </div>
-    <% end %>
-</div><!--/.row-->
 
-<div class="row">
-    <div class="fixed-table-container">
-        <div class="fixed-table-header">
-            <table>
-            </table>
-        </div>
-        <div class="fixed-table-body">
-            <div class="fixed-table-loading" style="top: 37px; display: none;">
-                Loading, please wait…
-            </div>
-
-            <table data-toggle="table" data-url="tables/data1.json" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true" data-sort-name="name" data-sort-order="desc" class="table table-hover">
-                <thead>
-                    <tr>
-                        <th class="bs-checkbox " style="width: 36px; ">
-                            <div class="th-inner ">
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                From
-                                <span class="order">
-                                    <span class="caret" style="margin: 10px 5px;"></span>
-                                </span>
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                Message
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                Sent at
-
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <%= if @conversation.status == "open" do %>
-                                <div class="th-inner sortable">
-                                    <%= link "Close", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @conversation.id), method: "put", class: "btn btn-danger" %>
-                                </div>
-                                <div class="fht-cell"></div>
-                            <% else %>
-                                <div class="th-inner sortable">
-                                    <%= link "Open", to: team_location_conversation_conversation_path(@conn, :open, @location.team_id, @location.id, @conversation.id), method: "put", class: "btn btn-danger" %>
-                                </div>
-                                <div class="fht-cell"></div>
-                            <% end %>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%= if @messages == [] do %>
-                        <tr class="no-records-found">
-                            <td colspan="5">No matching records found</td>
-                        </tr>
-                    <% end %>
-                    <%= for message <- @messages do %>
-                        <tr>
-                            <td></td>
-                            <td><%= message.phone_number %></td>
-                            <td><%= message.message %></td>
-                            <td><%= message.sent_at %></td>
-                            <td></td>
-                        </tr>
-                    <% end %>
-                </tbody>
-            </table>
-
+        <div class="message-header-actions">
+            <!-- invite members -->
             <%= if @conversation.status == "open" do %>
-                <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Send Reply to <%= @conversation.original_number %></div>
-                        <div class="panel-body">
-                            <%= form_for @changeset, team_location_conversation_conversation_message_path(@conn, :create, @location.team_id, @location.id, @conversation.id), fn f -> %>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <%= textarea f, :message, class: "form-control", height: 150 %>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="form-group">
-                                        <%= submit "Send", class: "btn btn-primary" %>
-                                    </div>
-                                </div>
-                            <% end %>
-                        </div>
+            <div class="dropdown d-inline-block">
+                <button type="button" class="btn btn-light btn-icon" title="Invite members" data-toggle="dropdown" data-display="static" aria-haspoppup="true" aria-expanded="false"><i class="fas fa-user-plus"></i></button>
+                <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
+                <div class="dropdown-menu dropdown-menu-right dropdown-menu-rich stop-propagation">
+                    <div class="dropdown-header"> Assign Conversation </div>
+                    <div class="form-group px-3 py-2 m-0">
+
+
+                        <select id="assigned_id" class="custom-select">
+                            <option value="">Select Team Member</option>
+                                <%= for team_member <- @team_members do %>
+                                    <%= if @conversation.team_member_id == team_member.id do %>
+                                        <option value="<%= team_member.id %>" selected><%= team_member.user.first_name %> <%= team_member.user.last_name %></option>
+                                    <% else %>
+                                        <option value="<%= team_member.id %>"><%= team_member.user.first_name %> <%= team_member.user.last_name %></option>
+                                    <% end %>
+                                <% end %>
+                            </select>
+                            <input type="button" value="Assign" id="assign_team_member">
+                            <script>
+                             $("#assign_team_member").click(function(e) {
+                                 e.preventDefault(); // prevent default action of link
+                                 val = $("#assigned_id").val(); 
+
+                                 if (val == "") {
+                                     alert("Please select a team member before trying to assign.");
+                                 } else {
+                                     $.ajax({
+                                         url: '/api/assign-team-member',
+                                         type: 'PUT',
+                                         data: "id=<%=  @conversation.id %>&location_id=<%= @location.id %>&team_member_id=" + val,
+                                         success: function(data) {
+                                             window.location.reload();
+                                         }
+                                     });
+                                 };
+
+                             });
+                            </script>
+
 
                     </div>
-                </div>
-
+                </div><!-- /.dropdown-menu -->
+            </div><!-- /invite members -->
+            <button type="button" class="btn btn-light btn-icon d-xl-none" data-toggle="sidebar"><i class="fa fa-angle-double-left"></i></button>
             <% end %>
-            </div>
-
-
-
-            <a href="<%= team_location_conversation_path(@conn, :index, @location.team_id, @location.id) %>" class="btn btn-primary">Conversations</a>
         </div>
+    </header>
+</article>
+
+<section class="message-body">
+    <div class="card card-fluid mb-0">
+        <section class="conversations" role="log">
+            <ul class="conversation-list">
+                <li class="log-divider">
+                    <span>
+                        <i class="far fa-fw fa-comment-alt"></i> Conversation started by <strong>+1 <%= format_phone(@conversation.original_number) %></strong> ·
+                        <%= format_date(@conversation.started_at) %>
+                    </span>
+                </li>
+
+                <%= for {message, index} <- Enum.with_index(@messages) do %>
+                    <% previous_message = Enum.at(@messages, index-1) %>
+                    <% next_message = Enum.at(@messages, index+1) %>
+
+                    <%= if message.phone_number == @conversation.original_number do %>
+                        <%= if previous_message && message.phone_number == previous_message.phone_number do %>
+                            <li class="conversation-inbound conversation-faux">
+                                <div class="conversation-message conversation-message-skip-avatar">
+                                    <div class="conversation-message-text"><%= message.message %></div>
+                                    <%= if next_message && next_message.phone_number != message.phone_number do %>
+                                        <div class="conversation-meta">
+                                            +1 <%= format_phone(message.phone_number) %>
+                                            ·
+                                            <%= format_date(message.sent_at) %>
+                                        </div>
+                                    <% end %>
+                                </div>
+                            </li>
+                        <% else %>
+                            <li class="conversation-inbound">
+                                <div class="conversation-avatar">
+                                    <a href="#!" class="tile tile-circle bg-muted"><i class="oi oi-person"></i></a>
+                                </div>
+                                <div class="conversation-message">
+                                    <div class="conversation-message-text"> <%= message.message %></div>
+                                    <%= if next_message && next_message.phone_number != message.phone_number do %>
+                                        <div class="conversation-meta">
+                                            +1 <%= format_phone(message.phone_number) %>
+                                            ·
+                                            <%= format_date(message.sent_at) %>
+                                        </div>
+                                    <% end %>
+                                </div>
+                            </li>
+                        <% end %>
+
+
+                    <% else %>
+                        <%= cond do %>
+                            <% String.contains?(message.message, "OPENED") -> %>
+                                <li class="log-divider">
+                                    <span>
+                                        <i class="fa fa-fw fa-user-plus"></i>
+                                        Conversation <%= String.replace(message.message, "OPENED:", "") %> · <%= format_date(message.sent_at) %>
+                                    </span>
+                                </li>
+                            <% String.contains?(message.message, "CLOSED") -> %>
+                                <li class="log-divider">
+                                    <span>
+                                        <i class="fa fa-fw fa-user-plus"></i>
+                                        Conversation <%= String.replace(message.message, "CLOSED:", "") %> · <%= format_date(message.sent_at) %>
+                                    </span>
+                                </li>
+                            <% String.contains?(message.message, "ASSIGNED") -> %>
+                                <li class="log-divider">
+                                    <span>
+                                        <i class="fa fa-fw fa-user-plus"></i>
+                                        <%= String.replace(message.message, "ASSIGNED:", "") %> · <%= format_date(message.sent_at) %>
+                                    </span>
+                                </li>
+                            <% true -> %>
+                                <%= if previous_message && message.phone_number != previous_message.phone_number do %>
+                                    <li class="conversation-outbound conversation-faux">
+                                        <div class="conversation-message conversation-message-skip-avatar">
+                                            <div class="conversation-message-text"><%= message.message %></div>
+                                            <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
+                                                <div class="conversation-meta">
+                                                    +1 <%= format_phone(message.phone_number) %>
+                                                    ·
+                                                    <%= format_date(message.sent_at) %>
+                                                </div>
+                                            <% end %>
+                                        </div>
+                                    </li>
+                                <% else %>
+                                    <li class="conversation-outbound">
+                                        <div class="conversation-avatar">
+                                            <a href="#!" class="tile tile-circle bg-muted"><i class="oi oi-person"></i></a>
+                                        </div>
+                                        <div class="conversation-message">
+                                            <div class="conversation-message-text"> <%= message.message %></div>
+                                            <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
+                                                <div class="conversation-meta">
+                                                    +1 <%= format_phone(message.phone_number) %>
+                                                    ·
+                                                    <%= format_date(message.sent_at) %>
+                                                </div>
+                                            <% end %>
+                                        </div>
+                                    </li>
+                                <% end %>
+                        <% end %>
+
+                    <% end %>
+
+                <% end %>
+            </ul>
+        </section>
     </div>
+</section>
+
+<%= if @conversation.status == "open" do %>
+    <footer class="message-publisher">
+
+        <%= form_for @changeset, team_location_conversation_conversation_message_path(@conn, :create, @location.team_id, @location.id, @conversation.id), fn f -> %>
+            <div class="media mb-1">
+                <div class="media-body">
+                    <%= text_input f, :message, class: "form-control border-0 shadow-none", place_holder: "Type a message" %>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-light btn-icon">
+                        <i class="far fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div><!-- /.media -->
+        <% end %>
+    </footer>
+<% end %>
+
+<div class="page-sidebar">
+    <div class="sidebar-section">
+        <fieldset>
+            <legend>Conversation Details</legend>
+            <div class="form-group">
+                <div class="form-label-group">
+                    <input type="text" class="form-control" value="<%= @conversation.location.location_name %>" readonly> <label for="fl1"> Location</label>
+                </div>
+            </div><!-- /.form-group -->
+            <div class="form-group">
+                <div class="form-label-group">
+                    <input type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.first_name, else: "N/A" %>" readonly> <label for="fl1">Member First Name</label>
+                </div>
+            </div><!-- /.form-group -->
+            <div class="form-group">
+                <div class="form-label-group">
+                    <input type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.last_name, else: "N/A" %>" readonly> <label for="fl1">Member Last Name</label>
+                </div>
+            </div><!-- /.form-group -->
+            <div class="form-group">
+                <div class="form-label-group">
+                    <input type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.phone_number, else: "N/A" %>" readonly> <label for="fl1">Member Phone Numbers</label>
+                </div>
+            </div><!-- /.form-group -->
+            <div class="form-group">
+                <div class="form-label-group">
+                    <input type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.email, else: "N/A" %>" readonly> <label for="fl1">Member Email</label>
+                </div>
+            </div><!-- /.form-group -->
+        </fieldset>
+    </div><!-- /.sidebar-section -->
 </div>

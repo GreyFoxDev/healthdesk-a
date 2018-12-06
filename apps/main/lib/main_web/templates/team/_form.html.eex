@@ -1,24 +1,24 @@
 <div class="panel-body">
-    <div class="col-md-6">
-        <%= form_for @data, @action, fn f -> %>
-        <div class="form-group">
-            <label>Team Name</label>
-            <%= text_input f, :team_name, class: "form-control" %>
-            <%#= error_tag @errors, :team_name %>
-        </div>
+    <section id="base-style" class="card">
+        <div class="card-body">
+            <%= form_for @data, @action, fn f -> %>
+                <fieldset>
+                    <div class="form-group">
+                        <label>Team Name</label>
+                        <%= text_input f, :team_name, class: "form-control" %>
+                        <%#= error_tag @errors, :team_name %>
+                    </div>
 
-        <div class="form-group">
-            <label>Website</label>
-            <%= text_input f, :website, class: "form-control" %>
-            <%#= error_tag @errors, :website %>
+                    <div class="form-group">
+                        <label>Website</label>
+                        <%= text_input f, :website, class: "form-control" %>
+                        <%#= error_tag @errors, :website %>
+                    </div>
+                    <div class="form-actions">
+                        <%= submit "Save", class: "btn btn-primary" %>
+                    </div>
+                </fieldset>
+            <% end %>
         </div>
-
-    </div>
-    <div class="col-md-8">
-        <div class="form-group">
-            <%= submit "Save", class: "btn btn-primary" %>
-            <%= link "Cancel", to: team_path(@conn, :index)  %>
-        </div>
-        <% end %>
-    </div>
+    </section>
 </div>

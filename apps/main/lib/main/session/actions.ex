@@ -56,7 +56,7 @@ defmodule Session.Actions do
       from: to}
   end
 
-  def start_or_update_conversation(%Session{request: request} = session) do
+  def start_or_update_conversation(%Session{request: request}) do
     with nil <- Data.Commands.Conversations.get_by_phone(request.from),
          %Data.Schema.Location{} = location <- Data.Commands.Location.get_by_phone(request.to) do
       %{
@@ -75,22 +75,24 @@ defmodule Session.Actions do
         "phone_number" => request.from,
         "message" => request.body,
         "sent_at" => DateTime.utc_now(),
-        "conversation_id" => conversation.id} |> Data.Commands.ConversationMessages.write()
+        "conversation_id" => conversation.id}
+      |> Data.Commands.ConversationMessages.write()
 
-      conversation
+      {:new, conversation}
     else
       %Data.Schema.Conversation{} = conversation ->
         %{
           "phone_number" => request.from,
           "message" => request.body,
           "sent_at" => DateTime.utc_now(),
-          "conversation_id" => conversation.id} |> Data.Commands.ConversationMessages.write()
-      conversation
+          "conversation_id" => conversation.id}
+        |> Data.Commands.ConversationMessages.write()
+
+      {:open, conversation}
     end
   end
 
   def update_conversation(%{body: body} = message, conversation) when body == @default_error do
-    IO.inspect body, label: "DEFAULT ERROR"
     %{
       "phone_number" => message.from,
       "message" => @default_error,
@@ -101,7 +103,6 @@ defmodule Session.Actions do
   end
 
   def update_conversation(%{body: body, from: from} = message, conversation) do
-    IO.inspect body, label: "NOT DEFAULT"
     %{
       "phone_number" => from,
       "message" => body,

@@ -35,6 +35,7 @@ defmodule Data.Schema.Location do
 
     has_many(:team_members, Data.Schema.TeamMember)
     has_many(:users, through: [:team_members, :users])
+    has_many(:conversations, Data.Schema.Conversation)
 
     timestamps()
   end

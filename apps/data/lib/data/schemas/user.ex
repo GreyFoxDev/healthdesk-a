@@ -26,6 +26,8 @@ defmodule Data.Schema.User do
 
     field(:deleted_at, :utc_datetime)
 
+    has_one(:team_member, Data.Schema.TeamMember)
+
     timestamps()
   end
 

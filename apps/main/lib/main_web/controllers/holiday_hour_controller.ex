@@ -14,41 +14,15 @@ defmodule MainWeb.HolidayHourController do
       |> current_user()
       |> HolidayHours.all(location_id)
 
-    render conn, "index.html", location: location, hours: hours
-  end
-
-  def new(conn, %{"location_id" => location_id}) do
-    location =
-      conn
-      |> current_user()
-      |> Location.get(location_id)
-
-    render(conn, "new.html",
-      changeset: HolidayHours.get_changeset(),
-      location: location,
-      errors: [])
-  end
-
-  def edit(conn, %{"id" => id, "location_id" => location_id}) do
-    location =
-      conn
-      |> current_user()
-      |> Location.get(location_id)
-
-    with %Data.Schema.User{} = user <- current_user(conn),
-         {:ok, changeset} <- HolidayHours.get_changeset(id, user) do
-
-      date = convert_date(changeset.data.holiday_date)
-      data = Map.merge(changeset.data, %{holiday_date: date})
-      changeset = Map.merge(changeset, %{data: data})
-      render(conn, "edit.html",
-        changeset: changeset,
-        location: location,
-        errors: [])
-    end
+    render conn, "index.html", location: location, hours: hours, teams: teams(conn), changeset: HolidayHours.get_changeset()
   end
 
   def create(conn, %{"holiday_hour" => hours, "team_id" => team_id, "location_id" => location_id} = params) do
+    location =
+      conn
+      |> current_user()
+      |> Location.get(location_id)
+
     hours
     |> Map.put("location_id", location_id)
     |> HolidayHours.create()
@@ -61,28 +35,7 @@ defmodule MainWeb.HolidayHourController do
          {:error, changeset} ->
            conn
            |> put_flash(:error, "Holiday Hours failed to create")
-           |> render_page("new.html", changeset, changeset.errors)
-       end
-  end
-
-  def update(conn, %{"id" => id, "holiday_hour" => hours, "team_id" => team_id, "location_id" => location_id}) do
-    hours
-    |> Map.merge(%{"id" => id, "location_id" => location_id})
-    |> HolidayHours.update()
-    |> case do
-         {:ok, _hours} ->
-           location =
-             conn
-             |> current_user()
-             |> Location.get(location_id)
-
-           conn
-           |> put_flash(:success, "Holiday Hours updated successfully.")
-           |> redirect(to: team_location_holiday_hour_path(conn, :index, team_id, location_id))
-         {:error, changeset} ->
-           conn
-           |> put_flash(:error, "Holiday Hours failed to update")
-           |> render_page("edit.html", changeset, changeset.errors)
+           |> render("index.html", location: location, hours: hours, teams: teams(conn), changeset: changeset, errors: changeset.errors)
        end
   end
 
@@ -98,16 +51,7 @@ defmodule MainWeb.HolidayHourController do
          {:error, changeset} ->
            conn
            |> put_flash(:error, "Holiday Hours failed to delete")
-           |> render_page("index.html", team_id, location_id)
+           |> redirect(to: team_location_holiday_hour_path(conn, :index, team_id, location_id))
        end
-  end
-
-  defp convert_date(date) when date in ["", nil], do: ""
-  defp convert_date(date), do: Date.to_string(date)
-
-  defp render_page(conn, page, changeset, errors \\ []) do
-    render(conn, page,
-      changeset: changeset,
-      errors: errors)
   end
 end

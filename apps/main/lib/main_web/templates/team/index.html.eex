@@ -1,103 +1,91 @@
-<div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">Teams</h1>
-    </div>
-</div><!--/.row-->
-
-<div class="row">
-    <div class="fixed-table-container">
-        <div class="fixed-table-header">
-            <table>
-            </table>
+<header class="page-title-bar">
+    <div class="d-flex justify-content-between">
+        <h1 class="page-title"> Teams (<%= Enum.count(@teams) %>)</h1>
+        <div class="btn-toolbar">
+            <%= if assigns[:current_user].role == "admin" do %> 
+                <a href="<%= team_path(@conn, :new) %>" class="btn btn-primary">
+                    <i class="fas fa-plus">&nbsp;</i> 
+                    New Team
+                </a>
+            <% end %>
         </div>
-        <div class="fixed-table-body">
-            <div class="fixed-table-loading" style="top: 37px; display: none;">
-                Loading, please wait…
-            </div>
-            <table data-toggle="table" data-url="tables/data1.json" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true" data-sort-name="name" data-sort-order="desc" class="table table-hover">
-                <thead>
-                    <tr>
-                        <th class="bs-checkbox " style="width: 36px; ">
-                            <div class="th-inner ">
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                Team Name
-                                <span class="order">
-                                    <span class="caret" style="margin: 10px 5px;"></span>
-                                </span>
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                Website
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <%= if assigns[:current_user].role == "admin" do %> 
-                                <a href="<%= team_path(@conn, :new) %>" class="btn btn-success">New</a>
-                            <% end %>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%= if @teams == [] do %>
-                        <tr class="no-records-found">
-                            <td colspan="5">No matching records found</td>
-                        </tr>
-                    <% end %>
+    </div>
+</header>
+
+<div class="page-section">
+    <section class="card card-fluid">
+        <header class="card-header nav-scroller">
+            <!-- .nav-tabs -->
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active show" data-toggle="tab" href="#project-myteams">My teams</a>
+                </li>
+            </ul><!-- /.nav-tabs -->
+        </header>
+
+        <div class="card-body">
+            <!-- grid row -->
+            <div class="row">
+                <!-- .col -->
+                <div class="col">
+                    <!-- .input-group -->
+                    <div class="input-group has-clearable">
+                        <button type="button" class="close" aria-label="Close"><span aria-hidden="true"><i class="fa fa-times-circle"></i></span></button>
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><span class="oi oi-magnifying-glass"></span></span>
+                        </div><input type="text" class="form-control" placeholder="Search">
+                    </div><!-- /.input-group -->
+                </div><!-- /.col -->
+                <!-- .col -->
+                <div class="col-auto d-none d-sm-flex">
+                    <!-- .dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last updated <span class="fa fa-caret-down"></span></button>
+                        <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
+                        <div class="dropdown-menu dropdown-menu-right stop-propagation">
+                            <h6 class="dropdown-header"> Sort By </h6><label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="0"> <span class="custom-control-label">Name</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="1"> <span class="custom-control-label">Name <span class="text-muted">(Decs)</span></span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="2" checked=""> <span class="custom-control-label">Last updated</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="3"> <span class="custom-control-label">Oldest updated</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="4"> <span class="custom-control-label">Last created</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="5"> <span class="custom-control-label">Oldest created</span></label>
+                        </div><!-- /.dropdown-menu -->
+                    </div><!-- /.dropdown -->
+                </div><!-- /.col -->
+            </div><!-- /grid row -->
+        </div>
+
+        <div class="text-muted px-3 mb-2"> Showing 1 to <%= Enum.count(@teams) %> of <%= Enum.count(@teams) %> entries </div>
+
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="project-myteams" role="tabpanel" aria-labelledby="project-myteams-tab">
+                <!-- .list-group -->
+                <div class="list-group list-group-flush list-group-divider">
+
                     <%= for team <- @teams do %>
-                        <tr>
-                            <td></td>
-                            <td><%= team.team_name %></td>
-                            <td><%= team.website %></td>
-                            <td>
-                                <%= link "Delete", to: team_path(@conn, :delete, team.id), method: "delete", class: "btn btn-danger" %>
-                                <a href="<%= team_path(@conn, :edit, team.id) %>" class="btn btn-primary">Edit</a>
-                                <a href="<%= team_location_path(@conn, :index, team.id) %>" class="btn btn-primary">Locations</a>
-                                <a href="<%= team_team_member_path(@conn, :index, team.id) %>" class="btn btn-primary">Team Members</a>
-                            </td>
-                        </tr>
-                    <% end %>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
-<!-- Modal -->
-<div class="modal fade"
-     id="viewModal"
-     tabindex="-1"
-     role="dialog"
-     aria-hidden="true">
+                        <!-- .list-group-item -->
+                        <div class="list-group-item">
+                            <div class="list-group-item-figure">
+                                <a href="page-team.html" class="user-avatar user-avatar-md"><img src="assets/images/avatars/team4.jpg" alt=""></a>
+                            </div>
+                            <div class="list-group-item-body">
+                                <div class="d-sm-flex justify-content-sm-between align-items-sm-center">
+                                    <div class="team">
+                                        <h4 class="list-group-item-title">
+                                            <a href="<%= team_path(@conn, :edit, team.id) %>"><%= team.team_name %>
+                                                &nbsp;
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </h4>
+                                        <p class="list-group-item-text"> Updated <%= format_date(team.updated_at) %> </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group-item-figure">
+                                <a href="<%= team_location_path(@conn, :index, team.id) %>" class="btn btn-sm btn-icon btn-secondary stop-propagation">...</a>
+                            </div>
+                        </div><!-- /.list-group-item -->
 
-    <div class="modal-dialog" role="document" data-bind="visible: true, with: gym">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h3 class="modal-title">Gym Details</h4>
-                <br />
-            </div>
-            <div class="modal-body">
-                <dl class="dl-horizontal">
-                    <dt>Name:</dt>
-                    <dd data-bind="text: name"></dd>
-                </dl>
-                <dl class="dl-horizontal">
-                    <dt>Phone Number:</dt>
-                    <dd data-bind="text: phone_number"></dd>
-                </dl>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <% end  %>
+                </div><!-- /.list-group -->
             </div>
         </div>
-    </div>
+
+    </section>
 </div>

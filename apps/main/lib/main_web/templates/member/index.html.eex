@@ -1,0 +1,67 @@
+<% team = @team %>
+<header class="page-title-bar">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active">
+                <a href="<%= team_path(@conn, :index) %>"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Teams</a>
+            </li>
+        </ol>
+</header>
+
+<div class="page-section">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card card-fluid">
+                <div class="card-header">
+                    <nav class="nav nav-tabs flex-column border-0">
+                        <a href="<%= team_path(@conn, :edit, team.id) %>" class="nav-link">Details</a>
+                        <a href="<%= team_team_member_path(@conn, :index, team.id) %>" class="nav-link">Teammates</a>
+                        <a href="<%= team_member_path(@conn, :index, team.id) %>" class="nav-link active">Members</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card card-fluid">
+                <span>
+                    <h6 class="card-header">
+                        Members
+
+                        <a href="<%= team_member_path(@conn, :new, @team.id) %>" class="nav-link">
+                            <i class="fas fa-plus"></i> 
+                            Add Member
+                        </a>
+
+                    </h6><!-- .card-body -->
+                </span>
+                <div class="card-body">
+
+                    <div class="list-group list-group-flush list-group-bordered">
+                        <%= if @members == [] do %>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="alert alert-warning mx-3"> There are no members for this team. </div>
+                            </div>
+                        <%= else %>
+                            <%= for member <- @members do %>
+                                <div class="list-group-item d-flex justify-content-between align-items-left">
+                                    <span><b><%= member.first_name %> <%= member.last_name %></b></span>
+                                    <span><%= member.phone_number %></span>
+                                    <span><%= member.email %></span>
+
+                                    <span>
+                                    <%= link {:safe, "<i class=\"fas fa-edit\"></i>"}, to: team_member_path(@conn, :edit, member.team_id, member.id) %>
+                                    <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_member_path(@conn, :delete, member.team_id, member.id), method: "delete" %>
+                                    </span>
+
+                                </div>
+                            <% end %>
+                        <% end %>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

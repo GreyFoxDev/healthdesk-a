@@ -19,6 +19,7 @@ defmodule Data.Schema.ConversationMessage do
 
     belongs_to(:conversation, Data.Schema.Conversation)
     field(:user, :map, virtual: true)
+    field(:member, :map, virtual: true)
 
     timestamps()
   end

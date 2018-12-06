@@ -1,36 +1,39 @@
 <div class="panel-body">
-    <div class="col-md-6">
-        <%= form_for @data, @action, fn f -> %>
-        <div class="form-group">
-            <label>Location Name</label>
-            <%= text_input f, :location_name, class: "form-control" %>
-            <%#= error_tag @errors, :team_name %>
-        </div>
+    <section id="base-style" class="card">
+        <div class="card-body">
+            <%= form_for @data, @action, fn f -> %>
+                <fieldset>
+                    <div class="form-group">
+                        <label>Location Name</label>
+                        <%= text_input f, :location_name, class: "form-control" %>
+                        <%#= error_tag @errors, :team_name %>
+                    </div>
 
-        <div class="form-group">
-            <label>Phone Number</label>
-            <%= text_input f, :phone_number, class: "form-control" %>
-            <%#= error_tag @errors, :website %>
-        </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <%= text_input f, :phone_number, class: "form-control" %>
+                        <%#= error_tag @errors, :website %>
+                    </div>
 
-        <div class="form-group">
-            <label>Address</label>
-            <%= text_input f, :address_1, class: "form-control" %>
-            <%= text_input f, :address_2, class: "form-control" %>
-            <label>City</label>
-            <%= text_input f, :city, class: "form-control" %>
-            <label>State</label>
-            <%= text_input f, :state, class: "form-control" %>
-            <label>Postal Code</label>
-            <%= text_input f, :postal_code, class: "form-control" %>
-        </div>
+                    <div class="form-group">
+                        <label>Address 1</label>
+                        <%= text_input f, :address_1, class: "form-control" %>
 
-    </div>
-    <div class="col-md-8">
-        <div class="form-group">
-            <%= submit "Save", class: "btn btn-primary" %>
-            <%= link "Cancel", to: team_path(@conn, :index)  %>
+                        <label>Address 2</label>
+                        <span class="badge badge-secondary"><em>Optional</em></span>
+                        <%= text_input f, :address_2, class: "form-control" %>
+                        <label>City</label>
+                        <%= text_input f, :city, class: "form-control" %>
+                        <label>State</label>
+                        <%= text_input f, :state, class: "form-control" %>
+                        <label>Postal Code</label>
+                        <%= text_input f, :postal_code, class: "form-control" %>
+                    </div>
+                    <div class="form-actions">
+                        <%= submit "Save", class: "btn btn-primary" %>
+                    </div>
+                </fieldset>
+            <% end %>
         </div>
-        <% end %>
-    </div>
+    </section>
 </div>

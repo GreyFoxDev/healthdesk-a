@@ -19,14 +19,16 @@ defmodule Session.ProcessCommand do
   Handle messages when session is open and not in a current command state
   """
   def call(%Session{request: request} = session, deps \\ @deps) do
-    conversation =
-      session
-      |> log("INBOUND", deps)
-      |> start_or_update_conversation()
+    with %Session{} = session <- log(session, "INBOUND", deps),
+         {:new, conversation} <- start_or_update_conversation(session) do
 
-    request.body
-    |> ask_question()
-    |> process_command(session, conversation)
+      request.body
+      |> ask_question()
+      |> process_command(session, conversation)
+    else
+      _ ->
+        {:ok, session}
+    end
   end
 
   defp process_command(command, %Session{request: request} = session, conversation, deps \\ @deps) do

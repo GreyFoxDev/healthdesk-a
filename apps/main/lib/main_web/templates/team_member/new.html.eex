@@ -1,8 +1,92 @@
-<div class="row">
-    <div class="col-lg-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">New Team Member</div>
-            <%= render "_form.html", data: @changeset, action: team_team_member_path(@conn, :create, @team_id), team_id: @team_id, locations: @locations, conn: @conn, errors: @errors %>
+<style>
+ #overlay {
+     position: fixed;
+     display: none;
+     width: 100%;
+     height: 100%;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-color: rgba(0,0,0,0.5);
+     z-index: 2;
+     cursor: pointer;
+ }
+</style>
+<script>
+ $( document ).ready(function() {
+     document.getElementById("overlay").style.display = "block";
+ });
+</script>
+<div id="overlay"></div>
+
+<header class="page-title-bar">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active">
+                <a href="<%= team_path(@conn, :index) %>"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Teams</a>
+            </li>
+        </ol>
+</header>
+
+<div class="page-section">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card card-fluid">
+                <div class="card-header">
+                    <nav class="nav nav-tabs flex-column border-0">
+                        <a href="<%= team_path(@conn, :edit, @team_id) %>" class="nav-link">Details</a>
+                        <a href="<%= team_team_member_path(@conn, :index, @team_id) %>" class="nav-link active">Teammates</a>
+                        <a href="<%= team_member_path(@conn, :index, @team_id) %>" class="nav-link">Members</a>
+                    </nav>
+                </div>
+            </div>
         </div>
+        <div class="col-lg-8">
+            <div class="card card-fluid">
+                <h6 class="card-header">
+                    Teammates
+
+                    <a href="<%= team_team_member_path(@conn, :new, @team_id) %>" class="nav-link">
+                        <i class="fas fa-plus"></i> 
+                        Add Teammate
+                    </a>
+                </h6><!-- .card-body -->
+                <div class="card-body">
+
+                    <div class="list-group list-group-flush list-group-bordered">
+                        <%= if @team_members == [] do %>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="alert alert-warning mx-3"> There are no teammates for this location. </div>
+                            </div>
+                        <%= else %>
+                            <%= for member <- @team_members do %>
+                                <div class="list-group-item d-flex justify-content-between align-items-left">
+                                    <span><b><%= member.user.first_name %> <%= member.user.last_name %></b></span>
+                                    <span><%= member.user.phone_number %></span>
+                                    <span><%= member.user.email %></span>
+
+                                    <span>
+                                    <%= link {:safe, "<i class=\"fas fa-edit\"></i>"}, to: team_team_member_path(@conn, :edit, member.team_id, member.id) %>
+                                    <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_team_member_path(@conn, :delete, member.team_id, member.id), method: "delete" %>
+                                    </span>
+
+                                </div>
+                            <% end %>
+                        <% end %>
+
+                    </div>
+                </div><!-- /.card-body -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-sidebar">
+    <div class="sidebar-section">
+        <fieldset>
+            <legend>Edit Teammate</legend>
+            <%= render "_form.html", data: @changeset, action: team_team_member_path(@conn, :create, @team_id), team_id: @team_id, locations: @locations, conn: @conn, errors: @errors %>
+        </fieldset>
     </div>
 </div>

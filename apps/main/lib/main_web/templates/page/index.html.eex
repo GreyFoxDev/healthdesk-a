@@ -1,36 +1,19 @@
-<div class="jumbotron">
-  <h2><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h2>
-  <p class="lead">A productive web framework that<br />does not compromise speed and maintainability.</p>
-</div>
-
-<div class="row marketing">
-  <div class="col-lg-6">
-    <h4>Resources</h4>
-    <ul>
-      <li>
-        <a href="http://phoenixframework.org/docs/overview">Guides</a>
-      </li>
-      <li>
-        <a href="https://hexdocs.pm/phoenix">Docs</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix">Source</a>
-      </li>
-    </ul>
-  </div>
-
-  <div class="col-lg-6">
-    <h4>Help</h4>
-    <ul>
-      <li>
-        <a href="http://groups.google.com/group/phoenix-talk">Mailing list</a>
-      </li>
-      <li>
-        <a href="http://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on freenode IRC</a>
-      </li>
-      <li>
-        <a href="https://twitter.com/elixirphoenix">@elixirphoenix</a>
-      </li>
-    </ul>
-  </div>
+<div class="empty-state-container">
+    <h1 class="state-header">Healthdesk AI is launching soon! </h1>
+    <p class="state-description lead">Build better relationships with your gym members through AI</p>
+    <form class="w-75 mx-auto">
+        <div class="form-group">
+            <div class="input-group bg-white border-white input-group-lg circle">
+                <input type="email" class="form-control text-black" placeholder="Your email">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary circle"><span class="d-none d-sm-inline">Subcribe</span> <span class="d-inline d-sm-none" aria-label="Subcribe"><i class="fa fa-arrow-circle-right"></i></span></button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="state-action">
+        <div class="text-center pt-3">
+            Already registered? Click <a href="/login" class="link">here</a> to login.
+        </div>
+    </div>
 </div>

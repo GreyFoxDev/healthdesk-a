@@ -35,6 +35,9 @@ defmodule Data.TeamMember do
   def get_by_team_id(%{role: role}, id) when role in @roles,
     do: TeamMember.all(id)
 
+  def get_by_location_id(%{role: role}, id) when role in @roles,
+    do: TeamMember.get_by_location(id)
+
   def create(params),
     do: TeamMember.write(params)
 

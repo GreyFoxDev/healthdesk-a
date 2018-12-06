@@ -31,19 +31,21 @@ defmodule MainWeb.Router do
     delete "/logout/:id", SessionController, :delete
 
     resources "/teams", TeamController do
+      resources "/members", MemberController
+      resources "/team-members", TeamMemberController
       resources "/locations", LocationController do
         resources "/conversations", ConversationController do
           resources "/conversation-messages", ConversationMessageController
           put "/close", ConversationController, :close
           put "/open", ConversationController, :open
         end
+        resources "/team-members", LocationTeamMemberController
         resources "/holiday-hours", HolidayHourController
         resources "/normal-hours", NormalHourController
         resources "/child-care-hours", ChildCareHourController
         resources "/wifi-network", WifiNetworkController
         resources "/pricing-plans", PricingPlanController
       end
-      resources "/team-members", TeamMemberController
     end
 
     resources "/users", UserController

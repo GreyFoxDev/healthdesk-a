@@ -21,6 +21,8 @@ defmodule Data.Schema.Conversation do
     field(:status, :string)
     field(:started_at, :utc_datetime)
 
+    field(:member, :map, virtual: true, default: %Data.Schema.Member{})
+
     belongs_to(:location, Data.Schema.Location)
     belongs_to(:team_member, Data.Schema.TeamMember)
 

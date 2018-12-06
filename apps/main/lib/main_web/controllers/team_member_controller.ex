@@ -15,7 +15,7 @@ defmodule MainWeb.TeamMemberController do
       |> current_user()
       |> TeamMember.get_by_team_id(team_id)
 
-    render conn, "index.html", team_members: team_members, team: team
+    render conn, "index.html", location: nil, team_members: team_members, team: team, teams: teams(conn)
   end
 
   def new(conn, %{"team_id" => team_id}) do
@@ -25,10 +25,18 @@ defmodule MainWeb.TeamMemberController do
       |> Location.get_by_team_id(team_id)
       |> Enum.map(&{&1.location_name, &1.id})
 
+    team_members =
+      conn
+      |> current_user()
+      |> TeamMember.get_by_team_id(team_id)
+
     render(conn, "new.html",
       changeset: TeamMember.get_changeset(),
+      location: nil,
       locations: locations,
       team_id: team_id,
+      teams: teams(conn),
+      team_members: team_members,
       errors: [])
   end
 
@@ -42,12 +50,18 @@ defmodule MainWeb.TeamMemberController do
         |> Location.get_by_team_id(team_id)
         |> Enum.map(&{&1.location_name, &1.id})
 
-      data = 
+      team_members =
+        conn
+        |> current_user()
+        |> TeamMember.get_by_team_id(team_id)
 
       render(conn, "edit.html",
         changeset: changeset,
+        location: nil,
         locations: locations,
         team_id: team_id,
+        teams: teams(conn),
+        team_members: team_members,
         errors: [])
     end
   end

@@ -1,0 +1,78 @@
+<% location = @location %>
+<header class="page-title-bar">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active">
+                <a href="<%= team_location_path(@conn, :index, location.team_id) %>"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Locations</a>
+            </li>
+        </ol>
+    </nav>
+    <h6 class="page-title">Edit <%= location.location_name %></h6>
+</header>
+
+<div class="page-section">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card card-fluid">
+                <div class="card-header">
+                    <nav class="nav nav-tabs flex-column border-0">
+                        <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link">Details</a>
+                        <a href="<%= team_location_location_team_member_path(@conn, :index, location.team_id, location.id) %>" class="nav-link active">Teammates</a>
+                        <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Normal Hours</a>
+                        <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Holiday Hours</a>
+                        <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hours</a>
+                        <a href="<%= team_location_wifi_network_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Wifi Network</a>
+                        <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Pricing Plans</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card card-fluid">
+                <h6 class="card-header"> Teammates </h6><!-- .card-body -->
+                <div class="card-body">
+                    <div class="list-group list-group-flush list-group-bordered">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <select class="custom-select" id="sel2" required="">
+                                <option value="">Select Team Member</option>
+                                <%= for team_member <- @team_members do %>
+                                    <option value="<%= team_member.id %>"><%= team_member.user.first_name %> <%= team_member.user.last_name %></option>
+                                <% end %>
+                            </select>
+                            <span>
+                                &nbsp;
+                                <a href="#" id="assign_team_member">
+                                    <i class="fa fa-plus"> </i>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                    <div class="list-group list-group-flush list-group-bordered">
+                        <%= if @location_team_members == [] do %>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="alert alert-warning mx-3"> There are no members for this location. </div>
+                            </div>
+                        <%= else %>
+                            <%= for member <- @location_team_members do %>
+                                <div class="list-group-item d-flex justify-content-between align-items-left">
+                                    <span><b><%= member.user.first_name %> <%= member.user.last_name %></b></span>
+                                    <span><%= member.user.phone_number %></span>
+                                    <span><%= member.user.email %></span>
+
+                                    <span>
+                                    <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_member_path(@conn, :delete, member.team_id, member.id), method: "delete" %>
+                                    </span>
+
+                                </div>
+                            <% end %>
+                        <% end %>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                        </div>
+                    </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>

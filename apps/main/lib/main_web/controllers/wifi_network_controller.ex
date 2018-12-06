@@ -9,43 +9,28 @@ defmodule MainWeb.WifiNetworkController do
       |> current_user()
       |> Location.get(location_id)
 
-    networks =
-      conn
-      |> current_user()
-      |> WifiNetwork.all(location_id)
-
-    render conn, "index.html", location: location, networks: networks
-  end
-
-  def new(conn, %{"location_id" => location_id}) do
-    location =
-      conn
-      |> current_user()
-      |> Location.get(location_id)
-
-    render(conn, "new.html",
-      changeset: WifiNetwork.get_changeset(),
-      location: location,
-      errors: [])
-  end
-
-  def edit(conn, %{"id" => id, "location_id" => location_id}) do
-    location =
-      conn
-      |> current_user()
-      |> Location.get(location_id)
-
     with %Data.Schema.User{} = user <- current_user(conn),
-         {:ok, changeset} <- WifiNetwork.get_changeset(id, user) do
+         [network|_] <- WifiNetwork.all(user, location_id),
+         {:ok, changeset} <- WifiNetwork.get_changeset(network.id, user) do
 
-      render(conn, "edit.html",
-        changeset: changeset,
-        location: location,
-        errors: [])
+      render conn, "index.html", location: location, changeset: changeset, errors: [], teams: teams(conn)
+    else
+      [] ->
+
+        render(conn, "index.html",
+          changeset: WifiNetwork.get_changeset(),
+          location: location,
+          teams: teams(conn),
+          errors: [])
     end
   end
 
   def create(conn, %{"wifi_network" => network, "team_id" => team_id, "location_id" => location_id}) do
+    location =
+      conn
+      |> current_user()
+      |> Location.get(location_id)
+
     network
     |> Map.put("location_id", location_id)
     |> WifiNetwork.create()
@@ -58,11 +43,16 @@ defmodule MainWeb.WifiNetworkController do
          {:error, changeset} ->
            conn
            |> put_flash(:error, "Wifi Network failed to create")
-           |> render_page("new.html", changeset, changeset.errors)
+           |> render("index.html", location: location, changeset: changeset, errors: changeset.errors, teams: teams(conn))
        end
   end
 
   def update(conn, %{"id" => id, "wifi_network" => network, "team_id" => team_id, "location_id" => location_id}) do
+    location =
+      conn
+      |> current_user()
+      |> Location.get(location_id)
+
     network
     |> Map.merge(%{"id" => id, "location_id" => location_id})
     |> WifiNetwork.update()
@@ -74,29 +64,7 @@ defmodule MainWeb.WifiNetworkController do
          {:error, changeset} ->
            conn
            |> put_flash(:error, "Wifi Network failed to update")
-           |> render_page("edit.html", changeset, changeset.errors)
+           |> render("index.html", location: location, changeset: changeset, errors: changeset.errors, teams: teams(conn))
        end
-  end
-
-  def delete(conn, %{"id" => id, "team_id" => team_id, "location_id" => location_id}) do
-    %{"id" => id, "deleted_at" => DateTime.utc_now()}
-    |> WifiNetwork.update()
-    |> case do
-         {:ok, _network} ->
-           conn
-           |> put_flash(:success, "Wifi Network deleted successfully.")
-           |> redirect(to: team_location_wifi_network_path(conn, :index, team_id, location_id))
-
-         {:error, _changeset} ->
-           conn
-           |> put_flash(:error, "Wifi Network failed to delete")
-           |> render_page("index.html", team_id, location_id)
-       end
-  end
-
-  defp render_page(conn, page, changeset, errors \\ []) do
-    render(conn, page,
-      changeset: changeset,
-      errors: errors)
   end
 end

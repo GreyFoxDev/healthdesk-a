@@ -1,64 +1,62 @@
-<div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">Wifi Networks for <%= @location.location_name %></h1>
-    </div>
-</div><!--/.row-->
+<% location = @location %>
 
-<div class="row">
-    <div class="fixed-table-container">
-        <div class="fixed-table-header">
-            <table>
-            </table>
-        </div>
-        <div class="fixed-table-body">
-            <div class="fixed-table-loading" style="top: 37px; display: none;">
-                Loading, please wait…
+<header class="page-title-bar">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active">
+                <a href="<%= team_location_path(@conn, :index, location.team_id) %>"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Locations</a>
+            </li>
+        </ol>
+    </nav>
+    <h6 class="page-title">Edit <%= location.location_name %></h6>
+</header>
+
+<div class="page-section">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card card-fluid">
+                <div class="card-header">
+                    <nav class="nav nav-tabs flex-column border-0">
+                        <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link">Details</a>
+                        <a href="<%= team_location_location_team_member_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Teammates</a>
+                        <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Normal Hours</a>
+                        <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Holiday Hours</a>
+                        <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hours</a>
+                        <a href="<%= team_location_wifi_network_path(@conn, :index, location.team_id, location.id) %>" class="nav-link active">Wifi Network</a>
+                        <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Pricing Plans</a>
+                    </nav>
+                </div>
             </div>
-            <table data-toggle="table" data-url="tables/data1.json" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true" data-sort-name="name" data-sort-order="desc" class="table table-hover">
-                <thead>
-                    <tr>
-                        <th class="bs-checkbox " style="width: 36px; ">
-                            <div class="th-inner ">
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <div class="th-inner sortable">
-                                Network Name
-                                <span class="order">
-                                    <span class="caret" style="margin: 10px 5px;"></span>
-                                </span>
-                            </div>
-                            <div class="fht-cell"></div>
-                        </th>
-                        <th style="">
-                            <%= if assigns[:current_user].role == "admin" && @networks == [] do %> 
-                                <a href="<%= team_location_wifi_network_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-success">New</a>
-                            <% end %>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%= if @networks == [] do %>
-                        <tr class="no-records-found">
-                            <td colspan="5">No matching records found</td>
-                        </tr>
+        </div>
+        <div class="col-lg-8">
+            <div class="card card-fluid">
+                <h6 class="card-header"> WiFi Network </h6><!-- .card-body -->
+                <div class="card-body">
+                    <%= if @changeset.data.id do %>
+
+                        <%=
+                        render "_form.html",
+                        data: @changeset,
+                        action: team_location_wifi_network_path(@conn, :update, @location.team_id, @location.id, @changeset.data),
+                        location: @location,
+                        conn: @conn,
+                        errors: @errors %>
+
+                    <% else %>
+
+                        <%=
+                        render "_form.html",
+                        data: @changeset,
+                        action: team_location_wifi_network_path(@conn, :create, @location.team_id, @location.id),
+                        location: @location,
+                        conn: @conn,
+                        errors: @errors %>
+
                     <% end %>
-                    <%= for network <- @networks do %>
-                        <tr>
-                            <td></td>
-                            <td><%= network.network_name %></td>
-                            <td>
-                                <%= link "Delete", to: team_location_wifi_network_path(@conn, :delete, @location.team_id, @location.id, network.id), method: "delete", class: "btn btn-danger" %>
-                                <a href="<%= team_location_wifi_network_path(@conn, :edit, @location.team_id, @location.id, network.id) %>" class="btn btn-primary">Edit</a>
-                            </td>
-                        </tr>
-                    <% end %>
-                </tbody>
-            </table>
 
 
-            <a href="<%= team_location_path(@conn, :index, @location.team_id) %>" class="btn btn-primary">Locations</a>
+                </div><!-- /.card-body -->
+            </div>
         </div>
     </div>
 </div>

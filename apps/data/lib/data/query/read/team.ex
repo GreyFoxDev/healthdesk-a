@@ -8,7 +8,8 @@ defmodule Data.Query.ReadOnly.Team do
 
   def all do
     from(t in Team,
-      where: is_nil(t.deleted_at)
+      where: is_nil(t.deleted_at),
+      preload: [locations: :conversations]
     )
     |> Repo.all()
   end
