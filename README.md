@@ -27,10 +27,30 @@ Next install the dependancies:
 > mix deps.get
 ```
 
-## Install Lib Sass
+## Install Node Modules
 
 ```bash
-> brew install libsass
+> cd ${projectRoot}/apps/main/assets/
+> yarn
 ```
+
+## Setup postgres
+
+You can do this quickly using docker for a local dev setup:
+
+```bash
+docker run --name postgres-healthdesk -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DATABASE=healthdesk_dev -e POSTGRES_USER=postgres postgres:alpine
+```
+
+## Run Migrations and Start the server
+
+```bash
+mix ecto.create
+mix ecto.migrate
+mix phx.server
+```
+
+
+
 
 
