@@ -1,0 +1,29 @@
+/* This file is for your main application css. */
+@import "looper/scss/theme.scss";
+
+body {
+  background-color: $white;
+}
+
+.cover {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.section {
+  padding: 3rem 0;
+}
+
+
+.top-bar-item-search {
+  flex: 1;
+
+  &.top-bar-item-search {
+    max-width: 600px;
+  }
+}
+
+.user-avatar {
+  border: 2px solid $gray-600;
+}

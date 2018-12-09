@@ -3569,6 +3569,10 @@ sshpk@^1.7.0:
     safer-buffer "^2.0.2"
     tweetnacl "~0.14.0"
 
+stacked-menu@1.1.9:
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/stacked-menu/-/stacked-menu-1.1.9.tgz#04648edf6d57f951f54f379994b2d9f3194775c3"
+
 static-extend@^0.1.1:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/static-extend/-/static-extend-0.1.2.tgz#60809c39cbff55337226fd5e0b520f341f1fb5c6"
