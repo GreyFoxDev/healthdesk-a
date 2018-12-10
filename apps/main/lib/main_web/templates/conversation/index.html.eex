@@ -45,7 +45,7 @@
             <%= if assigns[:current_user].role == "admin" do %> 
                 <a href="<%= team_location_conversation_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-primary">
                     <i class="fas fa-plus">&nbsp;</i> 
-                    New Conversation
+                    New Message
                 </a>
             <% end %>
             </div>
