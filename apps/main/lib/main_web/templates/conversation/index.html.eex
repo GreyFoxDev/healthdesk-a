@@ -1,62 +1,61 @@
+<header class="section-menu nav-scroller">
+    <!-- .nav-tabs -->
+    <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+            <a class="nav-link active show" data-toggle="tab" href="#project-assigned">Me (0)</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#project-open">Open (<%= Enum.count(@conversations, fn(c) -> c.status == "open" end) %>)</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#project-closed">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>
+        </li>
+    </ul><!-- /.nav-tabs -->
+</header>
+
 <header class="page-title-bar">
-    <div class="d-flex justify-content-between">
-        <h1 class="page-title"> Conversations for <%= @location.location_name %></h1>
-        <div class="btn-toolbar">
+    <div class="d-flex justify-space-between">
+        <h1 class="page-title sr-only">Conversations for <%= @location.location_name %></h1>
+
+        <div class="row">
+            <div class="col">
+                <div class="input-group has-clearable">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="oi oi-magnifying-glass"></span></span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Search message">
+                    <div class="input-group-append">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last updated <span class="fa fa-caret-down"></span></button>
+                            <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
+                            <div class="dropdown-menu dropdown-menu-right stop-propagation">
+                                <h6 class="dropdown-header"> Sort By </h6>
+                                <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="0"> <span class="custom-control-label">Name</span></label>
+                                <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="1"> <span class="custom-control-label">Name <span class="text-muted">(Decs)</span></span></label>
+                                <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="2" checked=""> <span class="custom-control-label">Last updated</span></label>
+                                <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="3"> <span class="custom-control-label">Oldest updated</span></label>
+                                <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="4"> <span class="custom-control-label">Last created</span></label>
+                                <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="5"> <span class="custom-control-label">Oldest created</span></label>
+                            </div><!-- /.dropdown-menu -->
+                        </div><!-- /.dropdown -->
+                    </div>
+                </div><!-- /.input-group -->
+            </div>
+            <div class="col align-self-end">
             <%= if assigns[:current_user].role == "admin" do %> 
                 <a href="<%= team_location_conversation_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-primary">
                     <i class="fas fa-plus">&nbsp;</i> 
                     New Conversation
                 </a>
             <% end %>
+            </div>
         </div>
     </div>
 </header>
 
 <div class="page-section">
     <section class="card card-fluid">
-        <header class="card-header nav-scroller">
-            <!-- .nav-tabs -->
-            <ul class="nav nav-tabs card-header-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active show" data-toggle="tab" href="#project-assigned">Me (0)</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#project-open">Open (<%= Enum.count(@conversations, fn(c) -> c.status == "open" end) %>)</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#project-closed">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>
-                </li>
-            </ul><!-- /.nav-tabs -->
-        </header>
-
-        <div class="card-body">
-            <!-- grid row -->
-            <div class="row">
-                <!-- .col -->
-                <div class="col">
-                    <!-- .input-group -->
-                    <div class="input-group has-clearable">
-                        <button type="button" class="close" aria-label="Close"><span aria-hidden="true"><i class="fa fa-times-circle"></i></span></button>
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><span class="oi oi-magnifying-glass"></span></span>
-                        </div><input type="text" class="form-control" placeholder="Search">
-                    </div><!-- /.input-group -->
-                </div><!-- /.col -->
-                <!-- .col -->
-                <div class="col-auto d-none d-sm-flex">
-                    <!-- .dropdown -->
-                    <div class="dropdown">
-                        <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last updated <span class="fa fa-caret-down"></span></button>
-                        <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
-                        <div class="dropdown-menu dropdown-menu-right stop-propagation">
-                            <h6 class="dropdown-header"> Sort By </h6><label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="0"> <span class="custom-control-label">Name</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="1"> <span class="custom-control-label">Name <span class="text-muted">(Decs)</span></span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="2" checked=""> <span class="custom-control-label">Last updated</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="3"> <span class="custom-control-label">Oldest updated</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="4"> <span class="custom-control-label">Last created</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="5"> <span class="custom-control-label">Oldest created</span></label>
-                        </div><!-- /.dropdown-menu -->
-                    </div><!-- /.dropdown -->
-                </div><!-- /.col -->
-            </div><!-- /grid row -->
-        </div>
-
-        <div class="text-muted px-3 mb-2">&nbsp;</div>
+        <div class="text-muted px-3 mb-2"></div>
 
         <div class="tab-content">
             <div class="tab-pane fade active show" id="project-assigned" role="tabpanel" aria-labelledby="project-assigned-tab">

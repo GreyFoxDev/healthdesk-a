@@ -5,6 +5,7 @@ body {
   background-color: $white;
 }
 
+/* landing page */
 .cover {
   height: 100vh;
   display: flex;
@@ -15,7 +16,11 @@ body {
   padding: 3rem 0;
 }
 
+.form-control[type=text] {
+  padding-left: 0;
+}
 
+/* search bar */
 .top-bar-item-search {
   flex: 1;
 
@@ -26,4 +31,27 @@ body {
 
 .user-avatar {
   border: 2px solid $gray-600;
+}
+
+/* Conversations */
+.section-menu {
+  background: $white;
+  position: relative;
+  top: -1.5rem;
+  margin-left: -2rem;
+  margin-right: -2rem;
+
+  .nav {
+    margin: 0;
+    padding-left: 2rem;
+
+    .nav-link {
+      font-weight: 700;
+      color: $gray-800;
+    }
+  }
+}
+
+.menu-item.active > .menu-link {
+  color: $primary;
 }
