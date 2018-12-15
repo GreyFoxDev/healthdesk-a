@@ -5,6 +5,9 @@ defmodule MainWeb.ConversationController do
 
   require Logger
 
+  @chatbot Application.get_env(:session, :chatbot, Chatbot)
+
+
   def index(conn, %{"location_id" => location_id} = params) do
 
     location =

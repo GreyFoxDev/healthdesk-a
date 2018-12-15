@@ -1,0 +1,17 @@
+/* This file is for your main application css. */
+@import "looper/scss/theme.scss";
+
+
+body {
+  background-color: $white;
+}
+
+.cover {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.section {
+  padding: 3rem 0;
+}

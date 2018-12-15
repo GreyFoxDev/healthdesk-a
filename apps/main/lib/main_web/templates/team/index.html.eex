@@ -62,7 +62,7 @@
                         <!-- .list-group-item -->
                         <div class="list-group-item">
                             <div class="list-group-item-figure">
-                                <a href="page-team.html" class="user-avatar user-avatar-md"><img src="assets/images/avatars/team4.jpg" alt=""></a>
+                                <a href="<%= team_path(@conn, :edit, team.id) %>" class="user-avatar user-avatar-md"><img src="/assets/images/avatars/team4.jpg" alt=""></a>
                             </div>
                             <div class="list-group-item-body">
                                 <div class="d-sm-flex justify-content-sm-between align-items-sm-center">

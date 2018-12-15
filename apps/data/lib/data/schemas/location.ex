@@ -44,5 +44,12 @@ defmodule Data.Schema.Location do
     model
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
+    |> validate_length(:location_name, max: 250)
+    |> validate_length(:phone_number, max: 50)
+    |> validate_length(:address_1, max: 250)
+    |> validate_length(:address_2, max: 250)
+    |> validate_length(:city, max: 100)
+    |> validate_length(:state, max: 2)
+    |> validate_length(:postal_code, max: 20)
   end
 end
