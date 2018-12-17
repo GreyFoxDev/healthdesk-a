@@ -25,7 +25,7 @@ defmodule MainWeb.SessionController do
 
   def create(conn, %{"session" => %{"verification_code" => code, "phone_number" => phone_number}}) do
     with {:ok, user} <- Query.authorize(phone_number),
-         # :ok <- Twilio.check(phone_number, code),
+         :ok <- Twilio.check(phone_number, code),
          {:role, "admin"} <- {:role, user.role} do
       redirect_to(conn, user, "/admin/teams")
     else
@@ -38,8 +38,8 @@ defmodule MainWeb.SessionController do
   end
 
   def create(conn, %{"session" => %{"phone_number" => phone_number}}) do
-    with {:ok, user} <- Query.authorize(phone_number) do
-        # :ok <- Twilio.verify(phone_number) do
+    with {:ok, user} <- Query.authorize(phone_number),
+        :ok <- Twilio.verify(phone_number) do
       conn
       |> put_layout(:login)
       |> put_flash(:success, "Please verify the phone number #{user.first_name}!")
@@ -65,7 +65,6 @@ defmodule MainWeb.SessionController do
   end
 
   defp redirect_to(conn, user, page) do
-    IO.inspect user
     conn
     |> Auth.login(user)
     |> put_flash(:success, "Welcome back #{user.first_name}!")
