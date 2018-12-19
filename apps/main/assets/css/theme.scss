@@ -12,13 +12,16 @@ body {
   flex-direction: column;
 }
 
+.app {
+  .form-control[type=text] {
+    padding-left: 0;
+  }
+}
+
 .section {
   padding: 3rem 0;
 }
 
-.form-control[type=text] {
-  padding-left: 0;
-}
 
 /* search bar */
 .top-bar-item-search {
