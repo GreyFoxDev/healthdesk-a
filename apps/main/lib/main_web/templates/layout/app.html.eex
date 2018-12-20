@@ -72,8 +72,12 @@
                                   <%= current_user.first_name %>&nbsp
                                   <%= current_user.last_name %>
                               </h6>
-
+                              <%= link "Profile", to: "/profile", method: "get", class: "dropdown-item" %>
                               <%= link "Logout", to: session_path(@conn, :delete, current_user), method: "delete", class: "dropdown-item" %>
+                              <hr />
+                              <%= link "Settings", to: "/settings", method: "delete", class: "dropdown-item" %>
+                              <%= link "Get support", to: "mailto:info@healthdesk.ai", method: "delete", class: "dropdown-item" %>
+                              <%= link "Terms and policies", to: "/policies", method: "delete", class: "dropdown-item" %>
                           </div><!-- /.dropdown-menu -->
                       </div>
                   <% end %>
