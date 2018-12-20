@@ -33,8 +33,6 @@
                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-rich stop-propagation">
                     <div class="dropdown-header"> Assign Conversation </div>
                     <div class="form-group px-3 py-2 m-0">
-
-
                         <select id="assigned_id" class="custom-select">
                             <option value="">Select Team Member</option>
                                 <%= for team_member <- @team_members do %>

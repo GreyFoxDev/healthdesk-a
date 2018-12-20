@@ -32,8 +32,20 @@ body {
   }
 }
 
-.user-avatar {
-  border: 2px solid $gray-600;
+
+.user-avatar-wrapper {
+  padding-left: 40px;
+  display: block;
+
+  .user-avatar {
+    border: 2px solid $gray-600;
+    float: left;
+  }
+
+  span, b {
+    display: block;
+    padding-left: 25px;
+  }
 }
 
 /* Conversations */
@@ -57,4 +69,10 @@ body {
 
 .menu-item.active > .menu-link {
   color: $primary;
+}
+
+.table.no-first-border {
+  tbody > tr:first-child td {
+    border-top: 0;
+  }
 }
