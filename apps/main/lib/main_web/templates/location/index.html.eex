@@ -50,38 +50,38 @@
             </div><!-- /grid row -->
         </div>
 
-        <div class="text-muted px-3 mb-2"> Showing 1 to <%= Enum.count(@locations) %> of <%= Enum.count(@locations) %> entries </div>
+        <div class="text-muted px-3 mb-2">Showing 1 to <%= Enum.count(@locations) %> of <%= Enum.count(@locations) %> entries </div>
 
         <div class="tab-content">
             <div class="tab-pane fade active show" id="project-myteams" role="tabpanel" aria-labelledby="project-myteams-tab">
                 <!-- .list-group -->
-                <div class="list-group list-group-flush list-group-divider">
+                <table class="table">
+                    <thead class="sr-only">
+                        <tr>
+                        <th scope="col">User</th>
+                        <th scope="col">Team</th>
+                        <th scope="col">Updated</th>
+                        <th />
+                        </tr>
+                    </thead>
+                    <tbody>
                     <%= for location <- @locations do %>
-                        <!-- .list-group-item -->
-                        <div class="list-group-item">
-                            <div class="list-group-item-figure">
-                                <a href="<%= team_location_path(@conn, :edit, @team.id, location.id) %>" class="user-avatar user-avatar-md"><img src="/assets/images/avatars/team4.jpg" alt=""></a>
-                            </div>
-                            <div class="list-group-item-body">
-                                <div class="d-sm-flex justify-content-sm-between align-items-sm-center">
-                                    <div class="team">
-                                        <h4 class="list-group-item-title">
-                                            <a href="<%= team_location_path(@conn, :edit, @team.id, location.id) %>"><%= location.location_name %>
-                                                &nbsp;
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                        </h4>
-                                        <p class="list-group-item-text"> Updated <%= format_date(location.updated_at) %> </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="list-group-item-figure">
-                                <a href="<%= team_location_conversation_path(@conn, :index, location.team_id, location.id) %>" class="btn btn-sm btn-icon btn-secondary stop-propagation">...</a>
-                            </div>
-                        </div><!-- /.list-group-item -->
-
+                        <tr>
+                            <td>
+                                <b><a href="<%= team_location_conversation_path(@conn, :index, location.team_id, location.id) %>"><%= location.location_name %></a></b><br />
+                            </td>
+                            <td>
+                            </td>
+                            <td>Updated <%= format_date(location.updated_at) %></td>
+                            <td>
+                                <a href="<%= team_location_path(@conn, :edit, @team.id, location.id) %>" class="btn btn-sm btn-icon btn-secondary stop-propagation" title="Edit"><span class="fa fa-edit"></span></a>
+                            </td>
+                        </tr>
                     <% end  %>
-                </div><!-- /.list-group -->
+                    </tbody>
+                </table><!-- /.list-group -->
+
+
             </div>
         </div>
 
