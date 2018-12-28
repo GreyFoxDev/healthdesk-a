@@ -47,7 +47,7 @@
                             <script>
                              $("#assign_team_member").click(function(e) {
                                  e.preventDefault(); // prevent default action of link
-                                 val = $("#assigned_id").val(); 
+                                 val = $("#assigned_id").val();
 
                                  if (val == "") {
                                      alert("Please select a team member before trying to assign.");
@@ -55,7 +55,7 @@
                                      $.ajax({
                                          url: '/api/assign-team-member',
                                          type: 'PUT',
-                                         data: "id=<%=  @conversation.id %>&location_id=<%= @location.id %>&team_member_id=" + val,
+                                         data: "id=<%= @conversation.id %>&location_id=<%= @location.id %>&team_member_id=" + val,
                                          success: function(data) {
                                              window.location.reload();
                                          }
@@ -69,7 +69,6 @@
                     </div>
                 </div><!-- /.dropdown-menu -->
             </div><!-- /invite members -->
-            <button type="button" class="btn btn-light btn-icon d-xl-none" data-toggle="sidebar"><i class="fa fa-angle-double-left"></i></button>
             <% end %>
         </div>
     </header>

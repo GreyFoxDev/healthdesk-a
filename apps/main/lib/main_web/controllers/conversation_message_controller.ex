@@ -34,6 +34,7 @@ defmodule MainWeb.ConversationMessageController do
       messages: messages,
       team_members: team_members,
       teams: teams(conn),
+      has_sidebar: True,
       changeset: ConversationMessages.get_changeset()
   end
 

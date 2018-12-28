@@ -12,7 +12,7 @@ defmodule Data.Query.ReadOnly.ConversationMessage do
   def all(conversation_id) do
     from(c in ConversationMessage,
       where: c.conversation_id == ^conversation_id,
-      order_by: [desc: c.sent_at]
+      order_by: c.sent_at
     )
     |> Repo.all()
   end

@@ -15,23 +15,29 @@
     </td>
     <td>
         <b><a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>">+1 <%= format_phone(@c.original_number) %></a></b>
-
-        <p class="list-group-item-text"><%= List.last(@c.conversation_messages).message |> String.slice(0..100) %>&hellip;</p>
+        <p class="list-group-item-text"><%= List.first(@c.conversation_messages).message |> String.slice(0..100) %>&hellip;</p>
     </td>
     <td>
-        <%= List.last(@c.conversation_messages).sent_at |> format_date() %>
+        <%= List.first(@c.conversation_messages).sent_at |> format_date() %>
     </td>
     <td>
         <div class="dropdown">
-            <button class="btn btn-sm btn-icon btn-secondary stop-propagation" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 ...
             </button>
+            <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                <%= if @c.status != "open" do %>
+                    <%= link("Open", class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :open, @location.team_id, @location.id, @c.id), method: :put) %>
+                <% else %>
+                    <span class="dropdown-item disabled">Open</span>
+                <%  end %>
 
-            <div class="dropdown-menu dropdown-menu-right stop-propagation">
-                <h6 class="dropdown-header">Open/Close</h6>
-                <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="0"> <span class="custom-control-label">Name</span></label>
-                <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="1"> <span class="custom-control-label">Name <span class="text-muted">(Decs)</span></span></label>
-            </div><!-- /.dropdown-menu -->
-        </div><!-- /.dropdown -->
+                <%= if @c.status != "closed" do %>
+                    <%= link("Close", class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @c.id), method: :put) %>
+                <% else %>
+                    <span class="dropdown-item disabled">Closed</span>
+                <% end %>
+            </div>
+        </div>
     </td>
 </tr>

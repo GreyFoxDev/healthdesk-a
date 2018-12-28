@@ -2,7 +2,7 @@
     <!-- .nav-tabs -->
     <ul class="nav nav-tabs card-header-tabs">
         <li class="nav-item">
-            <a class="nav-link active show" data-toggle="tab" href="#project-assigned">Me (0)</a>
+            <a class="nav-link active show" data-toggle="tab" href="#project-assigned">Me (<%= Enum.count(@conversations, &(&1.team_member_id == assigns[:current_user].id)) %>)</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#project-open">Open (<%= Enum.count(@conversations, fn(c) -> c.status == "open" end) %>)</a>
@@ -53,28 +53,32 @@
         <div class="tab-content">
 
             <div class="tab-pane fade active show" id="project-assigned" role="tabpanel" aria-labelledby="project-assigned-tab">
+                <!-- .list-group-item -->
                 <%= if Enum.count(@conversations, &(&1.team_member_id == assigns[:current_user].id)) == 0 do %>
                     <div class="alert alert-info mx-3">You have no assigned conversations for this location</div>
                 <% end %>
+
+                <table class="table no-first-border">
+                    <tbody>
+                    <%= for c <- Enum.filter(@conversations, &(&1.team_member_id == assigns[:current_user].id)) do %>
+                        <%= render("_conversation_row.html", c: c, conn: @conn, location: @location) %>
+                    <% end %>
+                    </tbody>
+                </table>
             </div>
 
             <div class="tab-pane fade" id="project-open" role="tabpanel" aria-labelledby="project-open-tab">
-                <!-- .list-group -->
-                <div class="list-group list-group-flush list-group-divider">
-                    <!-- .list-group-item -->
+                <%= if Enum.count(@conversations, &(&1.status == "open")) == 0 do %>
+                    <div class="alert alert-info mx-3">There are no open conversations for this location.</div>
+                <% end %>
 
-                    <%= if Enum.count(@conversations, &(&1.status == "open")) == 0 do %>
-                        <div class="alert alert-info mx-3">There are no open conversations for this location.</div>
+                <table class="table no-first-border">
+                    <tbody>
+                    <%= for c <- Enum.filter(@conversations, &(&1.status == "open")) do %>
+                        <%= render("_conversation_row.html", c: c, conn: @conn, location: @location) %>
                     <% end %>
-
-                    <table class="table no-first-border">
-                        <tbody>
-                        <%= for c <- Enum.filter(@conversations, &(&1.status == "open")) do %>
-                            <%= render("_conversation_row.html", c: c, conn: @conn, location: @location) %>
-                        <% end %>
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
             </div>
 
             <div class="tab-pane fade" id="project-closed" role="tabpanel" aria-labelledby="project-closed-tab">
@@ -82,7 +86,7 @@
                     <div class="alert alert-info mx-3">There are no closed conversations for this location.</div>
                 <% end %>
 
-                <table class="table">
+                <table class="table no-first-border">
                     <tbody>
                         <%= for c <- Enum.filter(@conversations, &(&1.status == "closed")) do %>
                             <% team_member = (c.team_member || default_user()) %>

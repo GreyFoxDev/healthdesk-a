@@ -10,6 +10,32 @@ b > a {
   color: $gray-800;
 }
 
+.message {
+  position: relative;
+  top: -1.5rem;
+  margin-right: -2rem;
+  margin-left: -2rem;
+}
+.message-body {
+  margin-right: -2rem;
+  margin-left: -2rem;
+}
+.message-publisher {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+}
+
+.page.has-sidebar-open {
+  width: calc(100% - 22.5rem);
+  position: relative;
+}
+
+.hide-arrow::after {
+  display: none !important;
+}
+
 /* landing page */
 .cover {
   height: 100vh;
@@ -73,4 +99,38 @@ b > a {
   tbody > tr:first-child td {
     border-top: 0;
   }
+}
+
+.dropdown {
+  .dropdown-item.disabled {
+    color: #ddd;
+  }
+}
+
+// messages
+.conversation-inbound .conversation-message-skip-avatar {
+  padding-left: 0;
+
+  .conversation-message-text {
+    border-radius: 10px;
+    color: $gray-800; 
+    background: $gray-100;
+    box-shadow: none;
+    border: 1px solid $gray-200;
+    font-weight: 500;
+  }
+}
+
+.conversation-outbound {
+  padding-right: 1rem;
+
+  .conversation-avatar + .conversation-message .conversation-message-text {
+    border-radius: 10px;
+    color: $gray-800; 
+    background: $gray-100;
+    box-shadow: none;
+    border: 1px solid $gray-200;
+    font-weight: 500;
+  }
+
 }

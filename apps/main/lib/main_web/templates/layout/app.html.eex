@@ -72,12 +72,13 @@
                                   <%= current_user.first_name %>&nbsp
                                   <%= current_user.last_name %>
                               </h6>
-                              <%= link "Profile", to: "/profile", method: "get", class: "dropdown-item" %>
+                              <%= link "Profile", to: "/profile", class: "dropdown-item" %>
                               <%= link "Logout", to: session_path(@conn, :delete, current_user), method: "delete", class: "dropdown-item" %>
                               <hr />
-                              <%= link "Settings", to: "/settings", method: "delete", class: "dropdown-item" %>
+                              <%= link "Settings", to: settings_url(@conn, current_user), class: "dropdown-item" %>
                               <%= link "Get support", to: "mailto:info@healthdesk.ai", method: "delete", class: "dropdown-item" %>
-                              <%= link "Terms and policies", to: "/policies", method: "delete", class: "dropdown-item" %>
+                              <%= link "Terms of use", to: "https://healthdesk.ai/terms", target: "_blank", class: "dropdown-item" %>
+                              <%= link "Privacy policy", to: "https://healthdesk.ai/privacy", target: "_blank", class: "dropdown-item" %>
                           </div><!-- /.dropdown-menu -->
                       </div>
                   <% end %>
@@ -126,7 +127,7 @@
 
       <main class="app-main">
           <div class="wrapper">
-              <div class="page has-sidebar">
+              <div class="page <%= if assigns[:has_sidebar] do %>has-sidebar-open<% end %>">
                   <div class="page-inner">
                       <%= render @view_module, @view_template, assigns %>
                   </div>
