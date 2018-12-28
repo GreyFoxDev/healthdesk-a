@@ -15,7 +15,7 @@
 
 <header class="page-title-bar">
     <div class="d-flex justify-content-between">
-        <div class="input-group has-clearable">
+        <div class="input-group has-clearable message-search">
             <div class="input-group-prepend">
                 <span class="input-group-text"><span class="oi oi-magnifying-glass"></span></span>
             </div>
@@ -53,9 +53,8 @@
         <div class="tab-content">
 
             <div class="tab-pane fade active show" id="project-assigned" role="tabpanel" aria-labelledby="project-assigned-tab">
-
                 <%= if Enum.count(@conversations, &(&1.team_member_id == assigns[:current_user].id)) == 0 do %>
-                    <div class="alert alert-info mx-3">You have no assigned conversations for this location.</div>
+                    <div class="alert alert-info mx-3">You have no assigned conversations for this location</div>
                 <% end %>
             </div>
 

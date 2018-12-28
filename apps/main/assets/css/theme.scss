@@ -6,6 +6,10 @@ body {
   background-color: $white;
 }
 
+b > a {
+  color: $gray-800;
+}
+
 /* landing page */
 .cover {
   height: 100vh;
