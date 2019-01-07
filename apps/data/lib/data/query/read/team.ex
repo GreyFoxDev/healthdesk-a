@@ -9,7 +9,10 @@ defmodule Data.Query.ReadOnly.Team do
   def all do
     from(t in Team,
       where: is_nil(t.deleted_at),
-      preload: [locations: :conversations]
+      left_join: l in assoc(t, :locations),
+      left_join: c in assoc(l, :conversations),
+      preload: [locations: { l, conversations: c}],
+      order_by: [t.team_name, l.location_name, c.started_at]
     )
     |> Repo.all()
   end
