@@ -63,6 +63,7 @@ defmodule MainWeb.MemberController do
         team_id: team_id,
         teams: teams(conn),
         members: members,
+        has_sidebar: true,
         errors: [])
     end
   end
