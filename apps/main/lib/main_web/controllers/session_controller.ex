@@ -39,7 +39,7 @@ defmodule MainWeb.SessionController do
 
   def create(conn, %{"session" => %{"phone_number" => phone_number}}) do
     with {:ok, user} <- Query.authorize(phone_number),
-        :ok <- Twilio.verify(phone_number) do
+         :ok <- Twilio.verify(phone_number) do
       conn
       |> put_layout(:login)
       |> put_flash(:success, "Please verify the phone number #{user.first_name}!")

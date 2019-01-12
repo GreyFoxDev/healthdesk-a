@@ -1,25 +1,3 @@
-<style>
- #overlay {
-     position: fixed;
-     display: none;
-     width: 100%;
-     height: 100%;
-     top: 0;
-     left: 0;
-     right: 0;
-     bottom: 0;
-     background-color: rgba(0,0,0,0.5);
-     z-index: 2;
-     cursor: pointer;
- }
-</style>
-<script>
- $( document ).ready(function() {
-     document.getElementById("overlay").style.display = "block";
- });
-</script>
-<div id="overlay"></div>
-
 <header class="page-title-bar">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">

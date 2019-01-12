@@ -38,8 +38,7 @@ defmodule MainWeb.Helper.Formatters  do
     |> to_time(:yesterday)
   end
   def parse_date(_seconds, date) do
-    Strftime.strftime!(date, "%d/%m/%Y")
-    #Calendar.DateTime.Format.httpdate(date)
+    Strftime.strftime!(date, "%m/%d/%Y")
   end
 
   def to_time(<< hour::binary-size(2), ":", minute::binary-size(2), _rest::binary >>, :today) do

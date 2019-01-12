@@ -9,5 +9,5 @@ defmodule MainWeb.Auth.Guardian do
     do: {:ok, to_string(user.id)}
 
   def resource_from_claims(claims),
-    do: {:ok, User.get(%{role: "system"}, IO.inspect(claims["sub"]))}
+    do: {:ok, User.get(%{role: "system"}, claims["sub"])}
 end
