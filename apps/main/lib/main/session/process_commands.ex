@@ -20,14 +20,13 @@ defmodule Session.ProcessCommand do
   """
   def call(%Session{request: request} = session, deps \\ @deps) do
     with %Session{} = session <- log(session, "INBOUND", deps),
-         {:new, conversation} <- start_or_update_conversation(session) do
-
-      request.body
-      |> ask_question()
-      |> process_command(session, conversation)
+         {:open, conversation} <- start_or_update_conversation(session) do
+      {:ok, session}
     else
-      _ ->
-        {:ok, session}
+      {_, conversation} ->
+        request.body
+        |> ask_question()
+        |> process_command(session, conversation)
     end
   end
 

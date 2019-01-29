@@ -80,7 +80,17 @@ defmodule Session.Actions do
 
       {:new, conversation}
     else
-      %Data.Schema.Conversation{} = conversation ->
+      %Data.Schema.Conversation{status: "closed"} = conversation ->
+        %{
+          "phone_number" => request.from,
+          "message" => request.body,
+          "status" => "open",
+          "sent_at" => DateTime.utc_now(),
+          "conversation_id" => conversation.id}
+        |> Data.Commands.ConversationMessages.write()
+
+        {:reopen, conversation}
+      %Data.Schema.Conversation{status: "open"} = conversation ->
         %{
           "phone_number" => request.from,
           "message" => request.body,
@@ -88,7 +98,7 @@ defmodule Session.Actions do
           "conversation_id" => conversation.id}
         |> Data.Commands.ConversationMessages.write()
 
-      {:open, conversation}
+        {:open, conversation}
     end
   end
 

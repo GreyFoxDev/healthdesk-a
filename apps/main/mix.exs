@@ -23,7 +23,7 @@ defmodule Main.Mixfile do
   def application do
     [
       mod: {Main.Application, []},
-      extra_applications: [:logger, :runtime_tools, :data, :chatbot]
+      extra_applications: [:logger, :runtime_tools, :con_cache, :data, :chatbot]
     ]
   end
 
@@ -45,6 +45,7 @@ defmodule Main.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:guardian, "~> 1.0"},
+      {:con_cache, "~> 0.13.0"},
       {:data, in_umbrella: true},
       {:chatbot, in_umbrella: true},
       {:wit_client, in_umbrella: true},

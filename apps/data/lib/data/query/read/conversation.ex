@@ -47,7 +47,6 @@ defmodule Data.Query.ReadOnly.Conversation do
        end
   end
 
-  def get_by_phone(phone_number) do
-    Repo.get_by(Conversation, [original_number: phone_number, status: "open"] )
-  end
+  def get_by_phone(phone_number),
+    do: Repo.get_by(Conversation, [original_number: phone_number] )
 end

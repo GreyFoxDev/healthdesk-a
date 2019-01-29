@@ -33,6 +33,7 @@ defmodule WitClient.MessageHandler do
          ]) do
       {response, 0} ->
         with %{} = response <- Poison.Parser.parse!(response)["entities"],
+             response <- IO.inspect(response),
              intent <- get_intent(response),
              args <- get_args(response) do
           send(from, {:response, {intent, args}})
@@ -54,19 +55,64 @@ defmodule WitClient.MessageHandler do
   def get_intent(_response), do: :unknown
 
   def get_args(%{"thanks" => [%{"value" => "true"} | _]}), do: "thanks"
-  def get_args(%{"datetime" => [%{"type" => "value", "value" => value} | _]}), do: value
 
-  def get_args(%{
-        "datetime" => [
-          %{"type" => "interval", "from" => %{"value" => from}, "to" => %{"value" => to}} | _
-        ]
-      }),
-      do: {from, to}
+  def get_args(map) do
+    map
+    |> Map.keys()
+    |> Enum.map(&(parse_args(&1, map)))
+  end
 
-  def get_args(_response), do: ""
+  defp parse_args("datetime" = key, map) do
+    map
+    |> Map.get(key)
+    |> parse_datetime()
+    |> set_value(key)
+  end
+
+  defp parse_args(key, map) do
+    map
+    |> Map.get(key)
+    |> set_value(key)
+  end
+
+  defp set_value(value, key) do
+    try do
+      {String.to_existing_atom(key),  value}
+    rescue
+      _error in ArgumentError ->
+        Logger.error("Invalid key from Wit.AI: #{inspect key} value: #{inspect value}")
+      {key, value}
+    end
+  end
+
+  defp parse_datetime([%{"type" => "value", "value" => value} | _]), do: value
+  defp parse_datetime([%{"type" => "interval", "from" => %{"value" => from}, "to" => %{"value" => to}} | _]), do: {from, to}
 
   def handle_info(_, state) do
     Logger.error("Unkown message: #{inspect(state)}")
     {:stop, :normal, state}
   end
 end
+
+
+%{
+  "_text" => "what time does jen teach cardio kickboxing?",
+  "entities" => %{
+    "Instructor" =>
+    %{
+      "suggested" => true,
+      "value" => "jen",
+      "type" => "value"
+    },
+    "class_type" =>
+      %{
+        "value" => "cardio kickboxing",
+        "type" => "value"
+      },
+    "intent" =>
+      %{
+        "value" => "queryInstructorSchedule"
+      }
+  },
+  "msg_id" => "163JHqlrmwNWeZiiN"
+}

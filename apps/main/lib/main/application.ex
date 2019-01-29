@@ -7,7 +7,12 @@ defmodule Main.Application do
     children = [
       supervisor(MainWeb.Endpoint, []),
       worker(Registry, [:duplicate, Session.Registry]),
-      supervisor(Session.Handler.Supervisor, [])
+      supervisor(Session.Handler.Supervisor, []),
+      {ConCache, [
+            name: :session_cache,
+            ttl_check_interval: :timer.hours(1),
+            global_ttl: :timer.hours(24)
+          ]}
     ]
 
     opts = [strategy: :one_for_one, name: Main.Supervisor]

@@ -5,6 +5,8 @@ defmodule MainWeb.TwilioController do
 
   alias Session.Handler.Supervisor, as: Session
 
+  plug MainWeb.Plug.OptIn
+
   def create(conn, params) do
     params
     |> build_request()

@@ -5,7 +5,8 @@ defmodule Data.Intent do
     HolidayHours,
     WifiNetwork,
     PricingPlan,
-    ChildCareHours
+    ChildCareHours,
+    ClassSchedule
   }
 
   @default_error "Not sure about that. Give me a minute..."
@@ -99,7 +100,60 @@ defmodule Data.Intent do
     end
   end
 
+  def get_message({"queryInstructorSchedule",  args}, phone_number) do
+    phone_number
+    |> get_classes()
+    |> handle_classes(args)
+  end
+
+  def get_message({"queryClassNext", args}, phone_number) do
+    phone_number
+    |> get_classes()
+    |> handle_classes(args)
+  end
+
   def get_message({:unknown, _args}, _), do: @default_error
+
+  def get_classes(phone_number) do
+    with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number) do
+      ClassSchedule.all(l.id)
+    else
+      _ -> []
+    end
+  end
+
+  def handle_classes([], _), do: "Unfortunately, we don't offer any classes"
+  def handle_classes(classes, [instructor: instructor, class_type: class_type, datetime: datetime]) do
+    date = Date.from_iso8601!(datetime)
+
+    Enum.filter(classes, fn(class) ->
+      class.instructor == instructor &&
+        class.class_type == class_type &&
+        class.date == date
+    end)
+  end
+
+  def handle_classes(classes, [instructor: instructor, class_type: class_type]) do
+    Enum.filter(classes, fn(class) ->
+      class.instructor == instructor && class.class_type == class_type
+    end)
+  end
+
+  def handle_classes(classes, [class_category: category, datetime: datetime]) do
+    date = Date.from_iso8601!(datetime)
+
+    Enum.filter(classes, fn(class) ->
+        class.class_category == category && class.date == date
+    end)
+  end
+
+  def handle_classes(classes, [class_category: category]) do
+    Enum.filter(classes, fn(class) -> class.category == category end)
+  end
+
+  def handle_classes(classes, [instructor: instructor]) do
+    Enum.filter(classes, fn(class) -> class.instructor == instructor end)
+  end
 
   defp convert_to_day(
          <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2),
