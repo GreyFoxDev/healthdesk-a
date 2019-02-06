@@ -7,7 +7,7 @@ defmodule MainWeb.Plug.BuildAnswer do
 
   import Plug.Conn
 
-  @storage Application.get_env(:session, :storage, Data.Intent)
+  alias MainWeb.Intents
 
   @spec init(list()) :: list()
   def init(opts), do: opts
@@ -16,7 +16,7 @@ defmodule MainWeb.Plug.BuildAnswer do
   def call(conn, opts \\ [])
 
   def call(%{assigns: %{opt_in: true, intent: intent, location: location}} = conn, _opts),
-    do: assign(conn, :response, @storage.get_message(intent, location))
+    do: assign(conn, :response, Intents.get(intent, location))
 
   def call(conn, _opts), do: conn
 end

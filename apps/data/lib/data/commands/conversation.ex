@@ -50,7 +50,8 @@ defmodule Data.Commands.Conversations do
   """
   @spec close(id :: binary) :: {:ok, Conversation.t()} | {:error, String.t()}
   def close(id) do
-    IO.inspect "HERE****"
+    IO.inspect("HERE****")
+
     with %Data.Schema.Conversation{id: id} = convo <- get(id),
          %Data.Schema.Conversation{id: id} = convo <- write(convo, @closed) do
       {:ok, convo}

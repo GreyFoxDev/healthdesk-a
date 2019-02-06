@@ -6,8 +6,6 @@ defmodule Main.Application do
 
     children = [
       supervisor(MainWeb.Endpoint, []),
-      worker(Registry, [:duplicate, Session.Registry]),
-      supervisor(Session.Handler.Supervisor, []),
       {ConCache, [
             name: :session_cache,
             ttl_check_interval: :timer.hours(1),
