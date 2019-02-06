@@ -100,7 +100,7 @@ defmodule Data.Intent do
     end
   end
 
-  def get_message({"queryInstructorSchedule",  args}, phone_number) do
+  def get_message({"queryInstructorSchedule", args}, phone_number) do
     phone_number
     |> get_classes()
     |> handle_classes(args)
@@ -123,36 +123,37 @@ defmodule Data.Intent do
   end
 
   def handle_classes([], _), do: "Unfortunately, we don't offer any classes"
-  def handle_classes(classes, [instructor: instructor, class_type: class_type, datetime: datetime]) do
+
+  def handle_classes(classes, instructor: instructor, class_type: class_type, datetime: datetime) do
     date = Date.from_iso8601!(datetime)
 
-    Enum.filter(classes, fn(class) ->
+    Enum.filter(classes, fn class ->
       class.instructor == instructor &&
         class.class_type == class_type &&
         class.date == date
     end)
   end
 
-  def handle_classes(classes, [instructor: instructor, class_type: class_type]) do
-    Enum.filter(classes, fn(class) ->
+  def handle_classes(classes, instructor: instructor, class_type: class_type) do
+    Enum.filter(classes, fn class ->
       class.instructor == instructor && class.class_type == class_type
     end)
   end
 
-  def handle_classes(classes, [class_category: category, datetime: datetime]) do
+  def handle_classes(classes, class_category: category, datetime: datetime) do
     date = Date.from_iso8601!(datetime)
 
-    Enum.filter(classes, fn(class) ->
-        class.class_category == category && class.date == date
+    Enum.filter(classes, fn class ->
+      class.class_category == category && class.date == date
     end)
   end
 
-  def handle_classes(classes, [class_category: category]) do
-    Enum.filter(classes, fn(class) -> class.category == category end)
+  def handle_classes(classes, class_category: category) do
+    Enum.filter(classes, fn class -> class.category == category end)
   end
 
-  def handle_classes(classes, [instructor: instructor]) do
-    Enum.filter(classes, fn(class) -> class.instructor == instructor end)
+  def handle_classes(classes, instructor: instructor) do
+    Enum.filter(classes, fn class -> class.instructor == instructor end)
   end
 
   defp convert_to_day(

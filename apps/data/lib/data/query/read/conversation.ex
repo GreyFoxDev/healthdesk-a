@@ -17,7 +17,8 @@ defmodule Data.Query.ReadOnly.Conversation do
       left_join: member in Member,
       on: c.original_number == member.phone_number,
       where: c.location_id == ^location_id,
-      order_by: [desc: m.sent_at], # most recent first
+      # most recent first
+      order_by: [desc: m.sent_at],
       preload: [conversation_messages: m, team_member: {t, user: u}],
       select: %{c | member: member}
     )
@@ -38,15 +39,17 @@ defmodule Data.Query.ReadOnly.Conversation do
     )
     |> Repo.all()
     |> case do
-         [] ->
-           nil
-         [conversation] ->
-           conversation
-         _ ->
-           :error
-       end
+      [] ->
+        nil
+
+      [conversation] ->
+        conversation
+
+      _ ->
+        :error
+    end
   end
 
   def get_by_phone(phone_number),
-    do: Repo.get_by(Conversation, [original_number: phone_number] )
+    do: Repo.get_by(Conversation, original_number: phone_number)
 end

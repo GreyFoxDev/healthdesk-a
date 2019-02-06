@@ -10,7 +10,7 @@ defmodule Chatbot.Client.Twilio do
   require Logger
 
   def call(%Chatbot.Params{provider: :twilio} = params) do
-    Logger.info("SENDING TO TWILIO: #{inspect params}")
+    Logger.info("SENDING TO TWILIO: #{inspect(params)}")
 
     ExTwilio.Message.create(
       from: params.from,

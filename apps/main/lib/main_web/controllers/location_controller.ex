@@ -57,22 +57,22 @@ defmodule MainWeb.LocationController do
     |> Map.put("team_id", team_id)
     |> Location.create()
     |> case do
-      {:ok, _location} ->
-        conn
-        |> put_flash(:success, "Location created successfully.")
-        |> redirect(to: team_location_path(conn, :index, team_id))
-      {:error, changeset} ->
-        conn
-        |> put_flash(:error, "Location failed to create")
-        |> render_page("new.html", changeset, changeset.errors)
-    end
+         %Data.Schema.Location{} ->
+          conn
+           |> put_flash(:success, "Location created successfully.")
+           |> redirect(to: team_location_path(conn, :index, team_id))
+         {:error, changeset} ->
+           conn
+           |> put_flash(:error, "Location failed to create")
+           |> render_page("new.html", changeset, changeset.errors)
+       end
   end
 
   def update(conn, %{"id" => id, "location" => location, "team_id" => team_id}) do
     location = Map.put(location, "team_id", team_id)
 
     case Location.update(id, location) do
-      {:ok, _location} ->
+      %Data.Schema.Location{} ->
         conn
         |> put_flash(:success, "Location updated successfully.")
         |> redirect(to: team_location_path(conn, :index, team_id))

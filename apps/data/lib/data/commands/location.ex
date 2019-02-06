@@ -7,5 +7,5 @@ defmodule Data.Commands.Location do
     do: Command.execute_task_with_results(fn -> Read.all(team_id) end)
 
   def get_by_phone(phone_number),
-    do: Command.execute_task_with_results(fn -> Read.get_by_phone(phone_number) end)
+    do: Read.get_by_phone(phone_number)
 end

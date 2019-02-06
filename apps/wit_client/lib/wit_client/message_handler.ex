@@ -22,6 +22,11 @@ defmodule WitClient.MessageHandler do
     {:ok, args}
   end
 
+  def handle_info(:ask, [from, nil]) do
+    send(from, {:error, :unknown})
+    {:stop, :normal, []}
+  end
+
   def handle_info(:ask, [from, question]) do
     question = Inflex.parameterize(question, "%20")
 
@@ -59,7 +64,7 @@ defmodule WitClient.MessageHandler do
   def get_args(map) do
     map
     |> Map.keys()
-    |> Enum.map(&(parse_args(&1, map)))
+    |> Enum.map(&parse_args(&1, map))
   end
 
   defp parse_args("datetime" = key, map) do
@@ -77,16 +82,20 @@ defmodule WitClient.MessageHandler do
 
   defp set_value(value, key) do
     try do
-      {String.to_existing_atom(key),  value}
+      {String.to_existing_atom(key), value}
     rescue
       _error in ArgumentError ->
-        Logger.error("Invalid key from Wit.AI: #{inspect key} value: #{inspect value}")
-      {key, value}
+        Logger.error("Invalid key from Wit.AI: #{inspect(key)} value: #{inspect(value)}")
+        {key, value}
     end
   end
 
   defp parse_datetime([%{"type" => "value", "value" => value} | _]), do: value
-  defp parse_datetime([%{"type" => "interval", "from" => %{"value" => from}, "to" => %{"value" => to}} | _]), do: {from, to}
+
+  defp parse_datetime([
+         %{"type" => "interval", "from" => %{"value" => from}, "to" => %{"value" => to}} | _
+       ]),
+       do: {from, to}
 
   def handle_info(_, state) do
     Logger.error("Unkown message: #{inspect(state)}")
@@ -94,25 +103,21 @@ defmodule WitClient.MessageHandler do
   end
 end
 
-
-%{
-  "_text" => "what time does jen teach cardio kickboxing?",
-  "entities" => %{
-    "Instructor" =>
-    %{
-      "suggested" => true,
-      "value" => "jen",
-      "type" => "value"
-    },
-    "class_type" =>
-      %{
-        "value" => "cardio kickboxing",
-        "type" => "value"
-      },
-    "intent" =>
-      %{
-        "value" => "queryInstructorSchedule"
-      }
-  },
-  "msg_id" => "163JHqlrmwNWeZiiN"
-}
+# %{
+#   "_text" => "what time does jen teach cardio kickboxing?",
+#   "entities" => %{
+#     "Instructor" => %{
+#       "suggested" => true,
+#       "value" => "jen",
+#       "type" => "value"
+#     },
+#     "class_type" => %{
+#       "value" => "cardio kickboxing",
+#       "type" => "value"
+#     },
+#     "intent" => %{
+#       "value" => "queryInstructorSchedule"
+#     }
+#   },
+#   "msg_id" => "163JHqlrmwNWeZiiN"
+# }

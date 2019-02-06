@@ -56,6 +56,7 @@ defmodule MainWeb.Router do
   scope "/api", MainWeb do
     pipe_through :api
 
+    get "/sms/inbound", TwilioController, :inbound
     post "/sms/twilio", TwilioController, :create
     put "/remove-avatar", AvatarController, :remove_avatar
     put "/assign-team-member", AssignTeamMemberController, :assign

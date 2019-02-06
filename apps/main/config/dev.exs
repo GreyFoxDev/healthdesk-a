@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :main, MainWeb.Endpoint,
-  http: [port: 4000],
+  http: [port: {:system, "PORT"}],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,

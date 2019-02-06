@@ -6,7 +6,6 @@ defmodule Data.Query.ReadOnly.Member do
   alias Data.Schema.Member
   alias Data.ReadOnly.Repo
 
-
   def all do
     from(t in Member,
       where: is_nil(t.deleted_at)
@@ -33,11 +32,11 @@ defmodule Data.Query.ReadOnly.Member do
     )
     |> Repo.all()
     |> case do
-         [] ->
-           nil
+      [] ->
+        nil
 
-         [member] ->
-           member
-       end
+      [member] ->
+        member
+    end
   end
 end

@@ -9,17 +9,18 @@ defmodule MainWeb.ConversationController do
 
 
   def index(conn, %{"location_id" => location_id} = params) do
-
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
+      |> IO.inspect(label: "LOCATION")
 
 
     conversations =
       conn
       |> current_user()
       |> Conversations.all(location_id)
+      |> IO.inspect(label: "CONVERSATIONS")
 
     render conn, "index.html", location: location, conversations: conversations, teams: teams(conn)
   end

@@ -21,7 +21,7 @@ One way is by creating a .env file that you can get into the environment as foll
 > export $(cat .env | xargs)
 ```
 
-Next install the dependancies: 
+Next install the dependancies:
 
 ```bash
 > mix deps.get
@@ -50,7 +50,15 @@ mix ecto.migrate
 mix phx.server
 ```
 
+## Testing locally with ngrok
 
+Found [this][1] and it will be helpful for testing and local debugging.
 
+Notes:
+- Before step 3 on that page. Sign up/authorize on the [ngok][2] site and setup the authtoken they issue.
+- The command to start the ngok server isn't `./ngrok <PORT>` it's actually `./ngrok http <PORT>`
+- set a port of your choice with `export PORT=<PORT>` and the app will pick it up when it starts
+- there is a route `/api/sms/inbound` that you can use to confirm that ngrok is working.
 
-
+[1] https://www.twilio.com/blog/2013/10/test-your-webhooks-locally-with-ngrok.html
+[2] https://ngrok.com/
