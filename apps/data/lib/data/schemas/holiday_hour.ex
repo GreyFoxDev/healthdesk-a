@@ -38,8 +38,6 @@ defmodule Data.Schema.HolidayHour do
     |> validate_required(@required_fields)
   end
 
-  defp convert_date(%{"holiday_date" => ""} = params), do: params
-
   defp convert_date(
          %{
            "holiday_date" =>

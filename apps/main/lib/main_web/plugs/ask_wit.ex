@@ -23,11 +23,9 @@ defmodule MainWeb.Plug.AskWit do
 
   defp ask_wit_ai(question) do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
-      IO.inspect(question, label: "THE QUESTION")
-
       receive do
         {:response, response} ->
-          IO.inspect(response, label: "WIT'S INTENT")
+          response
         _ ->
           :unknown_intent
       end

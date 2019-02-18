@@ -1,0 +1,36 @@
+defmodule MainWeb.Intents.MonthPass do
+  @moduledoc """
+  This module handles the Monthly Pass intent and returns a
+  formatted message
+  """
+
+  alias Data.Commands.PricingPlan
+
+  require Logger
+
+  @pass """
+  Our month pass is $[month_pass_price]. Please visit our front desk to purchase.
+  """
+
+  @no_pass """
+  Unfortunately, we don't offer a month pass.
+  """
+
+  @behaviour MainWeb.Intents
+
+  @impl MainWeb.Intents
+  def build_response(_args, location) do
+    case PricingPlan.price_plans(:monthly, location) do
+      {:ok, nil} ->
+        @no_pass
+
+      {:ok, pass} ->
+        String.replace(@pass, "[month_pass_price]", pass.pass_price)
+
+      {:error, reason} ->
+        Logger.error reason
+        @no_pass
+    end
+  end
+
+end

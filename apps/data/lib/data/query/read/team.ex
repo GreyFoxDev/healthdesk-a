@@ -17,6 +17,16 @@ defmodule Data.Query.ReadOnly.Team do
     |> Repo.all()
   end
 
+  def team_with_locations(team_id) do
+    from(t in Team,
+      where: t.id == ^team_id,
+      left_join: l in assoc(t, :locations),
+      preload: [:locations],
+      order_by: [t.team_name, l.location_name]
+    )
+    |> Repo.all()
+  end
+
   def get(id),
     do: Repo.get(Team, id)
 end

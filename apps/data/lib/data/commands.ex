@@ -14,11 +14,13 @@ defmodule Data.Commands do
       def get(id),
         do: Command.execute_task_with_results(fn -> Read.get(id) end)
 
-      def write(params),
-        do: Command.execute_task_with_results(fn -> Write.write(params) end)
+      def write(params) do
+        {:ok, Command.execute_task_with_results(fn -> Write.write(params) end)}
+      end
 
-      def write(orig_params, params),
-        do: Command.execute_task_with_results(fn -> Write.write(orig_params, params) end)
+      def write(orig_params, params) do
+        {:ok, Command.execute_task_with_results(fn -> Write.write(orig_params, params) end)}
+      end
 
       def delete(id),
         do: Command.execute_task(fn -> Write.delete(id) end)

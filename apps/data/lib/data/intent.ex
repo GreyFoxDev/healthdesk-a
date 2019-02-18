@@ -12,55 +12,7 @@ defmodule Data.Intent do
   @default_error "Not sure about that. Give me a minute..."
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-  def get_message({"getDayPass", _args}, phone_number) do
-    with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
-         plans <- PricingPlan.all(l.id),
-         [%{daily: daily}] <- Enum.filter(plans, &(&1.has_daily == true)) do
-      "Day passes are #{daily}"
-    else
-      _ ->
-        "Unfortunately, we don't offer a day pass."
-    end
-  end
 
-  def get_message({"getWeekPass", _args}, phone_number) do
-    with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
-         plans <- PricingPlan.all(l.id),
-         [%{weekly: weekly}] <- Enum.filter(plans, &(&1.has_weekly == true)) do
-      "Week passes are #{weekly}"
-    else
-      _ ->
-        "Unfortunately, we don't offer a week pass."
-    end
-  end
-
-  def get_message({"getMonthPass", _args}, phone_number) do
-    with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
-         plans <- PricingPlan.all(l.id),
-         [%{monthly: monthly}] <- Enum.filter(plans, &(&1.has_monthly == true)) do
-      "Month passes are #{monthly}"
-    else
-      _ ->
-        "Unfortunately, we don't offer a month pass."
-    end
-  end
-
-  def get_message({"getMessageGeneric", "thanks"}, _phone_number) do
-    "No sweat!"
-  end
-
-  def get_message({"getAddress", _args}, phone_number) do
-    with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number) do
-      address =
-        [l.address_1, l.address_2, "#{l.city},", l.state, l.postal_code]
-        |> Enum.join(" ")
-
-      "We are located at #{address}"
-    else
-      nil ->
-        @default_error
-    end
-  end
 
   def get_message({"getChildCareHours", args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
@@ -86,17 +38,6 @@ defmodule Data.Intent do
     else
       _ ->
         @default_error
-    end
-  end
-
-  def get_message({"getWifi", _args}, phone_number) do
-    with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
-         [wifi] <- WifiNetwork.all(l.id) do
-      ["Here's the Wifi Info\nNetwork: ", wifi.network_name, " Password: ", wifi.network_pword]
-      |> Enum.join()
-    else
-      _ ->
-        "Unfortunately, we don't offer free WiFi."
     end
   end
 

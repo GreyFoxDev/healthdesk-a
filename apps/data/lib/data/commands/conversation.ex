@@ -37,11 +37,9 @@ defmodule Data.Commands.Conversations do
         {member, location.id}
         |> new_params()
         |> write()
-
-      {:ok, convo}
     else
       {:ok, %Data.Schema.Conversation{} = conversation} ->
-        {:ok, write(conversation, %{"status" => "open"})}
+        write(conversation, %{"status" => "open"})
     end
   end
 
@@ -50,10 +48,8 @@ defmodule Data.Commands.Conversations do
   """
   @spec close(id :: binary) :: {:ok, Conversation.t()} | {:error, String.t()}
   def close(id) do
-    IO.inspect("HERE****")
-
     with %Data.Schema.Conversation{id: id} = convo <- get(id),
-         %Data.Schema.Conversation{id: id} = convo <- write(convo, @closed) do
+         {:ok, %Data.Schema.Conversation{id: id} = convo} <- write(convo, @closed) do
       {:ok, convo}
     else
       _ ->

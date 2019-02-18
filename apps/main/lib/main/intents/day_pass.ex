@@ -1,0 +1,40 @@
+defmodule MainWeb.Intents.DayPass do
+  @moduledoc """
+  This module handles the Daily Pass intent and returns a
+  formatted message
+  """
+
+  alias Data.Commands.{
+    PricingPlan,
+    Location
+  }
+
+  require Logger
+
+  @pass """
+  Our day pass is $[day_pass_price]. Please visit our front desk to purchase.
+  """
+
+  @no_pass """
+  Unfortunately, we don't offer a day pass.
+  """
+
+  @behaviour MainWeb.Intents
+
+  @impl MainWeb.Intents
+  def build_response(_args, location) do
+    location = Location.get_by_phone(location)
+    case PricingPlan.price_plans(:daily, location.id) do
+      {:ok, nil} ->
+        @no_pass
+
+      {:ok, pass} ->
+        String.replace(@pass, "[day_pass_price]", pass.pass_price)
+
+      {:error, reason} ->
+        Logger.error reason
+        @no_pass
+    end
+  end
+
+end

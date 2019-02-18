@@ -1,22 +1,17 @@
 defmodule MainWeb.LocationController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Location, Team}
+  alias Data.{Location, Commands.Team}
 
   def index(conn, %{"team_id" => team_id} = params) do
-    team =
+    {:ok, team} =
       conn
       |> current_user()
-      |> Team.get(team_id)
-
-    locations =
-      conn
-      |> current_user()
-      |> Location.get_by_team_id(team_id)
+      |> Team.get_team_locations(team_id)
 
     render conn, "index.html",
       location: nil,
-      locations: locations,
+      locations: team.locations,
       team: team,
       teams: teams(conn)
   end

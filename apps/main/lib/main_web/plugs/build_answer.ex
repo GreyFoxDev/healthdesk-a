@@ -1,6 +1,6 @@
 defmodule MainWeb.Plug.BuildAnswer do
   @moduledoc """
-
+  This plug matches the intent for a response.
   """
 
   require Logger

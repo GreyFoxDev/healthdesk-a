@@ -11,19 +11,32 @@ defmodule MainWeb.Intents do
   alias MainWeb.Intents.{
     Address,
     Hours,
-    Wifi
+    Wifi,
+    DayPass,
+    WeekPass,
+    MonthPass,
+    ChildCareHours,
+    Generic
   }
 
   @intents %{
     getAddress: Address,
-    # getHours: Hours,
-    getWifi: Wifi
+    getHours: Hours,
+    getWifi: Wifi,
+    getDayPass: DayPass,
+    getWeekPass: WeekPass,
+    getMonthPass: MonthPass,
+    getChildCareHours: ChildCareHours,
+    getMessageGeneric: Generic
   }
 
   @doc """
   Get the response from the intent module. If the intent hasn't been
   implemented then a default message is returned.
   """
+  def get(:unknown_intent, location),
+    do: build_response([], location)
+
   def get({intent, args}, location) do
     args = remove_intent(args)
 
@@ -33,7 +46,7 @@ defmodule MainWeb.Intents do
     |> apply(:build_response, [args, location])
   end
 
-  def build_response(args, location),
+  def build_response(_args, _location),
     do: "Not sure about that. Give me a minute..."
 
   defp fetch_module(intent) when is_atom(intent),
