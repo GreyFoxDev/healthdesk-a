@@ -27,7 +27,9 @@
             </button>
             <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                 <%= if @c.status != "open" do %>
-                    <%= link("Open", class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :open, @location.team_id, @location.id, @c.id), method: :put) %>
+                    <%= link("Open", class: "dropdown-item",
+                        to: team_location_conversation_conversation_path(@conn, :open, @location.team_id, @location.id, @c.id),
+                        method: :put) %>
                 <% else %>
                     <span class="dropdown-item disabled">Open</span>
                 <%  end %>

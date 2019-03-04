@@ -17,24 +17,37 @@
             <div class="card card-fluid">
                 <div class="card-header">
                     <nav class="nav nav-tabs flex-column border-0">
-                        <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link active">Details</a>
+                        <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link">Details</a>
                         <a href="<%= team_location_location_team_member_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Teammates</a>
                         <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Normal Hours</a>
                         <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Holiday Hours</a>
                         <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hours</a>
                         <a href="<%= team_location_wifi_network_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Wifi Network</a>
                         <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Pricing Plans</a>
-                        <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Class Schedule Upload</a>
+                        <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link active">Class Schedule Upload</a>
                     </nav>
                 </div>
             </div>
         </div>
         <div class="col-lg-8">
             <div class="card card-fluid">
-                <h6 class="card-header"> Pricing Plans </h6><!-- .card-body -->
+                <h6 class="card-header"> Class Schedule Uploads</h6><!-- .card-body -->
                 <div class="card-body">
-                    <%= render "_form.html", data: @changeset, action: team_location_path(@conn, :update, @team_id, @changeset.data), conn: @conn, errors: @errors %>
+                    <%= form_for @conn, team_location_class_schedule_path(@conn, :create, @location.team_id, @location.id), [multipart: true], fn f -> %>
+                        <div class="form-group">
+                            <%= file_input f, :csv, accept: "text/csv, .csv", class: "form-control" %>
+                        </div>
+                        <%= submit "Upload" %>
+                    <% end %>
+
                 </div><!-- /.card-body -->
+                <div>
+                    <%= if @upload_info do %>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="alert alert-success mx-3"> The file was successfully uploaded <b><%= @upload_info.count %> new records. </div>
+                        </div>
+                    <% end %>
+                </div>
             </div>
         </div>
     </div>

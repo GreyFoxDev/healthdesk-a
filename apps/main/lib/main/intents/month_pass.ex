@@ -4,7 +4,10 @@ defmodule MainWeb.Intents.MonthPass do
   formatted message
   """
 
-  alias Data.Commands.PricingPlan
+  alias Data.Commands.{
+    PricingPlan,
+    Location
+  }
 
   require Logger
 
@@ -20,7 +23,8 @@ defmodule MainWeb.Intents.MonthPass do
 
   @impl MainWeb.Intents
   def build_response(_args, location) do
-    case PricingPlan.price_plans(:monthly, location) do
+    location = Location.get_by_phone(location)
+    case PricingPlan.price_plans(:monthly, location.id) do
       {:ok, nil} ->
         @no_pass
 

@@ -34,6 +34,7 @@ defmodule MainWeb.Router do
       resources "/members", MemberController
       resources "/team-members", TeamMemberController
       resources "/locations", LocationController do
+        resources "/class-schedule", ClassScheduleController, only: [:new, :create]
         resources "/conversations", ConversationController do
           resources "/conversation-messages", ConversationMessageController
           put "/close", ConversationController, :close

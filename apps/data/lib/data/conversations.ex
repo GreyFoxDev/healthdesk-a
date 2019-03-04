@@ -3,6 +3,9 @@ defmodule Data.Conversations do
 
   @roles ["admin"]
 
+  @doc """
+  Get changesets for conversations.
+  """
   def get_changeset(),
     do: Data.Schema.Conversation.changeset(%Data.Schema.Conversation{})
 

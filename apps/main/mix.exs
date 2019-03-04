@@ -23,7 +23,7 @@ defmodule Main.Mixfile do
   def application do
     [
       mod: {Main.Application, []},
-      extra_applications: [:logger, :runtime_tools, :con_cache, :data, :chatbot]
+      extra_applications: [:logger, :runtime_tools, :con_cache, :data, :chatbot, :nimble_csv]
     ]
   end
 
@@ -53,7 +53,8 @@ defmodule Main.Mixfile do
       {:ex_aws_s3, "~> 2.0"},
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
-      {:elixir_uuid, "~> 1.2"}
+      {:elixir_uuid, "~> 1.2"},
+      {:nimble_csv, "~> 0.5.0"}
     ]
   end
 end

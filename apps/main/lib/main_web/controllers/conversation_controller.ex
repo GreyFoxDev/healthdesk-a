@@ -1,26 +1,22 @@
 defmodule MainWeb.ConversationController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Conversations, ConversationMessages, Location, TeamMember, Member}
+  alias Data.{Commands.Conversations, ConversationMessages, Location, TeamMember, Member}
 
   require Logger
 
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
-
 
   def index(conn, %{"location_id" => location_id} = params) do
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
-      |> IO.inspect(label: "LOCATION")
-
 
     conversations =
       conn
       |> current_user()
-      |> Conversations.all(location_id)
-      |> IO.inspect(label: "CONVERSATIONS")
+      |> Data.Conversations.all(location_id)
 
     render conn, "index.html", location: location, conversations: conversations, teams: teams(conn)
   end
@@ -32,7 +28,7 @@ defmodule MainWeb.ConversationController do
       |> Location.get(location_id)
 
     render(conn, "new.html",
-      changeset: Conversations.get_changeset(),
+      changeset: Data.Conversations.get_changeset(),
       location: location,
       teams: teams(conn),
       errors: [])
@@ -52,7 +48,7 @@ defmodule MainWeb.ConversationController do
     conversation =
       conn
       |> current_user()
-      |> Conversations.get(id)
+      |> Data.Conversations.get(id)
 
     messages =
       conn
@@ -72,36 +68,6 @@ defmodule MainWeb.ConversationController do
     end
   end
 
-  def create(conn, %{"location_id" => location_id} = params) do
-    location =
-      conn
-      |> current_user()
-      |> Location.get(location_id)
-
-    conn = params["conversation"]
-    |> Map.merge(%{"location_id" => location_id, "status" => "open", "started_at" => DateTime.utc_now()})
-    |> Conversations.create()
-    |> case do
-         %Data.Schema.Conversation{} = conversation ->
-           %{"conversation_id" => conversation.id,
-             "phone_number" => current_user(conn).phone_number,
-             "message" => params["conversation"]["message"],
-             "sent_at" => conversation.started_at}
-           |> ConversationMessages.create()
-
-           message = %{provider: :twilio, from: location.phone_number, to: params["conversation"]["original_number"], body: params["conversation"]["message"]}
-           @chatbot.send(message)
-           put_flash(conn, :success, "Sending message was successful")
-         {:error, changeset} ->
-           put_flash(conn, :error, "Sending message failed")
-       end
-
-    redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location.id))
-  end
-
-  def update(conn, params) do
-  end
-
   def open(conn, %{"conversation_id" => id, "location_id" => location_id}) do
     location =
       conn
@@ -114,7 +80,7 @@ defmodule MainWeb.ConversationController do
                 "sent_at" => DateTime.utc_now()}
 
 
-    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "open"}),
+    with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "open"}),
          {:ok, _} <- ConversationMessages.create(message) do
 
       redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
@@ -137,7 +103,7 @@ defmodule MainWeb.ConversationController do
                 "message" => "CLOSED: Closed by #{current_user(conn).last_name}",
                 "sent_at" => DateTime.utc_now()}
 
-    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed"}),
+    with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "closed"}),
          {:ok, _} <- ConversationMessages.create(message) do
 
       redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
@@ -148,4 +114,47 @@ defmodule MainWeb.ConversationController do
         |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
     end
   end
+
+  def create(conn, %{"location_id" => location_id} = params) do
+    location =
+      conn
+      |> current_user()
+      |> Location.get(location_id)
+
+    %{member: params["conversation"]["original_number"],
+      message: params["conversation"]["message"],
+      location_number: location.phone_number,
+      team_member_number: current_user(conn).phone_number}
+      |> find_or_start_conversation()
+      |> handle_sending_message()
+      |> update_conn(conn)
+      |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+  end
+
+  defp find_or_start_conversation(%{member: member, location_number: location} = params) do
+    member = "+1#{String.replace(member, "-", "")}"
+    case Conversations.find_or_start_conversation({member, location}) do
+      {:error, changeset} ->
+        {:error, changeset, params}
+      {:ok, %Data.Schema.Conversation{} = conversation} ->
+        {:ok, conversation, params}
+    end
+  end
+
+  defp handle_sending_message({:ok, conversation, params}) do
+    %{"conversation_id" => conversation.id,
+      "phone_number" => params.team_member_number,
+      "message" => params.message,
+      "sent_at" => Calendar.DateTime.now!("Etc/UTC")
+    }
+    |> ConversationMessages.create()
+
+    @chatbot.send(%{provider: :twilio, from: params.location_number, to: params.member, body: params.message})
+
+    :ok
+  end
+  defp handle_sending_message({:error, _, params}), do: :error
+
+  defp update_conn(:ok, conn), do: put_flash(conn, :success, "Sending message was successful")
+  defp update_conn(:error, conn), do: put_flash(conn, :error, "Sending message failed")
 end

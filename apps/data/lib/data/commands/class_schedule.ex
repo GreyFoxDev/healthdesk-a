@@ -5,4 +5,7 @@ defmodule Data.Commands.ClassSchedule do
 
   def all(location_id),
     do: Command.execute_task_with_results(fn -> Read.all(location_id) end)
+
+  def create(params),
+    do: Command.execute_task(fn -> Write.write(params) end)
 end

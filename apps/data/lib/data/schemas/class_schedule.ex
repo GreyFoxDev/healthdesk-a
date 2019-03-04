@@ -35,8 +35,30 @@ defmodule Data.Schema.ClassSchedule do
   end
 
   def changeset(model, params \\ %{}) do
+    params = clean_date(params)
+
     model
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
   end
+
+  defp clean_date(%{"date" => date} = params) do
+    fmt = case date do
+            << m :: binary-size(1), "/", d :: binary-size(1), "/", y :: binary-size(4) >> ->
+              "#{y}-0#{m}-0#{d}"
+            << m :: binary-size(1), "/", d :: binary-size(2), "/", y :: binary-size(4) >> ->
+              "#{y}-0#{m}-#{d}"
+            << m :: binary-size(2), "/", d :: binary-size(1), "/", y :: binary-size(4) >> ->
+              "#{y}-#{m}-0#{d}"
+            << m :: binary-size(2), "/", d :: binary-size(2), "/", y :: binary-size(4) >> ->
+              "#{y}-#{m}-#{d}"
+            date ->
+              date
+          end
+
+    Map.merge(params, %{"date" => fmt}) |> IO.inspect
+  end
+
+  defp clean_date(params), do: params
+
 end
