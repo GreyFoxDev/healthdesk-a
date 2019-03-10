@@ -5,7 +5,7 @@
             <a class="nav-link" data-toggle="tab" href="#project-assigned">Me (<%= Enum.count(@conversations, &(&1.team_member_id == assigns[:current_user].id)) %>)</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#project-open">Open (<%= Enum.count(@conversations, fn(c) -> c.status == "open" end) %>)</a>
+            <a class="nav-link" data-toggle="tab" href="#project-open">Open (<%= Enum.count(@conversations, fn(c) -> c.status in ["open", "pending"] end) %>)</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#project-closed">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>
@@ -56,7 +56,7 @@
         &nbsp;
         <%= if assigns[:current_user].role == "admin" do %> 
             <a href="<%= team_location_conversation_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-primary">
-                <i class="fas fa-plus">&nbsp;</i> 
+                <i class="fas fa-plus">&nbsp;</i>
                 New Message
             </a>
         <% end %>
@@ -85,13 +85,13 @@
             </div>
 
             <div class="tab-pane fade" id="project-open" role="tabpanel" aria-labelledby="project-open-tab">
-                <%= if Enum.count(@conversations, &(&1.status == "open")) == 0 do %>
+                <%= if Enum.count(@conversations, &(&1.status in ["open", "pending"])) == 0 do %>
                     <div class="alert alert-info mx-3">There are no open conversations for this location.</div>
                 <% end %>
 
                 <table class="table no-first-border">
                     <tbody>
-                    <%= for c <- Enum.filter(@conversations, &(&1.status == "open")) do %>
+                    <%= for c <- Enum.filter(@conversations, &(&1.status in ["open", "pending"])) do %>
                         <%= render("_conversation_row.html", c: c, conn: @conn, location: @location) %>
                     <% end %>
                     </tbody>

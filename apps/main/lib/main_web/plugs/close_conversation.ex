@@ -16,15 +16,26 @@ defmodule MainWeb.Plug.CloseConversation do
   @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t()
   def call(conn, opts)
 
+  @doc """
+  If the conversation is in a pending state, or the member has not opted in,
+  then no need to do anything. Just return the connection.
+  """
+  def call(%{assigns: %{status: "pending"}} = conn, _opts), do: conn
   def call(%{assigns: %{opt_in: false}} = conn, _opts), do: conn
 
-  def call(%{assigns: %{convo: id, location: location, intent: :unknown_intent}} = conn, _opts) do
-    CM.write_new_message(id, location, conn.assigns[:response])
-
+  @doc """
+  If the intent isn't found then set the conversation status to pending while
+  an admin addresses the member.
+  """
+  def call(%{assigns: %{convo: id, intent: {:unknown, []}}} = conn, _opts) do
+    C.pending(id)
     conn
   end
 
-  def call(%{assigns: %{convo: id, location: location}} = conn, _opts) do
+  @doc """
+  If the question has been answered then close the conversation
+  """
+  def call(%{assigns: %{convo: id, location: location} = assigns} = conn, _opts) do
     CM.write_new_message(id, location, conn.assigns[:response])
     C.close(id)
 

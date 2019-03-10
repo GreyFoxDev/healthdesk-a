@@ -16,7 +16,7 @@ defmodule MainWeb.Plug.AskWit do
   @doc """
   Only once the member has opted in will the question be sent to Wit
   """
-  def call(%{assigns: %{opt_in: true, message: message}} = conn, _opts),
+  def call(%{assigns: %{opt_in: true, status: "open", message: message}} = conn, _opts),
     do: assign(conn, :intent, ask_wit_ai(message))
 
   def call(conn, _opts), do: conn

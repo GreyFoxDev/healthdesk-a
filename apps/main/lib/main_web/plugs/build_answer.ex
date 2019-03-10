@@ -7,7 +7,7 @@ defmodule MainWeb.Plug.BuildAnswer do
 
   import Plug.Conn
 
-  alias MainWeb.Intents
+  alias MainWeb.{Intents, Notify}
 
   @spec init(list()) :: list()
   def init(opts), do: opts
@@ -15,8 +15,38 @@ defmodule MainWeb.Plug.BuildAnswer do
   @spec call(Plug.Conn.t(), list()) :: no_return()
   def call(conn, opts \\ [])
 
-  def call(%{assigns: %{opt_in: true, intent: intent, location: location}} = conn, _opts),
-    do: assign(conn, :response, Intents.get(intent, location))
+  @doc """
+  If the intent is 'unknown' then the super admin for the location needs to be notified that there is a new
+  message in the queue.
+  """
+  def call(%{assigns: %{opt_in: true, status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
+    :ok = notify_admin_user(assigns)
+
+    assign(conn, :response, Intents.get(:unknown_intent, assigns.location))
+  end
+
+  @doc """
+  If there is a known intent then get the corresponding response.
+  """
+  def call(%{assigns: %{opt_in: true, status: "open", intent: intent, location: location}} = conn, _opts) do
+    assign(conn, :response, Intents.get(intent, location))
+  end
+
+  def call(%{assigns: %{opt_in: true, status: "pending"} = assigns} = conn, _opts) do
+    :ok = notify_admin_user(assigns)
+
+    assign(conn, :response, Intents.get(:unknown_intent, assigns.location))
+  end
 
   def call(conn, _opts), do: conn
+
+  defp notify_admin_user(%{message: message, member: member, convo: convo, location: location}) do
+    message = """
+    Message From: #{member}\n
+    #{message}
+    """
+
+    :ok = Notify.send_to_admin(convo, message, location)
+
+  end
 end

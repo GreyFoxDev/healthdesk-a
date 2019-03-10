@@ -8,7 +8,9 @@ defmodule Data.Commands.Conversations do
   alias Data.Commands.Location
   alias Data.Schema.Conversation
 
+  @open %{"status" => "open"}
   @closed %{"status" => "closed"}
+  @pending %{"status" => "pending"}
 
   @doc """
   Gets all the conversations for a location using the location id
@@ -38,8 +40,24 @@ defmodule Data.Commands.Conversations do
         |> new_params()
         |> write()
     else
-      {:ok, %Data.Schema.Conversation{} = conversation} ->
-        write(conversation, %{"status" => "open"})
+      {:ok, %Data.Schema.Conversation{status: "closed"} = conversation} ->
+        write(conversation, @open)
+      {:ok, %Data.Schema.Conversation{}} = response ->
+        response
+    end
+  end
+
+  @doc """
+  Sets the status to pending for an existing conversation
+  """
+  @spec pending(id :: binary) :: {:ok, Conversation.t()} | {:error, String.t()}
+  def pending(id) do
+    with %Data.Schema.Conversation{id: id} = convo <- get(id),
+         {:ok, %Data.Schema.Conversation{id: id} = convo} <- write(convo, @pending) do
+      {:ok, convo}
+    else
+      _ ->
+        {:error, "Unable to change conversation status to pending."}
     end
   end
 

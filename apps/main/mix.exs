@@ -36,6 +36,7 @@ defmodule Main.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bitly, "~> 0.1"},
       {:phoenix, "~> 1.3.4"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.10"},

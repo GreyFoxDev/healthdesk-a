@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :main, MainWeb.Endpoint,
-  http: [port: {:system, "PORT"}],
+  http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
@@ -37,3 +37,9 @@ config :ex_aws,
   access_key_id: System.get_env("HD_AWS_ACCESS_KEY"),
   secret_access_key: System.get_env("HD_AWS_SECRET_ACCESS_KEY"),
   bucket: System.get_env("HD_AWS_BUCKET")
+
+config :bitly, access_token: System.get_env("BITLY_ACCESS_TOKEN")
+
+config :main,
+  super_admin: System.get_env("SUPER_ADMIN_PHONE"),
+  endpoint: "http://b07ad92e.ngrok.io"

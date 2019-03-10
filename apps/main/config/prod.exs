@@ -22,3 +22,9 @@ config :ex_aws,
   access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
   secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY"),
   bucket: System.get_env("AWS_BUCKET")
+
+config :bitly, access_token: System.get_env("BITLY_ACCESS_TOKEN")
+
+config :main,
+  super_admin: System.get_env("SUPER_ADMIN_PHONE"),
+  endpoint: "https://healthdesk-ai.herokuapp.com/"

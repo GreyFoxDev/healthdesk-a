@@ -7,6 +7,7 @@ defmodule MainWeb.Intents do
   """
 
   @callback build_response(List.t, location :: binary) :: String.t
+  @default_response "I'm checking with a teammate for assistance. One moment please..."
 
   alias MainWeb.Intents.{
     Address,
@@ -35,7 +36,7 @@ defmodule MainWeb.Intents do
   implemented then a default message is returned.
   """
   def get(:unknown_intent, location),
-    do: build_response([], location)
+    do: @default_response
 
   def get({intent, args}, location) do
     args = remove_intent(args)
@@ -47,7 +48,7 @@ defmodule MainWeb.Intents do
   end
 
   def build_response(_args, _location),
-    do: "Not sure about that. Give me a minute..."
+    do: @default_response
 
   defp fetch_module(intent) when is_atom(intent),
     do: @intents[intent] || MainWeb.Intents

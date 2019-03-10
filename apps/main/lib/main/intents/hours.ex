@@ -14,6 +14,7 @@ defmodule MainWeb.Intents.Hours do
   @hours "[date_prefix], our hours are [open] to [close]."
   @closed "[date_prefix], we are closed."
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+  @default_response "I'm checking with a teammate for assistance. One moment please..."
 
   @impl MainWeb.Intents
   def build_response([datetime: datetime], location) do
@@ -26,9 +27,11 @@ defmodule MainWeb.Intents.Hours do
 
     else
       _ ->
-        "Not sure about that. Give me a minute..."
+        @default_response
     end
   end
+
+  def build_response(_, _), do: @default_response
 
   defp get_day_of_week({_year, 12, 25}), do: {:holiday, "Christmas"}
   defp get_day_of_week({_year, 12, 31}), do: {:holiday, "New Year's Eve"}

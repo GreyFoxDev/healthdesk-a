@@ -11,7 +11,7 @@ config :main,
 
 # Configures the endpoint
 config :main, MainWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [scheme: "http", host: "localhost", port: 4000],
   secret_key_base: "z0HlXKVQRJoAEUI1h6E/u5b0uuQOQucLm2gG7PdJGQbQW4UO/B3eaaTu3OsW+Bpp",
   render_errors: [view: MainWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Main.PubSub,

@@ -24,7 +24,9 @@ defmodule MainWeb.Plug.OpenConversation do
 
       CM.write_new_message(convo.id, member, conn.assigns[:message])
 
-      assign(conn, :convo, convo.id)
+      conn
+      |> assign(:convo, convo.id)
+      |> assign(:status, convo.status)
     else
       {:error, message} ->
         Logger.error("MEMBER: #{member}\nLOCATION: #{location}\n - Error finding or starting a conversation")
