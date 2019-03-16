@@ -33,8 +33,33 @@
             <div class="card card-fluid">
                 <h6 class="card-header"> Normal Hours </h6><!-- .card-body -->
                 <div class="card-body">
+                    <div class="list-group list-group-flush list-group-bordered">
+                        <%= if @hours == [] do %>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="alert alert-warning mx-3"> There are no hours for this location. </div>
+                            </div>
+                        <%= else %>
+                            <%= for hour <- @hours do %>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><b><%= hour.day_of_week %></b></span>
+                                    <span><%= hour.open_at %> - <%= hour.close_at %></span>
 
-                    <%#= render "_form.html", data: @changeset, action: team_location_path(@conn, :update, @team_id, @changeset.data), conn: @conn, errors: @errors %>
+                                    <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_location_normal_hour_path(@conn, :delete, @location.team_id, @location.id, hour.id), method: "delete" %>
+
+                                </div>
+                            <% end %>
+                        <% end %>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <%=
+                            render "_form.html",
+                            data: @changeset,
+                            action: team_location_normal_hour_path(@conn, :create, @location.team_id, @location.id),
+                            location: @location,
+                            conn: @conn,
+                            errors: @changeset.errors %>
+                        </div>
+
+                    </div><!-- /.card-body -->
 
                 </div><!-- /.card-body -->
             </div>
