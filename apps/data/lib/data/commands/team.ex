@@ -11,6 +11,7 @@ defmodule Data.Commands.Team do
     else
       [] ->
         {:ok, nil}
+
       _ ->
         {:error, "Query returned more than one matching record for id #{team_id}"}
     end

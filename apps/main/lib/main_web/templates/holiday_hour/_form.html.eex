@@ -7,7 +7,12 @@
                         <fieldset>
                             <span>Holiday Name</span>
                             <span>
-                                <%= text_input f, :holiday_name, class: "form-control" %>
+                                <%=
+                                select f,
+                                :holiday_name,
+                                MainWeb.HolidayDates.holiday_names(),
+                                class: "form-control"
+                                %>
                             </span>
                             <span>Holiday Date</span>
                             <span>

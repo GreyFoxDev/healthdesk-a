@@ -12,11 +12,12 @@ defmodule Data.Commands.PricingPlan do
     case type do
       :daily ->
         Read.active_daily_pass(location_id)
+
       :weekly ->
         Read.active_weekly_pass(location_id)
+
       :monthly ->
         Read.active_monthly_pass(location_id)
     end
   end
-
 end

@@ -14,7 +14,7 @@ defmodule MainWeb.ChildCareHourController do
       |> current_user()
       |> ChildCareHours.all(location_id)
 
-    render conn, "index.html", location: location, hours: hours, teams: teams(conn)
+    render conn, "index.html", location: location, hours: hours, teams: teams(conn), changeset: ChildCareHours.get_changeset()
   end
 
   def new(conn, %{"location_id" => location_id}) do

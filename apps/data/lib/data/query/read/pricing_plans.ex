@@ -43,7 +43,6 @@ defmodule Data.Query.ReadOnly.PricingPlans do
       select: %{pass_price: p.monthly}
     )
     |> get_results()
-
   end
 
   def get(id),
@@ -61,10 +60,10 @@ defmodule Data.Query.ReadOnly.PricingPlans do
       {:ok, pass}
     else
       [] ->
-       {:ok, nil}
+        {:ok, nil}
 
       results ->
-        IO.inspect results
+        IO.inspect(results)
         {:error, "Query returned more than one matching record for pricing plan"}
     end
   end

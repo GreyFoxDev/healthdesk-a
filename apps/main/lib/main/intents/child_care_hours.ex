@@ -3,11 +3,139 @@ defmodule MainWeb.Intents.ChildCareHours do
   This handles child care hours message responses
   """
 
+  alias Data.Commands.{
+    ChildCareHours,
+    Location
+  }
+
   @behaviour MainWeb.Intents
 
+  @all_hours "Our child care hours are:\n[schedule]"
+  @hours "[date_prefix], our child care hours are [morning_open] to [morning_close]."
+  @afternoon_hours " and [afternoon_open] to [afternoon_close]."
+  @closed "[date_prefix], our child care is closed."
+  @no_child_care "Unfortunately, we don't offer child care."
+  @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+  @default_response "I'm checking with a teammate for assistance. One moment please..."
+
   @impl MainWeb.Intents
-  def build_response(args, location) do
-    "No sweat!"
+  def build_response([datetime: datetime], location) do
+    location = Location.get_by_phone(location)
+    <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
+
+    with {:normal, day_of_week} <- get_day_of_week({year, month, day}),
+         [hours] <- get_hours(location.id, {:normal, day_of_week}) do
+
+      prefix = date_prefix({:normal, day_of_week}, {year, month, day})
+
+      response =
+        @hours
+        |> String.replace("[date_prefix]", prefix)
+        |> String.replace("[morning_open]", hours.morning_open_at)
+        |> String.replace("[morning_close]", hours.morning_close_at)
+
+      response = if hours.afternoon_open_at do
+        response
+        |> String.replace(".", @afternoon_hours)
+        |> String.replace("[afternoon_open]", hours.afternoon_open_at)
+        |> String.replace("[afternoon_close]", hours.afternoon_close_at)
+      else
+        response
+      end
+
+      response
+
+    else
+      {:holiday, holiday} ->
+        "#{holiday} might affect the child care hours so best to call #{location.phone_number}"
+
+      :no_child_care ->
+        @no_child_care
+
+      [] ->
+        {term, day_of_week} = get_day_of_week({year, month, day})
+
+        String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}))
+      _ ->
+        @default_response
+    end
   end
+
+  def build_response(intent, location) do
+    location = Location.get_by_phone(location)
+
+    with [] <- get_hours(location.id) do
+      @no_child_care
+    else
+      hours ->
+        schedule =
+          hours
+          |> Stream.map(&format_schedule/1)
+          |> Enum.join("\n")
+
+      String.replace(@all_hours, "[schedule]", schedule) |> IO.inspect
+    end
+  end
+
+  def build_response(_, _), do: @default_response
+
+  defp get_day_of_week({year, month, day} = date) do
+    with nil <- MainWeb.HolidayDates.is_holiday?(date) do
+      {:normal, lookup_day_of_week(date)}
+    else
+      holiday ->
+        {:holiday, holiday}
+    end
+  end
+
+  defp format_schedule(%{afternoon_open_at: nil} = day) do
+    "#{day.day_of_week}: #{day.morning_open_at} to #{day.morning_close_at}"
+  end
+
+  defp format_schedule(day) do
+    "#{day.day_of_week}: #{day.morning_open_at} to #{day.morning_close_at} and #{day.afternoon_open_at} to #{day.afternoon_close_at}"
+  end
+
+  defp get_hours(location) do
+    ChildCareHours.all(location)
+  end
+
+  defp get_hours(location, {:normal, day_of_week}) do
+    location
+    |> ChildCareHours.all()
+    |> filter_hours(day_of_week)
+  end
+
+  defp filter_hours([], _) do
+    :no_child_care
+  end
+
+  defp filter_hours(hours, day_of_week) do
+    Enum.filter(hours, fn hour -> hour.day_of_week == day_of_week end)
+  end
+
+  defp date_prefix({:normal, day_of_week}, {year, month, day}) do
+    date = Calendar.Date.today!("PST8PDT")
+    today = lookup_day_of_week({date.year, date.month, date.day})
+
+    if today == day_of_week do
+      "Today"
+    else
+      "On #{month}/#{day}/#{year}"
+    end
+  end
+
+  defp lookup_day_of_week(day) do
+    {year, month, day} = convert_to_integer(day)
+    index = Calendar.ISO.day_of_week(year, month, day) |> Kernel.-(1)
+    Enum.at(@days_of_week, index)
+  end
+
+  defp convert_to_integer({year, month, day}) do
+    {check_binary(year), check_binary(month), check_binary(day)}
+  end
+
+  defp check_binary(value) when is_binary(value), do: String.to_integer(value)
+  defp check_binary(value) when is_integer(value), do: value
 
 end

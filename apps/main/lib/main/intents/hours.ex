@@ -1,18 +1,3 @@
-defmodule MainWeb.HolidayDates do
-
-  @dates %{
-    {2019, 5, 17} => "Memorial Day",
-    {2019, 7, 4} => "4th of July",
-    {2019, 8, 2} => "Labor Day",
-    {2019, 12, 25} => "Christmas",
-    {2019, 12, 31} => "New Year's Eve",
-    {2020, 1, 1} => "New Year's Day",
-  }
-
-  def is_holiday?(date), do: @dates[date]
-
-end
-
 defmodule MainWeb.Intents.Hours do
   @moduledoc """
 
@@ -81,9 +66,6 @@ defmodule MainWeb.Intents.Hours do
   defp date_prefix({:normal, day_of_week}, {year, month, day}) do
     date = Calendar.Date.today!("PST8PDT")
     today = lookup_day_of_week({date.year, date.month, date.day})
-
-    IO.inspect today, label: "TODAY"
-    IO.inspect day_of_week, label: "DAY OF WEEK"
 
     if today == day_of_week do
       "Today"

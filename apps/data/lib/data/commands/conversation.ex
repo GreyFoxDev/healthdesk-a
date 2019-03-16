@@ -42,6 +42,7 @@ defmodule Data.Commands.Conversations do
     else
       {:ok, %Data.Schema.Conversation{status: "closed"} = conversation} ->
         write(conversation, @open)
+
       {:ok, %Data.Schema.Conversation{}} = response ->
         response
     end

@@ -12,8 +12,6 @@ defmodule Data.Intent do
   @default_error "Not sure about that. Give me a minute..."
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-
-
   def get_message({"getChildCareHours", args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
          {_, day} = day_of_week <- convert_to_day(args),
