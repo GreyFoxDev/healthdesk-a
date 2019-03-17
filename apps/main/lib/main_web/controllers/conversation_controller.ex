@@ -103,7 +103,7 @@ defmodule MainWeb.ConversationController do
                 "message" => "CLOSED: Closed by #{current_user(conn).last_name}",
                 "sent_at" => DateTime.utc_now()}
 
-    with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "closed"}),
+    with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
          {:ok, _} <- ConversationMessages.create(message) do
 
       redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
