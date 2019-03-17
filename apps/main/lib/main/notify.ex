@@ -15,7 +15,7 @@ defmodule MainWeb.Notify do
   @doc """
   Send a notification to the super admin defined in the config. It will create a short URL.
   """
-  def send_to_admin(conversation_id, message, location) do
+  def send_to_admin(conversation_id, message, location, member \\ @super_admin) do
     location = Location.get_by_phone(location)
 
     %{data: link} =
@@ -29,7 +29,7 @@ defmodule MainWeb.Notify do
     message = %{
       provider: :twilio,
       from: location.phone_number,
-      to: @super_admin,
+      to: member,
       body: Enum.join([message, link[:url]], "\n")
     }
 

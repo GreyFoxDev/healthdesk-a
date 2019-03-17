@@ -1,12 +1,12 @@
 defmodule MainWeb.AssignTeamMemberController do
   use MainWeb, :controller
 
+  alias MainWeb.Notify
   alias Data.{Conversations, ConversationMessages, TeamMember, Location}
 
   require Logger
 
-  @assign_message "You have been assigned to a conversation. Please login to respond."
-  @chatbot Application.get_env(:session, :chatbot, Chatbot)
+  @assign_message "Message From: [phone_number]\n[message]"
 
   def assign(conn, %{"id" => id, "location_id" => location_id, "team_member_id" => team_member_id}) do
 
@@ -15,6 +15,8 @@ defmodule MainWeb.AssignTeamMemberController do
 
     team_member =
       TeamMember.get(%{role: "admin"}, team_member_id)
+
+    [original_message] = ConversationMessages.all(%{role: "admin"}, id) |> Enum.take(-1) |> IO.inspect
 
     message = %{"conversation_id" => id,
                 "phone_number" => team_member.user.phone_number,
@@ -25,10 +27,12 @@ defmodule MainWeb.AssignTeamMemberController do
     with {:ok, _pi} <- Conversations.update(%{"id" => id, "team_member_id" => team_member_id}),
          {:ok, _} <- ConversationMessages.create(message) do
 
-      @chatbot.send(%{provider: :twilio,
-                      from: location.phone_number,
-                      to: team_member.user.phone_number,
-                      body: @assign_message})
+      message =
+        @assign_message
+        |> String.replace("[phone_number]", original_message.phone_number)
+        |> String.replace("[message]", original_message.message)
+
+      Notify.send_to_admin(id, message, location.phone_number, team_member.user.phone_number)
 
       render(conn, "ok.json")
     else
