@@ -36,8 +36,8 @@ defmodule MainWeb.Intents.ClassDescription do
     do: @default_response
 
   defp find_classes(class, class_type) do
-    with class_type <- String.downcase(class.class_type()),
-         true <- String.contains?(class_type, String.downcase(class_type)) do
+    with type <- String.downcase(class.class_type()),
+         true <- String.contains?(type, String.downcase(class_type)) do
       true
     end
   end

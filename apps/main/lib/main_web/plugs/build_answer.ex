@@ -9,6 +9,8 @@ defmodule MainWeb.Plug.BuildAnswer do
 
   alias MainWeb.{Intents, Notify}
 
+  @default_response "I'm checking with a teammate for assistance. One moment please..."
+
   @spec init(list()) :: list()
   def init(opts), do: opts
 
@@ -29,7 +31,17 @@ defmodule MainWeb.Plug.BuildAnswer do
   If there is a known intent then get the corresponding response.
   """
   def call(%{assigns: %{opt_in: true, status: "open", intent: intent, location: location}} = conn, _opts) do
-    assign(conn, :response, Intents.get(intent, location))
+    response = Intents.get(intent, location)
+
+    if response == @default_response do
+      :ok = notify_admin_user(conn.assigns)
+
+      conn
+      |> assign(:status, "pending")
+      |> assign(:response, response)
+    else
+      assign(conn, :response, response)
+    end
   end
 
   def call(%{assigns: %{opt_in: true, status: "pending"} = assigns} = conn, _opts) do
