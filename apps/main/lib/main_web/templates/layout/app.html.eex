@@ -76,7 +76,7 @@
                               <%= link "Logout", to: session_path(@conn, :delete, current_user), method: "delete", class: "dropdown-item" %>
                               <hr />
                               <%= link "Settings", to: settings_url(@conn, current_user), class: "dropdown-item" %>
-                              <%= link "Get support", to: "mailto:info@healthdesk.ai", method: "delete", class: "dropdown-item" %>
+                              <%= link "Get support", to: "mailto:support@healthdesk.ai", method: "delete", class: "dropdown-item" %>
                               <%= link "Terms of use", to: "https://healthdesk.ai/terms", target: "_blank", class: "dropdown-item" %>
                               <%= link "Privacy policy", to: "https://healthdesk.ai/privacy", target: "_blank", class: "dropdown-item" %>
                           </div><!-- /.dropdown-menu -->
