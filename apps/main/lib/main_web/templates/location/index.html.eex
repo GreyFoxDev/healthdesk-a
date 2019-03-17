@@ -4,7 +4,7 @@
         <div class="btn-toolbar">
             <%= if assigns[:current_user].role == "admin" do %> 
                 <a href="<%= team_location_path(@conn, :new, @team.id) %>" class="btn btn-primary">
-                    <i class="fas fa-plus">&nbsp;</i> 
+                    <i class="fas fa-plus">&nbsp;</i>
                     New Location
                 </a>
             <% end %>
@@ -72,7 +72,7 @@
                             </td>
                             <td>
                             </td>
-                            <td>Updated <%= format_date(location.updated_at) %></td>
+                            <td>Updated <%= format_date(location.updated_at, location.timezone) %></td>
                             <td>
                                 <a href="<%= team_location_path(@conn, :edit, @team.id, location.id) %>" class="btn btn-sm btn-icon btn-secondary stop-propagation" title="Edit"><span class="fa fa-edit"></span></a>
                             </td>

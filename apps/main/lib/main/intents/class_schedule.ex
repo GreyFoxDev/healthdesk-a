@@ -41,7 +41,7 @@ defmodule MainWeb.Intents.ClassSchedule do
     else
       {term, day_of_week} = get_day_of_week({year, month, day})
 
-      String.replace(@no_classes, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}))
+      String.replace(@no_classes, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
     end
   end
 
@@ -74,8 +74,8 @@ defmodule MainWeb.Intents.ClassSchedule do
     end
   end
 
-  defp date_prefix({:normal, day_of_week}, {year, month, day}) do
-    date = Calendar.Date.today!("PST8PDT")
+  defp date_prefix({:normal, day_of_week}, {year, month, day}, timezone) do
+    date = Calendar.Date.today!(timezone)
     today = lookup_day_of_week({date.year, date.month, date.day})
 
     if today == day_of_week do

@@ -24,7 +24,7 @@ defmodule MainWeb.Intents.Hours do
     with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}),
          [hours] <- get_hours(location.id, {term, day_of_week}) do
 
-      prefix = date_prefix({term, day_of_week}, {year, month, day})
+      prefix = date_prefix({term, day_of_week}, {year, month, day}, location.timezone)
 
       @hours
       |> String.replace("[date_prefix]", prefix)
@@ -34,7 +34,7 @@ defmodule MainWeb.Intents.Hours do
       [] ->
         {term, day_of_week} = get_day_of_week({year, month, day})
 
-        String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}))
+        String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
       _ ->
         @default_response
     end
@@ -63,8 +63,8 @@ defmodule MainWeb.Intents.Hours do
     |> Enum.filter(fn hour -> hour.holiday_name == holiday end)
   end
 
-  defp date_prefix({:normal, day_of_week}, {year, month, day}) do
-    date = Calendar.Date.today!("PST8PDT")
+  defp date_prefix({:normal, day_of_week}, {year, month, day}, timezone \\ "PST8PDT") do
+    date = Calendar.Date.today!(timezone)
     today = lookup_day_of_week({date.year, date.month, date.day})
 
     if today == day_of_week do

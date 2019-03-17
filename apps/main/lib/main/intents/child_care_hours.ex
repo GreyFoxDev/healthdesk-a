@@ -26,7 +26,7 @@ defmodule MainWeb.Intents.ChildCareHours do
     with {:normal, day_of_week} <- get_day_of_week({year, month, day}),
          [hours] <- get_hours(location.id, {:normal, day_of_week}) do
 
-      prefix = date_prefix({:normal, day_of_week}, {year, month, day})
+      prefix = date_prefix({:normal, day_of_week}, {year, month, day}, location.timezone)
 
       response =
         @hours
@@ -55,7 +55,7 @@ defmodule MainWeb.Intents.ChildCareHours do
       [] ->
         {term, day_of_week} = get_day_of_week({year, month, day})
 
-        String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}))
+        String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
       _ ->
         @default_response
     end
@@ -114,8 +114,8 @@ defmodule MainWeb.Intents.ChildCareHours do
     Enum.filter(hours, fn hour -> hour.day_of_week == day_of_week end)
   end
 
-  defp date_prefix({:normal, day_of_week}, {year, month, day}) do
-    date = Calendar.Date.today!("PST8PDT")
+  defp date_prefix({:normal, day_of_week}, {year, month, day}, timezone \\ "PST8PDT") do
+    date = Calendar.Date.today!(timezone)
     today = lookup_day_of_week({date.year, date.month, date.day})
 
     if today == day_of_week do

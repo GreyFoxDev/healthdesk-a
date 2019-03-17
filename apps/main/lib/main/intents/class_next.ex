@@ -16,7 +16,7 @@ defmodule MainWeb.Intents.ClassNext do
   @impl MainWeb.Intents
   def build_response([class_type: [%{"value" => class_type}]], location) do
     location = Location.get_by_phone(location)
-    now = Calendar.DateTime.now!("PST8PDT")
+    now = Calendar.DateTime.now!(location.timezone)
     date = Calendar.Date.from_erl!({now.year, now.month, now.day})
     time = Calendar.Time.from_erl!({now.hour, now.minute, 0})
 
