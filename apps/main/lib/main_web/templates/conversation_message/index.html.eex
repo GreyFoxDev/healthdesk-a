@@ -184,7 +184,7 @@
                                                 <div class="conversation-meta">
                                                     <% team_member = Enum.find(@team_members, &(&1.user.phone_number == message.phone_number)) %>
                                                     <%= if team_member do %>
-                                                        <%= format_team_member(team_member) %>
+                                                        <%= format_team_member(team_member.user) %>
                                                     <% else %>
                                                         +1 <%= format_phone(message.phone_number) %>
                                                     <% end %>

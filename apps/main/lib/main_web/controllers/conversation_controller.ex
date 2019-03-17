@@ -2,6 +2,7 @@ defmodule MainWeb.ConversationController do
   use MainWeb.SecuredContoller
 
   alias Data.{Commands.Conversations, ConversationMessages, Location, TeamMember, Member}
+  alias MainWeb.Helper.Formatters
 
   require Logger
 
@@ -74,9 +75,12 @@ defmodule MainWeb.ConversationController do
       |> current_user()
       |> Location.get(location_id)
 
+
+    user_info = Formatters.format_team_member(current_user(conn))
+
     message = %{"conversation_id" => id,
                 "phone_number" => current_user(conn).phone_number,
-                "message" => "OPENED: Opened by #{current_user(conn).last_name}",
+                "message" => "OPENED: Opened by #{user_info}",
                 "sent_at" => DateTime.utc_now()}
 
 
@@ -98,9 +102,10 @@ defmodule MainWeb.ConversationController do
       |> current_user()
       |> Location.get(location_id)
 
+    user_info = Formatters.format_team_member(current_user(conn))
     message = %{"conversation_id" => id,
                 "phone_number" => current_user(conn).phone_number,
-                "message" => "CLOSED: Closed by #{current_user(conn).last_name}",
+                "message" => "CLOSED: Closed by #{user_info}",
                 "sent_at" => DateTime.utc_now()}
 
     with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),

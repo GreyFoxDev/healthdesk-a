@@ -15,10 +15,10 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_team_member(team_member) do
-    name = Enum.join([team_member.user.first_name, team_member.user.last_name], " ")
+    name = Enum.join([team_member.first_name, team_member.last_name], " ")
 
     if name == "" do
-      "+1 #{format_phone(team_member.user.phone_number)}"
+      "+1 #{format_phone(team_member.phone_number)}"
     else
       name
     end
