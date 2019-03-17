@@ -8,6 +8,7 @@ defmodule MainWeb.Intents do
 
   @callback build_response(List.t, location :: binary) :: String.t
   @default_response "I'm checking with a teammate for assistance. One moment please..."
+  @default_greeting "Hello! How can I help you?"
 
   alias MainWeb.Intents.{
     Address,
@@ -17,7 +18,12 @@ defmodule MainWeb.Intents do
     WeekPass,
     MonthPass,
     ChildCareHours,
-    Generic
+    Generic,
+    ClassSchedule,
+    ClassCategory,
+    ClassDescription,
+    ClassNext,
+    InstructorSchedule,
   }
 
   @intents %{
@@ -28,6 +34,11 @@ defmodule MainWeb.Intents do
     getWeekPass: WeekPass,
     getMonthPass: MonthPass,
     getChildCareHours: ChildCareHours,
+    queryClassSchedule: ClassSchedule,
+    queryClassCategory: ClassCategory,
+    queryClassDescription: ClassDescription,
+    queryClassNext: ClassNext,
+    queryInstructorSchedule: InstructorSchedule,
     getMessageGeneric: Generic
   }
 
@@ -37,6 +48,9 @@ defmodule MainWeb.Intents do
   """
   def get(:unknown_intent, location),
     do: @default_response
+
+  def get({:unknown, [{"greetings", _}]}, _location),
+    do: @default_greeting
 
   def get({intent, args}, location) do
     args = remove_intent(args)
@@ -55,5 +69,7 @@ defmodule MainWeb.Intents do
 
   defp remove_intent(args) when is_list(args),
     do: Enum.filter(args, fn({key, _}) -> key != :intent end)
+
+  defp remove_intent(args) when is_binary(args), do: args
 
 end

@@ -10,7 +10,7 @@ defmodule MainWeb.TwilioView do
     """
       <?xml version="1.0" encoding="UTF-8"?>
       <Response>
-        <Message>#{response}</Message>
+        <Message>#{String.replace(response, "&", "&amp;")}</Message>
       </Response>
     """
   end

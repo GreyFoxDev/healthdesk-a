@@ -14,7 +14,7 @@ defmodule Data.Schema.ConversationMessage do
 
   schema "conversation_messages" do
     field(:phone_number, :string)
-    field(:message, :text)
+    field(:message, :string)
     field(:sent_at, :utc_datetime)
 
     belongs_to(:conversation, Data.Schema.Conversation)
