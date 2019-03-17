@@ -14,6 +14,16 @@ defmodule MainWeb.Helper.Formatters  do
     phone_number
   end
 
+  def format_team_member(team_member) do
+    name = Enum.join([team_member.user.first_name, team_member.user.last_name], " ")
+
+    if name == "" do
+      "+1 #{format_phone(team_member.user.phone_number)}"
+    else
+      name
+    end
+  end
+
   def format_date(datetime) do
     DateTime.utc_now()
     |> Calendar.DateTime.diff(datetime)

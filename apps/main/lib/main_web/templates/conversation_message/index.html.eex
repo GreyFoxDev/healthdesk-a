@@ -152,7 +152,11 @@
                                             <div class="conversation-message-text"><%= message.message %></div>
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
-                                                    +1 <%= format_phone(message.phone_number) %>
+                                                    <%= if message.phone_number == @location.phone_number do %>
+                                                        Bot
+                                                    <% else %>
+                                                        +1 <%= format_phone(message.phone_number) %>
+                                                    <% end %>
                                                     ·
                                                     <%= format_date(message.sent_at) %>
                                                 </div>
@@ -168,7 +172,22 @@
                                             <div class="conversation-message-text"> <%= message.message %></div>
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
-                                                    +1 <%= format_phone(message.phone_number) %>
+                                                    <%= if message.phone_number == @location.phone_number do %>
+                                                        Bot
+                                                    <% else %>
+                                                        +1 <%= format_phone(message.phone_number) %>
+                                                    <% end %>
+                                                    ·
+                                                    <%= format_date(message.sent_at) %>
+                                                </div>
+                                            <% else %>
+                                                <div class="conversation-meta">
+                                                    <% team_member = Enum.find(@team_members, &(&1.user.phone_number == message.phone_number)) %>
+                                                    <%= if team_member do %>
+                                                        <%= format_team_member(team_member) %>
+                                                    <% else %>
+                                                        +1 <%= format_phone(message.phone_number) %>
+                                                    <% end %>
                                                     ·
                                                     <%= format_date(message.sent_at) %>
                                                 </div>
