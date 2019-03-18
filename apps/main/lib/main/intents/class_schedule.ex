@@ -81,7 +81,7 @@ defmodule MainWeb.Intents.ClassSchedule do
     if today == day_of_week do
       "today"
     else
-      "on #{month}/#{day}/#{year}"
+      "#{month}/#{day}/#{year}"
     end
   end
 
