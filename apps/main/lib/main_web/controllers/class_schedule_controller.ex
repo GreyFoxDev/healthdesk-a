@@ -18,11 +18,15 @@ defmodule MainWeb.ClassScheduleController do
   end
 
   def create(conn, %{"location_id" => location_id, "csv" => upload} = params) do
-    IO.inspect params
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
+
+    # Clear out location schedules
+    location_id
+    |> ClassSchedule.all()
+    |> Enum.each(&ClassSchedule.delete/1)
 
     count = upload.path
     |> File.stream!
