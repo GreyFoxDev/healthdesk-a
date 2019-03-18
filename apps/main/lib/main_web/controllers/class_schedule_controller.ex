@@ -32,6 +32,7 @@ defmodule MainWeb.ClassScheduleController do
         "date" => date,
         "start_time" => start_time,
         "end_time" => end_time,
+        "class_type" => name,
         "instructor" => instructor,
         "class_category" => category,
         "class_description" => description,

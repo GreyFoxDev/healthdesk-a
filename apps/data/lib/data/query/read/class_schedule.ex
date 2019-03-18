@@ -11,7 +11,8 @@ defmodule Data.Query.ReadOnly.ClassSchedule do
 
   def all(location_id) do
     from(t in ClassSchedule,
-      where: t.location_id == ^location_id
+      where: t.location_id == ^location_id,
+      order_by: [:date, :start_time]
     )
     |> Repo.all()
   end

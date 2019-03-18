@@ -35,7 +35,10 @@ defmodule Data.Schema.ClassSchedule do
   end
 
   def changeset(model, params \\ %{}) do
-    params = clean_date(params)
+    params =
+      params
+      |> clean_date()
+      |> clean_times()
 
     model
     |> cast(params, @all_fields)
@@ -61,8 +64,33 @@ defmodule Data.Schema.ClassSchedule do
           date
       end
 
-    Map.merge(params, %{"date" => fmt}) |> IO.inspect()
+    Map.merge(params, %{"date" => fmt})
   end
 
   defp clean_date(params), do: params
+
+  defp clean_times(%{"start_time" => start_time, "end_time" => end_time} = params) do
+    Map.merge(params, %{"start_time" => adjust_time(start_time), "end_time" => adjust_time(end_time)})
+  end
+
+  defp adjust_time(time) do
+    [hr,  << min::binary-size(2), " ", am_pm::binary-size(2)>>]  = String.split(time, ":")
+
+    min = String.to_integer(min)
+
+    hr = if am_pm == "AM" do
+      String.to_integer(hr)
+    else
+      hr = String.to_integer(hr)
+      if hr < 12 do
+        hr + 12
+      else
+        hr
+      end
+    end
+
+    Calendar.Time.from_erl!({hr, min, 0})
+  end
+
+  defp clean_times(params), do: params
 end

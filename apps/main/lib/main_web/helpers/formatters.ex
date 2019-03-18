@@ -37,15 +37,15 @@ defmodule MainWeb.Helper.Formatters  do
   def parse_date({:ok, seconds, _, _}, _date, _) when seconds < 18000, do: "#{div(seconds, 3600)} hours ago"
   def parse_date({:ok, seconds, _, _}, datetime, timezone) when seconds < 86400 do
     datetime
-    |> Calendar.DateTime.to_time()
     |> Calendar.DateTime.shift_zone!(timezone)
+    |> Calendar.DateTime.to_time()
     |> Calendar.Time.Format.iso8601()
     |> to_time(:today)
   end
   def parse_date({:ok, seconds, _, _}, datetime, timezone) when seconds < 172800 do
     datetime
-    |> Calendar.DateTime.to_time()
     |> Calendar.DateTime.shift_zone!(timezone)
+    |> Calendar.DateTime.to_time()
     |> Calendar.Time.Format.iso8601()
     |> to_time(:yesterday)
   end
@@ -56,10 +56,24 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def to_time(<< hour::binary-size(2), ":", minute::binary-size(2), _rest::binary >>, :today) do
-    "Today at #{hour}:#{minute}"
+    "Today at #{adjust_hour(hour, minute)}"
   end
 
   def to_time(<< hour::binary-size(2), ":", minute::binary-size(2), _rest::binary >>, :yesterday) do
-    "Yesterday at #{hour}:#{minute}"
+    "Yesterday at #{adjust_hour(hour, minute)}"
   end
+
+  defp adjust_hour(hour, minute) do
+    hour = String.to_integer(hour)
+
+    cond do
+      hour - 12 == 0 ->
+        "12:#{minute} AM"
+      hour > 12 ->
+        "#{hour - 12}:#{minute} PM"
+      true ->
+        "#{hour}:#{minute} AM"
+    end
+  end
+
 end
