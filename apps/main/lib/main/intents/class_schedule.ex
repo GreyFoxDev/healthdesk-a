@@ -45,8 +45,29 @@ defmodule MainWeb.Intents.ClassSchedule do
     end
   end
 
-  def build_response(_args, _location),
-    do: @default_response
+  def build_response(args, location) do
+    location = Location.get_by_phone(location)
+
+    date =
+      location.timezone
+      |> Calendar.Date.today!()
+
+    classes =
+      location.id
+      |> ClassSchedule.all()
+      |> Stream.filter(fn class -> class.date == date end)
+      |> Stream.map(&format_schedule/1)
+      |> Enum.join("\n")
+
+    if classes != "" do
+      @classes
+      |> String.replace("[date]", "#{date.month}-#{date.day}-#{date.year}")
+      |> String.replace("[classes]", classes)
+
+    else
+      String.replace(@no_classes, "[date_prefix]", "Today")
+    end
+  end
 
   def format_schedule(class) do
     {h, m, _} = Time.to_erl(class.start_time)
