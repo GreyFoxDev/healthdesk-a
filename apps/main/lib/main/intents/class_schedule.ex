@@ -16,6 +16,9 @@ defmodule MainWeb.Intents.ClassSchedule do
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
   @impl MainWeb.Intents
+  def build_response([datetime: {datetime, _}], location),
+    do: build_response([datetime: datetime], location)
+
   def build_response([datetime: datetime], location) do
     location = Location.get_by_phone(location)
 

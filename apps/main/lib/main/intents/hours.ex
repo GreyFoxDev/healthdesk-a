@@ -17,6 +17,9 @@ defmodule MainWeb.Intents.Hours do
   @default_response "I'm checking with a teammate for assistance. One moment please..."
 
   @impl MainWeb.Intents
+  def build_response([datetime: {datetime, _}], location),
+    do: build_response([datetime: datetime], location)
+
   def build_response([datetime: datetime], location) do
 
     location = Location.get_by_phone(location)
