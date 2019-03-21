@@ -46,7 +46,10 @@ defmodule MainWeb.Intents do
   Get the response from the intent module. If the intent hasn't been
   implemented then a default message is returned.
   """
-  def get(:unknown_intent, location),
+  def get(:unknown_intent, _location),
+    do: @default_response
+
+  def get(:unknown, _location),
     do: @default_response
 
   def get({:unknown, [{"greetings", _}]}, _location),

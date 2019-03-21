@@ -18,6 +18,7 @@ defmodule MainWeb.Intents.Hours do
 
   @impl MainWeb.Intents
   def build_response([datetime: datetime], location) do
+
     location = Location.get_by_phone(location)
     <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
@@ -40,7 +41,38 @@ defmodule MainWeb.Intents.Hours do
     end
   end
 
+  def build_response([], location) do
+    location = Location.get_by_phone(location)
+
+    erl_date =
+      location.timezone
+      |> Calendar.Date.today!()
+      |> Calendar.Date.to_erl()
+
+    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week(erl_date),
+         [hours] <- get_hours(location.id, {term, day_of_week}) do
+
+      @hours
+      |> String.replace("[date_prefix]", "Today")
+      |> String.replace("[open]", hours.open_at)
+      |> String.replace("[close]", hours.close_at)
+    else
+      [] ->
+        {term, day_of_week} = get_day_of_week(erl_date)
+
+      String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, erl_date, location.timezone))
+      _ ->
+        @default_response
+    end
+  end
+
   def build_response(_, _), do: @default_response
+
+  defp get_day_of_week({year, _, _} = day) when is_binary(year) do
+    day
+    |> convert_to_integer()
+    |> get_day_of_week()
+  end
 
   defp get_day_of_week({year, month, day} = date) do
     with nil <- MainWeb.HolidayDates.is_holiday?(date) do
@@ -63,7 +95,14 @@ defmodule MainWeb.Intents.Hours do
     |> Enum.filter(fn hour -> hour.holiday_name == holiday end)
   end
 
-  defp date_prefix({:normal, day_of_week}, {year, month, day}, timezone \\ "PST8PDT") do
+  defp date_prefix(term, day, timezone \\ "PST8PDT")
+
+  defp date_prefix(term, {year, _, _} = day, timezone) when is_binary(year) do
+    erl_date = convert_to_integer(day)
+    date_prefix(term, erl_date, timezone)
+  end
+
+  defp date_prefix({_term, day_of_week}, {year, month, day}, timezone) do
     date = Calendar.Date.today!(timezone)
     today = lookup_day_of_week({date.year, date.month, date.day})
 
