@@ -25,34 +25,33 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_date(datetime, timezone \\ "PST8PDT") do
-    DateTime.utc_now()
+    datetime = Calendar.DateTime.shift_zone!(datetime, timezone)
+    now = Calendar.DateTime.shift_zone!(DateTime.utc_now(), timezone)
+
+    now
     |> Calendar.DateTime.diff(datetime)
-    |> parse_date(datetime, timezone)
+    |> parse_date(datetime)
   end
 
-  def parse_date({:ok, seconds, _, _}, _date, _) when seconds < 60, do: "now"
-  def parse_date({:ok, seconds, _, _}, _date, _) when seconds < 120, do: "1 minute ago"
-  def parse_date({:ok, seconds, _, _}, _date, _) when seconds < 3600, do: "#{div(seconds, 60)} minutes ago"
-  def parse_date({:ok, seconds, _, _}, _date, _) when seconds < 7200, do: "1 hour ago"
-  def parse_date({:ok, seconds, _, _}, _date, _) when seconds < 18000, do: "#{div(seconds, 3600)} hours ago"
-  def parse_date({:ok, seconds, _, _}, datetime, timezone) when seconds < 86400 do
+  def parse_date({:ok, seconds, _, _}, _date) when seconds < 60, do: "now"
+  def parse_date({:ok, seconds, _, _}, _date) when seconds < 120, do: "1 minute ago"
+  def parse_date({:ok, seconds, _, _}, _date) when seconds < 3600, do: "#{div(seconds, 60)} minutes ago"
+  def parse_date({:ok, seconds, _, _}, _date) when seconds < 7200, do: "1 hour ago"
+  def parse_date({:ok, seconds, _, _}, _date) when seconds < 18000, do: "#{div(seconds, 3600)} hours ago"
+  def parse_date({:ok, seconds, _, _}, datetime) when seconds < 86400 do
     datetime
-    |> Calendar.DateTime.shift_zone!(timezone)
     |> Calendar.DateTime.to_time()
     |> Calendar.Time.Format.iso8601()
     |> to_time(:today)
   end
-  def parse_date({:ok, seconds, _, _}, datetime, timezone) when seconds < 172800 do
+  def parse_date({:ok, seconds, _, _}, datetime) when seconds < 172800 do
     datetime
-    |> Calendar.DateTime.shift_zone!(timezone)
     |> Calendar.DateTime.to_time()
     |> Calendar.Time.Format.iso8601()
     |> to_time(:yesterday)
   end
-  def parse_date(_seconds, datetime, timezone) do
-    datetime
-    |> Calendar.DateTime.shift_zone!(timezone)
-    |> Strftime.strftime!("%m/%d/%Y")
+  def parse_date(_seconds, datetime) do
+    Strftime.strftime!(datetime, "%m/%d/%Y")
   end
 
   def to_time(<< hour::binary-size(2), ":", minute::binary-size(2), _rest::binary >>, :today) do
