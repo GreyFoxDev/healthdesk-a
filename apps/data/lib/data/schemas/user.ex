@@ -12,6 +12,7 @@ defmodule Data.Schema.User do
     first_name
     last_name
     email
+    avatar
     deleted_at
   |a
 
@@ -19,10 +20,11 @@ defmodule Data.Schema.User do
 
   schema "users" do
     field(:phone_number, :string)
-    field(:role, :string, default: "team_member")
+    field(:role, :string, default: "teammate")
     field(:first_name, :string)
     field(:last_name, :string)
     field(:email, :string)
+    field(:avatar, :string)
 
     field(:deleted_at, :utc_datetime)
 

@@ -1,15 +1,15 @@
-<% team_member = (@c.team_member || default_user()) %>
 <tr>
+    <% team_member = (@c.team_member || default_user()) %>
     <td>
         <span class="user-avatar-wrapper">
-            <a href="#" class="user-avatar user-avatar-md"><img src="<%= team_member.avatar %>" alt=""></a>
+            <a href="#" class="user-avatar user-avatar-md"><img src="<%= team_member.user.avatar %>" alt=""></a>
             <span>
                 <b>
                     <a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>">
                         <%= team_member.user.first_name %> <%= team_member.user.last_name %>
                     </a>
                 </b>
-                <span class="list-group-item-text"><%= String.replace(team_member.user.role, "_", " ") |> String.capitalize() %></span>
+                <span class="list-group-item-text"><%= String.replace(team_member.user.role, "-", " ") |> String.capitalize() %></span>
             </span>
         </span>
     </td>

@@ -10,13 +10,11 @@ defmodule Data.Schema.TeamMember do
 
   @optional_fields ~w|
   location_id
-  avatar
   |a
 
   @all_fields @required_fields ++ @optional_fields
 
   schema "team_members" do
-    field(:avatar, :string)
     belongs_to(:team, Data.Schema.Team)
     belongs_to(:location, Data.Schema.Location)
     belongs_to(:user, Data.Schema.User)

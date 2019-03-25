@@ -2,6 +2,17 @@ defmodule MainWeb.Helper.Formatters  do
   alias Calendar.Strftime
   require Logger
 
+  def format_role("admin") do
+    "Super Admin"
+  end
+
+  def format_role(role) do
+    role
+    |> String.split("-")
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.join(" ")
+  end
+
   def format_phone(<< "+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
     Enum.join([area_code, prefix, line], "-")
   end
@@ -51,8 +62,8 @@ defmodule MainWeb.Helper.Formatters  do
   defp parse_date({:ok, seconds, _, _}, _date) when seconds < 3600, do: "#{div(seconds, 60)} minutes ago"
   defp parse_date({:ok, seconds, _, _}, _date) when seconds < 7200, do: "1 hour ago"
   defp parse_date({:ok, seconds, _, _}, _date) when seconds < 18000, do: "#{div(seconds, 3600)} hours ago"
-  defp parse_date({:ok, seconds, _, _}, datetime) do
-    time = datetime
+  defp parse_date({:ok, _seconds, _, _}, datetime) do
+    datetime
     |> Calendar.DateTime.to_time()
     |> Calendar.Time.Format.iso8601()
     |> to_time(:today)

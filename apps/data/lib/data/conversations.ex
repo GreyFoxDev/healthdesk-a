@@ -1,7 +1,7 @@
 defmodule Data.Conversations do
   alias Data.Commands.Conversations
 
-  @roles ["admin"]
+  @roles ["admin", "team-admin", "location-admin", "teammate"]
 
   @doc """
   Get changesets for conversations.
@@ -20,6 +20,10 @@ defmodule Data.Conversations do
 
   def all(%{role: role}, location_id) when role in @roles,
     do: Conversations.all(location_id)
+
+  def all(%{role: "teammate"}, location_id) do
+    Conversations.all(location_id)
+  end
 
   def all(_), do: {:error, :invalid_permissions}
 

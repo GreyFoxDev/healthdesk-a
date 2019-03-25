@@ -1,11 +1,11 @@
-<% team = @changeset.data %>
 <header class="page-title-bar">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active">
-                <a href="<%= team_path(@conn, :index) %>"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Teams</a>
             </li>
         </ol>
+    </nav>
+    <h6 class="page-title">Edit Profile</h6>
 </header>
 
 <div class="page-section">
@@ -14,17 +14,16 @@
             <div class="card card-fluid">
                 <div class="card-header">
                     <nav class="nav nav-tabs flex-column border-0">
-                        <a href="<%= team_path(@conn, :edit, team.id) %>" class="nav-link active">Details</a>
-                        <a href="<%= team_member_path(@conn, :index, team.id) %>" class="nav-link">Members</a>
+                        <a href="#" class="nav-link active">Profile</a>
                     </nav>
                 </div>
             </div>
         </div>
         <div class="col-lg-8">
             <div class="card card-fluid">
-                <h6 class="card-header"> Details </h6><!-- .card-body -->
                 <div class="card-body">
-                    <%= render "_form.html", data: @changeset, action: team_path(@conn, :update, @changeset.data), conn: @conn, errors: @errors %>
+
+                    <%= render "_form.html", data: @changeset, action: user_path(@conn, :update, @changeset.data), conn: @conn, errors: @errors %>
                 </div><!-- /.card-body -->
             </div>
         </div>

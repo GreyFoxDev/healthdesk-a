@@ -1,0 +1,46 @@
+<div class="panel-body">
+    <section id="base-style" class="card">
+        <div class="card-body">
+            <%= form_for @data, @action, [multipart: true], fn f -> %>
+                <fieldset>
+                    <span>
+                        <%= if @data.data.avatar && @data.data.avatar != "" do %> 
+                            <img id="avatar" src="<%= @data.data.avatar %>" height="40" width="40" >
+                            <a id="removeImage" href="#">Remove</a>
+                        <% end %>
+                        <div class="form-group">
+                            <%= label f, :image, "Avatar", class: "control-label" %>
+                            <div class="custom-file">
+                                <%= file_input f, :image, class: "custom-file-input", multiple: "" %> <label class="custom-file-label" for="tf3">Choose file</label>
+                            </div>
+                        </div>
+
+                    </span>
+
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <%= text_input f, :first_name, class: "form-control" %>
+                        <label>Last Name</label>
+                        <%= text_input f, :last_name, class: "form-control" %>
+                        <%#= error_tag @errors, :website %>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <%= text_input f, :phone_number, class: "form-control" %>
+                        <%#= error_tag @errors, :website %>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <%= text_input f, :email, class: "form-control" %>
+                        <%#= error_tag @errors, :website %>
+                    </div>
+
+                    <div class="form-actions">
+                        <%= submit "Save", class: "btn btn-primary" %>
+                    </div>
+                </fieldset>
+            <% end %>
+        </div>
+    </section>
+</div>

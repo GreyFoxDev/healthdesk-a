@@ -18,7 +18,6 @@
                 <div class="card-header">
                     <nav class="nav nav-tabs flex-column border-0">
                         <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link">Details</a>
-                        <a href="<%= team_location_location_team_member_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Teammates</a>
                         <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link active">Normal Hours</a>
                         <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Holiday Hours</a>
                         <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hours</a>

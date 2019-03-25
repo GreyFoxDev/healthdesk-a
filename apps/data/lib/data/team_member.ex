@@ -1,10 +1,12 @@
 defmodule Data.TeamMember do
   alias Data.Commands.TeamMember
 
-  @roles ["admin"]
+  @roles ["admin", "teammate", "location-admin", "team-admin"]
 
-  def get_changeset(),
-    do: Data.Schema.TeamMember.changeset(%Data.Schema.TeamMember{})
+  def get_changeset() do
+    IO.inspect %Data.Schema.TeamMember{}
+    Data.Schema.TeamMember.changeset(%Data.Schema.TeamMember{})
+  end
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =

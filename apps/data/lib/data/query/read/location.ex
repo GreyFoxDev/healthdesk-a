@@ -16,7 +16,8 @@ defmodule Data.Query.ReadOnly.Location do
   def all(team_id) do
     from(t in Location,
       where: is_nil(t.deleted_at),
-      where: t.team_id == ^team_id
+      where: t.team_id == ^team_id,
+      order_by: t.location_name
     )
     |> Repo.all()
   end

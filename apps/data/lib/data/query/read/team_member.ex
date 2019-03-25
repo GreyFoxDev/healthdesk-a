@@ -11,6 +11,7 @@ defmodule Data.Query.ReadOnly.TeamMember do
       join: u in User,
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
+      order_by: [u.first_name, u.last_name],
       preload: [:location, :user]
     )
     |> Repo.all()
@@ -22,6 +23,7 @@ defmodule Data.Query.ReadOnly.TeamMember do
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: t.team_id == ^team_id,
+      order_by: [u.first_name, u.last_name],
       preload: [:location, :user]
     )
     |> Repo.all()
@@ -52,6 +54,7 @@ defmodule Data.Query.ReadOnly.TeamMember do
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: t.location_id == ^location_id,
+      order_by: [u.first_name, u.last_name],
       preload: [:location, :user]
     )
     |> Repo.all()

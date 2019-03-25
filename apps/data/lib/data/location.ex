@@ -1,7 +1,7 @@
 defmodule Data.Location do
   alias Data.Commands.Location
 
-  @roles ["admin"]
+  @roles ["admin", "teammate", "location-admin", "team-admin"]
 
   def get_changeset(),
     do: Data.Schema.Location.changeset(%Data.Schema.Location{})
@@ -13,6 +13,10 @@ defmodule Data.Location do
       |> Data.Schema.Location.changeset()
 
     {:ok, changeset}
+  end
+
+  def all(%{role: "location-admin"} = user) do
+    Location.all() |> Enum.filter(&(&1.id == user.team_member.location_id))
   end
 
   def all(%{role: role}) when role in @roles,

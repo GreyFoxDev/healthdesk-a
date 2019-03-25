@@ -1,7 +1,7 @@
 defmodule Data.ChildCareHours do
   alias Data.Commands.ChildCareHours
 
-  @roles ["admin"]
+  @roles ["admin", "teammate", "location-admin", "team-admin"]
 
   def get_changeset(),
     do: Data.Schema.ChildCareHour.changeset(%Data.Schema.ChildCareHour{})

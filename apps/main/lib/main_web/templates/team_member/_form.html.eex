@@ -11,6 +11,16 @@
                             </div>
 
                             <%= inputs_for f, :user, fn u -> %>
+                                <span>Role</span>
+                                <span>
+                                    <%=
+                                    select u,
+                                    :role,
+                                    MainWeb.Roles.all(@current_user),
+                                    class: "form-control"
+                                    %>
+                                </span>
+
                                 <div class="form-group">
                                     <span>First Name</span>
                                     <span>
@@ -35,23 +45,22 @@
                                         <%= text_input u, :email, class: "form-control" %>
                                     </span>
                                 </div>
+                                <span>
+
+                                    <%= if @data.data.user_id && @data.data.user.avatar != "" do %> 
+                                        <img id="avatar" src="<%= @data.data.user.avatar %>" height="40" width="40" >
+                                        <a id="removeImage" href="#">Remove</a>
+                                    <% end %>
+                                    <div class="form-group">
+                                        <%= label u, :image, "Avatar", class: "control-label" %>
+                                        <div class="custom-file">
+                                            <%= file_input u, :image, class: "custom-file-input", multiple: "" %> <label class="custom-file-label" for="tf3">Choose file</label>
+                                        </div>
+                                    </div>
+
+                                </span>
                             <% end %>
 
-                            <span>
-                                <%= if @data.data.avatar && @data.data.avatar != "" do %> 
-                                    <img id="avatar" src="<%= @data.data.avatar %>" height="40" width="40" >
-                                    <a id="removeImage" href="#">Remove</a>
-                                <% end %>
-                                <div class="form-group">
-                                    <%= label f, :image, "Avatar", class: "control-label" %>
-                                    <div class="custom-file">
-
-                                        <%= file_input f, :image, class: "custom-file-input", multiple: "" %> <label class="custom-file-label" for="tf3">Choose file</label>
-                                    </div>
-                                </div>
-
-
-                            </span>
                         </fieldset>
                     </div>
                 </div>

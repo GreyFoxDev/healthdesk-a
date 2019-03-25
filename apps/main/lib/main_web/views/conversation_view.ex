@@ -4,7 +4,6 @@ defmodule MainWeb.ConversationView do
   import MainWeb.Helper.Formatters
 
   def default_user do
-    %{avatar: "/images/unknown-profile.jpg", user: %{role: "system", first_name: "Bot", last_name: ""}}
+    %{user: %{role: "system", first_name: "SMS Bot", last_name: "", avatar: "/images/unknown-profile.jpg"}}
   end
 end
-

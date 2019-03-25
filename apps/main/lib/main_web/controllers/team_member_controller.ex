@@ -4,7 +4,6 @@ defmodule MainWeb.TeamMemberController do
   alias Data.{TeamMember, Team, User, Location}
 
   def index(conn, %{"team_id" => team_id} = params) do
-
     team =
       conn
       |> current_user()
@@ -68,10 +67,11 @@ defmodule MainWeb.TeamMemberController do
     end
   end
 
-  def create(conn, %{"team_member" => %{"image" => _} = team_member, "team_id" => team_id} = params) do
-    with {:ok, _pid} <- User.create(team_member["user"]),
+  def create(conn, %{"team_member" => %{"user" => %{"image" => [image]}} = team_member, "team_id" => team_id} = params) do
+    with {:ok, avatar} <- Uploader.upload_image(image.path),
+         user_params <- Map.merge(team_member["user"], %{"avatar" => avatar}),
+         {:ok, _pid} <- User.create(user_params),
          {:ok, %Data.Schema.User{} = user} <- User.get_by_phone(team_member["user"]["phone_number"]),
-         {:ok, avatar} <- Uploader.upload_image(team_member["image"].path),
          {:ok, _pid} <- TeamMember.create(%{location_id: team_member["location_id"], user_id: user.id, team_id: team_id, avatar: avatar}) do
       conn
       |> put_flash(:success, "Team Member created successfully.")
@@ -113,11 +113,11 @@ defmodule MainWeb.TeamMemberController do
     end
   end
 
-  def update(conn, %{"id" => id, "team_member" => %{"image" => _} = team_member, "team_id" => team_id}) do
+  def update(conn, %{"id" => id, "team_member" => %{"user" => %{"image" => [image]}} = team_member, "team_id" => team_id}) do
     with %Data.Schema.TeamMember{} = member <- TeamMember.get(current_user(conn), id),
-         {:ok, avatar} <- Uploader.upload_image(team_member["image"].path),
-         {:ok, _pid} <- TeamMember.update(id, %{location_id: team_member["location_id"], avatar: avatar}),
-         {:ok, _pid} <- User.update(member.user_id, team_member["user"]) do
+         {:ok, avatar} <- Uploader.upload_image(image.path),
+         {:ok, _pid} <- TeamMember.update(id, %{location_id: team_member["location_id"]}),
+         {:ok, _pid} <- User.update(member.user_id, Map.merge(team_member["user"], %{"avatar" => avatar})) do
 
       conn
       |> put_flash(:success, "Team Member deleted successfully.")

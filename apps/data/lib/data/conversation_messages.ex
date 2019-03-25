@@ -1,7 +1,7 @@
 defmodule Data.ConversationMessages do
   alias Data.Commands.ConversationMessages
 
-  @roles ["admin"]
+  @roles ["admin", "teammate", "location-admin", "team-admin"]
 
   def get_changeset(),
     do: Data.Schema.ConversationMessage.changeset(%Data.Schema.ConversationMessage{})

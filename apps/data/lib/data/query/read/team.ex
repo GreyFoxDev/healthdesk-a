@@ -21,8 +21,10 @@ defmodule Data.Query.ReadOnly.Team do
     from(t in Team,
       where: t.id == ^team_id,
       left_join: l in assoc(t, :locations),
+      where: is_nil(l.deleted_at),
       preload: [:locations],
-      order_by: [t.team_name, l.location_name]
+      order_by: [t.team_name, l.location_name],
+      limit: 1
     )
     |> Repo.all()
   end

@@ -1,7 +1,7 @@
 defmodule Data.Team do
   alias Data.Commands.Team
 
-  @roles ["admin"]
+  @roles ["admin", "teammate", "location-admin", "team-admin"]
 
   def get_changeset(),
     do: Data.Schema.Team.changeset(%Data.Schema.Team{})
@@ -15,8 +15,15 @@ defmodule Data.Team do
     {:ok, changeset}
   end
 
+  def all(%{role: role} = user) when role in ["team-admin", "location-admin"] do
+    Team.all() |> Enum.filter(&(&1.id == user.team_member.team_id))
+  end
+
+
   def all(%{role: role}) when role in @roles,
     do: Team.all()
+
+  def all(_), do: []
 
   def all(_), do: {:error, :invalid_permissions}
 

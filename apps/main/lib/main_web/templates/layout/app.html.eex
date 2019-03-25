@@ -54,14 +54,14 @@
                       <div class="dropdown">
                           <button class="btn-account d-none d-md-flex" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <span class="user-avatar user-avatar-md">
-                                  <img src="<%= if current_user.team_member, do: current_user.team_member.avatar, else: "/images/unknown-profile.jpg" %>" alt=""></span>
+                                  <img src="<%= if current_user.avatar != "", do: current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt=""></span>
                                   <span class="account-summary pr-lg-4 d-none d-lg-block">
                                       <span class="account-name">
                                           <%= current_user.first_name %>
                                           <%= current_user.last_name %>
                                       </span>
                                       <span class="account-description">
-                                          <%= current_user.role %>
+                                          <%= MainWeb.Helper.Formatters.format_role(current_user.role) %>
                                       </span>
                                   </span>
                           </button>
@@ -72,10 +72,12 @@
                                   <%= current_user.first_name %>&nbsp
                                   <%= current_user.last_name %>
                               </h6>
-                              <%= link "Profile", to: "/profile", class: "dropdown-item" %>
+                              <%= link "Profile", to: user_path(@conn, :edit, current_user), class: "dropdown-item" %>
                               <%= link "Logout", to: session_path(@conn, :delete, current_user), method: "delete", class: "dropdown-item" %>
                               <hr />
-                              <%= link "Settings", to: settings_url(@conn, current_user), class: "dropdown-item" %>
+                              <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
+                                  <%= link "Settings", to: settings_url(@conn, current_user), class: "dropdown-item" %>
+                              <% end %>
                               <%= link "Get support", to: "mailto:support@healthdesk.ai", method: "delete", class: "dropdown-item" %>
                               <%= link "Terms of use", to: "https://healthdesk.ai/terms", target: "_blank", class: "dropdown-item" %>
                               <%= link "Privacy policy", to: "https://healthdesk.ai/privacy", target: "_blank", class: "dropdown-item" %>
@@ -90,33 +92,42 @@
               <section class="aside-menu overflow-hidden ps">
                   <nav id="stacked-menu" class="stacked-menu stacked-menu-has-collapsible">
                       <ul class="menu">
-                          <li class="menu-item has-active">
-                              <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>Teams</span>"}, to: team_path(@conn, :index), class: "menu-link" %>
-                          </li>
+                          <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
+                              <%= if @current_user.role == "admin" do %>
+                                  <li class="menu-item has-active">
+                                      <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>Teams</span>"}, to: team_path(@conn, :index), class: "menu-link" %>
+                                  </li>
+                              <% end %>
 
-                          <%= for team <- @teams do %>
+                              <%= for team <- @teams do %>
+                                  <%= if @current_user.role in ["location-admin", "team-admin"] do %>
+                                      <li class="menu-item has-active">
+                                          <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>My Team</span>"}, to: team_location_path(@conn, :index, team.id), class: "menu-link" %>
+                                      </li>
+                                  <% end %>
 
-                              <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
-                                  <a href="#" class="menu-link">
-                                      <span class="menu-icon oi oi-browser"></span>
-                                      <span class="menu-text">
-                                          <%= team.team_name %>
-                                      </span>
-                                  </a> <!-- child menu -->
-                                  <ul class="menu">
-                                      <li class="menu-subhead"><%= team.team_name %></li>
-                                      <%= for location <- team.locations do %>
-                                          <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                              <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
-                                                  <%= location.location_name %>
-                                                  <span class="badge badge-subtle">
-                                                     <%= Enum.count(location.conversations, &(&1.status == "open")) %>
-                                                  </span>
-                                              </a>
-                                          </li>
-                                      <% end %>
-                                  </ul>
-                              </li>
+                                  <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
+                                      <a href="http://google.com" class="menu-link">
+                                          <span class="menu-icon oi oi-browser"></span>
+                                          <span class="menu-text">
+                                              <%= team.team_name %>
+                                          </span>
+                                      </a> <!-- child menu -->
+                                      <ul class="menu">
+                                          <li class="menu-subhead"><%= team.team_name %></li>
+                                          <%= for location <- team.locations do %>
+                                              <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
+                                                  <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
+                                                      <%= location.location_name %>
+                                                      <span class="badge badge-subtle">
+                                                          <%= Enum.count(location.conversations, &(&1.status == "open")) %>
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                          <% end %>
+                                      </ul>
+                                  </li>
+                              <% end %>
                           <% end %>
 
                       </ul>

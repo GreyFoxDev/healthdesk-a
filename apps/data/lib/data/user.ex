@@ -6,6 +6,15 @@ defmodule Data.User do
   def get_changeset(),
     do: Data.Schema.User.changeset(%Data.Schema.User{})
 
+  def get_changeset(id, %{role: role}) when role in @roles do
+    changeset =
+      id
+      |> User.get()
+      |> Data.Schema.User.changeset()
+
+    {:ok, changeset}
+  end
+
   def authorize(phone_number) do
     with %Data.Schema.User{} = user <- User.by_phone_number(phone_number) do
       {:ok, user}
