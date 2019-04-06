@@ -22,7 +22,7 @@
                         <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Holiday Hours</a>
                         <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hours</a>
                         <a href="<%= team_location_wifi_network_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Wifi Network</a>
-                        <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link active">Pricing Plans</a>
+                        <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link active">Pass Prices</a>
                         <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Class Schedule Upload</a>
                     </nav>
                 </div>
@@ -30,7 +30,7 @@
         </div>
         <div class="col-lg-8">
             <div class="card card-fluid">
-                <h6 class="card-header"> Pricing Plans </h6><!-- .card-body -->
+                <h6 class="card-header">Pass Prices</h6><!-- .card-body -->
                 <div class="card-body">
                     <%= if @changeset.data.id do %>
                         <%=

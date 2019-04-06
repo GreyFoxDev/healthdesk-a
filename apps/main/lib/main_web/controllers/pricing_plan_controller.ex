@@ -41,12 +41,12 @@ defmodule MainWeb.PricingPlanController do
     |> case do
          {:ok, _plan} ->
            conn
-           |> put_flash(:success, "Pricing Plan created successfully.")
+           |> put_flash(:success, "Pass Price created successfully.")
            |> redirect(to: team_location_pricing_plan_path(conn, :index, team_id, location_id))
 
          {:error, changeset} ->
            conn
-           |> put_flash(:error, "Pricing Plan failed to create")
+           |> put_flash(:error, "Pass Price failed to create")
            |> render("index.html", location: location, changeset: changeset, errors: changeset.errors, teams: teams(conn))
        end
   end
@@ -63,11 +63,11 @@ defmodule MainWeb.PricingPlanController do
     |> case do
          {:ok, _plan} ->
            conn
-           |> put_flash(:success, "Pricing Plan updated successfully.")
+           |> put_flash(:success, "Pass Price updated successfully.")
            |> redirect(to: team_location_pricing_plan_path(conn, :index, team_id, location_id))
          {:error, changeset} ->
            conn
-           |> put_flash(:error, "Pricing Plan failed to update")
+           |> put_flash(:error, "Pass Price failed to update")
            |> render("index.html", location: location, changeset: changeset, errors: changeset.errors, teams: teams(conn))
        end
   end
