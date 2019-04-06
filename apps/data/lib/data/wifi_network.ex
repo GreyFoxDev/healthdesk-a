@@ -1,7 +1,7 @@
 defmodule Data.WifiNetwork do
   alias Data.Commands.WifiNetwork
 
-  @roles ["admin"]
+  @roles ["admin", "team-admin", "location-admin"]
 
   def get_changeset(),
     do: Data.Schema.WifiNetwork.changeset(%Data.Schema.WifiNetwork{})

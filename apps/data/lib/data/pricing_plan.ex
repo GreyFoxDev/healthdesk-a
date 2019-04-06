@@ -1,7 +1,7 @@
 defmodule Data.PricingPlan do
   alias Data.Commands.PricingPlan
 
-  @roles ["admin"]
+  @roles ["admin", "team-admin", "location-admin"]
 
   def get_changeset(),
     do: Data.Schema.PricingPlan.changeset(%Data.Schema.PricingPlan{})

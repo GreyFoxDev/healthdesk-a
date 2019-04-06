@@ -1,7 +1,7 @@
 defmodule Data.NormalHours do
   alias Data.Commands.NormalHours
 
-  @roles ["admin"]
+  @roles ["admin", "team-admin", "location-admin"]
 
   def get_changeset(),
     do: Data.Schema.NormalHour.changeset(%Data.Schema.NormalHour{})
