@@ -2,14 +2,16 @@
     <!-- .nav-tabs -->
     <ul class="nav nav-tabs card-header-tabs">
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#project-assigned">Me (<%= Enum.count(@conversations, &(&1.team_member_id == assigns[:current_user].id)) %>)</a>
+            <a class="nav-link" data-toggle="tab" href="#project-assigned">Me (<%= Enum.count(@conversations, &(&1.team_member_id == assigns[:current_user].id and &1.status in ["open", "pending"])) %>)</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#project-open">Open (<%= Enum.count(@conversations, fn(c) -> c.status in ["open", "pending"] end) %>)</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#project-closed">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>
-        </li>
+        <%= if assigns[:current_user].role != "teammate" do %>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#project-open">Open (<%= Enum.count(@conversations, fn(c) -> c.status in ["open", "pending"] end) %>)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#project-closed">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>
+            </li>
+        <% end %>
     </ul>
     <!-- /.nav-tabs -->
 
