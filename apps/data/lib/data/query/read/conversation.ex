@@ -50,6 +50,10 @@ defmodule Data.Query.ReadOnly.Conversation do
     end
   end
 
-  def get_by_phone(phone_number),
-    do: Repo.get_by(Conversation, original_number: phone_number)
+  def get_by_phone(phone_number, location_id) do
+    from(c in Conversation,
+      where: c.original_number == ^phone_number,
+      where: c.location_id == ^location_id
+    ) |> Repo.one()
+  end
 end
