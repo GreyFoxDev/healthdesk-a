@@ -78,7 +78,7 @@
                             <td>Updated <%= format_date(location.updated_at, location.timezone) %></td>
                             <td>
                                 <%= link {:safe, "<i class=\"fas fa-edit\"></i>"}, to: team_location_path(@conn, :edit, @team.id, location.id) %>
-                                <%= if @current_user.role in ["admin", "team-admin"] do %>
+                                <%= if @current_user.role in ["admin"] do %>
                                     <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_location_path(@conn, :delete, @team.id, location.id), method: "delete" %>
                                 <% end %>
                             </td>
