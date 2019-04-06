@@ -10,7 +10,9 @@ defmodule MainWeb.Plug.OptIn do
   alias Data.Commands.OptIn, as: O
 
   @opt_in_message """
-  To receive a response to your inquiry, you must opt-in. Reply YES for recurring automated SMS/MMS marketing messages powered by Healthdesk. No purchase required. Message and data rates may apply. Terms: https://healthdesk.ai/terms
+  Hello! We've received your message, however, since this is your first time texting us, you must opt-in before we can respond.
+  You'll only have to do this once. Reply 'yes' to receive automated SMS/MMS messages. No purchase required. Message and data
+  rates may apply. Terms: https://healthdesk.ai/terms
   """
 
   @opt_out_message """
