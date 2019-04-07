@@ -8,4 +8,5 @@ defmodule Data.Commands.TeamMember do
 
   def get_by_location(location_id),
     do: Command.execute_task_with_results(fn -> Read.get_by_location(location_id) end)
+
 end

@@ -69,6 +69,7 @@
                     </thead>
                     <tbody>
                     <%= for location <- @locations do %>
+                        <%= if @current_user.role in ["team-admin", "admin"] || location.id in Enum.map(@current_user.team_member.team_member_locations, &(&1.location.id)) do %>
                         <tr>
                             <td>
                                 <b><a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>"><%= location.location_name %></a></b><br />
@@ -83,6 +84,7 @@
                                 <% end %>
                             </td>
                         </tr>
+                        <% end %>
                     <% end  %>
                     </tbody>
                 </table><!-- /.list-group -->

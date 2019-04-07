@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
 <div class="panel-body">
     <section class="card">
         <div class="card-body">
@@ -6,8 +8,26 @@
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <fieldset>
                             <div class="form-group">
-                                <label>Location</label>
-                                <%= select f, :location_id, @locations, class: "custom-select" %>
+                                <label>Default Location</label>
+                                <span>
+                                    <%=
+                                    select f,
+                                    :location_id,
+                                    @locations,
+                                    class: "form-control"
+                                    %>
+                                </span>
+
+                            </div>
+                            <div class="form-group">
+                                <label>Additional Locations</label>
+                                <%=
+                                multiple_select f,
+                                :team_member_locations,
+                                @locations,
+                                data_style: "btn-default",
+                                class: "selectpicker form-control",
+                                selected: @selected_locations %>
                             </div>
 
                             <%= inputs_for f, :user, fn u -> %>

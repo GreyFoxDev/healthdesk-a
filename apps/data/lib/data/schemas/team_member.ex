@@ -6,18 +6,21 @@ defmodule Data.Schema.TeamMember do
   @required_fields ~w|
   user_id
   team_id
+  location_id
   |a
 
   @optional_fields ~w|
-  location_id
   |a
 
   @all_fields @required_fields ++ @optional_fields
 
   schema "team_members" do
     belongs_to(:team, Data.Schema.Team)
-    belongs_to(:location, Data.Schema.Location)
     belongs_to(:user, Data.Schema.User)
+    belongs_to(:location, Data.Schema.Location)
+
+    has_many(:team_member_locations, Data.Schema.TeamMemberLocation)
+    has_many(:locations, through: [:team_member_locations, :locations])
   end
 
   def changeset(model, params \\ %{}) do

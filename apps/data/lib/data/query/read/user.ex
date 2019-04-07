@@ -10,9 +10,13 @@ defmodule Data.Query.ReadOnly.User do
     do: Repo.all(User)
 
   def get(id) do
-    User
-    |> Repo.get(id)
-    |> Repo.preload(:team_member)
+    from(u in User,
+      left_join: t in assoc(u, :team_member),
+      where: is_nil(u.deleted_at),
+      where: u.id == ^id,
+      preload: [team_member: {t, [team_member_locations: [location: :conversations]]}]
+    )
+    |> Repo.one()
   end
 
   def get_by_phone(phone_number) do
@@ -20,16 +24,8 @@ defmodule Data.Query.ReadOnly.User do
       left_join: t in assoc(u, :team_member),
       where: is_nil(u.deleted_at),
       where: u.phone_number == ^phone_number,
-      preload: [team_member: t],
-      limit: 1
+      preload: [team_member: {t, team_member_locations: :location}]
     )
-    |> Repo.all()
-    |> case do
-      [] ->
-        nil
-
-      [user] ->
-        user
-    end
+    |> Repo.one()
   end
 end

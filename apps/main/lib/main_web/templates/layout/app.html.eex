@@ -106,27 +106,52 @@
                                       </li>
                                   <% end %>
 
-                                  <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
-                                      <a href="http://google.com" class="menu-link">
-                                          <span class="menu-icon oi oi-browser"></span>
-                                          <span class="menu-text">
-                                              <%= team.team_name %>
-                                          </span>
-                                      </a> <!-- child menu -->
-                                      <ul class="menu">
-                                          <li class="menu-subhead"><%= team.team_name %></li>
-                                          <%= for location <- team.locations do %>
-                                              <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                                  <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
-                                                      <%= location.location_name %>
-                                                      <span class="badge badge-subtle">
-                                                          <%= Enum.count(location.conversations, &(&1.status == "open")) %>
-                                                      </span>
-                                                  </a>
-                                              </li>
-                                          <% end %>
-                                      </ul>
-                                  </li>
+                                  <%= if @current_user.role in ["team-admin", "admin"] do %>
+                                      <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
+                                          <a href="http://google.com" class="menu-link">
+                                              <span class="menu-icon oi oi-browser"></span>
+                                              <span class="menu-text">
+                                                  <%= team.team_name %>
+                                              </span>
+                                          </a> <!-- child menu -->
+                                          <ul class="menu">
+                                              <li class="menu-subhead"><%= team.team_name %></li>
+                                              <%= for location <- team.locations do %>
+                                                  <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
+                                                      <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
+                                                          <%= location.location_name %>
+                                                          <span class="badge badge-subtle">
+                                                              <%= Enum.count(location.conversations, &(&1.status == "open")) %>
+                                                          </span>
+                                                      </a>
+                                                  </li>
+                                              <% end %>
+                                          </ul>
+                                      </li>
+                                  <% else %>
+                                      <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
+                                          <a href="http://google.com" class="menu-link">
+                                              <span class="menu-icon oi oi-browser"></span>
+                                              <span class="menu-text">
+                                                  <%= team.team_name %>
+                                              </span>
+                                          </a> <!-- child menu -->
+                                          <ul class="menu">
+                                              <li class="menu-subhead"><%= team.team_name %></li>
+                                              <%= for location <- Enum.map(@current_user.team_member.team_member_locations, &(&1.location)) do %>
+                                                  <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
+                                                      <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
+                                                          <%= location.location_name %>
+                                                          <span class="badge badge-subtle">
+                                                              <%= Enum.count(location.conversations, &(&1.status == "open")) %>
+                                                          </span>
+                                                      </a>
+                                                  </li>
+                                              <% end %>
+                                          </ul>
+                                      </li>
+
+                                  <% end %>
                               <% end %>
                           <% end %>
 

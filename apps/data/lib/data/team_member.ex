@@ -3,8 +3,9 @@ defmodule Data.TeamMember do
 
   @roles ["admin", "teammate", "location-admin", "team-admin"]
 
+  import Data.Query.WriteOnly.TeamMember, only: [associate_locations: 2]
+
   def get_changeset() do
-    IO.inspect %Data.Schema.TeamMember{}
     Data.Schema.TeamMember.changeset(%Data.Schema.TeamMember{})
   end
 
@@ -40,12 +41,25 @@ defmodule Data.TeamMember do
   def get_by_location_id(%{role: role}, id) when role in @roles,
     do: TeamMember.get_by_location(id)
 
-  def create(params),
-    do: TeamMember.write(params)
+  def create(params) do
+    {:ok, team_member} = result = TeamMember.write(params)
+
+    if params.locations != [] do
+      associate_locations(team_member.id, params.locations)
+    end
+
+    result
+  end
 
   def update(id, params) do
-    id
+    result = id
     |> TeamMember.get()
     |> TeamMember.write(params)
+
+    if params.locations != [] do
+      associate_locations(id, params.locations)
+    end
+
+    result
   end
 end

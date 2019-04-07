@@ -9,4 +9,4 @@
     <h1 class="page-title">New Teammate</h1>
 </header>
 
-<%= render "_form.html", data: @changeset, action: team_team_member_path(@conn, :create, @team_id), team_id: @team_id, locations: @locations, conn: @conn, errors: @errors, current_user: @current_user %>
+<%= render "_form.html", data: @changeset, action: team_team_member_path(@conn, :create, @team_id), team_id: @team_id, locations: @locations, conn: @conn, errors: @errors, current_user: @current_user, selected_locations: [] %>

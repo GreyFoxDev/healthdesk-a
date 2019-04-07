@@ -2,7 +2,7 @@
     <div class="d-flex justify-content-between">
         <h1 class="page-title"> <%= @team.team_name %></h1>
         <div class="btn-toolbar">
-            <%= if assigns[:current_user].role in ["admin", "team-admin"] do %> 
+            <%= if assigns[:current_user].role in ["admin", "team-admin", "location-admin"] do %> 
                 <a href="<%= team_team_member_path(@conn, :new, @team.id) %>" class="btn btn-primary">
                     <i class="fas fa-plus">&nbsp;</i>
                     New Teammate
@@ -64,7 +64,6 @@
                         <th scope="col">Name</th>
                         <th scope="col">Phone</th>
                         <th scope="col">Email</th>
-                        <th scope="col">Location</th>
                         <th scope="col">Role</th>
                         <th />
                         </tr>
@@ -87,9 +86,6 @@
                                     </td>
                                     <td>
                                         <span><%= member.user.email %></span>
-                                    </td>
-                                    <td>
-                                        <span><%= member.location.location_name %></span>
                                     </td>
                                     <td>
                                         <span><%= format_role(member.user.role) %></span>
