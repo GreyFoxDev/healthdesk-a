@@ -1,7 +1,7 @@
 defmodule Data.User do
   alias Data.Commands.User
 
-  @roles ["admin", "team-admin", "location-admin", "system"]
+  @roles ["admin", "team-admin", "location-admin", "teammate", "system"]
 
   def get_changeset(),
     do: Data.Schema.User.changeset(%Data.Schema.User{})
