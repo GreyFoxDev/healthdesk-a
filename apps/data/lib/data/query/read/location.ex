@@ -31,13 +31,6 @@ defmodule Data.Query.ReadOnly.Location do
       where: t.phone_number == ^phone_number,
       limit: 1
     )
-    |> Repo.all()
-    |> case do
-      [] ->
-        nil
-
-      [location] ->
-        location
-    end
+    |> Repo.one()
   end
 end
