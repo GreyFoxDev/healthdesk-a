@@ -52,7 +52,7 @@ defmodule Data.Query.ReadOnly.TeamMember do
   def get_by_location(location_id) do
     from(t in TeamMember,
       join: u in User,
-      left_join: l in assoc(t, :team_member_location),
+      left_join: l in assoc(t, :team_member_locations),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: l.location_id == ^location_id,
