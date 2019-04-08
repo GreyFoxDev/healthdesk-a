@@ -12,6 +12,10 @@
     </div>
 </header>
 
+<%= if messsage = get_flash(@conn, :error) do %>
+  <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+<% end %>
+
 <div class="page-section">
     <section class="card card-fluid">
         <header class="card-header nav-scroller">

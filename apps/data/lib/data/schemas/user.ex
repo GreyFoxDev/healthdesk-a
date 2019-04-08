@@ -37,5 +37,6 @@ defmodule Data.Schema.User do
     model
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
+    |> unique_constraint(:phone_number, name: :active_user_phone_number)
   end
 end

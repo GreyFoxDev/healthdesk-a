@@ -7,7 +7,7 @@ defmodule Data.Query.WriteOnly.User do
   def write(params) do
     %User{}
     |> User.changeset(params)
-    |> Repo.insert_or_update!()
+    |> Repo.insert!()
   end
 
   def write(original, params) do
