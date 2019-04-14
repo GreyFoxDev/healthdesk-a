@@ -71,7 +71,7 @@ defmodule MainWeb.Intents do
     do: @intents[intent] || MainWeb.Intents
 
   defp remove_intent(args) when is_list(args),
-    do: Enum.filter(args, fn({key, _}) -> key != :intent end)
+    do: Enum.filter(args, fn({key, _}) -> key != :intent and key != :greetings end)
 
   defp remove_intent(args) when is_binary(args), do: args
 

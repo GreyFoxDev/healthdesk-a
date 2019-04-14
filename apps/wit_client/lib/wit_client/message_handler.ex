@@ -38,7 +38,6 @@ defmodule WitClient.MessageHandler do
          ]) do
       {response, 0} ->
         with %{} = response <- Poison.Parser.parse!(response)["entities"],
-             response <- IO.inspect(response),
              intent <- get_intent(response),
              args <- get_args(response) do
           send(from, {:response, {intent, args}})
@@ -80,6 +79,9 @@ defmodule WitClient.MessageHandler do
     |> set_value(key)
   end
 
+  defp set_value(value, "greetings"),
+    do: {:greetings, value}
+
   defp set_value(value, key) do
     try do
       {String.to_existing_atom(key), value}
@@ -102,22 +104,3 @@ defmodule WitClient.MessageHandler do
     {:stop, :normal, state}
   end
 end
-
-# %{
-#   "_text" => "what time does jen teach cardio kickboxing?",
-#   "entities" => %{
-#     "Instructor" => %{
-#       "suggested" => true,
-#       "value" => "jen",
-#       "type" => "value"
-#     },
-#     "class_type" => %{
-#       "value" => "cardio kickboxing",
-#       "type" => "value"
-#     },
-#     "intent" => %{
-#       "value" => "queryInstructorSchedule"
-#     }
-#   },
-#   "msg_id" => "163JHqlrmwNWeZiiN"
-# }
