@@ -12,6 +12,8 @@ defmodule Data.Schema.Member do
   first_name
   last_name
   email
+  status
+  consent
   deleted_at
   |a
 
@@ -22,6 +24,8 @@ defmodule Data.Schema.Member do
     field(:first_name, :string)
     field(:last_name, :string)
     field(:email, :string)
+    field(:status, :string)
+    field(:consent, :boolean)
 
     field(:deleted_at, :utc_datetime)
 

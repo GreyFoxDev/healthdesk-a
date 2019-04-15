@@ -1,67 +1,100 @@
-<% team = @team %>
 <header class="page-title-bar">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active">
-                <a href="<%= team_path(@conn, :index) %>"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Teams</a>
-            </li>
-        </ol>
+    <div class="d-flex justify-content-between">
+        <h1 class="page-title"> <%= @team.team_name %></h1>
+        <div class="btn-toolbar">
+        </div>
+    </div>
 </header>
 
 <div class="page-section">
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="card card-fluid">
-                <div class="card-header">
-                    <nav class="nav nav-tabs flex-column border-0">
-                        <a href="<%= team_path(@conn, :edit, team.id) %>" class="nav-link">Details</a>
-                        <a href="<%= team_team_member_path(@conn, :index, team.id) %>" class="nav-link">Teammates</a>
-                        <a href="<%= team_member_path(@conn, :index, team.id) %>" class="nav-link active">Members</a>
-                    </nav>
-                </div>
+    <section class="card card-fluid">
+        <header class="card-header nav-scroller">
+            <!-- .nav-tabs -->
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link show"  href="<%= team_location_path(@conn, :index, @team.id) %>">Locations</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link show" href="<%= team_team_member_path(@conn, :index, @team.id) %>">Teammates</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active show" href="#">Members</a>
+                </li>
+            </ul><!-- /.nav-tabs -->
+        </header>
+
+        <div class="card-body">
+            <!-- grid row -->
+            <div class="row">
+                <!-- .col -->
+                <div class="col">
+                    <!-- .input-group -->
+                    <div class="input-group has-clearable">
+                        <button type="button" class="close" aria-label="Close"><span aria-hidden="true"><i class="fa fa-times-circle"></i></span></button>
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><span class="oi oi-magnifying-glass"></span></span>
+                        </div><input type="text" class="form-control" placeholder="Search">
+                    </div><!-- /.input-group -->
+                </div><!-- /.col -->
+                <!-- .col -->
+                <div class="col-auto d-none d-sm-flex">
+                    <!-- .dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last updated <span class="fa fa-caret-down"></span></button>
+                        <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
+                        <div class="dropdown-menu dropdown-menu-right stop-propagation">
+                            <h6 class="dropdown-header"> Sort By </h6><label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="0"> <span class="custom-control-label">Name</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="1"> <span class="custom-control-label">Name <span class="text-muted">(Decs)</span></span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="2" checked=""> <span class="custom-control-label">Last updated</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="3"> <span class="custom-control-label">Oldest updated</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="4"> <span class="custom-control-label">Last created</span></label> <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="5"> <span class="custom-control-label">Oldest created</span></label>
+                        </div><!-- /.dropdown-menu -->
+                    </div><!-- /.dropdown -->
+                </div><!-- /.col -->
+            </div><!-- /grid row -->
+        </div>
+
+        <div class="text-muted px-3 mb-2">Showing 1 to <%= Enum.count(@members) %> of <%= Enum.count(@members) %> entries </div>
+
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="project-myteams" role="tabpanel" aria-labelledby="project-myteams-tab">
+                <!-- .list-group -->
+                <table class="table">
+                    <thead class="sr-only">
+                        <tr>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Member Name</th>
+                            <th scope="col">Member Status</th>
+                            <th scope="col">Member Consent</th>
+                            <th scope="col">Updated</th>
+                            <th />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%= for member <- @members do %>
+                            <tr>
+                                <td>
+                                    <b><a href="<%= team_member_path(@conn, :edit, member.team_id, member.id) %>"><%= member.phone_number %></a></b><br />
+                                </td>
+                                <td>
+                                    <%= if member.last_name != "", do: "#{member.last_name}, #{member.first_name}", else: "#{member.first_name}" %>
+                                </td>
+                                <td>
+                                    <%= get_status(member.status) %>
+                                </td>
+                                <td>
+                                    <%= if member.consent, do: "Subscribed", else: "Unsubscribed" %>
+                                </td>
+                                <td>
+                                    <%= link {:safe, "<i class=\"fas fa-edit\"></i>"}, to: team_member_path(@conn, :edit, @team.id, member.id) %>
+                                    <%= if @current_user.role in ["admin"] do %>
+                                        <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_member_path(@conn, :delete, @team.id, member.id), method: "delete" %>
+                                    <% end %>
+                                </td>
+                            </tr>
+                        <% end  %>
+                    </tbody>
+                </table><!-- /.list-group -->
+
+
             </div>
         </div>
-        <div class="col-lg-8">
-            <div class="card card-fluid">
-                <span>
-                    <h6 class="card-header">
-                        Members
 
-                        <a href="<%= team_member_path(@conn, :new, @team.id) %>" class="nav-link">
-                            <i class="fas fa-plus"></i> 
-                            Add Member
-                        </a>
-
-                    </h6><!-- .card-body -->
-                </span>
-                <div class="card-body">
-
-                    <div class="list-group list-group-flush list-group-bordered">
-                        <%= if @members == [] do %>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div class="alert alert-warning mx-3"> There are no members for this team. </div>
-                            </div>
-                        <%= else %>
-                            <%= for member <- @members do %>
-                                <div class="list-group-item d-flex justify-content-between align-items-left">
-                                    <span><b><%= member.first_name %> <%= member.last_name %></b></span>
-                                    <span><%= member.phone_number %></span>
-                                    <span><%= member.email %></span>
-
-                                    <span>
-                                    <%= link {:safe, "<i class=\"fas fa-edit\"></i>"}, to: team_member_path(@conn, :edit, member.team_id, member.id) %>
-                                    <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_member_path(@conn, :delete, member.team_id, member.id), method: "delete" %>
-                                    </span>
-
-                                </div>
-                            <% end %>
-                        <% end %>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </section>
 </div>
-

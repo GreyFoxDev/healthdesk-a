@@ -61,5 +61,6 @@ defmodule MainWeb.Router do
     post "/sms/twilio", TwilioController, :create
     put "/remove-avatar", AvatarController, :remove_avatar
     put "/assign-team-member", AssignTeamMemberController, :assign
+    put "/update-member", UpdateMemberController, :update
   end
 end

@@ -23,6 +23,9 @@
                 <li class="nav-item">
                     <a class="nav-link show" href="<%= team_team_member_path(@conn, :index, @team.id) %>">Teammates</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link show" href="<%= team_member_path(@conn, :index, @team.id) %>">Members</a>
+                </li>
             </ul><!-- /.nav-tabs -->
         </header>
 

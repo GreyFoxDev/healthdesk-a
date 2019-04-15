@@ -1,64 +1,55 @@
 <div class="panel-body">
-    <section class="card">
+    <section id="base-style" class="card">
         <div class="card-body">
             <%= form_for @data, @action, fn f -> %>
-                <div class="list-group list-group-flush list-group-bordered">
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <fieldset>
-                            <div class="form-group">
-                                <label>Location</label>
-                                <%= select f, :location_id, @locations, class: "custom-select" %>
-                            </div>
-
-                                <div class="form-group">
-                                    <span>First Name</span>
-                                    <span>
-                                        <%= text_input f, :first_name, class: "form-control" %>
-                                    </span>
-                                </div>
-                                <div class="form-group">
-                                    <span>Last Name</span>
-                                    <span>
-                                        <%= text_input f, :last_name, class: "form-control" %>
-                                    </span>
-                                </div>
-                                <div class="form-group">
-                                    <span>Phone Number</span>
-                                    <span>
-                                        <%= text_input f, :phone_number, class: "form-control" %>
-                                    </span>
-                                </div>
-                                <div class="form-group">
-                                    <span>Email</span>
-                                    <span>
-                                        <%= text_input f, :email, class: "form-control" %>
-                                    </span>
-                                </div>
-
-                        </fieldset>
+                <fieldset>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <%= text_input f, :phone_number, class: "form-control" %>
                     </div>
-                </div>
-                <div class="form-actions">
-                    <%= submit "Save", class: "btn btn-primary" %> &nbsp;
-                    <%= link "Cancel", to: team_member_path(@conn, :index, @team_id), class: "btn btn-secondary" %>
-                </div>
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <%= text_input f, :first_name, class: "form-control" %>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <%= text_input f, :last_name, class: "form-control" %>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <%= text_input f, :email, class: "form-control" %>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Member Status</label>
+                        <span>
+                            <%=
+                            select f,
+                            :status,
+                            member_status,
+                            class: "form-control"
+                            %>
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Member Consent</label>
+                        <span>
+                            <%=
+                            select f,
+                            :consent,
+                            member_consent,
+                            class: "form-control"
+                            %>
+                        </span>
+                    </div>
+
+                    <div class="form-actions">
+                        <%= submit "Save", class: "btn btn-primary" %>
+                    </div>
+
+                </fieldset>
             <% end %>
         </div>
     </section>
 </div>
-
-<script>
- $("#removeImage").click(function(e) {
-     e.preventDefault(); // prevent default action of link
-
-     $.ajax({
-         url: '/api/remove-avatar',
-         type: 'PUT',
-         data: "id=<%= @data.data.id %>",
-         success: function(data) {
-             $("#avatar").toggle();
-             $("#removeImage").toggle();
-         }
-     });
- });
-</script>

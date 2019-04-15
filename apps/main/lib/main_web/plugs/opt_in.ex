@@ -7,7 +7,7 @@ defmodule MainWeb.Plug.OptIn do
 
   import Plug.Conn
 
-  alias Data.Commands.OptIn, as: O
+  alias Data.Commands.Member, as: Member
 
   @opt_in_message """
   Hello! We've received your message, however, since this is your first time texting us, you must opt-in before we can respond.
@@ -28,18 +28,18 @@ defmodule MainWeb.Plug.OptIn do
   @spec call(Plug.Conn.t(), list()) :: no_return()
   def call(conn, opts \\ [])
 
-  def call(%{assigns: %{member: member, message: message}} = conn, _opts) when is_binary(member) do
-    with {:ok, %{status: "yes"}} <- O.get_by_phone(member) do
+  def call(%{assigns: %{member: member, message: message, location: location}} = conn, _opts) when is_binary(member) do
+    with {:ok, %{consent: true}} <- Member.get_by_phone(member) do
       assign(conn, :opt_in, true)
     else
       {:ok, _} ->
         cond do
         String.downcase(message) in ["yes", "start"] ->
-          {:ok, _optin} = O.enable_opt_in(member)
+          {:ok, _optin} = Member.enable_opt_in(member, location)
 
           assign(conn, :opt_in, true)
         String.downcase(message) == "no" ->
-          {:ok, _optin} = O.disable_opt_in(member)
+          {:ok, _optin} = Member.disable_opt_in(member, location)
 
           conn
           |> assign(:opt_in, false)

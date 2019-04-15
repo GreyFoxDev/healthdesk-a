@@ -88,7 +88,6 @@
                 <%= for {message, index} <- Enum.with_index(@messages) do %>
                     <% previous_message = Enum.at(@messages, index-1) %>
                     <% next_message = Enum.at(@messages, index+1) %>
-                    <% member_name = if @conversation.member, do: [@conversation.member.first_name, @conversation.member.last_name] |> Enum.join(" "), else: " " %>
 
                     <%= if message.phone_number == @conversation.original_number do %>
                         <%= if previous_message && message.phone_number == previous_message.phone_number do %>
@@ -97,7 +96,7 @@
                                     <div class="conversation-message-text"><%= message.message %></div>
                                     <%= if next_message && next_message.phone_number != message.phone_number do %>
                                         <div class="conversation-meta">
-                                            <%= if member_name != " ", do: member_name, else: "+1 #{format_phone(message.phone_number)}" %>
+                                            +1 <%= format_phone(message.phone_number) %>
                                             ·
                                             <%= format_date(message.sent_at) %>
                                         </div>
@@ -113,7 +112,7 @@
                                     <div class="conversation-message-text"> <%= message.message %></div>
                                     <%= if next_message && next_message.phone_number != message.phone_number do %>
                                         <div class="conversation-meta">
-                                            <%= if member_name != " ", do: member_name, else: "+1 #{format_phone(message.phone_number)}" %>
+                                            +1 <%= format_phone(message.phone_number) %>
                                             ·
                                             <%= format_date(message.sent_at) %>
                                         </div>
@@ -228,11 +227,7 @@
     <div class="sidebar-section">
         <fieldset>
             <legend>Conversation Details</legend>
-            <form id="member-form" method="PUT">
-                <%= if @conversation.member do %>
-                    <input name="id" type="hidden" value="<%= @conversation.member.id %>">
-                <% end %>
-                <input name="member[team_id]" type="hidden" value="<%= @location.team_id %>">
+            <form id="member-form">
                 <div class="form-group">
                     <div class="form-label-group">
                         <input type="text" class="form-control" value="<%= @conversation.location.location_name %>" readonly> <label for="fl1"> Location</label>
@@ -240,68 +235,44 @@
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[first_name]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.first_name, else: "N/A" %>"> <label for="fl1">Member First Name</label>
+                        <input type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.first_name, else: "N/A" %>"> <label for="fl1">Member First Name</label>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[last_name]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.last_name, else: "N/A" %>"> <label for="fl1">Member Last Name</label>
+                        <input type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.last_name, else: "N/A" %>"> <label for="fl1">Member Last Name</label>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[phone_number]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.phone_number, else: "N/A" %>" readonly> <label for="fl1">Member Phone Numbers</label>
+                        <input type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.phone_number, else: "N/A" %>" readonly> <label for="fl1">Member Phone Numbers</label>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[email]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.email, else: "N/A" %>"> <label for="fl1">Member Email</label>
+                        <input type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.email, else: "N/A" %>"> <label for="fl1">Member Email</label>
                     </div>
                 </div><!-- /.form-group -->
-                <div class="form-group">
-                    <div class="form-label-group">
-                        <%= if @conversation.member do %>
-                            <input type="text" class="form-control" value="<%= if @conversation.member.consent, do: "Subscribed", else: "Unsubscribed" %>" readonly><label> Member Consent</label>
-                        <% else %>
-                            <input type="text" class="form-control" value="Not Subscribed" readonly> <label> Member Consent</label>
-                        <% end %>
-                    </div>
-                </div><!-- /.form-group -->
-                <div class="form-group">
-                    <div class="form-label-group">
-                        <label>Member Status</label>
-                        <select id="member-status" name="member[status]" class="custom-select">
-                            <%= for {key, value} <- member_status do %>
-                                <%= if @conversation.member && @conversation.member.status == value do %>
-                                    <option value="<%= value %>" selected><%= key %></option>
-                                <% else %>
-                                    <option value="<%= value %>"><%= key %></option>
-                                <% end %>
-                            <% end %>
-                        </select>
-                    </div>
-                </div>
 
-                <div class="form-actions">
-                    <input type="button" value="Update" id="update_member" class="btn btn-primary">
-                </div>
+                <input type="button" value="Assign" id="assign_team_member">
                 <script>
-                 $("#update_member").click(function(e) {
+                 $("#assign_team_member").click(function(e) {
                      e.preventDefault(); // prevent default action of link
+                     val = $("#assigned_id").val();
 
-                     $.ajax({
-                         url: '/api/update-member',
-                         type: 'PUT',
-                         data: $("#member-form").serialize(),
-                         success: function(data) {
-                             alert("You have successfully updated the member data");
-                             window.location.reload();
-                         },
-                         error: function (data) {
-                             response = data.responseJSON.message;
-                             alert(response);
-                         }
-                     });
+                     if (val == "") {
+                         alert("Please select a team member before trying to assign.");
+                     } else {
+                         $.ajax({
+                             url: '/api/assign-team-member',
+                             type: 'PUT',
+                             data: "id=<%= @conversation.id %>&location_id=<%= @location.id %>&team_member_id=" + val,
+                             success: function(data) {
+                                 window.location.reload();
+                             }
+                         });
+                     };
+
                  });
                 </script>
             </form>
