@@ -116,7 +116,7 @@
                                           </a> <!-- child menu -->
                                           <ul class="menu">
                                               <li class="menu-subhead"><%= team.team_name %></li>
-                                              <%= for location <- team.locations do %>
+                                              <%= for location <- Enum.filter(team.locations, &(&1.deleted_at == nil)) do %>
                                                   <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
                                                       <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
                                                           <%= location.location_name %>
@@ -138,7 +138,10 @@
                                           </a> <!-- child menu -->
                                           <ul class="menu">
                                               <li class="menu-subhead"><%= team.team_name %></li>
-                                              <%= for location <- Enum.map(@current_user.team_member.team_member_locations, &(&1.location)) do %>
+                                              <%= for location <-
+                                              @current_user.team_member.team_member_locations
+                                              |> Enum.filter(&(&1.location.deleted_at == nil))
+                                              |> Enum.map(&(&1.location)) do %>
                                                   <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
                                                       <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
                                                           <%= location.location_name %>
