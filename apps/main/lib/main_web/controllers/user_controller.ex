@@ -18,10 +18,15 @@ defmodule MainWeb.UserController do
 
   def update(conn, %{"id" => id, "user" => %{"image" => [image]} = user}) do
     with {:ok, avatar} <- Uploader.upload_image(image.path),
-         {:ok, _pid} <- User.update(id, Map.merge(user, %{"avatar" => avatar})) do
-      conn
-      |> put_flash(:success, "Profile updated successfully.")
-      |> redirect(to: "/admin/teams")
+         {:ok, user} <- User.update(id, Map.merge(user, %{"avatar" => avatar})) do
+      conn = put_flash(conn, :success, "Profile updated successfully.")
+      case user.role do
+        "admin" ->
+          redirect(conn, to: "/admin/teams")
+        _ ->
+          path = team_location_conversation_path(conn, :index, user.team_member.team_id, user.team_member.location_id)
+          redirect(conn, to: path)
+      end
     else
       {:error, changeset} ->
         conn
@@ -33,9 +38,14 @@ defmodule MainWeb.UserController do
   def update(conn, %{"id" => id, "user" => user}) do
     case User.update(id, user) do
       {:ok, %Data.Schema.User{} = user} ->
-        conn
-        |> put_flash(:success, "Profile updated successfully.")
-        |> redirect(to: "/admin/teams")
+        conn = put_flash(conn, :success, "Profile updated successfully.")
+        case user.role do
+          "admin" ->
+            redirect(conn, to: "/admin/teams")
+          _ ->
+            path = team_location_conversation_path(conn, :index, user.team_member.team_id, user.team_member.location_id)
+            redirect(conn, to: path)
+        end
       {:error, changeset} ->
         conn
         |> put_flash(:error, "Profile failed to update")
