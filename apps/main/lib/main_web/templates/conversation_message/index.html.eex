@@ -240,36 +240,36 @@
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[first_name]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.first_name, else: "N/A" %>"> <label for="fl1">Member First Name</label>
+                        <input name="member[first_name]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.first_name, else: "N/A" %>"> <label for="fl1"> First Name</label>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[last_name]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.last_name, else: "N/A" %>"> <label for="fl1">Member Last Name</label>
+                        <input name="member[last_name]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.last_name, else: "N/A" %>"> <label for="fl1"> Last Name</label>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[phone_number]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.phone_number, else: "N/A" %>" readonly> <label for="fl1">Member Phone Numbers</label>
+                        <input name="member[phone_number]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.phone_number, else: "N/A" %>" readonly> <label for="fl1"> Phone Numbers</label>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[email]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.email, else: "N/A" %>"> <label for="fl1">Member Email</label>
+                        <input name="member[email]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.email, else: "N/A" %>"> <label for="fl1"> Email</label>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
                         <%= if @conversation.member do %>
-                            <input type="text" class="form-control" value="<%= if @conversation.member.consent, do: "Subscribed", else: "Unsubscribed" %>" readonly><label> Member Consent</label>
+                            <input type="text" class="form-control" value="<%= if @conversation.member.consent, do: "Subscribed", else: "Unsubscribed" %>" readonly><label for="fl1"> Consent</label>
                         <% else %>
-                            <input type="text" class="form-control" value="Not Subscribed" readonly> <label> Member Consent</label>
+                            <input type="text" class="form-control" value="Not Subscribed" readonly> <label for="fl1"> Consent</label>
                         <% end %>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <label>Member Status</label>
+                        <label> Status</label>
                         <select id="member-status" name="member[status]" class="custom-select">
                             <%= for {key, value} <- member_status do %>
                                 <%= if @conversation.member && @conversation.member.status == value do %>
