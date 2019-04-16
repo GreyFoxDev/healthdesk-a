@@ -3,7 +3,8 @@ defmodule MainWeb.Helper.MemberOptions do
   @status [
     {"Not Selected", ""},
     {"Lead", "Lead"},
-    {"Prospect, Member", "Prospect"},
+    {"Prospect", "Prospect"},
+    {"Member", "Member"},
     {"At Risk Member", "At-Risk"},
     {"Alumni", "Alumni"},
     {"Non-Member", "Non-Member"}
