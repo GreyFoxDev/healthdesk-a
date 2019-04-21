@@ -1,5 +1,6 @@
 # Used by "mix format"
 [
-  inputs: ["mix.exs", "config/*.exs"],
-  subdirectories: ["apps/*"]
+  import_deps: [:phoenix],
+  subdirectories: ["apps/*"],
+  inputs: ["*.{ex,exs}", "{config,lib,priv,test}/**/*.{ex,exs}"]
 ]

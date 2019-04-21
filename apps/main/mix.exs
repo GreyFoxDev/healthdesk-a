@@ -37,14 +37,15 @@ defmodule Main.Mixfile do
   defp deps do
     [
       {:bitly, "~> 0.1"},
-      {:phoenix, "~> 1.3.4"},
+      {:phoenix, "~> 1.4.3"},
       {:phoenix_pubsub, "~> 1.0"},
-      {:phoenix_html, "~> 2.10"},
-      {:phoenix_ecto, "~> 3.3"},
+      {:phoenix_html, "~> 2.13.2"},
+      {:plug_cowboy, "~> 2.0"},
+      {:plug, "~> 1.7"},
       {:calendar, "~> 0.17.4"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:phoenix_live_view, github: "phoenixframework/phoenix_live_view"},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"},
       {:guardian, "~> 1.0"},
       {:con_cache, "~> 0.13.0"},
       {:data, in_umbrella: true},
@@ -55,7 +56,8 @@ defmodule Main.Mixfile do
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
       {:elixir_uuid, "~> 1.2"},
-      {:nimble_csv, "~> 0.5.0"}
+      {:nimble_csv, "~> 0.5.0"},
+      {:jason, "~> 1.0"}
     ]
   end
 end

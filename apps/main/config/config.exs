@@ -9,6 +9,8 @@ use Mix.Config
 config :main,
   namespace: Main
 
+config :phoenix, :json_library, Jason
+
 # Configures the endpoint
 config :main, MainWeb.Endpoint,
   url: [scheme: "http", host: "localhost", port: 4000],
