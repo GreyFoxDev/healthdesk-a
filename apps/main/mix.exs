@@ -40,6 +40,7 @@ defmodule Main.Mixfile do
       {:phoenix, "~> 1.4.3"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.13.2"},
+      {:phoenix_ecto, "~> 3.3"},
       {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.7"},
       {:calendar, "~> 0.17.4"},
