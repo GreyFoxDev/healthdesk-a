@@ -47,6 +47,9 @@
                         </div>
                     </div>
                   </div>
+                  <div>
+                      <%= live_render(@conn, MainWeb.Live.ConversationAlertsView, session: @current_user) %>
+                  </div>
               </div>
 
 

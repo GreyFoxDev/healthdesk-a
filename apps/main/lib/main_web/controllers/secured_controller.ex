@@ -12,7 +12,7 @@ defmodule MainWeb.SecuredContoller do
       plug :load_current_user
 
       def current_user(conn) do
-        MainWeb.Auth.Guardian.Plug.current_resource(conn)
+        MainWeb.Auth.Guardian.Plug.current_resource(conn) |> IO.inspect
       end
 
       def teams(conn) do

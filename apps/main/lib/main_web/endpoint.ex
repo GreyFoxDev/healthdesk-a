@@ -1,6 +1,7 @@
 defmodule MainWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :main
 
+  socket "/live", Phoenix.LiveView.Socket
   socket "/socket", MainWeb.UserSocket,
     websocket: true
 

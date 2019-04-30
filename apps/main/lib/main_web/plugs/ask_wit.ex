@@ -22,17 +22,17 @@ defmodule MainWeb.Plug.AskWit do
   def call(conn, _opts), do: conn
 
   defp ask_wit_ai(question) do
-    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
-      receive do
-        {:response, response} ->
-          response
-        _ ->
-          :unknown_intent
-      end
-    else
-      {:error, error} ->
-        Logger.error("AskWit Plug Error: #{inspect error}")
-        :unknown_intent
-    end
+    # with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
+    #   receive do
+    #     {:response, response} ->
+    #       response
+    #     _ ->
+    #       :unknown_intent
+    #   end
+    # else
+    #   {:error, error} ->
+    #     Logger.error("AskWit Plug Error: #{inspect error}")
+    #     :unknown_intent
+    # end
   end
 end

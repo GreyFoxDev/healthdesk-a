@@ -15,6 +15,7 @@ defmodule MainWeb.TwilioController do
   plug P.AskWit
   plug P.BuildAnswer
   plug P.CloseConversation
+  plug P.Broadcast
 
   @spec inbound(Plug.Conn.t(), Map.t()) :: Plug.Conn.t()
   def inbound(conn, params)

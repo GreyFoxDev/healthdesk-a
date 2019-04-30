@@ -11,13 +11,20 @@ config :main,
 
 config :phoenix, :json_library, Jason
 
+config :phoenix,
+  template_engines: [leex: Phoenix.LiveView.Engine]
+
 # Configures the endpoint
 config :main, MainWeb.Endpoint,
   url: [scheme: "http", host: "localhost", port: 4000],
   secret_key_base: "z0HlXKVQRJoAEUI1h6E/u5b0uuQOQucLm2gG7PdJGQbQW4UO/B3eaaTu3OsW+Bpp",
   render_errors: [view: MainWeb.ErrorView, accepts: ~w(html json)],
+  live_view: [
+    signing_salt: "e2coiRnvsrcguHHbgcQDoK4pOKj1x3Il92sTetEUUMjSS1gTu+DNLH0rlWOCdjox"
+  ],
   pubsub: [name: Main.PubSub,
            adapter: Phoenix.PubSub.PG2]
+
 
 # Configures Elixir's Logger
 config :logger, :console,
