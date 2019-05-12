@@ -1,1 +1,42 @@
-Admin Dashboard
+<div class="metric-row">
+    <div class="col-lg-9">
+        <div class="metric-row">
+            <!-- metric column -->
+            <!-- metric column -->
+            <div class="col">
+                <!-- .metric -->
+                <a href="user-projects.html" class="metric metric-bordered align-items-center">
+                    <h2 class="metric-label"> NUMBER OF LOCATIONS </h2>
+                    <p class="metric-value h3">
+                        <sub><i class="oi oi-fork"></i></sub> <span class="value">
+                            <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.locations + acc end) %>
+                        </span>
+                    </p>
+                </a> <!-- /.metric -->
+            </div><!-- /metric column -->
+            <!-- metric column -->
+            <div class="col">
+                <!-- .metric -->
+                <a href="user-tasks.html" class="metric metric-bordered align-items-center">
+                    <h2 class="metric-label"> NUMBER OF LOCATION ADMINS </h2>
+                    <p class="metric-value h3">
+                        <sub><i class="oi oi-people"></i></sub> <span class="value">
+                            <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.location_admins + acc end) %>
+                        </span>
+                    </p>
+                </a> <!-- /.metric -->
+            </div><!-- /metric column -->
+            <div class="col">
+                <!-- .metric -->
+                <a href="user-teams.html" class="metric metric-bordered align-items-center">
+                    <h2 class="metric-label"> NUMBER OF TEAMMATES </h2>
+                    <p class="metric-value h3">
+                        <sub><i class="oi oi-people"></i></sub> <span class="value">
+                            <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.teammates + acc end) %>
+                        </span>
+                    </p>
+                </a> <!-- /.metric -->
+            </div><!-- /metric column -->
+        </div>
+    </div><!-- metric column -->
+</div>

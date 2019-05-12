@@ -1,0 +1,15 @@
+defmodule Data.Schema.MetricsTeam do
+  @moduledoc false
+
+  use Data.Schema
+
+  @primary_key false
+  schema "metrics_teams" do
+    field(:teammates, :integer)
+    field(:location_admins, :integer)
+    field(:locations, :integer)
+    field(:bounce_rate, :float)
+
+    belongs_to(:team, Data.Schema.Team)
+  end
+end
