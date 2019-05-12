@@ -94,7 +94,7 @@
                         <%= if previous_message && message.phone_number == previous_message.phone_number do %>
                             <li class="conversation-inbound conversation-faux">
                                 <div class="conversation-message conversation-message-skip-avatar">
-                                    <div class="conversation-message-text"><%= message.message %></div>
+                                    <div class="conversation-message-text"><%= text_to_html(message.message) |> raw %></div>
                                     <%= if next_message && next_message.phone_number != message.phone_number do %>
                                         <div class="conversation-meta">
                                             <%= if member_name != " ", do: member_name, else: "+1 #{format_phone(message.phone_number)}" %>
@@ -110,7 +110,7 @@
                                     <a href="#!" class="tile tile-circle bg-muted"><i class="oi oi-person"></i></a>
                                 </div>
                                 <div class="conversation-message">
-                                    <div class="conversation-message-text"> <%= message.message %></div>
+                                    <div class="conversation-message-text"> <%= text_to_html(message.message) |> raw %></div>
                                     <%= if next_message && next_message.phone_number != message.phone_number do %>
                                         <div class="conversation-meta">
                                             <%= if member_name != " ", do: member_name, else: "+1 #{format_phone(message.phone_number)}" %>
@@ -150,7 +150,7 @@
                                 <%= if previous_message && message.phone_number != previous_message.phone_number do %>
                                     <li class="conversation-outbound conversation-faux">
                                         <div class="conversation-message conversation-message-skip-avatar">
-                                            <div class="conversation-message-text"><%= message.message %></div>
+                                            <div class="conversation-message-text"><%= text_to_html(message.message) |> raw %></div>
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
@@ -170,7 +170,7 @@
                                             <a href="#!" class="tile tile-circle bg-muted"><i class="oi oi-person"></i></a>
                                         </div>
                                         <div class="conversation-message">
-                                            <div class="conversation-message-text"> <%= message.message %></div>
+                                            <div class="conversation-message-text"> <%= text_to_html(message.message) |> raw %></div>
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
