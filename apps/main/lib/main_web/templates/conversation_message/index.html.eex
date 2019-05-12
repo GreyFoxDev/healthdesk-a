@@ -75,7 +75,14 @@
 </article>
 
 <section class="message-body">
-    <div class="card card-fluid mb-0">
+    <style>
+     .scrollable {
+         height: 70vh; /* or any value */
+         overflow-y: auto;
+     }
+    </style>
+
+    <div id="scroll-message" class="card card-fluid mb-0 scrollable">
         <section class="conversations" role="log">
             <ul id="convo" class="conversation-list">
                 <li class="log-divider">
@@ -309,3 +316,8 @@
         </fieldset>
     </div><!-- /.sidebar-section -->
 </div>
+
+<script>
+ var div = document.getElementById("scroll-message");
+ div.scrollTop = div.scrollHeight;
+</script>
