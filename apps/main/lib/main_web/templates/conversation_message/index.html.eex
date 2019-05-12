@@ -9,7 +9,11 @@
         &nbsp;
         <div class="team">
             <h4 class="list-group-item-title">
-                Message from <strong>+1 <%= format_phone(@conversation.original_number) %></strong>
+                <%= if @conversation.member && @conversation.member.first_name do %>
+                    Message from <strong><%= Enum.join([@conversation.member.first_name, @conversation.member.last_name], " ") %></strong>
+                <% else %>
+                    Message from <strong>+1 <%= format_phone(@conversation.original_number) %></strong>
+                <% end %>
             </h4>
             <%= if @conversation.team_member_id do %>
                 <p class="list-group-item-text">

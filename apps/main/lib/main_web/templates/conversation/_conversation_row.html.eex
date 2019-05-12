@@ -14,7 +14,12 @@
         </span>
     </td>
     <td>
-        <b><a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>">+1 <%= format_phone(@c.original_number) %></a></b>
+
+        <%= if @c.member && @c.member.first_name do %>
+            <b><a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>"><%= Enum.join([@c.member.first_name, @c.member.last_name], " ") %></a></b>
+        <% else %>
+            <b><a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>">+1 <%= format_phone(@c.original_number) %></a></b>
+        <% end %>
         <p class="list-group-item-text"><%= List.first(@c.conversation_messages).message |> String.slice(0..100) %>&hellip;</p>
     </td>
     <td>
