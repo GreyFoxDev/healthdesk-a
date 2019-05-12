@@ -44,7 +44,7 @@
                                     <span><%= hour.morning_open_at %> - <%= hour.morning_close_at %></span>
                                     <span><%= hour.afternoon_open_at %> - <%= hour.afternoon_close_at %></span>
 
-                                    <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_location_normal_hour_path(@conn, :delete, @location.team_id, @location.id, hour.id), method: "delete" %>
+                                    <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_location_child_care_hour_path(@conn, :delete, @location.team_id, @location.id, hour.id), method: "delete" %>
 
                                 </div>
                             <% end %>
