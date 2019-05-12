@@ -13,7 +13,7 @@ defmodule MainWeb.Plug.Broadcast do
   def call(conn, opts)
 
   def call(%{assigns: %{convo: convo, member: member, location: location, message: message} = assigns} = conn, _opts) do
-    with nil <- MCommand.get_by_phone(member) do
+    with {:ok, nil} <- MCommand.get_by_phone(member) do
       MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, phone_number: member})
     else
       {:ok, member} ->
