@@ -31,6 +31,12 @@ defmodule MainWeb.TwilioController do
     |> render("error.xml")
   end
 
+  def inbound(%Plug.Conn{assigns: %{status: "pending"}} = conn, _params) do
+    conn
+    |> put_resp_content_type("text/xml")
+    |> render("no_response.xml")
+  end
+
   @doc """
   Handle a successful communication with a member
   """

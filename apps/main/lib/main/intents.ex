@@ -55,6 +55,9 @@ defmodule MainWeb.Intents do
   def get({:unknown, [{"greetings", _}]}, _location),
     do: @default_greeting
 
+  def get({:unknown, _}, _location),
+    do: @default_response
+
   def get({intent, args}, location) do
     args = remove_intent(args)
 

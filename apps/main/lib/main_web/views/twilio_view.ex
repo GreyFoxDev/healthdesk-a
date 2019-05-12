@@ -15,6 +15,13 @@ defmodule MainWeb.TwilioView do
     """
   end
 
+  def render("no_response.xml", _) do
+    """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Response></Response>
+    """
+  end
+
   @doc """
   Render a generic error message if there was a problem
   """
