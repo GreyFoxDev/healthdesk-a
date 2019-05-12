@@ -73,7 +73,7 @@ defmodule MainWeb.Intents.ChildCareHours do
           |> Stream.map(&format_schedule/1)
           |> Enum.join("\n")
 
-      String.replace(@all_hours, "[schedule]", schedule) |> IO.inspect
+      String.replace(@all_hours, "[schedule]", schedule)
     end
   end
 
