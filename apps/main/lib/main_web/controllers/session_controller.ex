@@ -28,7 +28,9 @@ defmodule MainWeb.SessionController do
          :ok <- Twilio.check(phone_number, code) do
       case user.role do
         "admin" ->
-          redirect_to(conn, user, "/admin/teams")
+          redirect_to(conn, user, "/admin/")
+        "team-admin" ->
+          redirect_to(conn, user, "/admin/")
         _ ->
           path = team_location_conversation_path(conn, :index, user.team_member.team_id, user.team_member.location_id)
           redirect_to(conn, user, path)

@@ -79,6 +79,9 @@
                               <%= link "Profile", to: user_path(@conn, :edit, current_user), class: "dropdown-item" %>
                               <%= link "Logout", to: session_path(@conn, :delete, current_user), method: "delete", class: "dropdown-item" %>
                               <hr />
+                              <%= if @current_user.role in ["admin", "team-admin"] do %>
+                                  <%= link "Metrics Dashboard", to: admin_path(@conn, :index), class: "dropdown-item" %>
+                              <% end %>
                               <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
                                   <%= link "Settings", to: settings_url(@conn, current_user), class: "dropdown-item" %>
                               <% end %>
