@@ -31,7 +31,6 @@ defmodule WitClient.MessageHandler do
     question = Inflex.parameterize(question, "%20")
 
     case System.cmd("curl", [
-           "-XPOST",
            "-H",
            "Authorization: Bearer #{@access_token}",
            "https://api.wit.ai/message?v=20181028&q=#{question}"
