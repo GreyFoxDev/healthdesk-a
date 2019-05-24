@@ -55,7 +55,7 @@ defmodule Data.Query.ReadOnly.TeamMember do
       left_join: l in assoc(t, :team_member_locations),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
-      where: l.location_id == ^location_id,
+      where: l.location_id == ^location_id or t.location_id == ^location_id,
       order_by: [u.first_name, u.last_name],
       preload: [:team_member_locations, :user]
     )

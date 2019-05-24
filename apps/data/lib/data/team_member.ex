@@ -44,7 +44,7 @@ defmodule Data.TeamMember do
   def create(params) do
     {:ok, team_member} = result = TeamMember.write(params)
 
-    if params.locations != [] do
+    if params.locations && params.locations != [] do
       associate_locations(team_member.id, params.locations)
     end
 
