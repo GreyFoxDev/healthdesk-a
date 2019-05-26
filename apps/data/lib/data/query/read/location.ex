@@ -33,4 +33,13 @@ defmodule Data.Query.ReadOnly.Location do
     )
     |> Repo.one()
   end
+
+  def get_by_api_key(key) do
+    from(t in Location,
+      where: is_nil(t.deleted_at),
+      where: t.api_key == ^key,
+      limit: 1
+    )
+    |> Repo.one()
+  end
 end

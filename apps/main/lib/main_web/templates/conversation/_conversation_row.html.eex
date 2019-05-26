@@ -6,7 +6,11 @@
             <span>
                 <b>
                     <a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>">
-                        <%= team_member.user.first_name %> <%= team_member.user.last_name %>
+                        <%= if format_phone(@c.original_number) == "Web Client" do %>
+                            Web Bot
+                        <% else %>
+                            <%= team_member.user.first_name %> <%= team_member.user.last_name %>
+                        <% end %>
                     </a>
                 </b>
                 <span class="list-group-item-text"><%= String.replace(team_member.user.role, "-", " ") |> String.capitalize() %></span>
@@ -18,7 +22,7 @@
         <%= if @c.member && @c.member.first_name do %>
             <b><a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>"><%= Enum.join([@c.member.first_name, @c.member.last_name], " ") %></a></b>
         <% else %>
-            <b><a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>">+1 <%= format_phone(@c.original_number) %></a></b>
+            <b><a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>"><%= format_phone(@c.original_number) %></a></b>
         <% end %>
         <p class="list-group-item-text"><%= List.first(@c.conversation_messages).message |> String.slice(0..100) %>&hellip;</p>
     </td>

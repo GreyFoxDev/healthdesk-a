@@ -8,4 +8,7 @@ defmodule Data.Commands.Location do
 
   def get_by_phone(phone_number),
     do: Read.get_by_phone(phone_number)
+
+  def get_by_api_key(key),
+    do: Read.get_by_api_key(key)
 end

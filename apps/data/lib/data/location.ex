@@ -33,6 +33,9 @@ defmodule Data.Location do
   def get_by_team_id(%{role: role}, id) when role in @roles,
     do: Location.all(id)
 
+  def get_by_api_key(key),
+    do: Location.get_by_api_key(key)
+
   def create(params),
     do: Location.write(params)
 

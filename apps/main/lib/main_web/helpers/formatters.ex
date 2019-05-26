@@ -14,15 +14,15 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_phone(<< "+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
-    Enum.join([area_code, prefix, line], "-")
+    "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
 
   def format_phone(<< area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
-    Enum.join([area_code, prefix, line], "-")
+    "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
 
   def format_phone(phone_number) do
-    phone_number
+    "Web Client"
   end
 
   def format_team_member(team_member) do

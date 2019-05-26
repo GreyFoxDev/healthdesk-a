@@ -10,6 +10,7 @@ defmodule Data.Schema.Location do
   |a
 
   @optional_fields ~w|
+  api_key
   timezone
   address_1
   address_2
@@ -30,6 +31,7 @@ defmodule Data.Schema.Location do
     field(:state, :string)
     field(:postal_code, :string)
     field(:timezone, :string)
+    field(:api_key, :string)
 
     field(:deleted_at, :utc_datetime)
 
