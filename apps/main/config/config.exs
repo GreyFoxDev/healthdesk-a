@@ -16,7 +16,8 @@ config :phoenix,
 
 # Configures the endpoint
 config :main, MainWeb.Endpoint,
-  url: [scheme: "http", host: "localhost", port: 4000, check_origin: false],
+  url: [scheme: "http", host: "localhost", port: 4000],
+  check_origin: false,
   secret_key_base: "z0HlXKVQRJoAEUI1h6E/u5b0uuQOQucLm2gG7PdJGQbQW4UO/B3eaaTu3OsW+Bpp",
   render_errors: [view: MainWeb.ErrorView, accepts: ~w(html json)],
   live_view: [
