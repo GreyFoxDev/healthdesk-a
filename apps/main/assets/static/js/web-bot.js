@@ -8,7 +8,7 @@ function generate() {
     return rtn;
 }
 const room = generate();
-const url = "ws://localhost:4000/socket/websocket";
+const url = "ws://healthdesk-ai.herokuapp.com/socket/websocket";
 const socket = new WebSocket(url);
 function connect() {
     socket.onopen = () => {
