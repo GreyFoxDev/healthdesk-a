@@ -36,6 +36,12 @@
                         class: "form-control"
                         %>
                     </div>
+                    <div class="form-group">
+                        <label>API KEY</label>
+                        <%= text_input f, :api_key, class: "form-control", readonly: true %>
+                        <label>Web Greeting</label>
+                        <%= text_input f, :web_greeting, class: "form-control" %>
+                    </div>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>
                     </div>

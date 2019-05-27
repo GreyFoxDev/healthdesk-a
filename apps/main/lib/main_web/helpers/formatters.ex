@@ -22,7 +22,7 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_phone(phone_number) do
-    "Web Client"
+    "Unknown Visitor"
   end
 
   def format_team_member(team_member) do

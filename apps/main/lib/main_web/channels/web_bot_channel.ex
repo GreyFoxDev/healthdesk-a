@@ -46,7 +46,14 @@ defmodule MainWeb.WebBotChannel do
   end
 
   def handle_info(:after_join, socket) do
-    broadcast socket, "shout", %{message: "Greetings! How can I help?", from: "Bot"}
+    location = get_location(socket.assigns[:key])
+
+    if location.web_greeting && location.web_greeting != "" do
+      broadcast socket, "shout", %{message: location.web_greeting, from: "Bot"}
+    else
+      broadcast socket, "shout", %{message: "Greetings! How can I help?", from: "Bot"}
+    end
+
     {:noreply, socket}
   end
 

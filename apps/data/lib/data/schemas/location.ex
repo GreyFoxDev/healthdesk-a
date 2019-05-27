@@ -11,6 +11,7 @@ defmodule Data.Schema.Location do
 
   @optional_fields ~w|
   api_key
+  web_greeting
   timezone
   address_1
   address_2
@@ -32,6 +33,7 @@ defmodule Data.Schema.Location do
     field(:postal_code, :string)
     field(:timezone, :string)
     field(:api_key, :string)
+    field(:web_greeting, :string)
 
     field(:deleted_at, :utc_datetime)
 
@@ -55,5 +57,14 @@ defmodule Data.Schema.Location do
     |> validate_length(:city, max: 100)
     |> validate_length(:state, max: 2)
     |> validate_length(:postal_code, max: 20)
+    |> generate_api_key()
+  end
+
+  defp generate_api_key(changeset) do
+    case get_field(changeset, :api_key) do
+      nil -> put_change(changeset, :api_key, UUID.uuid4())
+      "" -> put_change(changeset, :api_key, UUID.uuid4())
+      _ -> changeset
+    end
   end
 end
