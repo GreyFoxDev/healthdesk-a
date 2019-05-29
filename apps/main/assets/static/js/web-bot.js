@@ -8,7 +8,7 @@ function generate() {
     return rtn;
 }
 const room = generate();
-const url = "ws://healthdesk-ai.herokuapp.com/socket/websocket";
+const url = "wss://healthdesk-ai.herokuapp.com/socket/websocket";
 const socket = new WebSocket(url);
 function connect() {
     socket.onopen = () => {
@@ -100,9 +100,6 @@ function insertChat(who, text, time){
             '</div>' +
             '</li>';
     }
-    setTimeout(
-        function(){
-            $("ul").append(control).scrollTop($("ul").prop('scrollHeight'));
-        }, time);
+ $("ul").append(control).scrollTop($("ul").prop('scrollHeight'));
 
 }
