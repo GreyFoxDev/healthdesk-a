@@ -23,7 +23,11 @@
                 </p>
             <% else %>
                 <p class="list-group-item-text">
-                    Assigned to: Bot
+                    <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
+                        Assigned to: Website Bot
+                    <% else %>
+                        Assigned to: SMS Bot
+                    <% end %>
                 </p>
             <% end %>
         </div>
@@ -165,7 +169,11 @@
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
-                                                        Bot
+                                                        <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
+                                                            Website Bot
+                                                        <% else %>
+                                                            SMS Bot
+                                                        <% end %>
                                                     <% else %>
                                                         <%= format_phone(message.phone_number) %>
                                                     <% end %>
@@ -185,7 +193,11 @@
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
-                                                        Bot
+                                                        <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
+                                                            Website Bot
+                                                        <% else %>
+                                                            SMS Bot
+                                                        <% end %>
                                                     <% else %>
                                                         <%= format_phone(message.phone_number) %>
                                                     <% end %>
