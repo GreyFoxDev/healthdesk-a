@@ -29,13 +29,13 @@
 #web-bot .msj{
     float:left;background:white;
 }
-#web-bot .frame{
+.frame{
     background:#e0e0de;
     height:450px;
     overflow:hidden;
     padding:0;
 }
-#web-bot .frame > div:last-of-type{
+.frame > div:last-of-type{
     position:absolute;bottom:0;width:100%;display:flex;
 }
 body > div > div > div:nth-child(2) > span{
@@ -117,4 +117,12 @@ body > div > div > div.msj-rta.macro{
     min-height: 250px;
     min-width: 300px;
     z-index: 9;
+}
+.chat-popup-close {
+    float:right;
+    display:inline-block;
+    padding:2px 5px;
+    background:#ccc;
+    position: relative;
+    z-index: 6;
 }
