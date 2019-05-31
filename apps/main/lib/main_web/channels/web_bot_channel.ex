@@ -39,7 +39,7 @@ defmodule MainWeb.WebBotChannel do
       message = "Sorry I can't help with that but please call #{location.phone_number} for assistance?"
       broadcast socket, "shout", %{message: message, from: "Bot"}
     else
-      broadcast socket, "shout", %{message: response.assigns[:response], from: "Bot"}
+      broadcast socket, "shout", %{message: String.replace(response.assigns[:response], "\n", "<br />"), from: "Bot"}
     end
 
     {:noreply, socket}
