@@ -100,6 +100,6 @@ function insertChat(who, text, time){
             '</div>' +
             '</li>';
     }
- $("ul").append(control).scrollTop($("ul").prop('scrollHeight'));
+    $("#web-bot ul").append(control).scrollTop($("#web-bot ul").prop('scrollHeight'));
 
 }
