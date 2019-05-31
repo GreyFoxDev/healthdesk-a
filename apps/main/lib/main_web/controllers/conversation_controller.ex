@@ -19,7 +19,10 @@ defmodule MainWeb.ConversationController do
       |> current_user()
       |> Data.Conversations.all(location_id)
 
-    render conn, "index.html", location: location, conversations: conversations, teams: teams(conn)
+    my_conversations =
+      Enum.filter(conversations, fn(c) -> c.team_member && c.team_member.user_id == current_user(conn).id end)
+
+    render conn, "index.html", location: location, conversations: conversations, my_conversations: my_conversations, teams: teams(conn)
   end
 
   def new(conn, %{"location_id" => location_id}) do
