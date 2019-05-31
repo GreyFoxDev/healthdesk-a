@@ -20,7 +20,7 @@ defmodule MainWeb.AssignTeamMemberController do
 
     message = %{"conversation_id" => id,
                 "phone_number" => team_member.user.phone_number,
-                "message" => "ASSIGNED: #{team_member.user.last_name} was assigned to the conversation.",
+                "message" => "ASSIGNED: #{team_member.user.first_name} #{team_member.user.last_name} was assigned to the conversation.",
                 "sent_at" => DateTime.utc_now()}
 
 

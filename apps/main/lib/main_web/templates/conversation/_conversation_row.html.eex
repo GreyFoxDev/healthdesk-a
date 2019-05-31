@@ -6,7 +6,7 @@
             <span>
                 <b>
                     <a href="<%= team_location_conversation_conversation_message_path(@conn, :index, @location.team_id, @location.id, @c.id) %>">
-                        <%= if format_phone(@c.original_number) == "Unknown Visitor" do %>
+                        <%= if !@c.team_member && format_phone(@c.original_number) == "Unknown Visitor" do %>
                             Website Bot
                         <% else %>
                             <%= team_member.user.first_name %> <%= team_member.user.last_name %>
