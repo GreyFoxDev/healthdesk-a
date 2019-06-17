@@ -19,27 +19,39 @@ defmodule MainWeb.WebBotChannel do
     end
   end
 
-  def handle_in("shout", %{"message" =>  message}, socket) do
-    location = get_location(socket.assigns[:key])
+  def handle_in("reply", %{"message" => message}, socket) do
+    broadcast socket, "reply", %{message: message, from: "Bot"}
+    {:noreply, socket}
+  end
 
-    response = %Plug.Conn{
-      assigns: %{
-        opt_in: true,
-        message: message,
-        member: socket.assigns[:user],
-        location: location.phone_number
+  def handle_in("ping", %{"key" => key}, socket) do
+    if authorized?(key) do
+      broadcast socket, "ping", %{message: "__pong__"}
+    end
+
+    {:noreply, socket}
+  end
+
+  def handle_in("shout", %{"message" => message, "key" => key}, socket) do
+    if authorized?(key) do
+      location = get_location(key)
+
+      response = %Plug.Conn{
+        assigns: %{
+          opt_in: true,
+          message: message,
+          member: socket.assigns[:user],
+          location: location.phone_number
+        }
       }
-    }
-    |> P.OpenConversation.call([])
-    |> P.AskWit.call([])
-    |> P.BuildAnswer.call([])
-    |> P.CloseConversation.call([])
+      |> P.OpenConversation.call([])
+      |> P.AskWit.call([])
+      |> P.BuildAnswer.call([])
+      |> P.CloseConversation.call([])
 
-    if response.assigns[:status] == "pending" do
-      message = "Sorry I can't help with that but please call #{location.phone_number} for assistance?"
-      broadcast socket, "shout", %{message: message, from: "Bot"}
-    else
-      broadcast socket, "shout", %{message: String.replace(response.assigns[:response], "\n", "<br />"), from: "Bot"}
+      if response.assigns[:status] != "pending" do
+        broadcast socket, "shout", %{message: String.replace(response.assigns[:response], "\n", "<br />"), from: "Bot"}
+      end
     end
 
     {:noreply, socket}
@@ -60,6 +72,11 @@ defmodule MainWeb.WebBotChannel do
   def handle_in(event, payload, socket) do
     Logger.warn("INVALID EVENT: #{IO.inspect(event)} with payload #{IO.inspect(payload)}")
     {:noreply, socket}
+  end
+
+  def terminate(reason, socket) do
+    Logger.warn("CONNECTION CLOSED: #{inspect reason}")
+    :ok
   end
 
   defp authorized?(key) do

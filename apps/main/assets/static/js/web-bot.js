@@ -10,6 +10,28 @@ function generate() {
 const room = generate();
 const url = "wss://healthdesk-ai.herokuapp.com/socket/websocket";
 const socket = new WebSocket(url);
+
+var timerId = 0;
+
+function keepAlive() {
+    var timeout = 20000;
+    if (socket.readyState == socket.OPEN) {
+        socket.send(JSON.stringify({
+            "topic": "web_bot:" + room,
+            "event": "ping",
+            "payload": {"message": "__ping__", "key": web_bot_config.key},
+            "ref": "sdkfml"
+        }));
+    }
+    timerId = setTimeout(keepAlive, timeout);
+}
+
+function cancelKeepAlive() {
+    if (timerId) {
+        clearTimeout(timerId);
+    }
+}
+
 function connect() {
     socket.onopen = () => {
         socket.send(JSON.stringify({
@@ -18,17 +40,23 @@ function connect() {
             "payload": {"key": web_bot_config.key},
             "ref": "lfskj"
         }));
+        keepAlive();
     };
     openForm();
 }
 connect();
 
+socket.onclose = () => {
+    console.log("Connection closed");
+    cancelKeepAlive();
+};
+
 socket.addEventListener("message", (event) => {
     var payload = JSON.parse(event.data).payload;
-    if (payload.message) {
+    if (payload.message && payload.message !== "__pong__") {
         insertChat(payload.from, payload.message, Date.now());
     }
-})
+});
 
 function send() {
     var msg = document.getElementById("web-bot-msg");

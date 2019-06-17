@@ -2,6 +2,7 @@ defmodule MainWeb.ConversationMessageController do
   use MainWeb.SecuredContoller
 
   alias Data.{ConversationMessages, Conversations, Location, TeamMember}
+  alias MainWeb.Endpoint
 
   require Logger
 
@@ -44,15 +45,18 @@ defmodule MainWeb.ConversationMessageController do
       |> current_user()
       |> Location.get(location_id)
 
-    conversation =
-      conn
-      |> current_user()
-      |> Conversations.get(conversation_id)
+    conn
+    |> current_user()
+    |> Conversations.get(conversation_id)
+    |> send_message(conn, params, location)
+    |> redirect(to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, conversation_id))
+  end
 
+  defp send_message(%{original_number: << "+1", _ :: binary >>} = conversation, conn, params, location) do
     user = current_user(conn)
 
-    conn = params["conversation_message"]
-    |> Map.merge(%{"conversation_id" => conversation_id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
+    params["conversation_message"]
+    |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
@@ -63,8 +67,23 @@ defmodule MainWeb.ConversationMessageController do
          {:error, changeset} ->
            put_flash(conn, :error, "Sending message failed")
        end
+  end
 
-    redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, conversation.id))
+  defp send_message(conversation, conn, params, location) do
+    user = current_user(conn)
+
+    params["conversation_message"]
+    |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
+    |> ConversationMessages.create()
+    |> case do
+         {:ok, _message} ->
+           message = %{"message" => params["conversation_message"]["message"]}
+           Logger.info "Message created ************* WEB CHAT #{inspect message}"
+           Endpoint.broadcast("web_bot:#{conversation.original_number}", "reply", message)
+           put_flash(conn, :success, "Sending message was successful")
+         {:error, changeset} ->
+           put_flash(conn, :error, "Sending message failed")
+       end
   end
 
   defp render_page(conn, page, changeset, errors \\ []) do
