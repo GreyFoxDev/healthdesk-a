@@ -140,20 +140,44 @@
         <div class="card-metric">
             <div class="metric">
                 <h2 class="metric-label"> TOTAL SESSIONS BY CHANNEL </h2>
-                <h2 class="metric-label"> WEB </h2>
-                <p class="metric-value h3">
-                    <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.total_web_sessions + acc end) %>
-                    </span>
-                </p>
-                <br />
-                <h2 class="metric-label"> SMS </h2>
-                <p class="metric-value h3">
-                    <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.total_sms_sessions + acc end) %>
-                    </span>
+                <p class="metric-label">
+                    <canvas id="canvas-sessions-by-channel" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
                 </p>
             </div>
         </div><!-- /.metric -->
     </div><!-- /metric column -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+    <script>
+     const ctx = document.getElementById('canvas-sessions-by-channel').getContext('2d');
+     const chartData = {
+         labels: [
+             'Web',
+             'SMS'
+         ],
+         datasets: [{
+             data: [
+                 <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.total_web_sessions + acc end) %>,
+                 <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.total_sms_sessions + acc end) %>
+             ],
+             borderWidth: 5,
+             backgroundColor: ['#2098d4', '#f8da50'],
+             hoverBackgroundColor: ['#148fb5', '#f2d02b'],
+         }],
+     };
+
+     new Chart(ctx, {
+         type: 'pie',
+         data: chartData,
+         maintainAspectRatio: false,
+         responsive: true,
+         options: {
+             legend: {
+                 display: true,
+                 position: 'left'
+             },
+         },
+     });
+    </script>
+
 </div>
