@@ -124,7 +124,7 @@ function insertChat(who, text, time){
             '<div class="msj macro">' +
             '<div class="text text-l">' +
             '<p>'+text+'</p>' +
-            '<p>'+who+' <small>'+date+'</small></p>' +
+            '<p>Website Bot <small>'+date+'</small></p>' +
             '</div>' +
             '</li>';
     }

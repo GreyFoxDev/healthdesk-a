@@ -20,7 +20,7 @@ defmodule MainWeb.WebBotChannel do
   end
 
   def handle_in("reply", %{"message" => message}, socket) do
-    broadcast socket, "reply", %{message: message, from: "Bot"}
+    broadcast socket, "reply", %{message: message, from: "Website Bot"}
     {:noreply, socket}
   end
 
@@ -50,7 +50,7 @@ defmodule MainWeb.WebBotChannel do
       |> P.CloseConversation.call([])
 
       if response.assigns[:status] != "pending" do
-        broadcast socket, "shout", %{message: String.replace(response.assigns[:response], "\n", "<br />"), from: "Bot"}
+        broadcast socket, "shout", %{message: String.replace(response.assigns[:response], "\n", "<br />"), from: "Website Bot"}
       end
     end
 
@@ -61,9 +61,9 @@ defmodule MainWeb.WebBotChannel do
     location = get_location(socket.assigns[:key])
 
     if location.web_greeting && location.web_greeting != "" do
-      broadcast socket, "shout", %{message: location.web_greeting, from: "Bot"}
+      broadcast socket, "shout", %{message: location.web_greeting, from: "Website Bot"}
     else
-      broadcast socket, "shout", %{message: "Greetings! How can I help?", from: "Bot"}
+      broadcast socket, "shout", %{message: "Greetings! How can I help?", from: "Website Bot"}
     end
 
     {:noreply, socket}
