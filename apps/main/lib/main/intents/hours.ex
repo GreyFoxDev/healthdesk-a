@@ -25,7 +25,7 @@ defmodule MainWeb.Intents.Hours do
     location = Location.get_by_phone(location)
     <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
-    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}),
+    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}, location.id),
          [hours] <- get_hours(location.id, {term, day_of_week}) do
 
       prefix = date_prefix({term, day_of_week}, {year, month, day}, location.timezone)
@@ -71,18 +71,17 @@ defmodule MainWeb.Intents.Hours do
 
   def build_response(_, _), do: @default_response
 
-  defp get_day_of_week({year, _, _} = day) when is_binary(year) do
+  defp get_day_of_week({year, _, _} = day, location) when is_binary(year) do
     day
     |> convert_to_integer()
     |> get_day_of_week()
   end
 
-  defp get_day_of_week({year, month, day} = date) do
-    with nil <- MainWeb.HolidayDates.is_holiday?(date) do
-      {:normal, lookup_day_of_week(date)}
+  defp get_day_of_week({year, month, day} = date, location) do
+    with holiday when not is_nil(holiday) <- HolidayHours.find(location, date) do
+      {:holiday, holiday}
     else
-      holiday ->
-        {:holiday, holiday}
+      {:normal, lookup_day_of_week(date)}
     end
   end
 
@@ -93,9 +92,7 @@ defmodule MainWeb.Intents.Hours do
   end
 
   defp get_hours(location, {:holiday, holiday}) do
-    location
-    |> HolidayHours.all()
-    |> Enum.filter(fn hour -> hour.holiday_name == holiday end)
+    holiday
   end
 
   defp date_prefix(term, day, timezone \\ "PST8PDT")
