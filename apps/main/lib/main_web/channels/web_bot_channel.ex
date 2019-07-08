@@ -48,6 +48,7 @@ defmodule MainWeb.WebBotChannel do
       |> P.AskWit.call([])
       |> P.BuildAnswer.call([])
       |> P.CloseConversation.call([])
+      |> P.Broadcast.call([])
 
       if response.assigns[:status] != "pending" do
         broadcast socket, "shout", %{message: String.replace(response.assigns[:response], "\n", "<br />"), from: "Website Bot"}
