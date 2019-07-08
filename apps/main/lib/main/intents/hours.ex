@@ -36,7 +36,7 @@ defmodule MainWeb.Intents.Hours do
       |> String.replace("[close]", hours.close_at)
     else
       [] ->
-        {term, day_of_week} = get_day_of_week({year, month, day})
+        {term, day_of_week} = get_day_of_week({year, month, day}, location.id)
 
         String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
       _ ->
@@ -52,7 +52,7 @@ defmodule MainWeb.Intents.Hours do
       |> Calendar.Date.today!()
       |> Calendar.Date.to_erl()
 
-    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week(erl_date),
+    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week(erl_date, location.id),
          [hours] <- get_hours(location.id, {term, day_of_week}) do
 
       @hours
@@ -61,7 +61,7 @@ defmodule MainWeb.Intents.Hours do
       |> String.replace("[close]", hours.close_at)
     else
       [] ->
-        {term, day_of_week} = get_day_of_week(erl_date)
+        {term, day_of_week} = get_day_of_week(erl_date, location.id)
 
       String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, erl_date, location.timezone))
       _ ->
@@ -74,14 +74,15 @@ defmodule MainWeb.Intents.Hours do
   defp get_day_of_week({year, _, _} = day, location) when is_binary(year) do
     day
     |> convert_to_integer()
-    |> get_day_of_week()
+    |> get_day_of_week(location)
   end
 
   defp get_day_of_week({year, month, day} = date, location) do
     with holiday when not is_nil(holiday) <- HolidayHours.find(location, date) do
       {:holiday, holiday}
     else
-      {:normal, lookup_day_of_week(date)}
+      nil ->
+        {:normal, lookup_day_of_week(date)}
     end
   end
 
@@ -91,7 +92,7 @@ defmodule MainWeb.Intents.Hours do
     |> Enum.filter(fn hour -> hour.day_of_week == day_of_week end)
   end
 
-  defp get_hours(location, {:holiday, holiday}) do
+  defp get_hours(_location, {:holiday, holiday}) do
     holiday
   end
 
