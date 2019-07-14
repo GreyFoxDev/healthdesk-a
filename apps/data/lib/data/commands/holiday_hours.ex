@@ -15,7 +15,7 @@ defmodule Data.Commands.HolidayHours do
   end
 
   defp match_date?(nil, _), do: false
-  defp match?(date, erl_date) do
+  defp match_date?(date, erl_date) do
     Date.to_erl(date) == erl_date
   end
 end
