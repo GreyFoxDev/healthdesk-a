@@ -25,8 +25,11 @@ defmodule MainWeb.Intents.Hours do
     location = Location.get_by_phone(location)
     <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
-    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}, location.id),
-         [hours] <- get_hours(location.id, {term, day_of_week}) do
+    IO.inspect {year, month, day}, label: "DAY"
+    IO.inspect location.id, label: "LOCATION ID"
+
+    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}, location.id) |> IO.inspect(label: "GET DAY OF WEEK"),
+         [hours] <- get_hours(location.id, {term, day_of_week}) |> IO.inspect(label: "GET HOURS") do
 
       prefix = date_prefix({term, day_of_week}, {year, month, day}, location.timezone)
 
@@ -45,6 +48,7 @@ defmodule MainWeb.Intents.Hours do
   end
 
   def build_response([], location) do
+    IO.inspect "ARGS ARE EMPTY"
     location = Location.get_by_phone(location)
 
     erl_date =
