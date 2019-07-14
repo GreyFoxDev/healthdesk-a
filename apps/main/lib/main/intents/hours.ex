@@ -82,10 +82,10 @@ defmodule MainWeb.Intents.Hours do
   end
 
   defp get_day_of_week({year, month, day} = date, location) do
-    with holiday when not is_nil(holiday) <- HolidayHours.find(location, date) do
+    with [holiday] <- HolidayHours.find(location, date) do
       {:holiday, holiday}
     else
-      nil ->
+      _ ->
         {:normal, lookup_day_of_week(date)}
     end
   end
@@ -97,7 +97,7 @@ defmodule MainWeb.Intents.Hours do
   end
 
   defp get_hours(_location, {:holiday, holiday}) do
-    holiday
+    [holiday]
   end
 
   defp date_prefix(term, day, timezone \\ "PST8PDT")
