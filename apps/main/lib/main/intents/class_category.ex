@@ -51,6 +51,7 @@ defmodule MainWeb.Intents.ClassCategory do
       location.id
       |> ClassSchedule.all()
       |> Stream.filter(&find_classes(&1, category))
+      |> Stream.uniq_by(&(&1.class_type))
       |> Stream.map(&(&1.class_type))
       |> Enum.join("\n")
 

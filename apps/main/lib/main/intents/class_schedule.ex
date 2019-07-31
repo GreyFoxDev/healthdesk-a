@@ -54,12 +54,10 @@ defmodule MainWeb.Intents.ClassSchedule do
     date =
       location.timezone
       |> Calendar.Date.today!()
-      |> IO.inspect(label: "DATE")
 
     classes =
       location.id
       |> ClassSchedule.all()
-      |> IO.inspect(label: "Schedule")
       |> Stream.filter(fn class -> class.date == date end)
       |> Stream.map(&format_schedule/1)
       |> Enum.join("\n")
