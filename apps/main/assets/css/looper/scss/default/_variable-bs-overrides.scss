@@ -38,6 +38,9 @@ $subtle-level:          .08 !default;
 $subtle-level-hover:    .12 !default;
 $subtle-level-active:   .2 !default;
 
+$input-height-inner: 10;
+$input-height-inner-sm: 5;
+$input-height-inner-lg: 15;
 
 // Social Colors
 // ==================================================
@@ -161,7 +164,6 @@ $input-disabled-bg:                     $gray-100;
 $input-border-color:                    $gray-400;
 $input-placeholder-color:               $text-muted;
 $input-group-addon-bg:                  $input-bg;
-
 
 $custom-control-indicator-bg:                   $white;
 $custom-control-indicator-bg-size:              63% 63%;

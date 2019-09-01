@@ -37,7 +37,7 @@ defmodule Main.Mixfile do
   defp deps do
     [
       {:bitly, "~> 0.1"},
-      {:phoenix, "~> 1.4.3"},
+      {:phoenix, "~> 1.4.9"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.13.2"},
       {:phoenix_ecto, "~> 3.3"},
@@ -45,7 +45,7 @@ defmodule Main.Mixfile do
       {:plug, "~> 1.7"},
       {:calendar, "~> 0.17.4"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
-      {:phoenix_live_view, github: "phoenixframework/phoenix_live_view"},
+      {:phoenix_live_view, "~> 0.1.1"},
       {:gettext, "~> 0.11"},
       {:guardian, "~> 1.0"},
       {:con_cache, "~> 0.13.0"},
