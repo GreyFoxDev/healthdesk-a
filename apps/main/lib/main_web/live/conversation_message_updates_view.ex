@@ -4,7 +4,8 @@ defmodule MainWeb.Live.ConversationMessageUpdatesView do
 
   alias MainWeb.ConversationMessageUpdatesView, as: View
 
-  def render(%{messages: messages} = assigns), do: View.render("index.html", assigns)
+  def render(%{messages: messages} = assigns),
+    do: View.render("index.html", assigns)
 
   def render(assigns) do
     ~L[]

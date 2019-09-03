@@ -6,16 +6,16 @@
     "watch": "brunch watch --stdin"
   },
   "dependencies": {
-    "popper.js": "^1.14.7",
     "bootstrap": "^4.3.1",
     "jquery": "^3.4.0",
+    "morphdom": "2.5.0",
     "open-iconic": "^1.1.1",
     "phoenix": "file:../../../deps/phoenix",
     "phoenix_html": "file:../../../deps/phoenix_html",
     "phoenix_live_view": "file:../../../deps/phoenix_live_view",
+    "popper.js": "^1.14.7",
     "sass-brunch": "^2.10.8",
-    "stacked-menu": "1.1.9",
-    "morphdom": "2.5.0"
+    "stacked-menu": "1.1.9"
   },
   "devDependencies": {
     "babel-brunch": "^7.0.1",

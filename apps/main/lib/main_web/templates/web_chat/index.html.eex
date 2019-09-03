@@ -1,0 +1,5 @@
+<div style="margin: 5px;">
+    <%=
+    live_render(@conn, MainWeb.Live.WebChat.Index, session: %{api_key: @api_key})
+    %>
+</div>

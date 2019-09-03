@@ -39,6 +39,8 @@ defmodule MainWeb.Endpoint do
     key: "_main_key",
     signing_salt: "EG6uBS60"
 
+  plug CORSPlug
+
   plug MainWeb.Router
 
   @doc """

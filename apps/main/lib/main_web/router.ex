@@ -22,6 +22,8 @@ defmodule MainWeb.Router do
     get "/", PageController, :index
     get "/login", SessionController, :new
     post "/login", SessionController, :create
+
+    get "/webchat/:api_key", WebChatController, :index
   end
 
   scope "/admin", MainWeb do

@@ -1,0 +1,30 @@
+<h2>Welcome to <%= @location.location_name %></h2>
+<%=for message <- @messages do %>
+  <%= if "link" == message.type do %>
+    <%= for link <- message.links do %>
+      <div style="width: 90%; padding: 5px; margin: 5px; background-color: blue;border-radius: 5px;" phx-click="link-click" phx-value="<%= link.value %>">
+        <a href="#" style="color: white;"><%= link.text %></a>
+      </div>
+    <% end %>
+  <% else %>
+    <p style="padding: 5px;">
+      <b><%= message.user %>:</b>
+      <%= if message.direction == "outbound" do %>
+        <%= raw(message.text) %>
+      <% else %>
+        <%= message.text %>
+      <% end %>
+    </p>
+  <% end %>
+<% end %>
+
+<br>
+<div class="panel-footer">
+  <div class="input-group">
+    <form phx-submit="send">
+      <input name="message" type="text" class="form-control"
+             style="width: 100%"
+             placeholder="Write your message here..." />
+    </form>
+  </div>
+</div>

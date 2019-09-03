@@ -6,6 +6,7 @@ defmodule Main.Application do
 
     children = [
       supervisor(MainWeb.Endpoint, []),
+      {Main.WebChat.Supervisor, []},
       {ConCache, [
             name: :session_cache,
             ttl_check_interval: :timer.hours(1),
@@ -20,5 +21,22 @@ defmodule Main.Application do
   def config_change(changed, _new, removed) do
     MainWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+end
+
+defmodule Main.WebChat.Supervisor do
+  use DynamicSupervisor
+
+  def start_link(_) do
+    DynamicSupervisor.start_link(__MODULE__, [], name: __MODULE__)
+  end
+
+  @impl true
+  def init(_init_arg) do
+    DynamicSupervisor.init(strategy: :one_for_one)
+  end
+
+  def start_child(socket) do
+    DynamicSupervisor.start_child(__MODULE__, {Main.WebChat.Events, socket})
   end
 end
