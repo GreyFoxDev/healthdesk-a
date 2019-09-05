@@ -1,3 +1,2 @@
 cd $phoenix_dir
-npm --prefix ./assets run build
 mix "${phoenix_ex}.digest.clean"
