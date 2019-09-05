@@ -11,13 +11,6 @@ defmodule Main.WebChat.Events do
     {:ok, %{assigns: assigns, current_event: nil}}
   end
 
-  defp location_stream(team_id) do
-    %{role: "admin"}
-    |> Location.get_by_team_id(team_id)
-    |> Stream.filter(&(&1.location_name != "Webbot"))
-    |> Stream.map(&("<option value=\"#{&1.id}\">#{&1.location_name}</option>"))
-  end
-
   def handle_call("join", _from, %{assigns: %{location: location}} = state) do
     locations = location_stream(location.team_id)
     count = Enum.count(locations) |> IO.inspect(label: "COUNT")
@@ -25,7 +18,12 @@ defmodule Main.WebChat.Events do
     response = if count > 1  do
       location_select(locations)
     else
-      which_plans()
+      """
+      Awesome!
+      <br />
+      #{which_plans()}
+
+      """
     end
 
     message = %{
@@ -127,6 +125,25 @@ defmodule Main.WebChat.Events do
     {:reply, message, %{state | current_event: :pricing}}
   end
 
+  def handle_call(<< "location:", id :: binary >>, _from, state) do
+    location = Location.get(%{role: "admin"}, id)
+
+    message = %{
+      type: "message",
+      user: "Webbot",
+      direction: "outbound",
+      text: """
+      #{location.location_name}<br />
+      Got it...
+
+      #{which_plans()}
+      """
+    }
+
+    {:reply, message, %{state | current_event: :pricing}}
+
+  end
+
   def handle_call("tour", _from, %{assigns: %{location: location}} = state) do
     locations = location_stream(location.team_id)
     count = Enum.count(locations)
@@ -158,22 +175,37 @@ defmodule Main.WebChat.Events do
     {:reply, message, %{state | current_event: :other}}
   end
 
+  defp location_stream(team_id) do
+    %{role: "admin"}
+    |> Location.get_by_team_id(team_id)
+    |> Stream.filter(&(&1.location_name != "Webbot"))
+    |> Stream.map(fn(location) ->
+      """
+      <li>
+        <a phx-click=\"link-click\" phx-value=\"location:#{location.id}\">
+          #{location.location_name}
+        </a>
+      </li>
+      """ end)
+  end
+
   defp location_select(locations) do
       """
       Awesome!
       <br />
       Which of our #{Enum.count(locations)} locations are you interested in?
       <br />
-      <select phx-change="join:location">
-      #{Enum.join(locations)}
-      </select>
+      <div class="wrapper-dropdown">
+        <span>Locations</span>
+        <ul class="dropdown">
+        #{Enum.join(locations)}
+        </ul>
+      </div>
       """
   end
 
   defp which_plans do
       """
-      Awesome!
-      <br />
       We have a few plans to choose from..
       <br />
       Would you like to be able to bring friends, attend group classes, tan, use massage chairs?
