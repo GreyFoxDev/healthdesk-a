@@ -3,12 +3,18 @@ defmodule Main.WebChat.Events do
 
   alias Data.Location
 
+  @days_of_week ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
   def start_link(assigns) do
     GenServer.start_link(__MODULE__, assigns)
   end
 
   def init(assigns) do
     {:ok, %{assigns: assigns, current_event: nil}}
+  end
+
+  def handle_call(:current_event, _from, %{current_event: event} = state) do
+    {:reply, event, state}
   end
 
   def handle_call("join", _from, %{assigns: %{location: location}} = state) do
@@ -98,7 +104,7 @@ defmodule Main.WebChat.Events do
       text: """
       Great choice!
       <br />
-      I'm redirecting you to the checkout page now..
+      All set! Someone from our team will text you shortly to get you set up. Thank you!
       """
     }
 
@@ -128,6 +134,12 @@ defmodule Main.WebChat.Events do
   def handle_call(<< "location:", id :: binary >>, _from, state) do
     location = Location.get(%{role: "admin"}, id)
 
+    next = if state.current_event == :tour do
+      day_of_week()
+    else
+      which_plans()
+    end
+
     message = %{
       type: "message",
       user: "Webbot",
@@ -135,13 +147,61 @@ defmodule Main.WebChat.Events do
       text: """
       #{location.location_name}<br />
       Got it...
-
-      #{which_plans()}
+      #{next}
       """
     }
 
     {:reply, message, %{state | current_event: :pricing}}
+  end
 
+  def handle_call(<< "tour:", day :: binary >>, _from, state) when day in @days_of_week do
+    message = %{
+      type: "message",
+      user: "Webbot",
+      direction: "outbound",
+      text: time_of_day()
+    }
+
+    {:reply, message, %{state | current_event: :tour_time}}
+  end
+
+  def handle_call(<< "tour:", time_of_day :: binary >>, _from, %{current_event: :tour_time} = state) do
+    message = %{
+      type: "message",
+      user: "Webbot",
+      direction: "outbound",
+      text: """
+      Perfect. And can I please get your first and last name?
+      """
+    }
+
+    {:reply, message, %{state | current_event: :tour_name}}
+  end
+
+  def handle_call(:tour_name, _from, %{current_event: :tour_name} = state) do
+    message = %{
+      type: "message",
+      user: "Webbot",
+      direction: "outbound",
+      text: """
+      Thank you. Lastly, what is your 10-digit phone number?
+      """
+    }
+
+    {:reply, message, %{state | current_event: :tour_phone}}
+  end
+
+  def handle_call(:tour_phone, _from, %{current_event: :tour_phone} = state) do
+    message = %{
+      type: "message",
+      user: "Webbot",
+      direction: "outbound",
+      text: """
+      All set! Someone from our team will text you shortly to confirm your appointment. Thank you!
+      """
+    }
+
+    {:reply, message, %{state | current_event: :done}}
   end
 
   def handle_call("tour", _from, %{assigns: %{location: location}} = state) do
@@ -151,7 +211,7 @@ defmodule Main.WebChat.Events do
     response = if count > 1  do
       location_select(locations)
     else
-      time_of_day()
+      day_of_week()
     end
 
     message = %{
@@ -181,11 +241,9 @@ defmodule Main.WebChat.Events do
     |> Stream.filter(&(&1.location_name != "Webbot"))
     |> Stream.map(fn(location) ->
       """
-      <li>
-        <a phx-click=\"link-click\" phx-value=\"location:#{location.id}\">
-          #{location.location_name}
-        </a>
-      </li>
+      <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="location:#{location.id}">
+      <a href="#" style="color: white;">#{location.location_name}</a>
+      </div>
       """ end)
   end
 
@@ -195,12 +253,9 @@ defmodule Main.WebChat.Events do
       <br />
       Which of our #{Enum.count(locations)} locations are you interested in?
       <br />
-      <div class="wrapper-dropdown">
-        <span>Locations</span>
-        <ul class="dropdown">
-        #{Enum.join(locations)}
-        </ul>
-      </div>
+      #{Enum.join(locations)}
+
+
       """
   end
 
@@ -218,29 +273,63 @@ defmodule Main.WebChat.Events do
 
   defp select_plans do
     """
-    <div style="width: 90%; padding: 5px; margin: 5px; background-color: blue;border-radius: 5px;" phx-click="link-click" phx-value="join:basic">
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="join:basic">
       <a href="#" style="color: white;">Basic $12.95/month</a>
     </div>
-    <div style="width: 90%; padding: 5px; margin: 5px; background-color: blue;border-radius: 5px;" phx-click="link-click" phx-value="join:premium">
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="join:premium">
       <a href="#" style="color: white;">Premium $27.95/month</a>
     </div>
-    <div style="width: 90%; padding: 5px; margin: 5px; background-color: blue;border-radius: 5px;" phx-click="link-click" phx-value="join:level-10">
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="join:level-10">
       <a href="#" style="color: white;">Level 10 $39.95/month</a>
     </div>
-    <div style="width: 90%; padding: 5px; margin: 5px; background-color: blue;border-radius: 5px;" phx-click="link-click" phx-value="join:need-more-info">
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="join:need-more-info">
       <a href="#" style="color: white;">Need more info</a>
     </div>
 
     """
   end
 
+  defp day_of_week() do
+    """
+    Got it. What day works best?
+    <br>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:monday">
+      <a href="#" style="color: white;">Monday</a>
+    </div>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:tuesday">
+      <a href="#" style="color: white;">Tuesday</a>
+    </div>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:wednesday">
+      <a href="#" style="color: white;">Wednesday</a>
+    </div>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:thursday">
+      <a href="#" style="color: white;">Thursday</a>
+    </div>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:friday">
+      <a href="#" style="color: white;">Friday</a>
+    </div>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:saturday">
+      <a href="#" style="color: white;">Saturday</a>
+    </div>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:sunday">
+      <a href="#" style="color: white;">Sunday</a>
+    </div>
+    """
+  end
+
   defp time_of_day() do
     """
-    Got it. What day and time work best for you?
+    Got it. What time of day is best?
     <br>
-    <form action="#" phx-submit="tour:datetime">
-      <input type="datetime-local">
-    </form>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:morning">
+      <a href="#" style="color: white;">Morning</a>
+    </div>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:afternoon">
+      <a href="#" style="color: white;">Afternoon</a>
+    </div>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="tour:afternoon">
+      <a href="#" style="color: white;">Evening</a>
+    </div>
     """
   end
 

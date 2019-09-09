@@ -54,7 +54,7 @@ defmodule MainWeb.Router do
 
     resources "/users", UserController, only: [:edit, :update]
 
-    resources "/messages", MessageController, except: [:delete, :new, :create]
+    # resources "/messages", MessageController, except: [:delete, :new, :create]
   end
 
   scope "/api", MainWeb do

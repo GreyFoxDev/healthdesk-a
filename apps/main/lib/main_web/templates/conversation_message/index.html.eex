@@ -165,7 +165,11 @@
                                 <%= if previous_message && message.phone_number != previous_message.phone_number do %>
                                     <li class="conversation-outbound conversation-faux">
                                         <div class="conversation-message conversation-message-skip-avatar">
-                                            <div class="conversation-message-text"><%= text_to_html(message.message) |> raw %></div>
+                                            <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
+                                                <div class="conversation-message-text"><%= message.message |> raw %></div>
+                                            <% else %>
+                                                <div class="conversation-message-text"><%= text_to_html(message.message) |> raw %></div>
+                                            <% end %>
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>

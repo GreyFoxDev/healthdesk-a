@@ -1,5 +1,12 @@
+<style>
+ body {
+     background-color: #9B3426;
+     color: white;
+ }
+
+</style>
 <div style="margin: 5px;">
     <%=
-    live_render(@conn, MainWeb.Live.WebChat.Index, session: %{api_key: @api_key})
+    live_render(@conn, MainWeb.Live.WebChat.Index, session: %{api_key: @api_key, remote_id: @ip})
     %>
 </div>

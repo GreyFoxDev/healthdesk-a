@@ -3,10 +3,21 @@ defmodule MainWeb.Live.WebChat.Index do
 
   alias Data.Location
   alias Main.WebChat.Supervisor
+  alias MainWeb.Plug, as: P
+  alias MainWeb.Notify
 
-  def mount(%{api_key: api_key}, socket) do
+  @events %{
+    "join" => "Join today!",
+    "pricing" => "Get pricing info",
+    "tour" => "Schedule a tour",
+    "other" => "Something else"
+  }
+  @main_events Map.keys(@events)
+
+  def mount(%{api_key: api_key, remote_id: id}, socket) do
     with %{} = location <- authorized?(api_key) do
       socket = socket
+      |> assign(%{user: id})
       |> assign(%{location: location})
       |> assign(%{messages: default_messages()})
 
@@ -34,6 +45,19 @@ defmodule MainWeb.Live.WebChat.Index do
   end
 
   def handle_event("send", %{"message" => message}, socket) do
+    location = socket.assigns.location
+    conversation = %Plug.Conn{
+      assigns: %{
+        opt_in: true,
+        message: message,
+        member: socket.assigns.user,
+        location: location.phone_number
+      }
+    }
+    |> P.OpenConversation.call([])
+
+    current_event = GenServer.call(socket.assigns.event_manager, :current_event)
+
     messages = add_message(%{
           type: "message",
           user: "Anonymous",
@@ -41,13 +65,74 @@ defmodule MainWeb.Live.WebChat.Index do
           text: message},
       socket.assigns.messages)
 
+    socket = assign(socket, %{messages: messages})
+
+    messages = if current_event in [:tour_name, :tour_phone] do
+      socket.assigns.event_manager
+      |> GenServer.call(current_event)
+      |> close_conversation(conversation)
+      |> add_message(socket.assigns.messages)
+
+    else
+      conversation =
+        conversation
+        |> P.AskWit.call([])
+        |> P.BuildAnswer.call([])
+
+      message = %{
+        type: "message",
+        user: "Webbot",
+        direction: "outbound",
+        text: conversation.assigns.response
+      }
+
+      message
+      |> close_conversation(conversation)
+      |> add_message(socket.assigns.messages)
+    end
+
+    {:noreply, assign(socket, %{messages: messages})}
+  end
+
+  def handle_event("link-click", event, socket) when event in @main_events do
+    location = socket.assigns.location
+    conversation = %Plug.Conn{
+      assigns: %{
+        opt_in: true,
+        message: @events[event],
+        member: socket.assigns.user,
+        location: location.phone_number
+      }
+    }
+    |> P.OpenConversation.call([])
+
+    :ok = notify_admin_user(conversation.assigns)
+
+    messages =
+      socket.assigns.event_manager
+      |> GenServer.call(event)
+      |> close_conversation(conversation)
+      |> add_message(socket.assigns.messages)
+
     {:noreply, assign(socket, %{messages: messages})}
   end
 
   def handle_event("link-click", event, socket) do
+    location = socket.assigns.location
+    conversation = %Plug.Conn{
+      assigns: %{
+        opt_in: true,
+        message: parse_event(event),
+        member: socket.assigns.user,
+        location: location.phone_number
+      }
+    }
+    |> P.OpenConversation.call([])
+
     messages =
       socket.assigns.event_manager
       |> GenServer.call(event)
+      |> close_conversation(conversation)
       |> add_message(socket.assigns.messages)
 
     {:noreply, assign(socket, %{messages: messages})}
@@ -56,6 +141,33 @@ defmodule MainWeb.Live.WebChat.Index do
   def handle_event(event, params, socket) do
     IO.inspect {event, params}
     {:noreply, socket}
+  end
+
+  defp parse_event(<< "tour:", rest :: binary >>) do
+    String.replace(rest, "-", " ")
+  end
+
+  defp parse_event(<< "join:", rest :: binary >>) do
+    String.replace(rest, "-", " ")
+  end
+
+  defp parse_event(<< "location:", id :: binary >>) do
+    location = get_location(id)
+    location.location_name
+  end
+
+  defp close_conversation(message, conversation) do
+    assigns = Map.put(conversation.assigns, :response, message.text)
+
+    conversation
+    |> Map.put(:assigns, assigns)
+    |> P.CloseConversation.call([])
+
+    message
+  end
+
+  defp build_answer(conversation, event, socket) do
+    response = GenServer.call(socket.assigns.event_manager, event)
   end
 
   defp authorized?(key) do
@@ -82,5 +194,19 @@ defmodule MainWeb.Live.WebChat.Index do
     |> Enum.reverse()
     |> (fn(messages) -> [message|messages] end).()
     |> Enum.reverse()
+  end
+
+  defp get_location(id) do
+    Location.get(%{role: "admin"}, id)
+  end
+
+  defp notify_admin_user(%{message: message, member: member, convo: convo, location: location}) do
+    message = """
+    Message From: #{member}\n
+    #{message}
+    """
+
+    :ok = Notify.send_to_admin(convo, message, location)
+
   end
 end

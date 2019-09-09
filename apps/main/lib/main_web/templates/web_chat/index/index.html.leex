@@ -2,7 +2,7 @@
 <%=for message <- @messages do %>
   <%= if "link" == message.type do %>
     <%= for link <- message.links do %>
-      <div style="width: 90%; padding: 5px; margin: 5px; background-color: blue;border-radius: 5px;" phx-click="link-click" phx-value="<%= link.value %>">
+      <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="<%= link.value %>">
         <a href="#" style="color: white;"><%= link.text %></a>
       </div>
     <% end %>
