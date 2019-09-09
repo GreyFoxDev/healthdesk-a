@@ -23,7 +23,7 @@ defmodule Data.Query.ReadOnly.Team do
     sub = from(l in Location, where: is_nil(l.deleted_at))
     from(t in Team,
       where: t.id == ^team_id,
-      join: l in assoc(t, :locations),
+      left_join: l in assoc(t, :locations),
       left_join: m in assoc(t, :team_members),
       preload: [locations: ^sub, team_members: m],
       order_by: [t.team_name, l.location_name],
