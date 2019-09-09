@@ -19,7 +19,7 @@ defmodule MainWeb.Live.WebChat.Index do
       socket = socket
       |> assign(%{user: id})
       |> assign(%{location: location})
-      |> assign(%{messages: default_messages()})
+      |> assign(%{messages: default_messages(location)})
 
       {:ok, event_manager} = Supervisor.start_child(socket.assigns)
       {:ok, assign(socket, %{event_manager: event_manager})}
@@ -81,7 +81,7 @@ defmodule MainWeb.Live.WebChat.Index do
 
       message = %{
         type: "message",
-        user: "Webbot",
+        user: location.location_name,
         direction: "outbound",
         text: conversation.assigns.response
       }
@@ -174,10 +174,10 @@ defmodule MainWeb.Live.WebChat.Index do
     Location.get_by_api_key(key)
   end
 
-  defp default_messages do
+  defp default_messages(location) do
     [
       %{type: "message",
-        user: "Webbot",
+        user: (if location.web_handle, do: location.web_handle, else: "Webbot"),
         direction: "outbound",
         text: "How may I assist you today? You can choose from the links below or just type your question."},
       %{type: "link", links: [

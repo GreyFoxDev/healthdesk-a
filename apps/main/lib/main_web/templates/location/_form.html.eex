@@ -25,7 +25,61 @@
                         <label>City</label>
                         <%= text_input f, :city, class: "form-control" %>
                         <label>State</label>
-                        <%= text_input f, :state, class: "form-control" %>
+                        <%=
+                        select f,
+                        :state,
+                        ["AL",
+                        "AK",
+                        "AZ",
+                        "AR",
+                        "CA",
+                        "CO",
+                        "CT",
+                        "DE",
+                        "FL",
+                        "GA",
+                        "HI",
+                        "ID",
+                        "IL",
+                        "IN",
+                        "IA",
+                        "KS",
+                        "KY",
+                        "LA",
+                        "ME",
+                        "MD",
+                        "MA",
+                        "MI",
+                        "MN",
+                        "MS",
+                        "MO",
+                        "MT",
+                        "NE",
+                        "NV",
+                        "NH",
+                        "NJ",
+                        "NM",
+                        "NY",
+                        "NC",
+                        "ND",
+                        "OH",
+                        "OK",
+                        "OR",
+                        "PA",
+                        "RI",
+                        "SC",
+                        "SD",
+                        "TN",
+                        "TX",
+                        "UT",
+                        "VT",
+                        "VA",
+                        "WA",
+                        "WV",
+                        "WI",
+                        "WY"],
+                        class: "form-control"
+                        %>
                         <label>Postal Code</label>
                         <%= text_input f, :postal_code, class: "form-control" %>
                         <label>Timezone</label>
@@ -39,8 +93,32 @@
                     <div class="form-group">
                         <label>API KEY</label>
                         <%= text_input f, :api_key, class: "form-control", readonly: true %>
+                        <style>
+                         .checkboxes label {
+                             display: inline-block;
+                             padding-right: 10px;
+                             margin: 10px 0px 10px;
+                             white-space: nowrap;
+                         }
+                         .checkboxes input {
+                             vertical-align: middle;
+                         }
+                         .checkboxes label span {
+                             vertical-align: middle;
+                         }
+                        </style>
+                        <span>
+                            <div class="checkboxes">
+                                <label for="web_chat">
+                                    <span>Web Enabled?</span>
+                                    <%= checkbox f, :web_chat %>
+                                </label>
+                            </div>
+                        </span>
                         <label>Web Greeting</label>
                         <%= text_input f, :web_greeting, class: "form-control" %>
+                        <label>Web Handle</label>
+                        <%= text_input f, :web_handle, class: "form-control" %>
                     </div>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>

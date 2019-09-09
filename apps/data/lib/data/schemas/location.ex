@@ -12,6 +12,8 @@ defmodule Data.Schema.Location do
   @optional_fields ~w|
   api_key
   web_greeting
+  web_handle
+  web_chat
   timezone
   address_1
   address_2
@@ -34,6 +36,8 @@ defmodule Data.Schema.Location do
     field(:timezone, :string)
     field(:api_key, :string)
     field(:web_greeting, :string)
+    field(:web_handle, :string)
+    field(:web_chat, :boolean)
 
     field(:deleted_at, :utc_datetime)
 

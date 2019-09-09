@@ -34,7 +34,7 @@ defmodule Main.WebChat.Events do
 
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: response
     }
@@ -45,7 +45,7 @@ defmodule Main.WebChat.Events do
   def handle_call("join:yes", _from, state) do
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: """
       We've got you covered..
@@ -63,7 +63,7 @@ defmodule Main.WebChat.Events do
   def handle_call("join:not-sure", _from, state) do
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: """
       No worries...
@@ -85,7 +85,7 @@ defmodule Main.WebChat.Events do
   def handle_call("join:need-more-info", _from, state) do
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: """
       Please, type away!
@@ -99,7 +99,7 @@ defmodule Main.WebChat.Events do
   when plan in ["basic", "premium", "level-10"] do
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: """
       Great choice!
@@ -123,7 +123,7 @@ defmodule Main.WebChat.Events do
 
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: response
     }
@@ -142,7 +142,7 @@ defmodule Main.WebChat.Events do
 
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: """
       #{location.location_name}<br />
@@ -157,7 +157,7 @@ defmodule Main.WebChat.Events do
   def handle_call(<< "tour:", day :: binary >>, _from, state) when day in @days_of_week do
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: time_of_day()
     }
@@ -168,7 +168,7 @@ defmodule Main.WebChat.Events do
   def handle_call(<< "tour:", time_of_day :: binary >>, _from, %{current_event: :tour_time} = state) do
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: """
       Perfect. And can I please get your first and last name?
@@ -181,7 +181,7 @@ defmodule Main.WebChat.Events do
   def handle_call(:tour_name, _from, %{current_event: :tour_name} = state) do
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: """
       Thank you. Lastly, what is your 10-digit phone number?
@@ -194,7 +194,7 @@ defmodule Main.WebChat.Events do
   def handle_call(:tour_phone, _from, %{current_event: :tour_phone} = state) do
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: """
       All set! Someone from our team will text you shortly to confirm your appointment. Thank you!
@@ -216,7 +216,7 @@ defmodule Main.WebChat.Events do
 
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: response
     }
@@ -227,7 +227,7 @@ defmodule Main.WebChat.Events do
   def handle_call("other", _from, state) do
     message = %{
       type: "message",
-      user: "Webbot",
+      user: get_web_handle(location),
       direction: "outbound",
       text: "Please type away!"
     }
@@ -238,7 +238,7 @@ defmodule Main.WebChat.Events do
   defp location_stream(team_id) do
     %{role: "admin"}
     |> Location.get_by_team_id(team_id)
-    |> Stream.filter(&(&1.location_name != "Webbot"))
+    |> Stream.reject(&(&1.web_chat))
     |> Stream.map(fn(location) ->
       """
       <div style="width: 90%; padding: 5px; margin: 5px; background-color: #DB4437;border-radius: 5px;" phx-click="link-click" phx-value="location:#{location.id}">
@@ -332,5 +332,8 @@ defmodule Main.WebChat.Events do
     </div>
     """
   end
+
+  defp get_web_handle(%{web_handle: ""}), do: "Webbot"
+  defp get_web_handle(%{web_handle: handle}), do: handle
 
 end

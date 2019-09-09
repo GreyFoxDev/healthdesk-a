@@ -1,4 +1,9 @@
-<h2>Welcome to <%= @location.location_name %></h2>
+<%= if @location.web_greeting != "" do %>
+  <h2><%= @location.web_greeting %></h2>
+<% else %>
+  <h2>Welcome to <%= @location.location_name %></h2>
+<% end %>
+
 <%=for message <- @messages do %>
   <%= if "link" == message.type do %>
     <%= for link <- message.links do %>
