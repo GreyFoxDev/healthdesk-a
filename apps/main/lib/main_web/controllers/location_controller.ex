@@ -4,10 +4,13 @@ defmodule MainWeb.LocationController do
   alias Data.{Location, Commands.Team}
 
   def index(conn, %{"team_id" => team_id} = params) do
+    IO.inspect params
     {:ok, team} =
       conn
       |> current_user()
+      |> IO.inspect(label: "CURRENT USEr")
       |> Team.get_team_locations(team_id)
+      |> IO.inspect(label: "TEAM")
 
     render conn, "index.html",
       location: nil,
