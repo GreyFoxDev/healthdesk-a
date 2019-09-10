@@ -24,7 +24,7 @@
             <% else %>
                 <p class="list-group-item-text">
                     <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
-                        Assigned to: Website Bot
+                        Assigned to: Website
                     <% else %>
                         Assigned to: SMS Bot
                     <% end %>
@@ -174,7 +174,7 @@
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
                                                         <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
-                                                            Website Bot
+                                                            Website
                                                         <% else %>
                                                             SMS Bot
                                                         <% end %>
@@ -198,7 +198,7 @@
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
                                                         <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
-                                                            Website Bot
+                                                            Website
                                                         <% else %>
                                                             SMS Bot
                                                         <% end %>

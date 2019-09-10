@@ -45,7 +45,10 @@ defmodule MainWeb.Live.WebChat.Index do
   end
 
   def handle_event("send", %{"message" => message}, socket) do
-    location = socket.assigns.location
+    current_location =
+      GenServer.call(socket.assigns.event_manager, :current_location)
+
+    location = (current_location || socket.assigns.location)
     conversation = %Plug.Conn{
       assigns: %{
         opt_in: true,
@@ -81,7 +84,7 @@ defmodule MainWeb.Live.WebChat.Index do
 
       message = %{
         type: "message",
-        user: location.location_name,
+        user: socket.assigns.location.location_name,
         direction: "outbound",
         text: conversation.assigns.response
       }
