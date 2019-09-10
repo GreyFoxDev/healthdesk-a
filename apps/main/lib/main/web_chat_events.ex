@@ -218,7 +218,7 @@ defmodule Main.WebChat.Events do
       <br />
       <br />
       <input type="button" class="btn btn-secondary" phx-click="link-click" phx-value="join:not-sure" value="Not Sure">
-      <input type="button" class="btn btn-primary" phx-click="link-click" phx-value="join:yes" value="Yes!">
+      <input type="button" class="btn btn-primary" style="background-color: #9B3426;" phx-click="link-click" phx-value="join:yes" value="Yes!">
       """
   end
 

@@ -82,6 +82,19 @@ defmodule MainWeb.Live.WebChat.Index do
         |> P.AskWit.call([])
         |> P.BuildAnswer.call([])
 
+
+      response = case conversation.assigns.intent do
+                   {"getHours", _} ->
+                     "Members have 24/7 keycard access. #{String.replace(conversation.assigns.response, "our hours", "our staff hours")}"
+                   {"getMembershipPricing", _} ->
+                     "Our membership dues vary based on the number of members joining, location, and several other factors. We'd love to figure out the plan that works best for you and show you around the club. When's a good day and time for you to stop by?"
+                   _ ->
+                     conversation.assigns.response
+      end
+
+      assigns = Map.put(conversation.assigns, :response, response)
+      conversation = Map.put(conversation, :assigns, assigns)
+
       message = %{
         type: "message",
         user: socket.assigns.location.location_name,
