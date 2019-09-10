@@ -1,2 +1,4 @@
 cd $phoenix_dir
+mix deps.clean --all
+mix do deps.get, deps.compile
 mix "${phoenix_ex}.digest.clean"
