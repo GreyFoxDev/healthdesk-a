@@ -1,5 +1,7 @@
 echo "Running compile for static assets..."
 
+brunch build --production
+
 cd $phoenix_dir
 
 mix "${phoenix_ex}.digest"
