@@ -58,6 +58,10 @@ defmodule MainWeb.Intents do
   def get({:unknown, _}, _location),
     do: @default_response
 
+  def get({"getMembershipPricing", _}, location) do
+    "Our membership dues vary based on the number of members joining, location, and several other factors. We'd love to figure out the plan that works best for you and show you around the club. When's a good day and time for you to stop by?    "
+  end
+
   def get({intent, args}, location) do
     args = remove_intent(args)
 

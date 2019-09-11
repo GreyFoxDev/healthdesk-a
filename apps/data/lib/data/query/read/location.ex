@@ -29,7 +29,8 @@ defmodule Data.Query.ReadOnly.Location do
     from(t in Location,
       where: is_nil(t.deleted_at),
       where: t.phone_number == ^phone_number,
-      limit: 1
+      limit: 1,
+      preload: [:team]
     )
     |> Repo.one()
   end

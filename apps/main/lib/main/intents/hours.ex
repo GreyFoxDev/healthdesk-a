@@ -15,6 +15,8 @@ defmodule MainWeb.Intents.Hours do
   @closed "[date_prefix], we are closed."
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
   @default_response "I'm checking with a teammate for assistance. One moment please..."
+  @alt_response "Members have 24/7 keycard access. [date_prefix], our staff hours are [open] to [close]."
+
 
   @impl MainWeb.Intents
   def build_response([datetime: {datetime, _}], location),
@@ -25,18 +27,24 @@ defmodule MainWeb.Intents.Hours do
     location = Location.get_by_phone(location)
     <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
-    IO.inspect {year, month, day}, label: "DAY"
-    IO.inspect location.id, label: "LOCATION ID"
-
     with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}, location.id) |> IO.inspect(label: "GET DAY OF WEEK"),
          [hours] <- get_hours(location.id, {term, day_of_week}) |> IO.inspect(label: "GET HOURS") do
 
       prefix = date_prefix({term, day_of_week}, {year, month, day}, location.timezone)
 
-      @hours
-      |> String.replace("[date_prefix]", prefix)
-      |> String.replace("[open]", hours.open_at)
-      |> String.replace("[close]", hours.close_at)
+      IO.inspect location.team.team_name, label: "********************"
+
+      if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
+        @alt_response
+        |> String.replace("[date_prefix]", prefix)
+        |> String.replace("[open]", hours.open_at)
+        |> String.replace("[close]", hours.close_at)
+      else
+        @hours
+        |> String.replace("[date_prefix]", prefix)
+        |> String.replace("[open]", hours.open_at)
+        |> String.replace("[close]", hours.close_at)
+      end
     else
       [] ->
         {term, day_of_week} = get_day_of_week({year, month, day}, location.id)
@@ -48,7 +56,6 @@ defmodule MainWeb.Intents.Hours do
   end
 
   def build_response([], location) do
-    IO.inspect "ARGS ARE EMPTY"
     location = Location.get_by_phone(location)
 
     erl_date =
@@ -59,10 +66,18 @@ defmodule MainWeb.Intents.Hours do
     with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week(erl_date, location.id),
          [hours] <- get_hours(location.id, {term, day_of_week}) do
 
-      @hours
-      |> String.replace("[date_prefix]", "Today")
-      |> String.replace("[open]", hours.open_at)
-      |> String.replace("[close]", hours.close_at)
+      if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
+        @alt_response
+        |> String.replace("[date_prefix]", "Today")
+        |> String.replace("[open]", hours.open_at)
+        |> String.replace("[close]", hours.close_at)
+      else
+        @hours
+        |> String.replace("[date_prefix]", "Today")
+        |> String.replace("[open]", hours.open_at)
+        |> String.replace("[close]", hours.close_at)
+      end
+
     else
       [] ->
         {term, day_of_week} = get_day_of_week(erl_date, location.id)
