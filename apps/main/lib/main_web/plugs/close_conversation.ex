@@ -21,7 +21,10 @@ defmodule MainWeb.Plug.CloseConversation do
   then no need to do anything. Just return the connection.
   """
   def call(%{assigns: %{status: "pending"}} = conn, _opts), do: conn
-  def call(%{assigns: %{opt_in: false}} = conn, _opts), do: conn
+  def call(%{assigns: %{convo: id, location: location, opt_in: false}} = conn, _opts) do
+    CM.write_new_message(id, location, conn.assigns[:response])
+    conn
+  end
 
   @doc """
   If the intent isn't found then set the conversation status to pending while
