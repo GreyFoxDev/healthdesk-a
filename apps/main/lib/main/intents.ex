@@ -61,7 +61,7 @@ defmodule MainWeb.Intents do
   def get({"getMembershipPricing", _}, location) do
     """
     We offer 3 membership plans. Here's a link to our Join Online page:
-    <a href="https://10fitness.com/location-select/">https://10fitness.com/location-select/</a>
+    https://10fitness.com/location-select/
     """
   end
 
