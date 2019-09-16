@@ -31,46 +31,46 @@ defmodule Main.WebChat.Events do
       """
       Awesome!
       <br />
-      #{which_plans()}
+      #{which_plans(location)}
       """
     end
 
     {:reply, build_message(response, location, "outbound"), %{state | current_event: :join}}
   end
 
-  def handle_call("join:yes", _from, %{assigns: %{location: location}} = state) do
+  def handle_call("join:yes", _from, %{assigns: %{location: location}, current_location: current_location} = state) do
     response = """
     We've got you covered..
     <br />
-    Our Premium plan includes all of that plus 20% off all merchandise for just $27.95 per month. (cancel anytime)
+    Our Premium plan includes all of that plus 20% off all merchandise for just $27.95 per month. (plus joining and annual fees)
     <br />
     To join online now, please select your plan below.
     <br />
-    #{select_plans()}
+    #{select_plans(current_location)}
     """
 
     {:reply, build_message(response, location, "outbound"), state}
   end
 
-  def handle_call("join:not-sure", _from, %{assigns: %{location: location}} = state) do
+  def handle_call("join:not-sure", _from, %{assigns: %{location: location}, current_location: current_location} = state) do
     response = """
     No worries...
     <br />
-    Most of our members go with our Premium plan for just $27.95 per month. (cancel anytime)
+    Most of our members go with our Premium plan for just $27.95 per month. (plus join and annual fees)
     <br />
     It includes everything listed above plus 20% off all merchandise.
     <br />
 
     To join online now, please select a plan below.
     <br />
-    #{select_plans()}
+    #{select_plans(current_location)}
     """
 
     {:reply, build_message(response, location, "outbound"), state}
   end
 
   def handle_call("join:need-more-info", _from, %{assigns: %{location: location}} = state) do
-    {:reply, build_message("Please, type away!", location, "outbound"), state}
+    {:reply, build_message(text_box(), location, "outbound"), state}
   end
 
   def handle_call(<< "join:", plan :: binary >>, _from, %{assigns: %{location: location}} = state)
@@ -91,7 +91,7 @@ defmodule Main.WebChat.Events do
     response = if count > 1  do
       location_select(locations)
     else
-      which_plans()
+      which_plans(location)
     end
 
     {:reply, build_message(response, location, "outbound"), %{state | current_event: :pricing}}
@@ -104,9 +104,9 @@ defmodule Main.WebChat.Events do
              :tour ->
                day_of_week()
              :other ->
-               "Please type away!"
+               text_box()
              _ ->
-               which_plans()
+               which_plans(location_requested)
            end
 
     response = """
@@ -173,7 +173,7 @@ defmodule Main.WebChat.Events do
     response = if count > 1  do
       location_select(locations)
     else
-      "Please type away!"
+      text_box()
     end
 
     {:reply, build_message(response, location, "outbound"), %{state | current_event: :other}}
@@ -210,11 +210,21 @@ defmodule Main.WebChat.Events do
       """
   end
 
-  defp which_plans do
+  defp which_plans(location) do
+      question = case location.location_name do
+                   "Bryant" ->
+                     "Would you like to be able to bring friends, tan, use massage chairs, or go to any of our 13 locations?"
+                   "West Conway" ->
+                     "Would you like to be able to bring friends or go to any of our 13 locations?"
+                   "Springfield" ->
+                     "Would you like to be able to bring friends, tan, use massage chairs, or go to any of our 13 locations?"
+                   _ ->
+                     "Would you like to be able to bring friends, attend group classes, tan, use massage chairs?"
+      end
       """
       We have a few plans to choose from..
       <br />
-      Would you like to be able to bring friends, attend group classes, tan, use massage chairs?
+      #{question}
       <br />
       <br />
       <input type="button" class="btn btn-secondary" phx-click="link-click" phx-value="join:not-sure" value="Not Sure">
@@ -222,10 +232,16 @@ defmodule Main.WebChat.Events do
       """
   end
 
-  defp select_plans do
+  defp select_plans(location) do
+    basic_plan = if location.location_name == "Downtown" do
+      "$19.95"
+    else
+      "$12.95"
+    end
+
     """
     <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;" phx-click="link-click" phx-value="join:basic">
-      <a href="#" style="color: white;">Basic $12.95/month</a>
+      <a href="#" style="color: white;">Basic #{basic_plan}/month</a>
     </div>
     <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;" phx-click="link-click" phx-value="join:premium">
       <a href="#" style="color: white;">Premium $27.95/month</a>
@@ -280,6 +296,22 @@ defmodule Main.WebChat.Events do
     </div>
     <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;" phx-click="link-click" phx-value="tour:afternoon">
       <a href="#" style="color: white;">Evening (4PM - 7PM)</a>
+    </div>
+    """
+  end
+
+  defp text_box do
+    """
+    Please type away!
+    <br>
+    <div class="panel-footer">
+      <div class="input-group">
+        <form phx-submit="send">
+          <input name="message" type="text" class="form-control"
+          style="width: 100%"
+          placeholder="Type here..." />
+        </form>
+      </div>
     </div>
     """
   end

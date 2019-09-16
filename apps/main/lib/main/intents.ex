@@ -59,7 +59,10 @@ defmodule MainWeb.Intents do
     do: @default_response
 
   def get({"getMembershipPricing", _}, location) do
-    "Our membership dues vary based on the number of members joining, location, and several other factors. We'd love to figure out the plan that works best for you and show you around the club. When's a good day and time for you to stop by?    "
+    """
+    We offer 3 membership plans. Here's a link to our Join Online page:
+    <a href="https://10fitness.com/location-select/">https://10fitness.com/location-select/</a>
+    """
   end
 
   def get({intent, args}, location) do

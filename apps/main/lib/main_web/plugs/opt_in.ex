@@ -7,10 +7,14 @@ defmodule MainWeb.Plug.OptIn do
 
   import Plug.Conn
 
-  alias Data.Commands.Member, as: Member
+  alias Data.Commands.{Member, Location}
 
   @opt_in_message """
   Hello! We've received your message, however, since this is your first time texting us, you must opt-in before we can respond. You'll only have to do this once. Reply 'yes' to receive automated SMS/MMS messages. No purchase required. Message and data rates may apply. Terms: https://healthdesk.ai/terms
+  """
+
+  @opt_in_message_10 """
+  Hello! Please opt-in to receive a response to your inquiry. You'll only need to do this once. Reply 'yes' to receive automated SMS/MMS messages. No purchase required. Msg&data rates may apply. Terms: https://healthdesk.ai/terms
   """
 
   @opt_out_message """
@@ -32,7 +36,6 @@ defmodule MainWeb.Plug.OptIn do
     else
       {:ok, _} ->
         message = String.downcase(message) |> String.trim()
-        IO.inspect message, label: "MESSAGE"
         cond do
         message in ["yes", "start"] ->
           {:ok, _optin} = Member.enable_opt_in(member, location)
@@ -47,9 +50,17 @@ defmodule MainWeb.Plug.OptIn do
           |> assign(:opt_in, false)
           |> assign(:response, @opt_out_message)
         true ->
-          conn
-          |> assign(:opt_in, false)
-          |> assign(:response, @opt_in_message)
+          location = Location.get_by_phone(location)
+          if location.team.team_name == "10 Fitness" do
+            conn
+            |> assign(:opt_in, false)
+            |> assign(:response, @opt_in_message_10)
+          else
+            conn
+            |> assign(:opt_in, false)
+            |> assign(:response, @opt_in_message)
+          end
+
       end
     end
   end
