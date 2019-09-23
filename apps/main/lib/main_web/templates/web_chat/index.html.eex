@@ -5,14 +5,16 @@
  }
 
 </style>
-<script>
-   setInterval(function(){ window.scrollBy(0,1000); }, 500);
-</script>
 
-<div style="margin: 5px;">
+<div id="healthdesk-ai-chat-window" style="margin: 5px;">
     <%=
     live_render(@conn, MainWeb.Live.WebChat.Index, session: %{api_key: @api_key, remote_id: @ip})
     %>
 </div>
+<script>
+ $("body").on("DOMSubtreeModified", "#healthdesk-ai-chat-window", function() {
+     window.scrollBy(0,1000);
+ });
+</script>
 <br />
 <br />

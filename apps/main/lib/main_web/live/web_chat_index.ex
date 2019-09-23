@@ -63,7 +63,7 @@ defmodule MainWeb.Live.WebChat.Index do
 
     messages = add_message(%{
           type: "message",
-          user: "Anonymous",
+          user: "You",
           direction: "inbound",
           text: message},
       socket.assigns.messages)
@@ -129,6 +129,7 @@ defmodule MainWeb.Live.WebChat.Index do
 
     :ok = notify_admin_user(conversation.assigns)
 
+
     messages =
       socket.assigns.event_manager
       |> GenServer.call(event)
@@ -160,7 +161,6 @@ defmodule MainWeb.Live.WebChat.Index do
   end
 
   def handle_event(event, params, socket) do
-    IO.inspect {event, params}
     {:noreply, socket}
   end
 
@@ -212,10 +212,20 @@ defmodule MainWeb.Live.WebChat.Index do
 
   defp add_message(message, messages) do
     messages
+    |> Enum.map(&disable_textboxes/1)
     |> Enum.reverse()
     |> (fn(messages) -> [message|messages] end).()
     |> Enum.reverse()
   end
+
+  defp disable_textboxes(%{text: text} = message) do
+    if String.contains?(text, "class=\"input-group\"") do
+      Map.put(message, :text, String.replace(text, "class=\"input-group\"", "hidden" ))
+    else
+      message
+    end
+  end
+  defp disable_textboxes(message), do: message
 
   defp get_location(id) do
     Location.get(%{role: "admin"}, id)
