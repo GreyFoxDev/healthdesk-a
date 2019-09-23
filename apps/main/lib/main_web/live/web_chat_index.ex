@@ -200,7 +200,7 @@ defmodule MainWeb.Live.WebChat.Index do
       %{type: "message",
         user: (if location.web_handle, do: location.web_handle, else: "Webbot"),
         direction: "outbound",
-        text: "How may I assist you today? You can choose from the links below or just type your question."},
+        text: "How may I assist you today? Please choose an option below:"},
       %{type: "link", links: [
            %{value: "join", text: "Join today!"},
            %{value: "pricing", text: "Get pricing info"},

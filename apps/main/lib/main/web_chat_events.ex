@@ -78,7 +78,19 @@ defmodule Main.WebChat.Events do
     response = """
     Great choice!
     <br />
-    All set! Someone from our team will text you shortly to get you set up. Thank you!
+    Go ahead and select your plan to continue and message us here if you have any questions.
+    <br />
+    <a href="https://10fitness.com/location-select/" target="_top">Select Plan</a>
+    <br>
+    <div class="panel-footer">
+      <div class="input-group">
+        <form phx-submit="send">
+          <input name="message" type="text" class="form-control"
+          style="width: 100%"
+          placeholder="Type here..." />
+        </form>
+      </div>
+    </div>
     """
 
     {:reply, build_message(response, location, "outbound"), state}
