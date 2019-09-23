@@ -125,6 +125,17 @@ defmodule Main.WebChat.Events do
   def handle_call(<< "tour:", time_of_day :: binary >>, _from, %{current_event: :tour_time, assigns: %{location: location}} = state) do
     response = """
     Perfect. And can I please get your first and last name?
+    <br>
+    <div class="panel-footer">
+      <div class="input-group">
+        <form phx-submit="send">
+          <input name="message" type="text" class="form-control"
+          style="width: 100%"
+          placeholder="Type here..." />
+        </form>
+      </div>
+    </div>
+
     """
 
     {:reply, build_message(response, location, "outbound"), %{state | current_event: :tour_name}}
@@ -133,6 +144,16 @@ defmodule Main.WebChat.Events do
   def handle_call(:tour_name, _from, %{current_event: :tour_name, assigns: %{location: location}} = state) do
     response = """
     Thank you. Lastly, what is your 10-digit phone number?
+    <br>
+    <div class="panel-footer">
+      <div class="input-group">
+        <form phx-submit="send">
+          <input name="message" type="text" class="form-control"
+          style="width: 100%"
+          placeholder="Type here..." />
+        </form>
+      </div>
+    </div>
     """
 
     {:reply, build_message(response, location, "outbound"), %{state | current_event: :tour_phone}}
@@ -219,7 +240,7 @@ defmodule Main.WebChat.Events do
                    "Springfield" ->
                      "Would you like to be able to bring friends, tan, use massage chairs, or go to any of our 13 locations?"
                    _ ->
-                     "Would you like to be able to bring friends, attend group classes, tan, use massage chairs?"
+                     "Would you like to be able to bring friends, attend group classes, tan, or use massage chairs?"
       end
       """
       We have a few plans to choose from..

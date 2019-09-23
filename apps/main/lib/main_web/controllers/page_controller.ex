@@ -6,4 +6,10 @@ defmodule MainWeb.PageController do
     |> put_layout(:default)
     |> render("index.html")
   end
+
+  def secret(conn, _params) do
+    conn
+    |> put_layout(:default)
+    |> render("secret.html")
+  end
 end

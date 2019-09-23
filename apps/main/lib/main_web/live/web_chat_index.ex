@@ -85,11 +85,26 @@ defmodule MainWeb.Live.WebChat.Index do
       assigns = Map.put(conversation.assigns, :response, conversation.assigns.response)
       conversation = Map.put(conversation, :assigns, assigns)
 
+      response = """
+      #{conversation.assigns.response}
+      <br />
+      <div class="panel-footer">
+        <div class="input-group">
+          <form phx-submit="send">
+            <input name="message" type="text" class="form-control"
+            style="width: 100%"
+            placeholder="Type here..." />
+          </form>
+        </div>
+      </div>
+      """
+
+
       message = %{
         type: "message",
-        user: socket.assigns.location.location_name,
+        user: location.location_name,
         direction: "outbound",
-        text: conversation.assigns.response
+        text: response
       }
 
       message

@@ -23,6 +23,7 @@ defmodule MainWeb.Router do
     get "/login", SessionController, :new
     post "/login", SessionController, :create
 
+    get "/webchat/secret", PageController, :secret
     get "/webchat/:api_key", WebChatController, :index
   end
 

@@ -2,6 +2,7 @@ defmodule MainWeb.WebChatController do
   use MainWeb, :controller
 
   plug :put_layout, {MainWeb.LayoutView, :web_chat}
+  plug MainWeb.Plug.AllowFrom
 
   def index(conn, %{"api_key" => api_key} = params) do
     ip =
