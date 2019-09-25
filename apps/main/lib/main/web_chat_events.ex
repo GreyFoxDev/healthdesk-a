@@ -73,14 +73,17 @@ defmodule Main.WebChat.Events do
     {:reply, build_message(text_box(), location, "outbound"), state}
   end
 
-  def handle_call(<< "join:", plan :: binary >>, _from, %{assigns: %{location: location}} = state)
+  def handle_call(<< "join:", plan :: binary >>, _from, %{assigns: %{location: location}, current_location: current_location} = state)
   when plan in ["basic", "premium", "level-10"] do
+
+    link = "https://10fitness.com/#{Inflex.parameterize(current_location.location_name, "-")}-membership-plans/"
+
     response = """
     Great choice!
     <br />
     Go ahead and select your plan to continue and message us here if you have any questions.
     <br />
-    <a href="https://10fitness.com/location-select/" target="_top">Select Plan</a>
+    <a href="#{link}" target="_top">Select Plan</a>
     <br>
     <div class="panel-footer">
       <div class="input-group">
@@ -338,7 +341,7 @@ defmodule Main.WebChat.Events do
     Please type away!
     <br>
     <div class="panel-footer">
-      <div class="input-group">
+      <div class="healthdesk-ai-group">
         <form phx-submit="send">
           <input name="message" type="text" class="form-control"
           style="width: 100%"

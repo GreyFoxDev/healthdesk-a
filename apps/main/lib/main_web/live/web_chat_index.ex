@@ -89,7 +89,7 @@ defmodule MainWeb.Live.WebChat.Index do
       #{conversation.assigns.response}
       <br />
       <div class="panel-footer">
-        <div class="input-group">
+        <div class="healthdesk-ai-group">
           <form phx-submit="send">
             <input name="message" type="text" class="form-control"
             style="width: 100%"
@@ -219,8 +219,8 @@ defmodule MainWeb.Live.WebChat.Index do
   end
 
   defp disable_textboxes(%{text: text} = message) do
-    if String.contains?(text, "class=\"input-group\"") do
-      Map.put(message, :text, String.replace(text, "class=\"input-group\"", "hidden" ))
+    if String.contains?(text, "class=\"healthdesk-ai-group\"") do
+      Map.put(message, :text, String.replace(text, "class=\"healthdesk-ai-group\"", "hidden" ))
     else
       message
     end
@@ -238,6 +238,5 @@ defmodule MainWeb.Live.WebChat.Index do
     """
 
     :ok = Notify.send_to_admin(convo, message, location)
-
   end
 end
