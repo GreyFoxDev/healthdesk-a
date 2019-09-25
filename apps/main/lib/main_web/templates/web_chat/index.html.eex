@@ -3,6 +3,12 @@
      background-color: white;
      color: black;
  }
+ textarea {
+     resize: none;
+     overflow: hidden;
+     min-height: 50px;
+     max-height: 100px;
+ }
 
 </style>
 
@@ -15,6 +21,11 @@
  $("body").on("DOMSubtreeModified", "#healthdesk-ai-chat-window", function() {
      window.scrollBy(0,1000);
  });
+
+ function auto_grow(element) {
+     element.style.height = "5px";
+     element.style.height = (element.scrollHeight)+"px";
+ }
 </script>
 <br />
 <br />

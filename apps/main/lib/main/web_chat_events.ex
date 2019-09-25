@@ -97,9 +97,7 @@ defmodule Main.WebChat.Events do
     <div class="panel-footer">
       <div class="input-group">
         <form phx-submit="send">
-          <input name="message" type="text" class="form-control"
-          style="width: 100%"
-          placeholder="Type here..." />
+        <textarea oninput="auto_grow(this)" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
         </form>
       </div>
     </div>
@@ -153,9 +151,7 @@ defmodule Main.WebChat.Events do
     <div class="panel-footer">
       <div class="input-group">
         <form phx-submit="send">
-          <input name="message" type="text" class="form-control"
-          style="width: 100%"
-          placeholder="Type here..." />
+          <textarea oninput="auto_grow(this)" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
         </form>
       </div>
     </div>
@@ -172,9 +168,7 @@ defmodule Main.WebChat.Events do
     <div class="panel-footer">
       <div class="input-group">
         <form phx-submit="send">
-          <input name="message" type="text" class="form-control"
-          style="width: 100%"
-          placeholder="Type here..." />
+          <textarea oninput="auto_grow(this)" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
         </form>
       </div>
     </div>
@@ -352,9 +346,7 @@ defmodule Main.WebChat.Events do
     <div class="panel-footer">
       <div class="healthdesk-ai-group">
         <form phx-submit="send">
-          <input name="message" type="text" class="form-control"
-          style="width: 100%"
-          placeholder="Type here..." />
+          <textarea oninput="auto_grow(this)" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
         </form>
       </div>
     </div>
