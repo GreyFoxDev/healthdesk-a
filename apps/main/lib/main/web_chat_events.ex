@@ -76,7 +76,16 @@ defmodule Main.WebChat.Events do
   def handle_call(<< "join:", plan :: binary >>, _from, %{assigns: %{location: location}, current_location: current_location} = state)
   when plan in ["basic", "premium", "level-10"] do
 
-    link = "https://10fitness.com/#{Inflex.parameterize(current_location.location_name, "-")}-membership-plans/"
+    location_name = case current_location.location_name do
+                      "Downtown" ->
+                        "downtown little rock"
+                      "North Little Rock" ->
+                        "nlr"
+                      name ->
+                        name
+                    end
+
+    link = "https://10fitness.com/#{Inflex.parameterize(location_name, "-")}-membership-plans/"
 
     response = """
     Great choice!
