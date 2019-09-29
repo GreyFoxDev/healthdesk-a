@@ -35,6 +35,11 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
 
+  def call(%{assigns: %{convo: id, intent: :unknown_intent}} = conn, _opts) do
+    C.pending(id)
+    conn
+  end
+
   @doc """
   If the question has been answered then close the conversation
   """

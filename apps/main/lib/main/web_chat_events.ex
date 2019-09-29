@@ -96,9 +96,7 @@ defmodule Main.WebChat.Events do
     <br>
     <div class="panel-footer">
       <div class="input-group">
-        <form phx-submit="send">
-        <textarea oninput="auto_grow(this)" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
-        </form>
+        <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
       </div>
     </div>
     """
@@ -150,9 +148,7 @@ defmodule Main.WebChat.Events do
     <br>
     <div class="panel-footer">
       <div class="input-group">
-        <form phx-submit="send">
-          <textarea oninput="auto_grow(this)" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
-        </form>
+        <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
       </div>
     </div>
 
@@ -167,9 +163,7 @@ defmodule Main.WebChat.Events do
     <br>
     <div class="panel-footer">
       <div class="input-group">
-        <form phx-submit="send">
-          <textarea oninput="auto_grow(this)" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
-        </form>
+        <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
       </div>
     </div>
     """
@@ -345,9 +339,7 @@ defmodule Main.WebChat.Events do
     <br>
     <div class="panel-footer">
       <div class="healthdesk-ai-group">
-        <form phx-submit="send">
-          <textarea oninput="auto_grow(this)" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
-        </form>
+        <textarea oninput="auto_grow(this)" phx-keydown="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
       </div>
     </div>
     """

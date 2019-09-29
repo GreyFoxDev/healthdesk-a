@@ -44,7 +44,11 @@ defmodule MainWeb.Live.WebChat.Index do
     MainWeb.WebChat.IndexView.render("index.html", assigns)
   end
 
-  def handle_event("send", %{"message" => message}, socket) do
+  def handle_info({:response, {:unknown, []}}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("send", %{"keyCode" => 13, "value" => message}, socket) do
     current_location =
       GenServer.call(socket.assigns.event_manager, :current_location)
 
@@ -70,33 +74,15 @@ defmodule MainWeb.Live.WebChat.Index do
 
     socket = assign(socket, %{messages: messages})
 
-    messages = if current_event in [:tour_name, :tour_phone] do
-      socket.assigns.event_manager
-      |> GenServer.call(current_event)
-      |> close_conversation(conversation)
-      |> add_message(socket.assigns.messages)
-
-    else
-      conversation =
-        conversation
-        |> P.AskWit.call([])
-        |> P.BuildAnswer.call([])
-
-      assigns = Map.put(conversation.assigns, :response, conversation.assigns.response)
-      conversation = Map.put(conversation, :assigns, assigns)
-
+    if conversation.assigns.status == "pending" do
       response = """
-      #{conversation.assigns.response}
       <br />
       <div class="panel-footer">
         <div class="healthdesk-ai-group">
-          <form phx-submit="send">
-            <textarea oninput="auto_grow(this)" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
-          </form>
+          <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
         </div>
       </div>
       """
-
 
       message = %{
         type: "message",
@@ -105,12 +91,50 @@ defmodule MainWeb.Live.WebChat.Index do
         text: response
       }
 
-      message
-      |> close_conversation(conversation)
-      |> add_message(socket.assigns.messages)
+      messages = add_message(message, socket.assigns.messages)
+
+      {:noreply, assign(socket, %{messages: messages})}
+    else
+      messages = if current_event in [:tour_name, :tour_phone] do
+        socket.assigns.event_manager
+        |> GenServer.call(current_event)
+        |> close_conversation(conversation)
+        |> add_message(socket.assigns.messages)
+
+      else
+        conversation =
+          conversation
+          |> P.AskWit.call([])
+          |> P.BuildAnswer.call([])
+
+        assigns = Map.put(conversation.assigns, :response, conversation.assigns.response)
+        conversation = Map.put(conversation, :assigns, assigns)
+
+        response = """
+        #{conversation.assigns.response}
+        <br />
+        <div class="panel-footer">
+        <div class="healthdesk-ai-group">
+        <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
+        </div>
+        </div>
+        """
+
+        message = %{
+          type: "message",
+          user: location.location_name,
+          direction: "outbound",
+          text: response
+        }
+
+        message
+        |> close_conversation(conversation)
+        |> add_message(socket.assigns.messages)
+      end
+
+      {:noreply, assign(socket, %{messages: messages})}
     end
 
-    {:noreply, assign(socket, %{messages: messages})}
   end
 
   def handle_event("link-click", event, socket) when event in @main_events do
@@ -126,7 +150,6 @@ defmodule MainWeb.Live.WebChat.Index do
     |> P.OpenConversation.call([])
 
     :ok = notify_admin_user(conversation.assigns)
-
 
     messages =
       socket.assigns.event_manager
