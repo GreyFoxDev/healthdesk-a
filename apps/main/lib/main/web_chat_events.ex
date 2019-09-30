@@ -78,9 +78,9 @@ defmodule Main.WebChat.Events do
              "Bryant" -> "0011"
              "Cabot" -> "1013"
              "Conway" -> "1014"
-             "Conway - West" -> "7310"
+             "West Conway" -> "7310"
              "Jonesboro" -> "1015"
-             "Downtown Little Rock" -> "1036"
+             "Downtown" -> "1036"
              "Rodney Parham" -> "0010"
              "University" -> "7010"
              "Maumelle" -> "0112"
@@ -91,7 +91,9 @@ defmodule Main.WebChat.Events do
            end
 
     """
-    <a href="http://10fitness.com/buy?club=#{club}&plan=#{plan}" target="_top">Sign up now!</a>
+    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;">
+      <a href="http://10fitness.com/buy?club=#{club}&plan=#{plan}" style="color: white;" target="_top">Proceed to checkout</a>
+    </div>
     """
   end
 
@@ -142,6 +144,7 @@ defmodule Main.WebChat.Events do
     <br />
     #{link}
     <br />
+    Let us know if you have any questions!
     <div class="panel-footer">
       <div class="input-group">
         <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
