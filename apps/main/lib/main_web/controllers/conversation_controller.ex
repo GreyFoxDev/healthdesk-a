@@ -140,7 +140,13 @@ defmodule MainWeb.ConversationController do
   end
 
   defp find_or_start_conversation(%{member: member, location_number: location} = params) do
-    member = "+1#{String.replace(member, "-", "")}"
+    member = String.replace(member, "-", "")
+
+    member = if length(member) == 10 do
+      "+1#{member}"
+    else
+      member
+    end
     case Conversations.find_or_start_conversation({member, location}) do
       {:error, changeset} ->
         {:error, changeset, params}

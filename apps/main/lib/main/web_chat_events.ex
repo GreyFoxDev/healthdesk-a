@@ -73,27 +73,75 @@ defmodule Main.WebChat.Events do
     {:reply, build_message(text_box(), location, "outbound"), state}
   end
 
+  def build_link_10_fitness(club, plan) do
+    club = case club do
+             "Bryant" -> "0011"
+             "Cabot" -> "1013"
+             "Conway" -> "1014"
+             "Conway - West" -> "7310"
+             "Jonesboro" -> "1015"
+             "Downtown Little Rock" -> "1036"
+             "Rodney Parham" -> "0010"
+             "University" -> "7010"
+             "Maumelle" -> "0112"
+             "North Little Rock" -> "1010"
+             "Paragould" -> "1086"
+             "Searcy" -> "1048"
+             "Springfield" -> "0111"
+           end
+
+    """
+    <a href="http://10fitness.com/buy?club=#{club}&plan=#{plan}" target="_top">Sign up now!</a>
+    """
+  end
+
+  def build_signup_message(club, plan) when club in ["Bryant", "Paragould"] do
+    case plan do
+      "basic" ->
+    """
+    The Basic plan joining fee is $1 and the annual fee is $39.95. Click below to proceed to checkout.
+    """
+      "premium" ->
+    """
+    The Premium plan joining fee is $1 and the annual fee is $39.95. Click below to proceed to checkout.
+    """
+      "level-10" ->
+    """
+    The Level 10 plan joining fee is $1 and the annual fee is $39.95. Click below to proceed to checkout.
+    """
+    end
+  end
+
+  def build_signup_message(club, plan) do
+    case plan do
+      "basic" ->
+        """
+        The Basic plan joining fee is $59.95 and the annual fee is $39.95. Click below to proceed to checkout.
+        """
+      "premium" ->
+        """
+        The Premium plan joining fee is $19.95 and the annual fee is $39.95. Click below to proceed to checkout.
+        """
+      "level-10" ->
+        """
+        The Level 10 plan joining fee is FREE and the annual fee is $39.95. Click below to proceed to checkout.
+        """
+    end
+  end
+
   def handle_call(<< "join:", plan :: binary >>, _from, %{assigns: %{location: location}, current_location: current_location} = state)
   when plan in ["basic", "premium", "level-10"] do
 
-    location_name = case current_location.location_name do
-                      "Downtown" ->
-                        "downtown little rock"
-                      "North Little Rock" ->
-                        "nlr"
-                      name ->
-                        name
-                    end
-
-    link = "https://10fitness.com/#{Inflex.parameterize(location_name, "-")}-membership-plans/"
+    message = build_signup_message(current_location.location_name, plan)
+    link = build_link_10_fitness(current_location.location_name, String.replace(plan, "-", ""))
 
     response = """
     Great choice!
     <br />
-    Go ahead and select your plan to continue and message us here if you have any questions.
+    #{message}
     <br />
-    <a href="#{link}" target="_top">Select Plan</a>
-    <br>
+    #{link}
+    <br />
     <div class="panel-footer">
       <div class="input-group">
         <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>

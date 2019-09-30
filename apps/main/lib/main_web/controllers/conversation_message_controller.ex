@@ -72,6 +72,8 @@ defmodule MainWeb.ConversationMessageController do
   defp send_message(conversation, conn, params, location) do
     user = current_user(conn)
 
+    [web_location] = Location.get_by_team_id(user, location.team_id) |> Enum.filter(&(&1.web_chat)) |> IO.inspect()
+
     params["conversation_message"]
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
@@ -79,7 +81,15 @@ defmodule MainWeb.ConversationMessageController do
          {:ok, _message} ->
            message = %{"message" => params["conversation_message"]["message"]}
            Logger.info "Message created ************* WEB CHAT #{inspect message}"
-           Endpoint.broadcast("web_bot:#{conversation.original_number}", "reply", message)
+           process_name = :"#{conversation.original_number}:#{web_location.id}" |> IO.inspect
+
+           case Registry.lookup(Registry.WebChat, process_name) do
+             [{pid, _}] ->
+               send(pid, {:admin_response, params["conversation_message"]["message"]})
+             _ ->
+               put_flash(conn, :error, "Sending message failed to #{process_name}")
+           end
+           # Endpoint.broadcast("web_bot:#{conversation.original_number}", "reply", message)
            put_flash(conn, :success, "Sending message was successful")
          {:error, changeset} ->
            put_flash(conn, :error, "Sending message failed")

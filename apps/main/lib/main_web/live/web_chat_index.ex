@@ -21,6 +21,9 @@ defmodule MainWeb.Live.WebChat.Index do
       |> assign(%{location: location})
       |> assign(%{messages: default_messages(location)})
 
+      process_name = :"#{id}:#{location.id}" |> IO.inspect()
+      Registry.register(Registry.WebChat, process_name, self())
+
       {:ok, event_manager} = Supervisor.start_child(socket.assigns)
       {:ok, assign(socket, %{event_manager: event_manager})}
     else
@@ -46,6 +49,32 @@ defmodule MainWeb.Live.WebChat.Index do
 
   def handle_info({:response, {:unknown, []}}, socket) do
     {:noreply, socket}
+  end
+
+  def handle_info({:admin_response, message}, socket) do
+    current_location =
+      GenServer.call(socket.assigns.event_manager, :current_location)
+
+    location = (current_location || socket.assigns.location)
+
+    response = """
+    #{message}
+    <br />
+    <div class="panel-footer">
+      <div class="healthdesk-ai-group">
+        <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
+      </div>
+    </div>
+    """
+
+    messages = add_message(%{
+          type: "message",
+          user: location.location_name,
+          direction: "outbound",
+          text: response},
+      socket.assigns.messages)
+
+    {:noreply, assign(socket, %{messages: messages})}
   end
 
   def handle_event("send", %{"keyCode" => 13, "value" => message}, socket) do
@@ -209,7 +238,7 @@ defmodule MainWeb.Live.WebChat.Index do
   end
 
   defp build_answer(conversation, event, socket) do
-    response = GenServer.call(socket.assigns.event_manager, event)
+    GenServer.call(socket.assigns.event_manager, event)
   end
 
   defp authorized?(key) do
