@@ -3,7 +3,7 @@ defmodule Main.WebChat.Events do
 
   alias Data.Location
 
-  @days_of_week ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+  @days_of_week ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
 
   def start_link(assigns) do
     GenServer.start_link(__MODULE__, assigns)
@@ -361,9 +361,6 @@ defmodule Main.WebChat.Events do
     </div>
     <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;" phx-click="link-click" phx-value="tour:saturday">
       <a href="#" style="color: white;">Saturday</a>
-    </div>
-    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;" phx-click="link-click" phx-value="tour:sunday">
-      <a href="#" style="color: white;">Sunday</a>
     </div>
     """
   end
