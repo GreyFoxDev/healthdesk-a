@@ -32,7 +32,8 @@ defmodule Data.Commands.Conversations do
   """
   @spec find_or_start_conversation({member :: binary, location :: binary}) :: Conversation.t() | nil
   def find_or_start_conversation({member, location}) do
-    with %Data.Schema.Location{} = location <- IO.inspect(Location.get_by_phone(location)),
+
+    with %Data.Schema.Location{} = location <- Location.get_by_phone(location),
           {:ok, nil} <- get_by_phone(member, location.id) do
       convo =
       {member, location.id}

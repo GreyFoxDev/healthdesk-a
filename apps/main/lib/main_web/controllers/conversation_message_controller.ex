@@ -72,7 +72,7 @@ defmodule MainWeb.ConversationMessageController do
   defp send_message(conversation, conn, params, location) do
     user = current_user(conn)
 
-    [web_location] = Location.get_by_team_id(user, location.team_id) |> Enum.filter(&(&1.web_chat)) |> IO.inspect()
+    [web_location] = Location.get_by_team_id(user, location.team_id) |> Enum.filter(&(&1.web_chat))
 
     params["conversation_message"]
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
@@ -81,7 +81,7 @@ defmodule MainWeb.ConversationMessageController do
          {:ok, _message} ->
            message = %{"message" => params["conversation_message"]["message"]}
            Logger.info "Message created ************* WEB CHAT #{inspect message}"
-           process_name = :"#{conversation.original_number}:#{web_location.id}" |> IO.inspect
+           process_name = :"#{conversation.original_number}:#{web_location.id}"
 
            case Registry.lookup(Registry.WebChat, process_name) do
              [{pid, _}] ->

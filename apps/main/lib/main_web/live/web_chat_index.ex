@@ -21,7 +21,7 @@ defmodule MainWeb.Live.WebChat.Index do
       |> assign(%{location: location})
       |> assign(%{messages: default_messages(location)})
 
-      process_name = :"#{id}:#{location.id}" |> IO.inspect()
+      process_name = :"#{id}:#{location.id}"
       Registry.register(Registry.WebChat, process_name, self())
 
       {:ok, event_manager} = Supervisor.start_child(socket.assigns)
@@ -104,25 +104,7 @@ defmodule MainWeb.Live.WebChat.Index do
     socket = assign(socket, %{messages: messages})
 
     if conversation.assigns.status == "pending" do
-      response = """
-      <br />
-      <div class="panel-footer">
-        <div class="healthdesk-ai-group">
-          <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
-        </div>
-      </div>
-      """
-
-      message = %{
-        type: "message",
-        user: location.location_name,
-        direction: "outbound",
-        text: response
-      }
-
-      messages = add_message(message, socket.assigns.messages)
-
-      {:noreply, assign(socket, %{messages: messages})}
+      {:noreply, socket}
     else
       messages = if current_event in [:tour_name, :tour_phone] do
         socket.assigns.event_manager

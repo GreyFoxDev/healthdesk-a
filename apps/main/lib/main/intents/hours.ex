@@ -27,12 +27,10 @@ defmodule MainWeb.Intents.Hours do
     location = Location.get_by_phone(location)
     <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
-    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}, location.id) |> IO.inspect(label: "GET DAY OF WEEK"),
-         [hours] <- get_hours(location.id, {term, day_of_week}) |> IO.inspect(label: "GET HOURS") do
+    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}, location.id),
+         [hours] <- get_hours(location.id, {term, day_of_week}) do
 
       prefix = date_prefix({term, day_of_week}, {year, month, day}, location.timezone)
-
-      IO.inspect location.team.team_name, label: "********************"
 
       if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
         @alt_response

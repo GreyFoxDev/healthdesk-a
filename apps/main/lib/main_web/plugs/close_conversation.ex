@@ -20,7 +20,11 @@ defmodule MainWeb.Plug.CloseConversation do
   If the conversation is in a pending state, or the member has not opted in,
   then no need to do anything. Just return the connection.
   """
-  def call(%{assigns: %{status: "pending"}} = conn, _opts), do: conn
+  def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
+    CM.write_new_message(id, location, conn.assigns[:response])
+    C.pending(id)
+    conn
+  end
   def call(%{assigns: %{convo: id, location: location, opt_in: false}} = conn, _opts) do
     CM.write_new_message(id, location, conn.assigns[:response])
     conn

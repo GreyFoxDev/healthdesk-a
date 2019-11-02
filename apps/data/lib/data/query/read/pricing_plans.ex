@@ -63,7 +63,6 @@ defmodule Data.Query.ReadOnly.PricingPlans do
         {:ok, nil}
 
       results ->
-        IO.inspect(results)
         {:error, "Query returned more than one matching record for pricing plan"}
     end
   end

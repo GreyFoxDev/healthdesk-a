@@ -33,6 +33,10 @@ defmodule MainWeb.Notify do
       body: Enum.join([message, link[:url]], "\n")
     }
 
+
+    alert_info = %{location: location, convo: conversation_id}
+    MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)
+
     @chatbot.send(message)
 
     :ok

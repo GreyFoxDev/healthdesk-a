@@ -17,7 +17,8 @@ defmodule Main.WebChat.Events do
     {:reply, event, state}
   end
 
-  def handle_call(:current_location, _from, %{current_location: location} = state) do
+  def handle_call(:current_location, _from, %{assigns: %{location: location}, current_location: current_location} = state) do
+    location = (current_location || location)
     {:reply, location, state}
   end
 
@@ -39,6 +40,7 @@ defmodule Main.WebChat.Events do
   end
 
   def handle_call("join:yes", _from, %{assigns: %{location: location}, current_location: current_location} = state) do
+    location = (current_location || location)
     response = """
     We've got you covered..
     <br />
@@ -46,13 +48,14 @@ defmodule Main.WebChat.Events do
     <br />
     To join online now, please select your plan below.
     <br />
-    #{select_plans(current_location)}
+    #{select_plans(location)}
     """
 
     {:reply, build_message(response, location, "outbound"), state}
   end
 
   def handle_call("join:not-sure", _from, %{assigns: %{location: location}, current_location: current_location} = state) do
+    location = (current_location || location)
     response = """
     No worries...
     <br />
@@ -63,7 +66,7 @@ defmodule Main.WebChat.Events do
 
     To join online now, please select a plan below.
     <br />
-    #{select_plans(current_location)}
+    #{select_plans(location)}
     """
 
     {:reply, build_message(response, location, "outbound"), state}
@@ -88,13 +91,20 @@ defmodule Main.WebChat.Events do
              "Paragould" -> "1086"
              "Searcy" -> "1048"
              "Springfield" -> "0111"
+             _ -> nil
            end
 
-    """
-    <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;">
-      <a href="http://10fitness.com/buy?club=#{club}&plan=#{plan}" style="color: white;" target="_top">Proceed to checkout</a>
-    </div>
-    """
+    if club do
+      """
+      <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;">
+        <a href="http://10fitness.com/buy?club=#{club}&plan=#{plan}" style="color: white;" target="_top">
+          Proceed to checkout
+        </a>
+      </div>
+      """
+    else
+      nil
+    end
   end
 
   def build_signup_message(club, plan) when club in ["Bryant", "Paragould"] do
@@ -133,24 +143,36 @@ defmodule Main.WebChat.Events do
 
   def handle_call(<< "join:", plan :: binary >>, _from, %{assigns: %{location: location}, current_location: current_location} = state)
   when plan in ["basic", "premium", "level-10"] do
+    location = (current_location || location)
 
-    message = build_signup_message(current_location.location_name, plan)
-    link = build_link_10_fitness(current_location.location_name, String.replace(plan, "-", ""))
-
-    response = """
-    Great choice!
-    <br />
-    #{message}
-    <br />
-    #{link}
-    <br />
-    Let us know if you have any questions!
-    <div class="panel-footer">
+    link = build_link_10_fitness(location.location_name, String.replace(plan, "-", ""))
+    response = if link do
+      """
+      Great choice!
+      <br />
+      #{build_signup_message(location.location_name, plan)}
+      <br />
+      #{link}
+      <br />
+      Let us know if you have any questions!
+      <div class="panel-footer">
       <div class="input-group">
-        <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
+      <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
       </div>
-    </div>
-    """
+      </div>
+      """
+    else
+      """
+      Great choice! We will contact you shortly
+      <br />
+      Let us know if you have any questions!
+      <div class="panel-footer">
+      <div class="input-group">
+      <textarea oninput="auto_grow(this)" phx-keyup="send" class="form-control" name="message" placeholder="Type here..." style="width: 100%"></textarea>
+      </div>
+      </div>
+      """
+    end
 
     {:reply, build_message(response, location, "outbound"), state}
   end
