@@ -42,7 +42,7 @@ defmodule Main.WebChat.Events do
   def handle_call("join:yes", _from, %{assigns: %{location: location}, current_location: current_location} = state) do
     location = (current_location || location)
     response = """
-    We've got you covered..
+    We've got you covered...
     <br />
     Our Premium plan includes all of that plus 20% off all merchandise for just $27.95 per month. (plus joining and annual fees)
     <br />
@@ -328,7 +328,7 @@ defmodule Main.WebChat.Events do
                      "Would you like to be able to bring friends, attend group classes, tan, or use massage chairs?"
       end
       """
-      We have a few plans to choose from..
+      We have a few plans to choose from...
       <br />
       #{question}
       <br />
@@ -364,7 +364,7 @@ defmodule Main.WebChat.Events do
 
   defp day_of_week() do
     """
-    Got it. What day works best?
+    What day works best?
     <br>
     <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;" phx-click="link-click" phx-value="tour:monday">
       <a href="#" style="color: white;">Monday</a>
@@ -389,7 +389,7 @@ defmodule Main.WebChat.Events do
 
   defp time_of_day() do
     """
-    Got it. What time of day is best?
+    What time of day is best?
     <br>
     <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;" phx-click="link-click" phx-value="tour:morning">
       <a href="#" style="color: white;">Morning (8AM - 12PM)</a>
