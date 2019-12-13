@@ -27,7 +27,7 @@ defmodule MainWeb.Api.ConversationController do
     CM.write_new_message(id, from, message)
     C.close(id)
 
-    :ok = Notify.send_to_admin(id, message, from)
+    :ok = MainWeb.Notify.send_to_admin(id, message, from)
 
     conn
     |> put_status(200)
