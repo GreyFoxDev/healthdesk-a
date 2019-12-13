@@ -40,11 +40,13 @@ defmodule MainWeb.FlowController do
     }
   end
 
-  defp build_chat_params("support_additional_access" = name, params) do
+  defp build_chat_params("support_home_club_change" = name, params) do
     %{
       flow_name: name,
       fname: params["fName"],
       lname: params["lName"],
+      home_club: params["home_club"],
+      new_club: params["new_club"]
     }
   end
 
