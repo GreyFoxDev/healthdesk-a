@@ -26,7 +26,7 @@ defmodule WitClient.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:inflex, "~> 1.10.0"},
+      {:inflex, "~> 2.0"},
       {:poison, "~> 3.1"},
       {:elixir_wit, "~> 2.0.0"}
     ]

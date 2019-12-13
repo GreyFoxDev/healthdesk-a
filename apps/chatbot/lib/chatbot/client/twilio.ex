@@ -19,6 +19,15 @@ defmodule Chatbot.Client.Twilio do
     )
   end
 
+  def execution(%Chatbot.Params{provider: :twilio} = params) do
+    body = Poison.encode!(params.body)
+    ExTwilio.Api.create(
+      ExTwilio.Studio.Execution,
+      [to: params.to, from: params.from, parameters: body],
+      [flow_sid: "FWf6e6a86bbc3fd9971cb2deb70dca3538"]
+    )
+  end
+
   def verify(phone_number) do
     [authy_url(), "via=sms&code_length=6&phone_number=", phone_number, "&country_code=1"]
     |> Enum.join()

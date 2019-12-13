@@ -24,7 +24,7 @@ defmodule Chatbot.MixProject do
 
   defp deps do
     [
-      {:ex_twilio, "~> 0.5.0"}
+      {:ex_twilio, "~> 0.8.1"}
     ]
   end
 end
