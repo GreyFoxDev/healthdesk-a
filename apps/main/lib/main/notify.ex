@@ -16,7 +16,8 @@ defmodule MainWeb.Notify do
   Send a notification to the super admin defined in the config. It will create a short URL.
   """
   def send_to_admin(conversation_id, message, location, member \\ @super_admin) do
-    location = Location.get_by_phone(location)
+    IO.inspect(location) |> IO.inspect(label: "LOCATION # SENT")
+    location = Location.get_by_phone(location) |> IO.inspect(label: "LOCATION")
 
     %{data: link} =
       @url
