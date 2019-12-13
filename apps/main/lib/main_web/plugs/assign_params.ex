@@ -30,6 +30,7 @@ defmodule MainWeb.Plug.AssignParams do
     |> assign(:flow_name, flow)
     |> assign(:member, params["phone"])
     |> assign(:location, location.phone_number)
+    |> assign(:location_name, location.location_name)
     |> assign(:first_name, params["fName"])
     |> assign(:last_name, params["lName"])
     |> assign(:home_club, params["home_club"]) # optional
