@@ -29,6 +29,9 @@ defmodule MainWeb.FlowController do
       flow_name: name,
       fname: params.first_name,
       lname: params.last_name,
+      location_name: params.location_name,
+      phone: params.member,
+      barcode: params.barcode,
       location_name: params.location_name
     }
   end
@@ -38,6 +41,9 @@ defmodule MainWeb.FlowController do
       flow_name: name,
       fname: params.first_name,
       lname: params.last_name,
+      location_name: params.location_name,
+      phone: params.member,
+      barcode: params.barcode,
       location_name: params.location_name
     }
   end
@@ -48,6 +54,8 @@ defmodule MainWeb.FlowController do
       fname: params.first_name,
       lname: params.last_name,
       location_name: params.location_name,
+      phone: params.member,
+      barcode: params.barcode,
       home_club: params.home_club,
       new_club: params.new_club
     }

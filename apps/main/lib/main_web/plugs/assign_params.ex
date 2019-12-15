@@ -33,6 +33,7 @@ defmodule MainWeb.Plug.AssignParams do
     |> assign(:location_name, location.location_name)
     |> assign(:first_name, params["fName"])
     |> assign(:last_name, params["lName"])
+    |> assign(:barcode, params["barcode"])
     |> assign(:home_club, params["home_club"]) # optional
     |> assign(:new_club, params["new_club"]) # optional
   end
