@@ -31,40 +31,42 @@ defmodule MainWeb.Plug.OptIn do
   def call(conn, opts \\ [])
 
   def call(%{assigns: %{member: member, message: message, location: location}} = conn, _opts) when is_binary(member) do
-    with {:ok, %{consent: true}} <- Member.get_by_phone(member) do
-      assign(conn, :opt_in, true)
-    else
-      {:ok, _} ->
-        message = String.downcase(message) |> String.trim()
-        cond do
-        message in ["yes", "start"] ->
-          {:ok, _optin} = Member.enable_opt_in(member, location)
+    assign(conn, :opt_in, true)
+    # with {:ok, %{consent: true}} <- Member.get_by_phone(member) do
+    #   assign(conn, :opt_in, true)
+    # else
+    #   {:ok, _} ->
+    #     message = String.downcase(message) |> String.trim()
+    #     cond do
+    #     message in ["yes", "start"] ->
+    #       {:ok, _optin} = Member.enable_opt_in(member, location)
 
-          conn
-          |> assign(:opt_in, true)
-          |> assign(:message, message)
-        message == "no" ->
-          {:ok, _optin} = Member.disable_opt_in(member, location)
+    #       conn
+    #       |> assign(:opt_in, true)
+    #       |> assign(:message, message)
+    #     message == "no" ->
+    #       {:ok, _optin} = Member.disable_opt_in(member, location)
 
-          conn
-          |> assign(:opt_in, false)
-          |> assign(:response, @opt_out_message)
-        true ->
-          location = Location.get_by_phone(location)
-          if location.team.team_name == "10 Fitness" do
-            conn
-            |> assign(:opt_in, false)
-            |> assign(:response, @opt_in_message_10)
-          else
-            conn
-            |> assign(:opt_in, false)
-            |> assign(:response, @opt_in_message)
-          end
+    #       conn
+    #       |> assign(:opt_in, false)
+    #       |> assign(:response, @opt_out_message)
+    #     true ->
+    #       location = Location.get_by_phone(location)
+    #       if location.team.team_name == "10 Fitness" do
+    #         conn
+    #         |> assign(:opt_in, false)
+    #         |> assign(:response, @opt_in_message_10)
+    #       else
+    #         conn
+    #         |> assign(:opt_in, false)
+    #         |> assign(:response, @opt_in_message)
+    #       end
 
-      end
-    end
+    #   end
+    # end
   end
 
-  def call(conn, _opts),do: assign(conn, :opt_in, false)
+  def call(conn, _opts),do: assign(conn, :opt_in, true)
+  # def call(conn, _opts),do: assign(conn, :opt_in, false)
 
 end
