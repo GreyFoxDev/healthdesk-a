@@ -36,7 +36,7 @@ defmodule Chatbot.Client.Twilio do
     ExTwilio.Api.create(
       ExTwilio.ProgrammableChat.Channel,
       [to: params.to, from: params.from, body: params.body, friendly_name: "Nick"],
-      [service_id: "IS50f97ff40e9743c4a50301479706cbd7", to: params.to, account: account, token: token]
+      [service_id: service_id, to: params.to, account: account, token: token]
     )
     |> IO.inspect(label: "CHANNEL")
   end
