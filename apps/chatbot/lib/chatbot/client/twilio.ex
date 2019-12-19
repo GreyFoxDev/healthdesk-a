@@ -28,6 +28,19 @@ defmodule Chatbot.Client.Twilio do
     )
   end
 
+  def channel(%Chatbot.Params{provider: :twilio} = params) do
+    account = Application.get_env(:ex_twilio, :flex_account_sid)
+    token = Application.get_env(:ex_twilio, :flex_auth_token)
+    service_id = Application.get_env(:ex_twilio, :flex_service_id)
+
+    ExTwilio.Api.create(
+      ExTwilio.ProgrammableChat.Channel,
+      [to: params.to, from: params.from, body: params.body, friendly_name: "Nick"],
+      [service_id: "IS50f97ff40e9743c4a50301479706cbd7", to: params.to, account: account, token: token]
+    )
+    |> IO.inspect(label: "CHANNEL")
+  end
+
   def verify(phone_number) do
     [authy_url(), "via=sms&code_length=6&phone_number=", phone_number, "&country_code=1"]
     |> Enum.join()

@@ -79,16 +79,11 @@ defmodule MainWeb.ConversationMessageController do
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-           message = %{"message" => params["conversation_message"]["message"]}
-           Logger.info "Message created ************* WEB CHAT #{inspect message}"
-           process_name = :"#{conversation.original_number}:#{web_location.id}"
+           message = %Chatbot.Params{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
+           Logger.info "Message created ************* #{inspect @chatbot} #{inspect message}"
+           Chatbot.Client.Twilio.channel(message)
+           put_flash(conn, :success, "Sending message was successful")
 
-           case Registry.lookup(Registry.WebChat, process_name) do
-             [{pid, _}] ->
-               send(pid, {:admin_response, params["conversation_message"]["message"]})
-             _ ->
-               put_flash(conn, :error, "Sending message failed to #{process_name}")
-           end
            # Endpoint.broadcast("web_bot:#{conversation.original_number}", "reply", message)
            put_flash(conn, :success, "Sending message was successful")
          {:error, changeset} ->

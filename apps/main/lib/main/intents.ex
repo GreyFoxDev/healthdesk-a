@@ -7,7 +7,7 @@ defmodule MainWeb.Intents do
   """
 
   @callback build_response(List.t, location :: binary) :: String.t
-  @default_response "One moment please..."
+  @default_response "During normal business hours a representative will be with you shortly."
   @default_greeting "Hello! How can I help you?"
 
   alias MainWeb.Intents.{

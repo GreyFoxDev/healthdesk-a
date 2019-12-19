@@ -5,8 +5,11 @@ defmodule MainWeb.TwilioJsonController do
   use MainWeb, :controller
 
   alias MainWeb.Plug, as: P
+  alias Data.Commands.Conversations
 
   require Logger
+
+  @default "During normal business hours a representative will be with you shortly."
 
   plug P.AssignParams
   plug P.OpenConversation
@@ -30,18 +33,28 @@ defmodule MainWeb.TwilioJsonController do
     |> json(%{message: "Service Error"})
   end
 
-  def inbound(%Plug.Conn{assigns: %{status: "pending"}} = conn, _params) do
+  def inbound(%Plug.Conn{assigns: %{status: "pending", convo: id}} = conn, _params) do
+
+    convo = Conversations.get(id)
+
+    count = convo.conversation_messages
+    |> Enum.filter(fn m -> m.message == @default end)
+    |> Enum.count()
+    |> IO.inspect(label: "COUNT")
+
     conn
     |> put_resp_content_type("application/json")
     |> put_status(404)
-    |> json(%{message: "Not Found"})
+    |> json(%{message: "Not Found", count: count})
   end
 
   @doc """
   Handle a successful communication with a member
   """
-  def inbound(%Plug.Conn{assigns: %{response: response}} = conn, _params)
+  def inbound(%Plug.Conn{assigns: %{response: response}} = conn, params)
   when is_binary(response) do
+    IO.inspect conn.assigns, label: "ASSIGNS"
+    IO.inspect params, label: "PARAMS"
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")

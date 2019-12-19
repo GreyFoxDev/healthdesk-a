@@ -24,7 +24,8 @@ defmodule Chatbot.MixProject do
 
   defp deps do
     [
-      {:ex_twilio, "~> 0.8.1"}
+      {:ex_twilio, git: "https://github.com/HealthdeskAI/ex_twilio.git"}
+      # {:ex_twilio, "~> 0.8.1"}
     ]
   end
 end

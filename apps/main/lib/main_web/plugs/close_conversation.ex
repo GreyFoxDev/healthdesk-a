@@ -10,6 +10,8 @@ defmodule MainWeb.Plug.CloseConversation do
   alias Data.Commands.Conversations, as: C
   alias Data.Commands.ConversationMessages, as: CM
 
+  @default "During normal business hours a representative will be with you shortly."
+
   @spec init(list()) :: list()
   def init(opts), do: opts
 
@@ -21,7 +23,17 @@ defmodule MainWeb.Plug.CloseConversation do
   then no need to do anything. Just return the connection.
   """
   def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
-    CM.write_new_message(id, location, conn.assigns[:response])
+
+    convo = C.get(id)
+
+    count = convo.conversation_messages
+    |> Enum.filter(fn m -> m.message == @default end)
+    |> Enum.count()
+
+    if count < 2 && conn.assigns[:response] == @default do
+      CM.write_new_message(id, location, conn.assigns[:response])
+    end
+
     C.pending(id)
     conn
   end
