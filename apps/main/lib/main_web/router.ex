@@ -69,7 +69,7 @@ defmodule MainWeb.Router do
 
     get "/sms/inbound", TwilioController, :inbound
     get "/sms/inbound.json", TwilioJsonController, :inbound
-    post "/sms/twilio", TwilioController, :create
+    post "/sms/twilio", TwilioController, :inbound
     put "/remove-avatar", AvatarController, :remove_avatar
     put "/assign-team-member", AssignTeamMemberController, :assign
     put "/update-member", UpdateMemberController, :update
