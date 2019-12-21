@@ -142,7 +142,7 @@ defmodule MainWeb.ConversationController do
   defp find_or_start_conversation(%{member: member, location_number: location} = params) do
     member = String.replace(member, "-", "")
 
-    member = if length(member) == 10 do
+    member = if String.length(member) == 10 do
       "+1#{member}"
     else
       member
