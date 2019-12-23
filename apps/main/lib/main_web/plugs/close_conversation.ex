@@ -10,7 +10,7 @@ defmodule MainWeb.Plug.CloseConversation do
   alias Data.Commands.Conversations, as: C
   alias Data.Commands.ConversationMessages, as: CM
 
-  @default "During normal business hours a representative will be with you shortly."
+  @default "During normal business hours, a team member will be with you shortly."
 
   @spec init(list()) :: list()
   def init(opts), do: opts

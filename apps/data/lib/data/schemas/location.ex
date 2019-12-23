@@ -20,6 +20,7 @@ defmodule Data.Schema.Location do
   city
   state
   postal_code
+  slack_integration
   deleted_at
   |a
 
@@ -38,6 +39,7 @@ defmodule Data.Schema.Location do
     field(:web_greeting, :string)
     field(:web_handle, :string)
     field(:web_chat, :boolean)
+    field(:slack_integration, :string)
 
     field(:deleted_at, :utc_datetime)
 

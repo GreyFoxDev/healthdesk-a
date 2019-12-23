@@ -44,5 +44,7 @@ defmodule MainWeb.Plug.AssignParams do
     |> assign(:barcode, params["barcode"])
     |> assign(:home_club, params["home_club"]) # optional
     |> assign(:new_club, params["new_club"]) # optional
+    |> assign(:message, params["msg"])
   end
+
 end

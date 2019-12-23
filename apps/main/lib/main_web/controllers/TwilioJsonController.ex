@@ -9,7 +9,7 @@ defmodule MainWeb.TwilioJsonController do
 
   require Logger
 
-  @default "During normal business hours a representative will be with you shortly."
+  @default "During normal business hours, a team member will be with you shortly."
 
   plug P.AssignParams
   plug P.OpenConversation
@@ -40,7 +40,6 @@ defmodule MainWeb.TwilioJsonController do
     count = convo.conversation_messages
     |> Enum.filter(fn m -> m.message == @default end)
     |> Enum.count()
-    |> IO.inspect(label: "COUNT")
 
     conn
     |> put_resp_content_type("application/json")
@@ -53,8 +52,6 @@ defmodule MainWeb.TwilioJsonController do
   """
   def inbound(%Plug.Conn{assigns: %{response: response}} = conn, params)
   when is_binary(response) do
-    IO.inspect conn.assigns, label: "ASSIGNS"
-    IO.inspect params, label: "PARAMS"
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")

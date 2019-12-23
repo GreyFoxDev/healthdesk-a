@@ -24,40 +24,18 @@ defmodule MainWeb.FlowController do
     |> json(%{status: :success})
   end
 
-  defp build_chat_params("support_24hr_waiver" = name, params) do
+  defp build_chat_params(name, params) do
     %{
-      flow_name: name,
+      flow_name: String.replace(name, "_", " "),
       fname: params.first_name,
       lname: params.last_name,
       location_name: params.location_name,
       phone: params.member,
       barcode: params.barcode,
-      location_name: params.location_name
-    }
-  end
-
-  defp build_chat_params("support_additional_access" = name, params) do
-    %{
-      flow_name: name,
-      fname: params.first_name,
-      lname: params.last_name,
       location_name: params.location_name,
-      phone: params.member,
-      barcode: params.barcode,
-      location_name: params.location_name
-    }
-  end
-
-  defp build_chat_params("support_home_club_change" = name, params) do
-    %{
-      flow_name: name,
-      fname: params.first_name,
-      lname: params.last_name,
-      location_name: params.location_name,
-      phone: params.member,
-      barcode: params.barcode,
       home_club: params.home_club,
-      new_club: params.new_club
+      new_club: params.new_club,
+      message: params.message
     }
   end
 

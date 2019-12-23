@@ -1,0 +1,25 @@
+<div class="panel-body">
+    <section class="card">
+        <div class="card-body">
+            <%= form_for @data, @action, fn f -> %>
+                <div class="list-group list-group-flush list-group-bordered">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <fieldset>
+                            <span>Disposition Name</span>
+                            <span>
+                                <%= text_input f, :disposition_name, class: "form-control" %>
+                            </span>
+                        </fieldset>
+                    </div>
+                </div>
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                <%= submit "Save", class: "btn btn-primary" %>
+                <%= link "Cancel", to: team_path(@conn, :edit, @team.id)  %>
+            </div>
+            <% end %>
+
+        </div>
+    </section>
+</div>

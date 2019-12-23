@@ -16,6 +16,7 @@
                     <nav class="nav nav-tabs flex-column border-0">
                         <a href="<%= team_path(@conn, :edit, team.id) %>" class="nav-link active">Details</a>
                         <a href="<%= team_member_path(@conn, :index, team.id) %>" class="nav-link">Members</a>
+                        <a href="<%= team_disposition_path(@conn, :index, team.id) %>" class="nav-link">Dispositions</a>
                     </nav>
                 </div>
             </div>

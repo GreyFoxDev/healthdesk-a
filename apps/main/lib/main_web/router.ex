@@ -35,6 +35,7 @@ defmodule MainWeb.Router do
     delete "/logout/:id", SessionController, :delete
 
     resources "/teams", TeamController do
+      resources "/dispositions", DispositionController
       resources "/members", MemberController
       resources "/team-members", TeamMemberController
       resources "/locations", LocationController do

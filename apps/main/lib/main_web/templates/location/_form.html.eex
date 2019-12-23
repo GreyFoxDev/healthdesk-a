@@ -119,6 +119,8 @@
                         <%= text_input f, :web_greeting, class: "form-control" %>
                         <label>Web Handle</label>
                         <%= text_input f, :web_handle, class: "form-control" %>
+                        <label>Slack Integration</label>
+                        <%= text_input f, :slack_integration, class: "form-control" %>
                     </div>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>
