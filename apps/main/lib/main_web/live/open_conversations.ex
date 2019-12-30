@@ -37,7 +37,15 @@ defmodule MainWeb.Live.OpenConverationsView do
   end
 
   def handle_info(:update, socket) do
-    {:noreply, assign(socket, %{count: open_convos(socket.assigns.location_id)})}
+    count =
+      try do
+        open_convos(socket.assigns.location_id)
+      rescue
+        _ ->
+          socket.assigns.count
+      end
+
+    {:noreply, assign(socket, %{count: count})}
   end
 
   defp open_convos(location_id) do
