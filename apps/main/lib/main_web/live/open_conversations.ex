@@ -5,7 +5,8 @@ defmodule MainWeb.Live.OpenConverationsView do
   alias Data.Conversations, as: C
 
   def mount(%{location_id: location_id, header: true} = session, socket) do
-    :timer.send_interval(1000, self(), :update)
+    timer = Enum.random(1000..10_000)
+    :timer.send_interval(timer, self(), :update)
 
     socket =
       socket
