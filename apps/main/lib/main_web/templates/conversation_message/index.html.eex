@@ -30,8 +30,9 @@
 
         <div class="message-header-actions">
             <!-- invite members -->
-            <%= if @conversation.status in ["open", "pending"] do %>
+            <%= if @conversation.status in ["open", "pending", "closed"] do %>
                 <div class="dropdown d-inline-block">
+                    <%= if @conversation.status in ["open", "pending"] do  %>
 
                     <button type="button" class="btn btn-light btn-icon" title="Invite members" data-toggle="dropdown" data-display="static" aria-haspoppup="true" aria-expanded="false"><i class="fas fa-user-plus"></i></button>
                     <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
@@ -72,6 +73,7 @@
                             </script>
                         </div>
                     </div><!-- /.dropdown-menu -->
+                    <% end %>
                     <div class="dropdown" style="display: inline-block">
                         <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             ...
