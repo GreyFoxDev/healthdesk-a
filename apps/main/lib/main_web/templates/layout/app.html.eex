@@ -173,7 +173,7 @@
 
       <main class="app-main">
           <div class="wrapper">
-              <div class="page <%= if assigns[:has_sidebar] do %>has-sidebar-open<% end %>">
+              <div class="page <%= if assigns[:has_sidebar] do %>has-sidebar-open<% end %> has-sidebar has-sidebar-expand-xl">
                   <div class="page-inner">
                       <%= render @view_module, @view_template, assigns %>
                   </div>

@@ -16,3 +16,11 @@ body {
 .section {
   padding: 3rem 0;
 }
+
+.page.has-sidebar-open {
+    width: none !important;
+}
+
+.message-body {
+    margin: 0 !important;
+}

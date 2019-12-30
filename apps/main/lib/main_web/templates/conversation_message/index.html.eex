@@ -95,6 +95,7 @@
 
             </div><!-- /invite members -->
             <% end %>
+            <button type="button" class="btn btn-light btn-icon d-xl-none" data-toggle="sidebar"><i class="fa fa-angle-double-left"></i></button> <!--Need to add this button element for the sidebar responsive icon-->
         </div>
     </header>
 </article>
@@ -262,6 +263,13 @@
 <% end %>
 
 <div class="page-sidebar">
+    <header class="sidebar-header d-sm-none"> <!--Need To Add this section. some of the html was missing-->
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+                <a class="prevent-default" href="#" onclick="Looper.toggleSidebar()"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Back</a>
+            </li>
+        </ol>
+    </header>
     <div class="sidebar-section">
         <fieldset>
             <legend>Conversation Details</legend>
