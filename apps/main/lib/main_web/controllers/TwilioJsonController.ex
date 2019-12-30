@@ -12,6 +12,7 @@ defmodule MainWeb.TwilioJsonController do
   @default "During normal business hours, a team member will be with you shortly."
 
   plug P.AssignParams
+  plug P.SaveMemberData
   plug P.OpenConversation
   plug P.OptIn
   plug P.CacheQuestion

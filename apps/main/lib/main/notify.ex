@@ -16,8 +16,7 @@ defmodule MainWeb.Notify do
   Send a notification to the super admin defined in the config. It will create a short URL.
   """
   def send_to_admin(conversation_id, message, location, member \\ @super_admin) do
-    IO.inspect(location) |> IO.inspect(label: "LOCATION # SENT")
-    location = Location.get_by_phone(location) |> IO.inspect(label: "LOCATION")
+    location = Location.get_by_phone(location)
 
     %{data: link} =
       @url
@@ -34,6 +33,13 @@ defmodule MainWeb.Notify do
       body: Enum.join([message, link[:url]], "\n")
     }
 
+    if location.slack_integration && location.slack_integration != "" do
+      headers = [{"content-type", "application/json"}]
+
+      body = Jason.encode! %{text: message.body}
+
+      Tesla.post location.slack_integration, body, headers: headers
+    end
 
     alert_info = %{location: location, convo: conversation_id}
     MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)

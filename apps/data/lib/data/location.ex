@@ -3,6 +3,8 @@ defmodule Data.Location do
 
   @roles ["admin", "teammate", "location-admin", "team-admin"]
 
+  defdelegate get_by_phone(phone_number), to: Location
+
   def get_changeset(),
     do: Data.Schema.Location.changeset(%Data.Schema.Location{})
 

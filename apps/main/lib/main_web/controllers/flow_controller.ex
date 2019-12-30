@@ -6,6 +6,7 @@ defmodule MainWeb.FlowController do
 
   alias MainWeb.Plug, as: P
   alias Chatbot.Client.Twilio
+  alias Data.Location
 
   require Logger
 
@@ -25,6 +26,8 @@ defmodule MainWeb.FlowController do
   end
 
   defp build_chat_params(name, params) do
+    location = Location.get_by_phone(params.location)
+
     %{
       flow_name: String.replace(name, "_", " "),
       fname: params.first_name,

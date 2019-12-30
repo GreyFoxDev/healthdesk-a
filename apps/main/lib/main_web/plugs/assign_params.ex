@@ -27,17 +27,19 @@ defmodule MainWeb.Plug.AssignParams do
       |> assign(:message, body)
       |> assign(:member, member)
       |> assign(:location, location)
+      |> assign(:memberName, params["memberName"])
+      |> assign(:phoneNumber, params["phoneNumber"])
     end
   end
 
   def call(%{params: %{"flow_name" => flow} = params} = conn, _opts) do
-
     location = Location.get(%{role: "admin"}, params["location_id"])
 
     conn
     |> assign(:flow_name, flow)
     |> assign(:member, params["phone"])
     |> assign(:location, location.phone_number)
+    |> assign(:location_id, location.id)
     |> assign(:location_name, location.location_name)
     |> assign(:first_name, params["fName"])
     |> assign(:last_name, params["lName"])

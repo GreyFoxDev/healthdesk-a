@@ -10,6 +10,7 @@ defmodule Data.Query.ReadOnly.Metrics do
     Repo.all(MetricsTeam)
   end
 
-  def team_metrics_by_team_id(team_id),
-    do: Repo.get_by(MetricsTeam, team_id: team_id)
+  def team_metrics_by_team_id(team_id) do
+    Repo.get_by(MetricsTeam, team_id: team_id)
+  end
 end

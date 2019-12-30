@@ -35,8 +35,10 @@ defmodule Data.Member do
   def get_by_team_id(%{role: role}, id) when role in @roles,
     do: Member.all(id)
 
-  def get_by_phone_number(%{role: role}, phone_number) when role in @roles,
-    do: Member.by_phone_number(phone_number)
+  def get_by_phone_number(%{role: role}, phone_number) when role in @roles do
+    {:ok, member} = Member.get_by_phone(phone_number)
+    member
+  end
 
   def create(params),
     do: Member.write(params)

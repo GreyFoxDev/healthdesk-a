@@ -38,7 +38,6 @@ defmodule Chatbot.Client.Twilio do
       [to: params.to, from: params.from, body: params.body, friendly_name: "Nick"],
       [service_id: service_id, to: params.to, account: account, token: token]
     )
-    |> IO.inspect(label: "CHANNEL")
   end
 
   def verify(phone_number) do

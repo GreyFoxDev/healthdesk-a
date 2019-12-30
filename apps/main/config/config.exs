@@ -26,6 +26,7 @@ config :main, MainWeb.Endpoint,
   pubsub: [name: Main.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+config :tesla, adapter: Tesla.Adapter.Hackney
 
 # Configures Elixir's Logger
 config :logger, :console,

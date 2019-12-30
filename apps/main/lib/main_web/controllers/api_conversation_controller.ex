@@ -23,12 +23,25 @@ defmodule MainWeb.Api.ConversationController do
     |> json(%{conversation_id: id, updated: true})
   end
 
-  def close(conn, %{"conversation_id" => id, "from" => from, "message" => message}) do
-    CM.write_new_message(id, from, message)
+  def update(conn, params) do
+    conn
+    |> put_status(200)
+    |> put_resp_content_type("application/json")
+    |> json(%{success: false})
+  end
+
+  def close(conn, %{"conversation_id" => id, "from" => from, "message" => message} = params) do
+    if message == "Sent to Slack" do
+      CM.write_new_message(id, from, params["slack_message"])
+
+      :ok = MainWeb.Notify.send_to_admin(id, params["slack_message"], from)
+    else
+      CM.write_new_message(id, from, message)
+
+      :ok = MainWeb.Notify.send_to_admin(id, message, from)
+    end
+
     C.close(id)
-
-    :ok = MainWeb.Notify.send_to_admin(id, message, from)
-
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")

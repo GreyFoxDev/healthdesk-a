@@ -128,7 +128,7 @@
                                                       <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
                                                           <%= location.location_name %>
                                                           <span class="badge badge-subtle">
-                                                              <%= Enum.count(location.conversations, &(&1.status == "open")) %>
+                                                              <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{location_id: location.id}) %>
                                                           </span>
                                                       </a>
                                                   </li>
@@ -153,7 +153,7 @@
                                                       <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
                                                           <%= location.location_name %>
                                                           <span class="badge badge-subtle">
-                                                              <%= Enum.count(location.conversations, &(&1.status == "open")) %>
+                                                              <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{location_id: location.id}) %>
                                                           </span>
                                                       </a>
                                                   </li>

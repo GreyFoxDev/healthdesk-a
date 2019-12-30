@@ -23,11 +23,7 @@
                 </p>
             <% else %>
                 <p class="list-group-item-text">
-                    <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
-                        Assigned to: Website Bot
-                    <% else %>
-                        Assigned to: SMS Bot
-                    <% end %>
+                    Assigned to: <%= format_phone(@conversation.original_number) |> format_assigned() %>
                 </p>
             <% end %>
         </div>
@@ -35,14 +31,16 @@
         <div class="message-header-actions">
             <!-- invite members -->
             <%= if @conversation.status in ["open", "pending"] do %>
-            <div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-light btn-icon" title="Invite members" data-toggle="dropdown" data-display="static" aria-haspoppup="true" aria-expanded="false"><i class="fas fa-user-plus"></i></button>
-                <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
-                <div class="dropdown-menu dropdown-menu-right dropdown-menu-rich stop-propagation">
-                    <div class="dropdown-header"> Assign Conversation </div>
-                    <div class="form-group px-3 py-2 m-0">
-                        <select id="assigned_id" class="custom-select">
-                            <option value="">Select Team Member</option>
+                <div class="dropdown d-inline-block">
+
+                    <button type="button" class="btn btn-light btn-icon" title="Invite members" data-toggle="dropdown" data-display="static" aria-haspoppup="true" aria-expanded="false"><i class="fas fa-user-plus"></i></button>
+                    <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
+                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-rich stop-propagation">
+
+                        <div class="dropdown-header"> Assign Conversation </div>
+                        <div class="form-group px-3 py-2 m-0">
+                            <select id="assigned_id" class="custom-select">
+                                <option value="">Select Team Member</option>
                                 <%= for team_member <- @team_members do %>
                                     <%= if @conversation.team_member_id == team_member.id do %>
                                         <option value="<%= team_member.id %>" selected><%= team_member.user.first_name %> <%= team_member.user.last_name %></option>
@@ -72,10 +70,29 @@
 
                              });
                             </script>
+                        </div>
+                    </div><!-- /.dropdown-menu -->
+                    <div class="dropdown" style="display: inline-block">
+                        <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            ...
+                        </button>
+                        <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                            <%= if @conversation.status != "open" do %>
+                                <%= link("Open", class: "dropdown-item",
+                                    to: team_location_conversation_conversation_path(@conn, :open, @location.team_id, @location.id, @conversation.id),
+                                    method: :put) %>
+                            <% else %>
+                                <span class="dropdown-item disabled">Open</span>
+                            <%  end %>
 
-
+                            <%= if @conversation.status != "closed" do %>
+                                <%= link("Close", class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @conversation.id), method: :put) %>
+                            <% else %>
+                                <span class="dropdown-item disabled">Closed</span>
+                            <% end %>
+                        </div>
                     </div>
-                </div><!-- /.dropdown-menu -->
+
             </div><!-- /invite members -->
             <% end %>
         </div>
@@ -173,11 +190,7 @@
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
-                                                        <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
-                                                            Website Bot
-                                                        <% else %>
-                                                            SMS Bot
-                                                        <% end %>
+                                                        <%= format_phone(@conversation.original_number) |> format_assigned() %>
                                                     <% else %>
                                                         <%= format_phone(message.phone_number) %>
                                                     <% end %>
@@ -197,11 +210,7 @@
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
-                                                        <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
-                                                            Website Bot
-                                                        <% else %>
-                                                            SMS Bot
-                                                        <% end %>
+                                                        <%= format_phone(@conversation.original_number) |> format_assigned() %>
                                                     <% else %>
                                                         <%= format_phone(message.phone_number) %>
                                                     <% end %>
@@ -278,21 +287,12 @@
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[phone_number]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.phone_number, else: "N/A" %>" readonly> <label for="fl1"> Phone Numbers</label>
+                        <input name="member[phone_number]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.phone_number, else: "N/A" %>"> <label for="fl1"> Phone Numbers</label>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
                         <input name="member[email]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.email, else: "N/A" %>"> <label for="fl1"> Email</label>
-                    </div>
-                </div><!-- /.form-group -->
-                <div class="form-group">
-                    <div class="form-label-group">
-                        <%= if @conversation.member do %>
-                            <input type="text" class="form-control" value="<%= if @conversation.member.consent, do: "Subscribed", else: "Unsubscribed" %>" readonly><label for="fl1"> Consent</label>
-                        <% else %>
-                            <input type="text" class="form-control" value="Not Subscribed" readonly> <label for="fl1"> Consent</label>
-                        <% end %>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">

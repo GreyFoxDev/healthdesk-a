@@ -7,7 +7,7 @@
         </li>
         <%= if assigns[:current_user].role != "teammate" do %>
             <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#project-open">Open (<%= Enum.count(@conversations, fn(c) -> c.status in ["open", "pending"] end) %>)</a>
+                <a class="nav-link" data-toggle="tab" href="#project-open"><%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{location_id: @location.id, header: true}) %></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#project-closed">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>

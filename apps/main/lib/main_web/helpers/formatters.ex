@@ -21,9 +21,15 @@ defmodule MainWeb.Helper.Formatters  do
     "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
 
+  def format_phone(<< "messanger:", _rest :: binary >>), do: "Facebook Visitor"
+
   def format_phone(phone_number) do
     "Unknown Visitor"
   end
+
+  def format_assigned("Unknown Visitor"), do: "Website Bot"
+  def format_assigned("Facebook Visitor"), do: "Facebook Bot"
+  def format_assigned(_), do: "SMS Bot"
 
   def format_team_member(team_member) do
     name = Enum.join([team_member.first_name, team_member.last_name], " ")
