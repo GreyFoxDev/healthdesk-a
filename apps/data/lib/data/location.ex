@@ -38,6 +38,9 @@ defmodule Data.Location do
   def get_by_api_key(key),
     do: Location.get_by_api_key(key)
 
+    def get_by_messanger_id(messanger_id),
+      do: Location.get_by_messanger_id(messanger_id)
+
   def create(params),
     do: Location.write(params)
 

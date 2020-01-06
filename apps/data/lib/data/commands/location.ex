@@ -11,4 +11,8 @@ defmodule Data.Commands.Location do
 
   def get_by_api_key(key),
     do: Read.get_by_api_key(key)
+
+  def get_by_messanger_id(messanger_id),
+    do: Read.get_by_messanger_id(messanger_id)
+
 end

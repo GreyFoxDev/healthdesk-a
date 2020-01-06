@@ -43,4 +43,13 @@ defmodule Data.Query.ReadOnly.Location do
     )
     |> Repo.one()
   end
+
+  def get_by_messanger_id(messanger_id) do
+    from(t in Location,
+      where: is_nil(t.deleted_at),
+      where: t.messanger_id == ^messanger_id,
+      limit: 1
+    )
+    |> Repo.one()
+  end
 end

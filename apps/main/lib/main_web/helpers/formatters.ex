@@ -21,7 +21,7 @@ defmodule MainWeb.Helper.Formatters  do
     "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
 
-  def format_phone(<< "messanger:", _rest :: binary >>), do: "Facebook Visitor"
+  def format_phone(<< "messenger:", _rest :: binary >>), do: "Facebook Visitor"
 
   def format_phone(phone_number) do
     "Unknown Visitor"

@@ -53,6 +53,7 @@ defmodule MainWeb.TwilioJsonController do
   """
   def inbound(%Plug.Conn{assigns: %{response: response}} = conn, params)
   when is_binary(response) do
+
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
