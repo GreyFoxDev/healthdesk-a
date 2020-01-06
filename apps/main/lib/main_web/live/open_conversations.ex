@@ -5,9 +5,7 @@ defmodule MainWeb.Live.OpenConverationsView do
   alias Data.Conversations, as: C
 
   def mount(%{location_id: location_id, header: true} = session, socket) do
-    timer = Enum.random(1000..10_000)
-    :timer.send_interval(timer, self(), :update)
-
+    MainWeb.Endpoint.subscribe("alert:#{location_id}")
     socket =
       socket
       |> assign(:count, open_convos(location_id))
@@ -18,7 +16,8 @@ defmodule MainWeb.Live.OpenConverationsView do
   end
 
   def mount(%{location_id: location_id} = session, socket) do
-    :timer.send_interval(100, self(), :update)
+    timer = Enum.random(1000..10_000)
+    :timer.send_interval(timer, self(), :update)
     socket =
       socket
       |> assign(:count, open_convos(location_id))
@@ -34,6 +33,18 @@ defmodule MainWeb.Live.OpenConverationsView do
 
   def render(%{count: count, header: false} = assigns) do
     ~L[<%= count %>]
+  end
+
+  def handle_info(broadcast = %{topic: << "alert:", location_id :: binary >>}, socket) do
+    count =
+      try do
+        open_convos(socket.assigns.location_id)
+      rescue
+        _ ->
+          socket.assigns.count
+      end
+
+    {:noreply, assign(socket, %{count: count})}
   end
 
   def handle_info(:update, socket) do

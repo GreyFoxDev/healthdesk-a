@@ -43,6 +43,7 @@ defmodule MainWeb.Notify do
 
     alert_info = %{location: location, convo: conversation_id}
     MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)
+    MainWeb.Endpoint.broadcast("alert:#{location.id}", "broadcast", alert_info)
 
     @chatbot.send(message)
 
