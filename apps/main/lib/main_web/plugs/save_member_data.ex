@@ -8,7 +8,7 @@ defmodule MainWeb.Plug.SaveMemberData do
   @spec init(list()) :: list()
   def init(opts), do: opts
 
-  def call(%{assigns: %{memberName: name, phoneNumber: phone, location: location}} = conn, _opts) do
+  def call(%{assigns: %{memberName: name, phoneNumber: phone, location: location}} = conn, _opts) when phone != nil do
     l = Location.get_by_phone(location)
     phone = format_phone(phone)
     [first_name, last_name] =
