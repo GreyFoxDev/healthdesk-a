@@ -9,7 +9,7 @@ defmodule MainWeb.TwilioJsonController do
 
   require Logger
 
-  @default "During normal business hours, a team member will be with you shortly."
+  @default "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
 
   plug P.AssignParams
   plug P.SaveMemberData

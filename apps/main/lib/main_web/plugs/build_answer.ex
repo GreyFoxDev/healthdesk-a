@@ -9,7 +9,7 @@ defmodule MainWeb.Plug.BuildAnswer do
 
   alias MainWeb.{Intents, Notify}
 
-  @default_response "During normal business hours, a team member will be with you shortly."
+  @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
 
   @spec init(list()) :: list()
   def init(opts), do: opts
