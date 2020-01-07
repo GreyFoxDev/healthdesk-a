@@ -35,18 +35,26 @@
                 ...
             </button>
             <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                <%= if @c.status != "open" do %>
+                <%= if @c.status == "closed" do %>
                     <%= link("Open", class: "dropdown-item",
                         to: team_location_conversation_conversation_path(@conn, :open, @location.team_id, @location.id, @c.id),
                         method: :put) %>
-                <% else %>
-                    <span class="dropdown-item disabled">Open</span>
                 <%  end %>
 
                 <%= if @c.status != "closed" do %>
-                    <%= link("Close", class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @c.id), method: :put) %>
-                <% else %>
-                    <span class="dropdown-item disabled">Closed</span>
+                    <%= if @dispositions != [] do %>
+                        <label class="custom-select">Close with:</label>
+                        <div class="form-group">
+                            <div class="form-label-group">
+
+                                <%= for {key, value} <- @dispositions do %>
+                                    <%= link(key, class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @c.id, disposition_id: value), method: :put) %>
+                                <% end %>
+                            </div>
+                        </div>
+                    <% else %>
+                        <%= link("Close", class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @conversation.id), method: :put) %>
+                    <% end %>
                 <% end %>
             </div>
         </div>

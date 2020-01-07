@@ -29,12 +29,19 @@ defmodule MainWeb.ConversationMessageController do
       |> current_user()
       |> ConversationMessages.all(conversation_id)
 
+    dispositions =
+      conn
+      |> current_user()
+      |> Data.Disposition.get_by_team_id(location.team_id)
+      |> Enum.map(fn disposition ->  {disposition.disposition_name, disposition.id} end)
+
     render conn, "index.html",
       location: location,
       conversation: conversation,
       messages: messages,
       team_members: team_members,
       teams: teams(conn),
+      dispositions: dispositions,
       has_sidebar: True,
       changeset: ConversationMessages.get_changeset()
   end

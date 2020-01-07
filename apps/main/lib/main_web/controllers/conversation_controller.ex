@@ -22,7 +22,13 @@ defmodule MainWeb.ConversationController do
     my_conversations =
       Enum.filter(conversations, fn(c) -> c.team_member && c.team_member.user_id == current_user(conn).id end)
 
-    render conn, "index.html", location: location, conversations: conversations, my_conversations: my_conversations, teams: teams(conn)
+    dispositions =
+      conn
+      |> current_user()
+      |> Data.Disposition.get_by_team_id(location.team_id)
+      |> Enum.map(fn disposition ->  {disposition.disposition_name, disposition.id} end)
+
+    render conn, "index.html", location: location, conversations: conversations, my_conversations: my_conversations, teams: teams(conn), dispositions: dispositions
   end
 
   def new(conn, %{"location_id" => location_id}) do
@@ -99,17 +105,31 @@ defmodule MainWeb.ConversationController do
     end
   end
 
-  def close(conn, %{"conversation_id" => id, "location_id" => location_id}) do
+  def close(conn, %{"conversation_id" => id, "location_id" => location_id} = params) do
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
 
     user_info = Formatters.format_team_member(current_user(conn))
-    message = %{"conversation_id" => id,
-                "phone_number" => current_user(conn).phone_number,
-                "message" => "CLOSED: Closed by #{user_info}",
-                "sent_at" => DateTime.utc_now()}
+
+    message = if params["disposition_id"] do
+      Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => params["disposition_id"]})
+      disposition =
+        conn
+        |> current_user()
+        |> Data.Disposition.get(params["disposition_id"])
+
+      %{"conversation_id" => id,
+        "phone_number" => current_user(conn).phone_number,
+        "message" => "CLOSED: Closed by #{user_info} with disposition #{disposition.disposition_name}",
+        "sent_at" => DateTime.utc_now()}
+    else
+        %{"conversation_id" => id,
+          "phone_number" => current_user(conn).phone_number,
+          "message" => "CLOSED: Closed by #{user_info}",
+          "sent_at" => DateTime.utc_now()}
+    end
 
     with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
          {:ok, _} <- ConversationMessages.create(message) do

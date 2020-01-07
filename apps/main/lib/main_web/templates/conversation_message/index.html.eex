@@ -79,18 +79,26 @@
                             ...
                         </button>
                         <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                            <%= if @conversation.status != "open" do %>
+                            <%= if @conversation.status == "closed" do %>
                                 <%= link("Open", class: "dropdown-item",
                                     to: team_location_conversation_conversation_path(@conn, :open, @location.team_id, @location.id, @conversation.id),
                                     method: :put) %>
-                            <% else %>
-                                <span class="dropdown-item disabled">Open</span>
                             <%  end %>
 
                             <%= if @conversation.status != "closed" do %>
-                                <%= link("Close", class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @conversation.id), method: :put) %>
-                            <% else %>
-                                <span class="dropdown-item disabled">Closed</span>
+                                <%= if @dispositions != [] do %>
+                                    <label class="custom-select">Close with:</label>
+                                    <div class="form-group">
+                                        <div class="form-label-group">
+
+                                            <%= for {key, value} <- @dispositions do %>
+                                                <%= link(key, class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @conversation.id, disposition_id: value), method: :put) %>
+                                            <% end %>
+                                        </div>
+                                    </div>
+                                <% else %>
+                                    <%= link("Close", class: "dropdown-item", to: team_location_conversation_conversation_path(@conn, :close, @location.team_id, @location.id, @conversation.id), method: :put) %>
+                                <% end %>
                             <% end %>
                         </div>
                     </div>

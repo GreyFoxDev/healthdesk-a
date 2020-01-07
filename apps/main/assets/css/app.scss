@@ -24,3 +24,9 @@ body {
 .message-body {
     margin: 0 !important;
 }
+
+.custom-select {
+    height: auto;
+    padding-top: calc(.75rem + .75rem * (2 / 3));
+    padding-bottom: calc(.75rem / 3);
+}

@@ -9,6 +9,5 @@ defmodule Data.ReadOnly.Repo.Migrations.CreateDispositions do
 
       timestamps()
     end
-
   end
 end
