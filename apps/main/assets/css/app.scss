@@ -31,5 +31,7 @@ body {
     padding-bottom: calc(.75rem / 3) !important;
 }
 
+@media (max-width:600px) {
 .message-header-actions {
   margin-left: 0 !important; }
+}
