@@ -26,7 +26,7 @@ body {
 }
 
 .custom-select {
-    height: auto;
+    height: auto !important;
     padding-top: calc(.75rem + .75rem * (2 / 3)) !important;
     padding-bottom: calc(.75rem / 3) !important;
 }
