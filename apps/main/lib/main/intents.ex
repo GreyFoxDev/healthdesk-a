@@ -58,7 +58,7 @@ defmodule MainWeb.Intents do
   def get({:unknown, _}, _location),
     do: @default_response
 
-  def get({"getMembershipPricing", _}, location) do
+  def get({"routeSales", _}, location) do
     """
     We'd be happy to share information about our membership plans and pricing. When is the best day and time for you to stop by for a tour? Or if you'd prefer, when's the best time to give you a call? 
     """
