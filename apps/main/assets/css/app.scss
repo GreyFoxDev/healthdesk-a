@@ -7,6 +7,12 @@ body {
   background-color: $white;
 }
 
+.conversation-outbound .conversation-avatar+.conversation-message .conversation-message-text {
+  color: white !important; }
+
+.conversation-outbound .conversation-message-skip-avatar {
+  padding-right: 0 !important; }
+
 .message-header {
   justify-content: center; }
 
