@@ -6,7 +6,7 @@
             <div class="input-group bg-white border-white input-group-lg circle">
                 <input type="email" class="form-control text-black" placeholder="Your email">
                 <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary circle"><span class="d-none d-sm-inline">Subcribe</span> <span class="d-inline d-sm-none" aria-label="Subcribe"><i class="fa fa-arrow-circle-right"></i></span></button>
+                    <button type="submit" class="btn btn-primary circle"><span class="d-none d-sm-inline">Subscribe</span> <span class="d-inline d-sm-none" aria-label="Subcribe"><i class="fa fa-arrow-circle-right"></i></span></button>
                 </div>
             </div>
         </div>
