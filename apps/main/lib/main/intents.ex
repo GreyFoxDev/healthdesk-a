@@ -60,8 +60,7 @@ defmodule MainWeb.Intents do
 
   def get({"getMembershipPricing", _}, location) do
     """
-    We offer 3 membership plans. Here's a link to our Join Online page:
-    https://10fitness.com/location-select/
+    We'd be happy to share information about our membership plans and pricing. When is the best day and time for you to stop by for a tour? Or if you'd prefer, when's the best time to give you a call? 
     """
   end
 
