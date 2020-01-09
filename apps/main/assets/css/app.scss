@@ -7,6 +7,10 @@ body {
   background-color: $white;
 }
 
+top-bar-brand a img {
+  width: 160px !important;
+max-width: 160px !important;}
+
 .cover {
   height: 100vh;
   display: flex;
