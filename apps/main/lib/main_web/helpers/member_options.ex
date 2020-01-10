@@ -24,7 +24,7 @@ defmodule MainWeb.Helper.MemberOptions do
     [
       {"Not Subscribed", ""},
       {"Subscribed", true},
-      {"Unsubsribed", false}
+      {"Unsubscribed", false}
     ]
   end
 
