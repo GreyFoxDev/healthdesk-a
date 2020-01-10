@@ -16,7 +16,7 @@ defmodule MainWeb.Intents.ChildCareHours do
   @closed "[date_prefix], our child care is closed."
   @no_child_care "Unfortunately, we don't offer child care."
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-  @default_response "I'm checking with a teammate for assistance. One moment please..."
+  @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
 
   @impl MainWeb.Intents
   def build_response([datetime: datetime], location) do
