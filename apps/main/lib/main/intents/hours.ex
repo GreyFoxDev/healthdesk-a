@@ -11,11 +11,11 @@ defmodule MainWeb.Intents.Hours do
 
   @behaviour MainWeb.Intents
 
-  @hours "[date_prefix], our hours are [open] to [close]."
-  @closed "[date_prefix], we are closed."
+  @hours "[date_prefix], our hours are [open] to [close]. Is there anything else we can assist you with?"
+  @closed "[date_prefix], we are closed. Is there anything else we can assist you with?"
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-  @default_response "I'm checking with a teammate for assistance. One moment please..."
-  @alt_response "Members have 24/7 keycard access. [date_prefix], our staff hours are [open] to [close]."
+  @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
+  @alt_response "Members have 24/7 keycard access. [date_prefix], our staff hours are [open] to [close]. Is there anything else we can assist you with?"
 
 
   @impl MainWeb.Intents
