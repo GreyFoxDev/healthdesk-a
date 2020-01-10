@@ -30,9 +30,9 @@
 
     <body>
         <main class="auth">
-            <header id="auth-header" class="auth-header">
+<!--             <header id="auth-header" class="auth-header">
                 <canvas class="particles-js-canvas-el" style="width:100%; height:100%;" width="2760" height="522"></canvas>
-            </header>
+            </header> -->
 
             <%= if get_flash(@conn, :error) do %>
                 <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
