@@ -19,20 +19,25 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous" />
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" />
         <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>" />
-        <header class="app-header app-header-dark">
+<!--         <header class="app-header app-header-dark">
             <div class="top-bar">
                 <div class="top-bar-brand">
                     <a href="/"><img src="https://raw.githubusercontent.com/HealthdeskAI/healthdesk-ai/master/apps/main/assets/static/images/healthdesk-logo.png?token=AHWZN6XK6IUUHHQI6YVCJUC6D7IV4"/></a>
                 </div>
             </div>
-        </header>
+        </header> -->
     </head>
 
     <body>
         <main class="auth">
-<!--             <header id="auth-header" class="auth-header">
+            <header id="auth-header" class="app-header app-header-dark">
                 <canvas class="particles-js-canvas-el" style="width:100%; height:100%;" width="2760" height="522"></canvas>
-            </header> -->
+                <div class="top-bar">
+                    <div class="top-bar-brand">
+                        <a href="/"><img src="https://raw.githubusercontent.com/HealthdeskAI/healthdesk-ai/master/apps/main/assets/static/images/healthdesk-logo.png?token=AHWZN6XK6IUUHHQI6YVCJUC6D7IV4"/></a>
+                    </div>
+                </div>
+            </header>
 
             <%= if get_flash(@conn, :error) do %>
                 <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
