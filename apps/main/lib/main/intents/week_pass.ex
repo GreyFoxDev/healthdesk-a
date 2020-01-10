@@ -12,11 +12,11 @@ defmodule MainWeb.Intents.WeekPass do
   require Logger
 
   @pass """
-  Our week pass is $[week_pass_price]. Please visit our front desk to purchase.
+  Our week pass is $[week_pass_price]. Please visit our front desk to purchase. Is there anything else we can assist you with?
   """
 
   @no_pass """
-  Unfortunately, we don't offer a week pass.
+  Unfortunately, we don't offer a week pass. Is there anything else we can assist you with?
   """
 
   @behaviour MainWeb.Intents
