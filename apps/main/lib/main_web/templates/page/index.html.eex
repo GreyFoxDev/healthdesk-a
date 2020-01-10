@@ -1,19 +1,9 @@
 <div class="empty-state-container">
-    <h1 class="state-header">Healthdesk AI is launching soon! </h1>
-    <p class="state-description lead">Build better relationships with your gym members through AI</p>
-    <form class="w-75 mx-auto">
-        <div class="form-group">
-            <div class="input-group bg-white border-white input-group-lg circle">
-                <input type="email" class="form-control text-black" placeholder="Your email">
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary circle"><span class="d-none d-sm-inline">Subscribe</span> <span class="d-inline d-sm-none" aria-label="Subcribe"><i class="fa fa-arrow-circle-right"></i></span></button>
-                </div>
-            </div>
-        </div>
-    </form>
+    <h1 class="state-header">Healthdesk.ai Admin Portal</h1>
+    <p class="state-description lead">Build deeper relationships with your members and guests.</p>
     <div class="state-action">
         <div class="text-center pt-3">
-            Already registered? Click <a href="/login" class="link">here</a> to login.
+            Click <a href="/login" class="link">here</a> to login.
         </div>
     </div>
 </div>
