@@ -11,7 +11,7 @@ defmodule MainWeb.Intents.ClassSchedule do
   @behaviour MainWeb.Intents
 
   @classes "[date]:\n[classes]"
-  @default_response "I'm checking with a teammate for assistance. One moment please..."
+  @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
   @no_classes "There are no classes scheduled for [date_prefix]. Please ask about a different day."
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
