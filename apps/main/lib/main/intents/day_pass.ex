@@ -12,11 +12,11 @@ defmodule MainWeb.Intents.DayPass do
   require Logger
 
   @pass """
-  Our day pass is $[day_pass_price]. Please visit our front desk to purchase.
+  Our day pass is $[day_pass_price]. Please visit our front desk to purchase. Is there anything else we can assist you with?
   """
 
   @no_pass """
-  Unfortunately, we don't offer a day pass.
+  Unfortunately, we don't offer a day pass. Is there anything else we can assist you with?
   """
 
   @behaviour MainWeb.Intents
