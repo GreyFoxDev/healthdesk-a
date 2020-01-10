@@ -10,10 +10,12 @@ defmodule MainWeb.Intents.Wifi do
   Free WiFi:
   Network: [wifi_name]
   Password: [wifi_password]
+  
+  Is there anything else we can assist you with?
   """
 
   @no_wifi """
-  Unfortunately, we don't offer free WiFi.
+  Unfortunately, we don't offer free WiFi. Is there anything else we can assist you with?
   """
 
   @behaviour MainWeb.Intents
