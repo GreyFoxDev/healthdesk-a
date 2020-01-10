@@ -11,7 +11,7 @@ defmodule MainWeb.Intents.ClassCategory do
   @behaviour MainWeb.Intents
 
   @classes "[category]:\n[classes]"
-  @default_response "I'm checking with a teammate for assistance. One moment please..."
+  @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
   @no_classes "It doesn't look like we have a class category by that name. (Please ensure correct spelling)"
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
