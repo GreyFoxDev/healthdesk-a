@@ -11,6 +11,6 @@ defmodule MainWeb.Intents.Generic do
   end
 
   def build_response(_args, _location),
-    do: "Not sure about that. Give me a minute..."
+    do: "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
 
 end
