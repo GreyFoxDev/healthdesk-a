@@ -30,12 +30,10 @@
 
     <body>
         <main class="auth">
-            <header id="auth-header" class="app-header app-header-dark">
+            <header id="auth-header" class="auth-header">
                 <canvas class="particles-js-canvas-el" style="width:100%; height:100%;" width="2760" height="522"></canvas>
-                <div class="top-bar">
-                    <div class="top-bar-brand">
-                        <a href="/"><img src="https://raw.githubusercontent.com/HealthdeskAI/healthdesk-ai/master/apps/main/assets/static/images/healthdesk-logo.png?token=AHWZN6XK6IUUHHQI6YVCJUC6D7IV4"/></a>
-                    </div>
+                <div class="auth-header">
+                    <a href="/"><img src="https://raw.githubusercontent.com/HealthdeskAI/healthdesk-ai/master/apps/main/assets/static/images/healthdesk-logo.png?token=AHWZN6XK6IUUHHQI6YVCJUC6D7IV4"/></a>
                 </div>
             </header>
 
