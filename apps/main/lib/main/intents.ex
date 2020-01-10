@@ -77,7 +77,6 @@ defmodule MainWeb.Intents do
     """
     Thank you for your message. May I ask, why are you looking to cancel today? 
     """
-  end
 
   def get({"routeFrontDesk", _}, location) do
     """
