@@ -58,9 +58,35 @@ defmodule MainWeb.Intents do
   def get({:unknown, _}, _location),
     do: @default_response
 
-  def get({"routeSales", _}, location) do
+  def get({"routeNewSales", _}, location) do
     """
     We'd be happy to share information about our membership plans and pricing. When is the best day and time for you to stop by for a tour? Or if you'd prefer, when's the best time to give you a call? 
+    """
+    
+  def get({"routeHousekeeping", _}, location) do
+    """
+    Thank you for your message. We apologize for any inconvenience and are notifying our front desk now. Would you like us to follow-up with you? 
+    """
+
+  def get({"routeLostFound", _}, location) do
+    """
+    Thank you for your message. We are notifying our front desk now to check our Lost & Found. Can I please have your first and last name? 
+    """
+
+  def get({"routeRetention", _}, location) do
+    """
+    Thank you for your message. May I ask, why are you looking to cancel today? 
+    """
+  end
+
+  def get({"routeFrontDesk", _}, location) do
+    """
+    Thank you for your message. Can I please have your first and last name? 
+    """
+    
+  def get({"routeSupport", _}, location) do
+    """
+    Thank you for your message. Can I please have your first and last name? 
     """
   end
 
