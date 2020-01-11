@@ -96,7 +96,7 @@ defmodule MainWeb.ConversationController do
     with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "open"}),
          {:ok, _} <- ConversationMessages.create(message) do
 
-      redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
+      redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id))
     else
       {:error, changeset} ->
         conn
