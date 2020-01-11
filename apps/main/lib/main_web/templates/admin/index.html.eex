@@ -39,7 +39,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> NUMBER OF LOCATIONS </h2>
+                <h2 class="metric-label"> LOCATIONS </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-fork"></i></sub> <span class="value">
                         <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.locations + acc end) %>
@@ -53,7 +53,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> NUMBER OF LOCATION ADMINS </h2>
+                <h2 class="metric-label"> LOCATION ADMINS </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-people"></i></sub> <span class="value">
                         <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.location_admins + acc end) %>
@@ -67,7 +67,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> NUMBER OF TEAMMATES </h2>
+                <h2 class="metric-label"> TEAMMATES </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-people"></i></sub> <span class="value">
                         <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.teammates + acc end) %>
@@ -98,7 +98,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> NUMBER OF SESSIONS </h2>
+                <h2 class="metric-label"> SESSIONS </h2>
                 <p class="metric-value h3">
                     <span class="value">
                         <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.total_sessions + acc end) %>
@@ -176,7 +176,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> TOTAL SESSIONS BY CHANNEL </h2>
+                <h2 class="metric-label"> SESSIONS BY CHANNEL </h2>
                 <p class="metric-label">
                     <canvas id="canvas-sessions-by-channel" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
                 </p>
