@@ -53,7 +53,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> LOCATION ADMINS </h2>
+                <h2 class="metric-label"> ADMINS </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-people"></i></sub> <span class="value">
                         <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.location_admins + acc end) %>
@@ -131,7 +131,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> NUMBER OF INBOUND MESSAGES </h2>
+                <h2 class="metric-label"> INBOUND SMS </h2>
                 <p class="metric-value h3">
                     <span class="value">
                         <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.inbound_messages + acc end) %>
@@ -145,7 +145,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> AVG. MESSAGES PER USER </h2>
+                <h2 class="metric-label"> MESSAGES PER USER </h2>
                 <p class="metric-value h3">
                     <span class="value">
                         <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.average_messages_per_member + acc end) %>
@@ -159,7 +159,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> AVG. SESSIONS PER USER </h2>
+                <h2 class="metric-label"> SESSIONS PER USER </h2>
                 <p class="metric-value h3">
                     <span class="value">
                         <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.average_sessions_per_member + acc end) %>
