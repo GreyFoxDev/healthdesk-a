@@ -16,7 +16,8 @@ defmodule Chatbot.Params do
     :provider,
     :from,
     :to,
-    :body
+    :body,
+    :twilio_flow_id
   ]
 
   def build(%{provider: provider} = params)
@@ -26,7 +27,8 @@ defmodule Chatbot.Params do
        provider: provider,
        from: params[:from],
        to: params[:to],
-       body: params[:body]
+       body: params[:body],
+       twilio_flow_id: params[:twilio_flow_id]
      }}
   end
 

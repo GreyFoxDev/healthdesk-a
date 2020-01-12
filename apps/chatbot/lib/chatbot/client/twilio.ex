@@ -24,7 +24,7 @@ defmodule Chatbot.Client.Twilio do
     ExTwilio.Api.create(
       ExTwilio.Studio.Execution,
       [to: params.to, from: params.from, parameters: body],
-      [flow_sid: "FW91649ae1a2817ee9685fa4d5092d7fb6"]
+      [flow_sid: params.twilio_flow_id]
     )
   end
 

@@ -38,7 +38,8 @@ defmodule MainWeb.FlowController do
       location_name: params.location_name,
       home_club: params.home_club,
       new_club: params.new_club,
-      message: params.message
+      message: params.message,
+      twilio_flow_id: location.team.twilio_flow_id
     }
   end
 

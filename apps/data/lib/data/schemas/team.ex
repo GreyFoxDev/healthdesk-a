@@ -10,6 +10,7 @@ defmodule Data.Schema.Team do
 
   @optional_fields ~w|
     team_member_count
+    twilio_flow_id
     deleted_at
   |a
 
@@ -19,6 +20,7 @@ defmodule Data.Schema.Team do
     field(:team_name, :string)
     field(:website, :string)
     field(:team_member_count, :integer)
+    field(:twilio_flow_id, :string)
 
     field(:deleted_at, :utc_datetime)
 
