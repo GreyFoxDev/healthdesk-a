@@ -3,6 +3,8 @@ defmodule MainWeb.Plug.Broadcast do
 
   import Plug.Conn
 
+  require Logger
+
   alias Data.Commands.Member, as: MCommand
   alias Data.Commands.Location, as: LCommand
 
@@ -13,6 +15,7 @@ defmodule MainWeb.Plug.Broadcast do
   def call(conn, opts)
 
   def call(%{assigns: %{convo: convo, member: member, location: location, message: message} = assigns} = conn, _opts) do
+    Logger.info "BROADCAST: #{inspect conn}"
     with {:ok, nil} <- MCommand.get_by_phone(member) do
       MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, phone_number: member})
     else
