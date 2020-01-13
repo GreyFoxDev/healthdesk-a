@@ -1,7 +1,8 @@
 defmodule MainWeb.ConversationMessageController do
   use MainWeb.SecuredContoller
 
-  alias Data.{ConversationMessages, Conversations, Location, TeamMember}
+  alias Data.{ConversationMessages, Conversations, Location, MemberChannel, TeamMember}
+  alias Data.Schema.MemberChannel, as: Channel
   alias MainWeb.Endpoint
 
   require Logger
@@ -23,6 +24,7 @@ defmodule MainWeb.ConversationMessageController do
       conn
       |> current_user()
       |> Conversations.get(conversation_id)
+      |> fetch_member()
 
     messages =
       conn
@@ -45,6 +47,13 @@ defmodule MainWeb.ConversationMessageController do
       has_sidebar: True,
       changeset: ConversationMessages.get_changeset()
   end
+
+  def fetch_member(%{original_number: << "CH", _rest :: binary >> = channel} = conversation) do
+    with %Channel{} = channel <- MemberChannel.get_by_channel_id(%{role: "admin"}, channel) do
+      Map.put(conversation, :member, channel.member)
+    end
+  end
+  def fetch_member(conversation), do: conversation
 
   def create(conn, %{"location_id" => location_id, "conversation_id" => conversation_id} = params) do
     location =
