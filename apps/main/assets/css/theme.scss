@@ -56,9 +56,13 @@ b > a {
     max-width: 600px;
   }
 }
-
+ 
+@media (min-width:980px) {
 .user-avatar-wrapper {
   padding-left: 40px;
+}
+}
+.user-avatar-wrapper {
   display: block;
 
   .user-avatar {
