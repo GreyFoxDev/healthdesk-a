@@ -24,4 +24,12 @@ defmodule Data.Query.ReadOnly.Disposition do
   def get(id),
     do: Repo.get(Disposition, id)
 
+  def count(disposition_id) do
+    (from cd in Data.Schema.ConversationDisposition,
+      join: d in Disposition, on: cd.disposition_id == d.id,
+      where: d.id == ^disposition_id,
+      select: count(cd.id)
+    ) |> Repo.one
+  end
+
 end

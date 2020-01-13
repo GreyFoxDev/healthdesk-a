@@ -9,6 +9,8 @@ defmodule Data.Disposition do
     "team-admin"
   ]
 
+  defdelegate count(disposition_id), to: Data.Query.ReadOnly.Disposition
+
   def get_changeset(),
     do: Data.Schema.Disposition.changeset(%Data.Schema.Disposition{})
 

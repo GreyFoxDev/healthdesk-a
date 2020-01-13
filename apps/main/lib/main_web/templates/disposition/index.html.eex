@@ -33,6 +33,7 @@
                         <%= else %>
                             <%= for disposition <- @dispositions do %>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><b><%= Data.Disposition.count(disposition.id) %></b></span>
                                     <span><b><%= disposition.disposition_name %></b></span>
 
                                     <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_disposition_path(@conn, :delete, @team.id, disposition.id), method: "delete" %>
