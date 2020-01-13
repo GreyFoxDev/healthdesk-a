@@ -20,12 +20,6 @@ defmodule MainWeb.FlowController do
           from: attrs.location,
           body: params})
 
-    Logger.info "*************************************"
-    Logger.info "PARAMS: #{inspect params}"
-    Logger.info "*************************************"
-    Logger.info "RESULT: #{inspect result}"
-    Logger.info "*************************************"
-
     conn
     |> put_status(200)
     |> json(%{status: :success})

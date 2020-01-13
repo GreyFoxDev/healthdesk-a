@@ -13,7 +13,7 @@ defmodule MainWeb.AdminController do
 
     if current_user.role == "admin" do
       metrics = Metrics.all_teams()
-      render(conn, "index.html", metrics: Metrics.all_teams(), teams: teams, location: nil, team_id: nil)
+      render(conn, "index.html", metrics: metrics, teams: teams, location: nil, team_id: nil)
     else
       render(conn, "index.html", metrics: [Metrics.team(current_user.team_member.team_id)], teams: teams, location: nil, team_id: nil)
     end

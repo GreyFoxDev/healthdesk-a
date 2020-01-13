@@ -15,6 +15,7 @@ defmodule Data.Schema.MetricsTeam do
     field(:average_sessions_per_member, :float)
     field(:total_sms_sessions, :integer)
     field(:total_web_sessions, :integer)
+    field(:total_facebook_sessions, :integer)
     field(:bounce_rate, :float)
 
     belongs_to(:team, Data.Schema.Team)
