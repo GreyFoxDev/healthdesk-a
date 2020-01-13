@@ -51,6 +51,14 @@ max-width: 160px !important;}
   margin-left: 0 !important; }
 }
 
+@media (max-width: 980px) {
+.list-group-item-text {
+  max-height: 20px;
+  overflow: hidden;
+}
+}
+
+
 .empty-state-fullpage {
   background: linear-gradient(to bottom, #0c0c2a 0%,#2d1960 100%) !important; }
 
