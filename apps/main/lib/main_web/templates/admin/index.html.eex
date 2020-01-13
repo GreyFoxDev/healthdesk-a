@@ -80,19 +80,6 @@
 
 <div class="metric-row">
     <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> OPT-INS </h2>
-                <p class="metric-value h3">
-                    <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.members + acc end) %>
-                    </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
     <!-- metric column -->
     <div class="col-12 col-sm-6 col-lg-3">
         <!-- .metric -->
@@ -108,66 +95,10 @@
         </div><!-- /.metric -->
     </div><!-- /metric column -->
     <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> BOUNCE RATE </h2>
-                <p class="metric-value h3">
-                    <span class="value">
-                        <%= unless Enum.empty?(@metrics) do %>
-                            <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.bounce_rate + acc end) / Enum.count(@metrics) %> %
-                        <% end %>
-                    </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
 </div>
 
 <div class="metric-row">
     <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> INBOUND SMS </h2>
-                <p class="metric-value h3">
-                    <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.inbound_messages + acc end) %>
-                    </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> MESSAGES PER USER </h2>
-                <p class="metric-value h3">
-                    <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.average_messages_per_member + acc end) %>
-                    </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> SESSIONS PER USER </h2>
-                <p class="metric-value h3">
-                    <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.average_sessions_per_member + acc end) %>
-                    </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
 </div>
 
 <div class="metric-row">
