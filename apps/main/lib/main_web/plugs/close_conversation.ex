@@ -23,16 +23,19 @@ defmodule MainWeb.Plug.CloseConversation do
   then no need to do anything. Just return the connection.
   """
   def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
+    Logger.warn "STATUS: pending: #{inspect conn}"
 
-    if conn.assigns[:response] && conn.assigns[:response] != "" do
+    convo = C.get(id)
+
+    count = convo.conversation_messages
+    |> Enum.filter(fn m -> m.message == @default end)
+    |> Enum.count()
+
+    if count < 2 && conn.assigns[:response] == @default do
       CM.write_new_message(id, location, conn.assigns[:response])
     end
 
     C.pending(id)
-    conn
-  end
-  def call(%{assigns: %{convo: id, location: location, opt_in: false}} = conn, _opts) do
-    CM.write_new_message(id, location, conn.assigns[:response])
     conn
   end
 
@@ -54,6 +57,7 @@ defmodule MainWeb.Plug.CloseConversation do
   If the question has been answered then close the conversation
   """
   def call(%{assigns: %{convo: id, location: location} = assigns} = conn, _opts) do
+    Logger.warn "STATUS: #{assigns.status}: #{inspect conn}"
     CM.write_new_message(id, location, conn.assigns[:response])
     C.close(id)
 
