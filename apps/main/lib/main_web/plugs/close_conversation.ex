@@ -24,13 +24,7 @@ defmodule MainWeb.Plug.CloseConversation do
   """
   def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
 
-    convo = C.get(id)
-
-    count = convo.conversation_messages
-    |> Enum.filter(fn m -> m.message == @default end)
-    |> Enum.count()
-
-    if count < 2 && conn.assigns[:response] == @default do
+    if conn.assigns[:response] && conn.assigns[:response] != "" do
       CM.write_new_message(id, location, conn.assigns[:response])
     end
 

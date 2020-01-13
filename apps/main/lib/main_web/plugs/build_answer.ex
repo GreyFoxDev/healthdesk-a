@@ -49,8 +49,7 @@ defmodule MainWeb.Plug.BuildAnswer do
 
   def call(%{assigns: %{opt_in: true, status: "pending"} = assigns} = conn, _opts) do
     :ok = notify_admin_user(assigns)
-
-    assign(conn, :response, Intents.get(:unknown_intent, assigns.location))
+    conn
   end
 
   def call(conn, _opts), do: conn
