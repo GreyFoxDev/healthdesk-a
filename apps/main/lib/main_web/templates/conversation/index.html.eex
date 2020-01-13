@@ -35,27 +35,6 @@
 
 <header class="page-title-bar">
     <div class="d-flex justify-content-between">
-        <div class="input-group has-clearable message-search">
-            <div class="input-group-prepend">
-                <span class="input-group-text"><span class="oi oi-magnifying-glass"></span></span>
-            </div>
-            <input type="text" class="form-control" placeholder="Search message">
-            <div class="input-group-append">
-                <div class="dropdown">
-                    <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last updated <span class="fa fa-caret-down"></span></button>
-                    <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
-                    <div class="dropdown-menu dropdown-menu-right stop-propagation">
-                        <h6 class="dropdown-header"> Sort By </h6>
-                        <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="0"> <span class="custom-control-label">Name</span></label>
-                        <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="1"> <span class="custom-control-label">Name <span class="text-muted">(Decs)</span></span></label>
-                        <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="2" checked=""> <span class="custom-control-label">Last updated</span></label>
-                        <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="3"> <span class="custom-control-label">Oldest updated</span></label>
-                        <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="4"> <span class="custom-control-label">Last created</span></label>
-                        <label class="custom-control custom-radio"><input type="radio" class="custom-control-input" name="sortTeamsBy" value="5"> <span class="custom-control-label">Oldest created</span></label>
-                    </div><!-- /.dropdown-menu -->
-                </div><!-- /.dropdown -->
-            </div>
-        </div><!-- /.input-group -->
         &nbsp;
         <%= if assigns[:current_user].role in ["admin", "team-admin", "location-admin"] do %> 
             <a href="<%= team_location_conversation_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-primary">
