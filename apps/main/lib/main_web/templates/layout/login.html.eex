@@ -19,31 +19,25 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous" />
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" />
         <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>" />
-<!--         <header class="app-header app-header-dark">
-            <div class="top-bar">
-                <div class="top-bar-brand">
-                    <a href="/"><img src="https://raw.githubusercontent.com/HealthdeskAI/healthdesk-ai/master/apps/main/assets/static/images/healthdesk-logo.png?token=AHWZN6XK6IUUHHQI6YVCJUC6D7IV4"/></a>
-                </div>
-            </div>
-        </header> -->
     </head>
-
     <body>
         <main class="auth">
-            <header id="auth-header" class="auth-header">
-                <canvas class="particles-js-canvas-el" style="width:100%; height:100%;" width="2760" height="522"></canvas>
-                <div class="auth-header">
-                    <div class="top-bar-brand">
-                        <a href="/"><img src="https://raw.githubusercontent.com/HealthdeskAI/healthdesk-ai/master/apps/main/assets/static/images/healthdesk-logo.png?token=AHWZN6XK6IUUHHQI6YVCJUC6D7IV4"/></a>
-                    </div>
-                </div>
-            </header>
+             <header id="auth-header" class="auth-header" style="background-image: url(assets/images/illustration/img-1.png);">
+        <h1><a href="https://healthdesk.ai" target="_blank">
+<img class="branding" width="250px" src="https://raw.githubusercontent.com/HealthdeskAI/healthdesk-ai/master/apps/main/assets/static/images/healthdesk-logo.png?token=AHWZN6XK6IUUHHQI6YVCJUC6D7IV4"/></a>
+        </h1>
+        <p> Don't have an account? <a href="https://calendly.com/healthdesk" target="_blank">Request a Free Trial</a>
+        </p>
+      </header><!-- form -->
 
             <%= if get_flash(@conn, :error) do %>
                 <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
             <% end %>
 
             <%= render @view_module, @view_template, assigns %>
+                  <!-- copyright -->
+      <footer class="auth-footer"> © 2020 All Rights Reserved. <a href="https://healthdesk.ai/privacy/" target="_blank">Privacy</a> and <a href="https://healthdesk.ai/terms/" target="_blank">Terms</a><br> <div class="text-center"> <a href="mailto:support@healthdesk.ai">support@healthdesk.ai</a></div>
+      </footer>
         </main>
     </body>
 </html>
