@@ -23,7 +23,7 @@
                 </p>
             <% else %>
                 <p class="list-group-item-text">
-                    Assigned to: <%= format_phone(@conversation.original_number) |> format_assigned() %>
+                    Assigned to: <%= format_assigned(@conversation.original_number) %>
                 </p>
             <% end %>
         </div>
@@ -201,7 +201,7 @@
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
-                                                        <%= format_phone(@conversation.original_number) |> format_assigned() %>
+                                                        <%= format_assigned(@conversation.original_number) %>
                                                     <% else %>
                                                         <%= format_phone(message.phone_number) %>
                                                     <% end %>
@@ -221,7 +221,7 @@
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                                 <div class="conversation-meta">
                                                     <%= if message.phone_number == @location.phone_number do %>
-                                                        <%= format_phone(@conversation.original_number) |> format_assigned() %>
+                                                        <%= format_assigned(@conversation.original_number) %>
                                                     <% else %>
                                                         <%= format_phone(message.phone_number) %>
                                                     <% end %>

@@ -3,12 +3,14 @@ defmodule MainWeb.Plug.SaveMemberData do
 
   import Plug.Conn
 
-  alias Data.{Member, Team, Location}
+  alias Data.{Member, MemberChannel, Team, Location}
+
+  @role %{role: "admin"}
 
   @spec init(list()) :: list()
   def init(opts), do: opts
 
-  def call(%{assigns: %{memberName: name, phoneNumber: phone, location: location}} = conn, _opts) when phone != nil do
+  def call(%{assigns: %{memberName: name, phoneNumber: phone, location: location} = assigns} = conn, _opts) when phone != nil do
     l = Location.get_by_phone(location)
     phone = format_phone(phone)
     [first_name, last_name] =
@@ -16,32 +18,45 @@ defmodule MainWeb.Plug.SaveMemberData do
       |> String.split(" ")
       |> format_name()
 
-    with %Data.Schema.Member{} = member <- Member.get_by_phone_number(%{role: "admin"}, phone) do
-      if last_name do
-        Member.update(member.id, %{first_name: first_name, last_name: last_name})
+    {:ok, member} =
+      with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
+        update_member_data(member.id, first_name, last_name)
       else
-        Member.update(member.id, %{first_name: first_name})
+        nil ->
+          create_member_data(l.team_id, first_name, last_name, phone)
       end
-    else
-      nil ->
-      if last_name do
-        Member.create(%{
-              team_id: l.team_id,
-              first_name: first_name,
-              last_name: last_name,
-              phone_number: phone})
-      else
-        Member.create(%{
-              team_id: l.team_id,
-              first_name: first_name,
-              phone_number: phone})
-      end
+
+    if MemberChannel.get_by_channel_id(@role, assigns.member) == nil do
+      MemberChannel.create(%{member_id: member.id, channel_id: assigns.member})
     end
 
     conn
   end
 
   def call(conn, _opts), do: conn
+
+  defp create_member_data(team_id, first_name, nil, phone) do
+    Member.create(%{
+          team_id: team_id,
+          first_name: first_name,
+          phone_number: phone})
+  end
+
+  defp create_member_data(team_id, first_name, last_name, phone) do
+    Member.create(%{
+          team_id: team_id,
+          first_name: first_name,
+          last_name: last_name,
+          phone_number: phone})
+  end
+
+  defp update_member_data(member_id, first_name, nil) do
+    Member.update(member_id, %{first_name: first_name})
+  end
+
+  defp update_member_data(member_id, first_name, last_name) do
+    Member.update(member_id, %{first_name: first_name, last_name: last_name})
+  end
 
   def format_name([first, last] = name), do: name
   def format_name([first]), do: [first, nil]

@@ -30,6 +30,7 @@ defmodule Data.Schema.Member do
     field(:deleted_at, :utc_datetime)
 
     belongs_to(:team, Data.Schema.Team)
+    has_many(:member_channels, Data.Schema.MemberChannel)
 
     timestamps()
   end

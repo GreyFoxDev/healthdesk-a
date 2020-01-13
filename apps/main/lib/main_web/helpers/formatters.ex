@@ -2,6 +2,9 @@ defmodule MainWeb.Helper.Formatters  do
   alias Calendar.Strftime
   require Logger
 
+  alias Data.MemberChannel
+  alias Data.Schema.MemberChannel, as: Channel
+
   def format_role("admin") do
     "Super Admin"
   end
@@ -23,13 +26,23 @@ defmodule MainWeb.Helper.Formatters  do
 
   def format_phone(<< "messenger:", _rest :: binary >>), do: "Facebook Visitor"
 
+  def format_phone(<< "CH", _rest :: binary >> = channel_id) do
+    with %Channel{} = channel <- MemberChannel.get_by_channel_id(%{role: "admin"}, channel_id) do
+      Enum.join([channel.member.first_name, channel.member.last_name], " ")
+    else
+      nil ->
+        "Unknown Vistor"
+    end
+  end
+
   def format_phone(phone_number) do
     "Unknown Visitor"
   end
 
-  def format_assigned("Unknown Visitor"), do: "Website Bot"
-  def format_assigned("Facebook Visitor"), do: "Facebook Bot"
-  def format_assigned(_), do: "SMS Bot"
+  def format_assigned(<< "+1", _rest :: binary >>), do: "SMS Bot"
+  def format_assigned(<< "messenger:", _rest :: binary >>), do: "Facebook Bot"
+  def format_assigned(<< "CH", _rest :: binary >>), do: "Website Bot"
+  def format_assigned(_), do: "Unknown"
 
   def format_team_member(team_member) do
     name = Enum.join([team_member.first_name, team_member.last_name], " ")

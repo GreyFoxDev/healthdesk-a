@@ -68,7 +68,6 @@ defmodule MainWeb.ConversationMessageController do
     |> case do
          {:ok, _message} ->
            message = %{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
-           Logger.info "Message created ************* #{inspect @chatbot} #{inspect message}"
            @chatbot.send(message)
            put_flash(conn, :success, "Sending message was successful")
          {:error, changeset} ->
@@ -76,22 +75,40 @@ defmodule MainWeb.ConversationMessageController do
        end
   end
 
-  defp send_message(conversation, conn, params, location) do
+  defp send_message(%{original_number: << "messenger:", _ :: binary>>} = conversation, conn, params, location) do
     user = current_user(conn)
-
-    [web_location] = Location.get_by_team_id(user, location.team_id) |> Enum.filter(&(&1.web_chat))
 
     params["conversation_message"]
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-           message = %Chatbot.Params{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
-           Logger.info "Message created ************* #{inspect @chatbot} #{inspect message}"
-           Chatbot.Client.Twilio.channel(message)
+           message = %Chatbot.Params{provider: :twilio, from: "messenger:#{location.messanger_id}", to: conversation.original_number, body: params["conversation_message"]["message"]}
+           Chatbot.Client.Twilio.call(message)
            put_flash(conn, :success, "Sending message was successful")
+         {:error, changeset} ->
+           put_flash(conn, :error, "Sending message failed")
+       end
+  end
 
-           # Endpoint.broadcast("web_bot:#{conversation.original_number}", "reply", message)
+  defp send_message(%{original_number: << "CH", _ :: binary >>} = conversation, conn, params, location) do
+    user = current_user(conn)
+
+    [web_location] = Location.get_by_team_id(user, location.team_id) |> Enum.filter(&(&1.web_chat))
+
+    from = if conversation.team_member do
+      Enum.join([conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."], " ")
+    else
+      location.location_name
+    end
+
+    params["conversation_message"]
+    |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
+    |> ConversationMessages.create()
+    |> case do
+         {:ok, _message} ->
+           message = %Chatbot.Params{provider: :twilio, from: from, to: conversation.original_number, body: params["conversation_message"]["message"]}
+           Chatbot.Client.Twilio.channel(message)
            put_flash(conn, :success, "Sending message was successful")
          {:error, changeset} ->
            put_flash(conn, :error, "Sending message failed")
