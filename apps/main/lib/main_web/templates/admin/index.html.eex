@@ -21,6 +21,7 @@
 <script>
  function filterTeam(e) {
      if (e.value == "-99") {
+
          window.location.href = window.location.origin + '/admin';
      }
      else
@@ -28,6 +29,7 @@
          window.location.href = window.location.origin + '/admin?team_id=' + e.value ;
      }
  }
+
 </script>
 <% end %>
 <div class="metric-row">
@@ -78,6 +80,7 @@
 
 <div class="metric-row">
     <!-- metric column -->
+    <!-- metric column -->
     <div class="col-12 col-sm-6 col-lg-3">
         <!-- .metric -->
         <div class="card-metric">
@@ -91,20 +94,7 @@
             </div>
         </div><!-- /.metric -->
     </div><!-- /metric column -->
-      <!-- metric column -->
-        <div class="col-12 col-sm-6 col-lg-3">
-            <!-- .metric -->
-            <div class="card-metric" data-toggle="modal" data-target="#exampleModalLong">
-                <div class="metric">
-                    <h2 class="metric-label"> DISPOSITIONS </h2>
-                    <p class="metric-value h3">
-                        <sub><i class="oi oi-fork"></i></sub> <span class="value">
-                            <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.locations + acc end) %>
-                        </span>
-                    </p>
-                </div>
-            </div><!-- /.metric -->
-        </div><!-- /metric column -->
+    <!-- metric column -->
 </div>
 
 <div class="metric-row">
@@ -141,6 +131,7 @@
              hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC'],
          }],
      };
+
      new Chart(ctx, {
          type: 'pie',
          data: chartData,
@@ -156,35 +147,3 @@
     </script>
 
 </div>
-
-<!-- Modal -->
-  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-        <%= if @dispositions == [] do %>
-        <div class="list-group-item d-flex justify-content-between align-items-center">
-            <div class="alert alert-warning mx-3"> There are no dispositions for this team. </div>
-        </div>
-    <%= else %>
-        <%= for disposition <- @dispositions do %>
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="dis_count"><b><%= Data.Disposition.count(disposition.id) %></b></span>
-                <span><b><%= disposition.disposition_name %></b></span>
-            </div>
-        <% end %>
-    <% end %>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
