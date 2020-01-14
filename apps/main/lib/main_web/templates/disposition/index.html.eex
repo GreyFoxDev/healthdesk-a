@@ -25,6 +25,15 @@
             <div class="card card-fluid">
                 <h6 class="card-header"> Details </h6><!-- .card-body -->
                 <div class="card-body">
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <%=
+                            render "_form.html",
+                            data: @changeset,
+                            action: team_disposition_path(@conn, :create, @team.id),
+                            conn: @conn,
+                            team: @team,
+                            errors: @changeset.errors %>
+                        </div>
                     <div class="list-group list-group-flush list-group-bordered">
                         <%= if @dispositions == [] do %>
                             <div class="list-group-item d-flex justify-content-between align-items-center">
@@ -41,16 +50,6 @@
                                 </div>
                             <% end %>
                         <% end %>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <%=
-                            render "_form.html",
-                            data: @changeset,
-                            action: team_disposition_path(@conn, :create, @team.id),
-                            conn: @conn,
-                            team: @team,
-                            errors: @changeset.errors %>
-                        </div>
-
                     </div><!-- /.card-body -->
                 </div>
             </div>
