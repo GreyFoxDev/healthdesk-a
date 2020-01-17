@@ -10,6 +10,8 @@ defmodule Data.Disposition do
   ]
 
   defdelegate count(disposition_id), to: Data.Query.ReadOnly.Disposition
+  defdelegate count_all(), to: Data.Query.ReadOnly.Disposition
+  defdelegate count_by_team_id(team_id), to: Data.Query.ReadOnly.Disposition
 
   def get_changeset(),
     do: Data.Schema.Disposition.changeset(%Data.Schema.Disposition{})

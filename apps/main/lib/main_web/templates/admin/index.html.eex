@@ -1,39 +1,37 @@
 <%= if @current_user.role == "admin" do %>
-<div class="metric-row">
-    <div class="col-12 col-sm-6 col-lg-3">
-        <h2 class="metric-label"> TEAMS </h2>
-        <select class="form-control" id="team_id" name="team[id]" onchange="filterTeam(this)">
-            <%= unless @team_id do %>
-                <option selected value="-99">All Teams</option>
-            <% else %>
-                <option value="-99">All Teams</option>
-            <% end %>
-            <%= for team <- @teams do %>
-                <%= if team.id == @team_id do %>
-                    <option selected value="<%= team.id %>"><%= team.team_name %></option>
+    <div class="metric-row">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <h2 class="metric-label"> TEAMS </h2>
+            <select class="form-control" id="team_id" name="team[id]" onchange="filterTeam(this)">
+                <%= unless @team_id do %>
+                    <option selected value="-99">All Teams</option>
                 <% else %>
-                    <option value="<%= team.id %>"><%= team.team_name %></option>
+                    <option value="-99">All Teams</option>
                 <% end %>
-            <% end %>
-        </select>
-    </div><!-- /metric column -->
-</div>
-<script>
- function filterTeam(e) {
-     if (e.value == "-99") {
-
-         window.location.href = window.location.origin + '/admin';
+                <%= for team <- @teams do %>
+                    <%= if team.id == @team_id do %>
+                        <option selected value="<%= team.id %>"><%= team.team_name %></option>
+                    <% else %>
+                        <option value="<%= team.id %>"><%= team.team_name %></option>
+                    <% end %>
+                <% end %>
+            </select>
+        </div><!-- /metric column -->
+    </div>
+    <script>
+     function filterTeam(e) {
+         if (e.value == "-99") {
+             window.location.href = window.location.origin + '/admin';
+         }
+         else
+         {
+             window.location.href = window.location.origin + '/admin?team_id=' + e.value ;
+         }
      }
-     else
-     {
-         window.location.href = window.location.origin + '/admin?team_id=' + e.value ;
-     }
- }
-
-</script>
+    </script>
 <% end %>
-<div class="metric-row">
 
+<div class="metric-row">
     <!-- metric column -->
     <div class="col-12 col-sm-6 col-lg-3">
         <!-- .metric -->
@@ -77,7 +75,6 @@
         </div><!-- /.metric -->
     </div><!-- /metric column -->
 </div>
-
 <div class="metric-row">
     <!-- metric column -->
     <!-- metric column -->
@@ -95,8 +92,32 @@
         </div><!-- /.metric -->
     </div><!-- /metric column -->
     <!-- metric column -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <!-- .metric -->
+        <div class="card-metric" data-toggle="modal" data-target="#exampleModalLong">
+            <div class="metric">
+                <h2 class="metric-label"> DISPOSITIONS </h2>
+                <p class="metric-value h3">
+                    <span class="value"><%= Enum.map(@dispositions, &(&1.count)) |> Enum.sum() %>
+                    </span>
+                </p>
+            </div>
+        </div><!-- /.metric -->
+    </div><!-- /metric column -->
+    <!-- metric column -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <!-- .metric -->
+        <div class="card-metric">
+            <div class="metric">
+                <h2 class="metric-label"> SESSIONS PER DAY </h2>
+                <p class="metric-value h3">
+                    <span class="value">12
+                    </span>
+                </p>
+            </div>
+        </div><!-- /.metric -->
+    </div><!-- /metric column -->
 </div>
-
 <div class="metric-row">
     <!-- metric column -->
     <div class="col-12 col-sm-6 col-lg-4">
@@ -110,7 +131,6 @@
             </div>
         </div><!-- /.metric -->
     </div><!-- /metric column -->
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
     <script>
      const ctx = document.getElementById('canvas-sessions-by-channel').getContext('2d');
@@ -131,7 +151,6 @@
              hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC'],
          }],
      };
-
      new Chart(ctx, {
          type: 'pie',
          data: chartData,
@@ -145,5 +164,32 @@
          },
      });
     </script>
+</div>
 
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Dispositions</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <%= for disposition <- @dispositions do %>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <%= disposition.name %>
+                            <span class="badge badge-primary badge-pill"><%= disposition.count %></span>
+                        </li>
+                    <% end %>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button"  data-dismiss="modal" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
 </div>

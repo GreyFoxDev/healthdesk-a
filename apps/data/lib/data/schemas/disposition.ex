@@ -21,6 +21,8 @@ defmodule Data.Schema.Disposition do
 
     belongs_to(:team, Data.Schema.Team)
 
+    has_many(:conversation_dispositions, Data.Schema.ConversationDisposition)
+
     timestamps()
   end
 
