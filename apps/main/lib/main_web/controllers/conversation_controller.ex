@@ -20,7 +20,7 @@ defmodule MainWeb.ConversationController do
       |> Data.Conversations.all(location_id)
 
     my_conversations =
-      Enum.filter(conversations, fn(c) -> c.team_member && c.team_member.user_id == current_user(conn).id end) |> IO.inspect(label: "MY CONVERSATIONS")
+      Enum.filter(conversations, fn(c) -> c.team_member && c.team_member.user_id == current_user(conn).id end)
 
     dispositions =
       conn

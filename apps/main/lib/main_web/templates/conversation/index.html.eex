@@ -55,15 +55,15 @@
                 <!-- .list-group-item -->
                 <%= if Enum.count(@my_conversations) == 0 do %>
                     <div class="alert alert-info mx-3">You have no assigned conversations for this location</div>
-                <% else %>
-                    <table class="table no-first-border">
-                        <tbody>
-                            <%= for c <- @my_conversations do %>
-                                <%= render("_conversation_row.html", c: c, conn: @conn, location: @location, dispositions: @dispositions) %>
-                            <% end %>
-                        </tbody>
-                    </table>
                 <% end %>
+
+                <table class="table no-first-border">
+                    <tbody>
+                        <%= for c <- @my_conversations do %>
+                            <%= render("_conversation_row.html", c: c, conn: @conn, location: @location, dispositions: @dispositions) %>
+                        <% end %>
+                    </tbody>
+                </table>
             </div>
 
             <div class="tab-pane fade" id="project-open" role="tabpanel" aria-labelledby="project-open-tab">
@@ -73,9 +73,9 @@
 
                 <table class="table no-first-border">
                     <tbody>
-                    <%= for c <- Enum.filter(@conversations, &(&1.status in ["open", "pending"])) do %>
-                        <%= render("_conversation_row.html", c: c, conn: @conn, location: @location, dispositions: @dispositions) %>
-                    <% end %>
+                        <%= for c <- Enum.filter(@conversations, &(&1.status in ["open", "pending"])) do %>
+                            <%= render("_conversation_row.html", c: c, conn: @conn, location: @location, dispositions: @dispositions) %>
+                        <% end %>
                     </tbody>
                 </table>
             </div>
