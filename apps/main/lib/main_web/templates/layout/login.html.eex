@@ -23,22 +23,22 @@
     </head>
     <body>
         <main class="auth">
-             <header id="auth-header" class="auth-header" style="background-image: url(assets/images/illustration/img-1.png);">
-        <h1><a href="https://healthdesk.ai" target="_blank">
-<img class="branding" width="250px" src="https://raw.githubusercontent.com/HealthdeskAI/healthdesk-ai/master/apps/main/assets/static/images/healthdesk-logo.png?token=AHWZN6XK6IUUHHQI6YVCJUC6D7IV4"/></a>
-        </h1>
-        <p> Don't have an account? <a href="https://calendly.com/healthdesk" target="_blank">Request a Free Trial</a>
-        </p>
-      </header><!-- form -->
+            <header id="auth-header" class="auth-header" style="background-image: url(assets/images/illustration/img-1.png);">
+                <h1><a href="https://healthdesk.ai" target="_blank">
+                    <img class="branding" width="250px" src="/images/healthdesk-logo.png?token=AHWZN6XK6IUUHHQI6YVCJUC6D7IV4"/></a>
+                </h1>
+                <p> Don't have an account? <a href="https://calendly.com/healthdesk" target="_blank">Request a Free Trial</a>
+                </p>
+            </header><!-- form -->
 
             <%= if get_flash(@conn, :error) do %>
                 <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
             <% end %>
 
             <%= render @view_module, @view_template, assigns %>
-                  <!-- copyright -->
-      <footer class="auth-footer"> © 2020 All Rights Reserved. <a href="https://healthdesk.ai/privacy/" target="_blank">Privacy</a> and <a href="https://healthdesk.ai/terms/" target="_blank">Terms</a><br> <div class="text-center"> <a href="mailto:support@healthdesk.ai">support@healthdesk.ai</a></div>
-      </footer>
+            <!-- copyright -->
+            <footer class="auth-footer"> © 2020 All Rights Reserved. <a href="https://healthdesk.ai/privacy/" target="_blank">Privacy</a> and <a href="https://healthdesk.ai/terms/" target="_blank">Terms</a><br> <div class="text-center"> <a href="mailto:support@healthdesk.ai">support@healthdesk.ai</a></div>
+            </footer>
         </main>
     </body>
 </html>
