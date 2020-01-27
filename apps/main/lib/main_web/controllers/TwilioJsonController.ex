@@ -5,7 +5,7 @@ defmodule MainWeb.TwilioJsonController do
   use MainWeb, :controller
 
   alias MainWeb.Plug, as: P
-  alias Data.Commands.Conversations
+  alias Data.Conversations
 
   require Logger
 

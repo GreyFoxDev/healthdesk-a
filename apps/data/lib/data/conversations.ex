@@ -19,6 +19,7 @@ defmodule Data.Conversations do
 
   defdelegate create(params), to: Query
   defdelegate get_by_phone(phone_number, location_id), to: Query
+  defdelegate get(conversation_id), to: Query
 
   @doc """
   Get changesets for conversations.
@@ -41,11 +42,6 @@ defmodule Data.Conversations do
   def all(_, _), do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: Conversations.get(id)
-
-  def get(_, _), do: {:error, :invalid_permissions}
-
-  def get(%{role: role}, id) when role in @roles,
     do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
@@ -60,15 +56,13 @@ defmodule Data.Conversations do
   Retrieves a conversation from the database. If one isn't found then it will create one
   and return it. Conversations are unique to locations.
   """
-  @spec find_or_start_conversation({member :: binary, location :: binary}) ::
-          Conversation.t() | nil
+  @spec find_or_start_conversation({member :: binary, location :: binary}) :: Conversation.t() | nil
   def find_or_start_conversation({member, location}) do
     with %Location{} = location <- Data.Query.Location.get_by_phone(location),
          {:ok, nil} <- get_by_phone(member, location.id) do
-      convo =
-        {member, location.id}
-        |> new_params()
-        |> create()
+      {member, location.id}
+      |> new_params()
+      |> create()
     else
       {:ok, %Schema{status: "closed"} = conversation} ->
         Query.update(conversation, @open)
@@ -83,8 +77,8 @@ defmodule Data.Conversations do
   """
   @spec pending(id :: binary) :: {:ok, Conversation.t()} | {:error, String.t()}
   def pending(id) do
-    with %Schema{id: id} = convo <- Query.get(id),
-         {:ok, %Schema{id: id} = convo} <- Query.update(convo, @pending) do
+    with %Schema{id: ^id} = convo <- Query.get(id),
+         {:ok, %Schema{id: ^id} = convo} <- Query.update(convo, @pending) do
       {:ok, convo}
     else
       _ ->
@@ -97,8 +91,8 @@ defmodule Data.Conversations do
   """
   @spec close(id :: binary) :: {:ok, Conversation.t()} | {:error, String.t()}
   def close(id) do
-    with %Schema{id: id} = convo <- Query.get(id),
-         {:ok, %Schema{id: id} = convo} <- Query.update(convo, @closed) do
+    with %Schema{id: ^id} = convo <- Query.get(id),
+         {:ok, %Schema{id: ^id} = convo} <- Query.update(convo, @closed) do
       {:ok, convo}
     else
       _ ->

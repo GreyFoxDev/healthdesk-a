@@ -3,7 +3,7 @@ defmodule MainWeb.Intents.InstructorSchedule do
   This handles instructor schedule responses
   """
 
-  alias Data.Commands.{
+  alias Data.{
     ClassSchedule,
     Location
   }

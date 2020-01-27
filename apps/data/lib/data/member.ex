@@ -13,6 +13,7 @@ defmodule Data.Member do
   ]
 
   defdelegate create(params), to: Query
+  defdelegate get_by_phone(phone_number), to: Query
 
   def get_changeset(),
     do: Schema.changeset(%Schema{})

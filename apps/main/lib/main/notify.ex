@@ -5,7 +5,7 @@ defmodule MainWeb.Notify do
 
   require Logger
 
-  alias Data.Commands.Location
+  alias Data.Location
 
   @url "[url]/admin/teams/[team_id]/locations/[location_id]/conversations/[conversation_id]/conversation-messages"
   @super_admin Application.get_env(:main, :super_admin)

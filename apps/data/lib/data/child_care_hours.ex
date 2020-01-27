@@ -13,6 +13,7 @@ defmodule Data.ChildCareHours do
   ]
 
   defdelegate create(params), to: Query
+  defdelegate get_by_location_id(location_id), to: Query
 
   def get_changeset(),
     do: Schema.changeset(%Schema{})

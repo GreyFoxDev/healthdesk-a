@@ -8,8 +8,8 @@ defmodule MainWeb.Plug.OpenConversation do
 
   import Plug.Conn
 
-  alias Data.Commands.Conversations, as: C
-  alias Data.Commands.ConversationMessages, as: CM
+  alias Data.Conversations, as: C
+  alias Data.ConversationMessages, as: CM
 
   @spec init(list()) :: list()
   def init(opts), do: opts

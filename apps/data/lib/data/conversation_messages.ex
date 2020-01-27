@@ -13,6 +13,7 @@ defmodule Data.ConversationMessages do
   ]
 
   defdelegate create(params), to: Query
+  defdelegate get_by_conversation_id(conversation_id), to: Query
 
   def get_changeset(),
     do: Schema.changeset(%Schema{})
@@ -26,8 +27,8 @@ defmodule Data.ConversationMessages do
     {:ok, changeset}
   end
 
-  def all(%{role: role}, location_id) when role in @roles,
-    do: Query.get_by_location_id(location_id)
+  def all(%{role: role}, conversation_id) when role in @roles,
+    do: Query.get_by_conversation_id(conversation_id)
 
   def all(_), do: {:error, :invalid_permissions}
 

@@ -3,7 +3,7 @@ defmodule MainWeb.Intents.ChildCareHours do
   This handles child care hours message responses
   """
 
-  alias Data.Commands.{
+  alias Data.{
     ChildCareHours,
     Location
   }

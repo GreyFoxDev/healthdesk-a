@@ -1,7 +1,7 @@
 defmodule MainWeb.ConversationController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Commands.Conversations, ConversationMessages, Location, TeamMember, Member}
+  alias Data.{Conversations, ConversationMessages, Location, TeamMember, Member}
   alias MainWeb.Helper.Formatters
 
   require Logger
@@ -17,7 +17,7 @@ defmodule MainWeb.ConversationController do
     conversations =
       conn
       |> current_user()
-      |> Data.Conversations.all(location_id)
+      |> Conversations.all(location_id)
 
     my_conversations =
       Enum.filter(conversations, fn(c) -> c.team_member && c.team_member.user_id == current_user(conn).id end)
@@ -38,7 +38,7 @@ defmodule MainWeb.ConversationController do
       |> Location.get(location_id)
 
     render(conn, "new.html",
-      changeset: Data.Conversations.get_changeset(),
+      changeset: Conversations.get_changeset(),
       location: location,
       teams: teams(conn),
       errors: [])
@@ -58,7 +58,7 @@ defmodule MainWeb.ConversationController do
     conversation =
       conn
       |> current_user()
-      |> Data.Conversations.get(id)
+      |> Conversations.get(id)
 
     messages =
       conn
@@ -93,7 +93,7 @@ defmodule MainWeb.ConversationController do
                 "sent_at" => DateTime.utc_now()}
 
 
-    with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "open"}),
+    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "open"}),
          {:ok, _} <- ConversationMessages.create(message) do
 
       redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id))
@@ -131,7 +131,7 @@ defmodule MainWeb.ConversationController do
           "sent_at" => DateTime.utc_now()}
     end
 
-    with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
+    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
          {:ok, _} <- ConversationMessages.create(message) do
 
       redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))

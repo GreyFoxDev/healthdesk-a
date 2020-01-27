@@ -3,10 +3,7 @@ defmodule MainWeb.Plug.Broadcast do
 
   import Plug.Conn
 
-  require Logger
-
-  alias Data.Commands.Member, as: MCommand
-  alias Data.Commands.Location, as: LCommand
+  alias Data.{Member, Location}
 
   @spec init(list()) :: list()
   def init(opts), do: opts
@@ -15,8 +12,7 @@ defmodule MainWeb.Plug.Broadcast do
   def call(conn, opts)
 
   def call(%{assigns: %{convo: convo, member: member, location: location, message: message} = assigns} = conn, _opts) do
-    Logger.info "BROADCAST: #{inspect conn}"
-    with {:ok, nil} <- MCommand.get_by_phone(member) do
+    with {:ok, nil} <- Member.get_by_phone(member) do
       MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, phone_number: member})
     else
       {:ok, member} ->
@@ -24,7 +20,7 @@ defmodule MainWeb.Plug.Broadcast do
         MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, name: name})
     end
 
-    case LCommand.get_by_phone(location) do
+    case Location.get_by_phone(location) do
       nil -> nil
       location ->
         alert_info = Map.merge(assigns, %{location: location, member: member})

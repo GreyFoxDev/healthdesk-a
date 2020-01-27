@@ -1,5 +1,5 @@
 defmodule Data.Intent do
-  alias Data.Commands.{
+  alias Data.{
     Location,
     NormalHours,
     HolidayHours,
@@ -14,8 +14,8 @@ defmodule Data.Intent do
 
   def get_message({"getChildCareHours", args}, phone_number) do
     with %Data.Schema.Location{} = l <- Location.get_by_phone(phone_number),
-         {_, day} = day_of_week <- convert_to_day(args),
-         hours <- ChildCareHours.all(l.id),
+         {_, day} <- convert_to_day(args),
+         hours <- ChildCareHours.get_by_location_id(l.id),
          [hours] <- Enum.filter(hours, fn hour -> hour.day_of_week == day end) do
       [
         "Morning hours are: #{hours.morning_open_at} - #{hours.morning_close_at}\n",
@@ -111,7 +111,7 @@ defmodule Data.Intent do
 
   defp get_hours(location, {:holiday, holiday}) do
     location.id
-    |> HolidayHours.all()
+    |> HolidayHours.get_by_location_id()
     |> Enum.filter(fn hour -> hour.holiday_name == holiday end)
   end
 

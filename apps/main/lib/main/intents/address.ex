@@ -4,7 +4,7 @@ defmodule MainWeb.Intents.Address do
   formatted message.
   """
 
-  alias Data.Commands.Location
+  alias Data.Location
 
   @address_1 """
   We're located at:

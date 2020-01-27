@@ -16,6 +16,7 @@ defmodule Data.Location do
   defdelegate get_by_api_key(api_key), to: Query
   defdelegate get_by_messenger_id(messenger_id), to: Query
   defdelegate create(params), to: Query
+  defdelegate get(location_id), to: Query
 
   def get_changeset(),
     do: Schema.changeset(%Schema{})

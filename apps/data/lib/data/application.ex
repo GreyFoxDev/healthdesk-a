@@ -6,8 +6,7 @@ defmodule Data.Application do
   def start(_type, _args) do
     children = [
       {Data.ReadOnly.Repo, []},
-      {Data.WriteOnly.Repo, []},
-      {Data.Commands.Supervisor, []}
+      {Data.WriteOnly.Repo, []}
     ]
 
     opts = [strategy: :one_for_one, name: Data.Supervisor]
