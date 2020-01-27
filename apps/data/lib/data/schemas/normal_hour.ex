@@ -1,7 +1,18 @@
 defmodule Data.Schema.NormalHour do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a location's normal hours
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          location_id: binary(),
+          day_of_week: String.t() | nil,
+          open_at: String.t() | nil,
+          close_at: String.t() | nil,
+          active: boolean() | nil,
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   location_id

@@ -70,7 +70,7 @@ defmodule MainWeb.TeamMemberController do
   def create(conn, %{"team_member" => %{"user" => %{"image" => [image]}} = team_member, "team_id" => team_id} = params) do
     with {:ok, avatar} <- Uploader.upload_image(image.path),
          user_params <- Map.merge(team_member["user"], %{"avatar" => avatar}),
-         {:ok, nil} <- User.get_by_phone(team_member["user"]["phone_number"]),
+         nil <- User.get_by_phone(team_member["user"]["phone_number"]),
          {:ok, %Data.Schema.User{} = user} <- User.create(user_params),
          {:ok, _pid} <- TeamMember.create(%{location_id: team_member["location_id"], locations: team_member["team_member_locations"], user_id: user.id, team_id: team_id, avatar: avatar}) do
       conn
@@ -96,7 +96,7 @@ defmodule MainWeb.TeamMemberController do
   end
 
   def create(conn, %{"team_member" => team_member, "team_id" => team_id} = params) do
-    with {:ok, nil} <- User.get_by_phone(team_member["user"]["phone_number"]),
+    with nil <- User.get_by_phone(team_member["user"]["phone_number"]),
          {:ok, %Data.Schema.User{} = user} <- User.create(team_member["user"]),
          {:ok, _pid} <- TeamMember.create(%{location_id: team_member["location_id"], locations: team_member["team_member_locations"], user_id: user.id, team_id: team_id}) do
       conn

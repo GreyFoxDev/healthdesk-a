@@ -6,5 +6,4 @@ defmodule Data.Metrics do
 
   def team(team_id),
     do: Metrics.team_metrics_by_team_id(team_id)
-
 end

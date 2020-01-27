@@ -19,5 +19,4 @@ defmodule Data.Query.ReadOnly.ConversationDisposition do
 
   def get(id),
     do: Repo.get(ConversationDisposition, id)
-
 end

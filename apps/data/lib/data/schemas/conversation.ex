@@ -1,7 +1,17 @@
 defmodule Data.Schema.Conversation do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a location's conversations
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          location_id: binary(),
+          team_member_id: binary() | nil,
+          original_number: String.t(),
+          status: String.t() | nil,
+          started_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   location_id

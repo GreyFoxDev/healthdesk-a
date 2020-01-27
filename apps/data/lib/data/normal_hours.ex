@@ -1,36 +1,45 @@
 defmodule Data.NormalHours do
-  alias Data.Commands.NormalHours
+  @moduledoc """
+  This is the Normal Hours API for the data layer
+  """
+  alias Data.Query.NormalHour, as: Query
+  alias Data.Schema.NormalHour, as: Schema
 
-  @roles ["admin", "team-admin", "location-admin"]
+  @roles [
+    "admin",
+    "teammate",
+    "location-admin",
+    "team-admin"
+  ]
+
+  defdelegate create(params), to: Query
+  defdelegate get_by_location_id(location_id), to: Query
 
   def get_changeset(),
-    do: Data.Schema.NormalHour.changeset(%Data.Schema.NormalHour{})
+    do: Schema.changeset(%Schema{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> NormalHours.get()
-      |> Data.Schema.NormalHour.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
   end
 
   def all(%{role: role}, location_id) when role in @roles,
-    do: NormalHours.all(location_id)
+    do: Query.get_by_location_id(location_id)
 
-  def all(_), do: {:error, :invalid_permissions}
+  def all(_, _), do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: NormalHours.get(id)
+    do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-  def create(params),
-    do: NormalHours.write(params)
-
   def update(%{"id" => id} = params) do
     id
-    |> NormalHours.get()
-    |> NormalHours.write(params)
+    |> Query.get()
+    |> Query.update(params)
   end
 end

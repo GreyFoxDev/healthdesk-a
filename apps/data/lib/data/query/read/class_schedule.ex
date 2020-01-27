@@ -1,22 +1,22 @@
 defmodule Data.Query.ReadOnly.ClassSchedule do
-  @moduledoc false
+  # @moduledoc false
 
-  import Ecto.Query, only: [from: 2]
+  # import Ecto.Query, only: [from: 2]
 
-  alias Data.Schema.ClassSchedule
-  alias Data.ReadOnly.Repo
+  # alias Data.Schema.ClassSchedule
+  # alias Data.ReadOnly.Repo
 
-  def all,
-    do: Repo.all(ClassSchedule)
+  # def all,
+  #   do: Repo.all(ClassSchedule)
 
-  def all(location_id) do
-    from(t in ClassSchedule,
-      where: t.location_id == ^location_id,
-      order_by: [:date, :start_time]
-    )
-    |> Repo.all()
-  end
+  # def all(location_id) do
+  #   from(t in ClassSchedule,
+  #     where: t.location_id == ^location_id,
+  #     order_by: [:date, :start_time]
+  #   )
+  #   |> Repo.all()
+  # end
 
-  def get(id),
-    do: Repo.get(ClassSchedule, id)
+  # def get(id),
+  #   do: Repo.get(ClassSchedule, id)
 end

@@ -1,7 +1,19 @@
 defmodule Data.Schema.User do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a healthdesk user
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          phone_number: String.t(),
+          role: String.t() | nil,
+          first_name: String.t() | nil,
+          last_name: String.t() | nil,
+          email: String.t() | nil,
+          avatar: String.t() | nil,
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
     phone_number

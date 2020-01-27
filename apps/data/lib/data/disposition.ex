@@ -1,5 +1,9 @@
 defmodule Data.Disposition do
-  alias Data.Commands.Disposition
+  @moduledoc """
+  This is the Child Care Hours API for the data layer
+  """
+  alias Data.Query.Disposition, as: Query
+  alias Data.Schema.Disposition, as: Schema
 
   @roles [
     "admin",
@@ -9,42 +13,40 @@ defmodule Data.Disposition do
     "team-admin"
   ]
 
-  defdelegate count(disposition_id), to: Data.Query.ReadOnly.Disposition
-  defdelegate count_all(), to: Data.Query.ReadOnly.Disposition
-  defdelegate count_by_team_id(team_id), to: Data.Query.ReadOnly.Disposition
+  defdelegate create(params), to: Query
+  defdelegate count(disposition_id), to: Query
+  defdelegate count_all(), to: Query
+  defdelegate count_by_team_id(team_id), to: Query
 
   def get_changeset(),
-    do: Data.Schema.Disposition.changeset(%Data.Schema.Disposition{})
+    do: Schema.changeset(%Schema{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> Disposition.get()
-      |> Data.Schema.Disposition.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
   end
 
   def all(%{role: role}) when role in @roles,
-    do: Disposition.all()
+    do: Query.all()
 
   def all(_),
     do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: Disposition.get(id)
+    do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-  def get_by_team_id(%{role: role}, id) when role in @roles,
-    do: Disposition.all(id)
+  def get_by_team_id(%{role: role}, team_id) when role in @roles,
+    do: Query.get_by_team_id(team_id)
 
-  def create(params),
-    do: Disposition.write(params)
-
-  def update(id, params) do
+  def update(%{"id" => id} = params) do
     id
-    |> Disposition.get()
-    |> Disposition.write(params)
+    |> Query.get()
+    |> Query.update(params)
   end
 end

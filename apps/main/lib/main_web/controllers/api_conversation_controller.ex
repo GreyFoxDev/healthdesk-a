@@ -1,9 +1,9 @@
 defmodule MainWeb.Api.ConversationController do
   use MainWeb, :controller
 
-  alias Data.Commands.Conversations, as: C
-  alias Data.Commands.ConversationMessages, as: CM
-  alias Data.Commands.Location
+  alias Data.Conversations, as: C
+  alias Data.ConversationMessages, as: CM
+  alias Data.Location
 
   def create(conn, %{"location" => << "messenger:", location :: binary>>, "member" => << "messenger:", member :: binary>>}) do
     location = Location.get_by_messanger_id(location)
@@ -26,7 +26,12 @@ defmodule MainWeb.Api.ConversationController do
   end
 
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message} = params) do
-    CM.write_new_message(id, from, message)
+    CM.create(%{
+          "conversation_id" => id,
+          "phone_number" => from,
+          "message" => message,
+          "sent_at" => DateTime.utc_now()})
+
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
@@ -34,7 +39,6 @@ defmodule MainWeb.Api.ConversationController do
   end
 
   def update(conn, params) do
-
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
@@ -43,11 +47,19 @@ defmodule MainWeb.Api.ConversationController do
 
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message} = params) do
     if message == "Sent to Slack" do
-      CM.write_new_message(id, from, params["slack_message"])
+      CM.create(%{
+            "conversation_id" => id,
+            "phone_number" => from,
+            "message" => params["slack_message"],
+            "sent_at" => DateTime.utc_now()})
 
       :ok = MainWeb.Notify.send_to_admin(id, params["slack_message"], from)
     else
-      CM.write_new_message(id, from, message)
+      CM.create(%{
+            "conversation_id" => id,
+            "phone_number" => from,
+            "message" => message,
+            "sent_at" => DateTime.utc_now()})
 
       :ok = MainWeb.Notify.send_to_admin(id, message, from)
     end

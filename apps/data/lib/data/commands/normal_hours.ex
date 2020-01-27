@@ -1,8 +1,8 @@
 defmodule Data.Commands.NormalHours do
-  @moduledoc false
+  # @moduledoc false
 
-  use Data.Commands, schema: NormalHours
+  # use Data.Commands, schema: NormalHours
 
-  def all(location_id),
-    do: Command.execute_task_with_results(fn -> Read.all(location_id) end)
+  # def all(location_id),
+  #   do: Command.execute_task_with_results(fn -> Read.all(location_id) end)
 end

@@ -8,6 +8,4 @@ config :ex_twilio,
   flex_auth_token: Map.fetch!(System.get_env(), "FLEX_TWILIO_AUTH_TOKEN"),
   flex_service_id: Map.fetch!(System.get_env(), "FLEX_SERVICE_ID")
 
-
-
 config :logger, level: :debug

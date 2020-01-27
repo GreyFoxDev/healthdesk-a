@@ -1,7 +1,21 @@
 defmodule Data.Schema.HolidayHour do
-  @moduledoc false
+  @moduledoc """
+  The schema for a location's holiday hours
 
+  TODO:
+  * Change holiday_date field to date, not UTC date time
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          location_id: binary(),
+          holiday_name: String.t() | nil,
+          holiday_date: :utc_datetime | nil,
+          open_at: String.t() | nil,
+          close_at: String.t() | nil,
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   location_id
@@ -38,12 +52,7 @@ defmodule Data.Schema.HolidayHour do
     |> validate_required(@required_fields)
   end
 
-  defp convert_date(
-         %{
-           "holiday_date" =>
-             <<_y::binary-size(4), "-", _m::binary-size(2), "-", _d::binary-size(2)>> = date
-         } = params
-       ) do
+  defp convert_date(%{"holiday_date" => date} = params) do
     Map.merge(params, %{"holiday_date" => "#{date} 00:00:00Z"})
   end
 

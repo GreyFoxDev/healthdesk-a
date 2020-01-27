@@ -1,7 +1,25 @@
 defmodule Data.Schema.Member do
-  @moduledoc false
+  @moduledoc """
+  The schema for a team's member
 
+  TODO:
+  * Remove consent field
+  * Add messenger_id field
+
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          team_id: binary(),
+          phone_number: String.t(),
+          first_name: String.t() | nil,
+          last_name: String.t() | nil,
+          email: String.t() | nil,
+          status: String.t() | nil,
+          consent: boolean() | nil,
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   phone_number

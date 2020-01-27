@@ -1,27 +1,31 @@
 defmodule Data.User do
-  alias Data.Commands.User
+  @moduledoc """
+  This is the User API for the data layer
+  """
+  alias Data.Query.User, as: Query
+  alias Data.Schema.User, as: Schema
 
-  @roles ["admin", "team-admin", "location-admin", "teammate", "system"]
+  @roles [
+    "admin",
+    "team-admin",
+    "location-admin",
+    "teammate",
+    "system"
+  ]
+
+  defdelegate create(params), to: Query
+  defdelegate get_by_phone(phone_number), to: Query
 
   def get_changeset(),
-    do: Data.Schema.User.changeset(%Data.Schema.User{})
+    do: Schema.changeset(%Schema{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> User.get()
-      |> Data.Schema.User.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
-  end
-
-  def authorize(phone_number) do
-    with %Data.Schema.User{} = user <- User.by_phone_number(phone_number) do
-      {:ok, user}
-    else
-      nil ->
-        {:error, :not_found}
-    end
   end
 
   def all(%{role: role}) when role in @roles,
@@ -30,25 +34,13 @@ defmodule Data.User do
   def all(_), do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: User.get(id)
+    do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-  def get_by_phone(phone_number) do
-    with %Data.Schema.User{} = user <- User.by_phone_number(phone_number) do
-      {:ok, user}
-    else
-      nil ->
-        {:ok, nil}
-    end
-  end
-
-  def create(params),
-    do: User.write(params)
-
-  def update(id, params) do
+  def update(%{"id" => id} = params) do
     id
-    |> User.get()
-    |> User.write(params)
+    |> Query.get()
+    |> Query.update(params)
   end
 end

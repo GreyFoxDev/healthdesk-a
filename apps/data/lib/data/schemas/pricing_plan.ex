@@ -1,7 +1,20 @@
 defmodule Data.Schema.PricingPlan do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a location's pricing plan options
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          location_id: binary(),
+          has_daily: boolean() | nil,
+          daily: String.t() | nil,
+          has_weekly: boolean() | nil,
+          weekly: String.t() | nil,
+          has_monthly: boolean() | nil,
+          monthly: String.t() | nil,
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   location_id

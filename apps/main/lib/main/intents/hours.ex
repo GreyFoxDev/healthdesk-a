@@ -1,9 +1,6 @@
 defmodule MainWeb.Intents.Hours do
-  @moduledoc """
 
-  """
-
-  alias Data.Commands.{
+  alias Data.{
     HolidayHours,
     NormalHours,
     Location
@@ -95,7 +92,7 @@ defmodule MainWeb.Intents.Hours do
   end
 
   defp get_day_of_week({year, month, day} = date, location) do
-    with [holiday] <- HolidayHours.find(location, date) do
+    with [holiday] <- find_holiday(location, date) do
       {:holiday, holiday}
     else
       _ ->
@@ -105,7 +102,7 @@ defmodule MainWeb.Intents.Hours do
 
   defp get_hours(location, {:normal, day_of_week}) do
     location
-    |> NormalHours.all()
+    |> NormalHours.get_by_location_id()
     |> Enum.filter(fn hour -> hour.day_of_week == day_of_week end)
   end
 
@@ -143,4 +140,18 @@ defmodule MainWeb.Intents.Hours do
 
   defp check_binary(value) when is_binary(value), do: String.to_integer(value)
   defp check_binary(value) when is_integer(value), do: value
+
+  def find_holiday(location_id, erl_date) do
+    location_id
+    |> HolidayHour.get_by_location_id()
+    |> Enum.filter(fn d ->
+      match_date?(d.holiday_date, erl_date)
+    end)
+  end
+
+  defp match_date?(nil, _), do: false
+
+  defp match_date?(date, erl_date) do
+    Date.to_erl(date) == erl_date
+  end
 end

@@ -27,7 +27,7 @@ defmodule Data.Query.WriteOnly.TeamMember do
   def associate_locations(id, locations) do
     from(m in TeamMemberLocation, where: m.team_member_id == ^id) |> Repo.delete_all()
 
-    Enum.map(locations, fn(location) ->
+    Enum.map(locations, fn location ->
       %TeamMemberLocation{}
       |> TeamMemberLocation.changeset(%{location_id: location, team_member_id: id})
       |> Repo.insert!()

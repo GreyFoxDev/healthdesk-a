@@ -1,48 +1,51 @@
 defmodule Data.TeamMember do
-  alias Data.Commands.TeamMember
+  @moduledoc """
+  This is the Team Member API for the data layer
+  """
+  alias Data.Query.TeamMember, as: Query
+  alias Data.Schema.TeamMember, as: Schema
 
-  @roles ["admin", "teammate", "location-admin", "team-admin"]
+  @roles [
+    "admin",
+    "teammate",
+    "location-admin",
+    "team-admin"
+  ]
 
-  import Data.Query.WriteOnly.TeamMember, only: [associate_locations: 2]
+  defdelegate create(params), to: Query
+  defdelegate associate_locations(one, two), to: Query
 
-  def get_changeset() do
-    Data.Schema.TeamMember.changeset(%Data.Schema.TeamMember{})
-  end
+  def get_changeset(),
+    do: Schema.changeset(%Schema{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> TeamMember.get()
-      |> Data.Schema.TeamMember.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
   end
 
-  def all(%{role: role}) when role in @roles,
-    do: TeamMember.all()
-
   def all(%{role: role}, location_id) when role in @roles,
-    do: TeamMember.get_by_location(location_id)
+    do: Query.get_by_location_id(location_id)
 
   def all(_, _),
     do: {:error, :invalid_permissions}
 
-  def all(_),
-    do: {:error, :invalid_permissions}
-
   def get(%{role: role}, id) when role in @roles,
-    do: TeamMember.get(id)
+    do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-  def get_by_team_id(%{role: role}, id) when role in @roles,
-    do: TeamMember.all(id)
+  def get_by_team_id(%{role: role}, team_id) when role in @roles,
+    do: Query.get_by_team_id(team_id)
 
-  def get_by_location_id(%{role: role}, id) when role in @roles,
-    do: TeamMember.get_by_location(id)
+  def get_by_location_id(%{role: role}, location_id) when role in @roles,
+    do: Query.get_by_location_id(location_id)
 
   def create(params) do
-    {:ok, team_member} = result = TeamMember.write(params)
+    {:ok, team_member} = result = Query.create(params)
 
     if params.locations && params.locations != [] do
       associate_locations(team_member.id, params.locations)
@@ -52,9 +55,10 @@ defmodule Data.TeamMember do
   end
 
   def update(id, params) do
-    result = id
-    |> TeamMember.get()
-    |> TeamMember.write(params)
+    result =
+      id
+      |> Query.get()
+      |> Query.update(params)
 
     if params.locations != [] do
       associate_locations(id, params.locations)

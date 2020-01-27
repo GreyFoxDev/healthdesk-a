@@ -1,52 +1,55 @@
 defmodule Data.Location do
-  alias Data.Commands.Location
+  @moduledoc """
+  This is the Location API for the data layer
+  """
+  alias Data.Query.Location, as: Query
+  alias Data.Schema.Location, as: Schema
 
-  @roles ["admin", "teammate", "location-admin", "team-admin"]
+  @roles [
+    "admin",
+    "teammate",
+    "location-admin",
+    "team-admin"
+  ]
 
-  defdelegate get_by_phone(phone_number), to: Location
+  defdelegate get_by_phone(phone_number), to: Query
+  defdelegate get_by_api_key(api_key), to: Query
+  defdelegate get_by_messenger_id(messenger_id), to: Query
+  defdelegate create(params), to: Query
 
   def get_changeset(),
-    do: Data.Schema.Location.changeset(%Data.Schema.Location{})
+    do: Schema.changeset(%Schema{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> Location.get()
-      |> Data.Schema.Location.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
   end
 
   def all(%{role: "location-admin"} = user) do
-    Location.all() |> Enum.filter(&(&1.id == user.team_member.location_id))
+    Query.all() |> Enum.filter(&(&1.id == user.team_member.location_id))
   end
 
   def all(%{role: role}) when role in @roles,
-    do: Location.all()
+    do: Query.all()
 
   def all(_),
     do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: Location.get(id)
+    do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-  def get_by_team_id(%{role: role}, id) when role in @roles,
-    do: Location.all(id)
-
-  def get_by_api_key(key),
-    do: Location.get_by_api_key(key)
-
-    def get_by_messanger_id(messanger_id),
-      do: Location.get_by_messanger_id(messanger_id)
-
-  def create(params),
-    do: Location.write(params)
+  def get_by_team_id(%{role: role}, team_id) when role in @roles,
+    do: Query.get_by_team_id(team_id)
 
   def update(id, params) do
     id
-    |> Location.get()
-    |> Location.write(params)
+    |> Query.get()
+    |> Query.update(params)
   end
 end

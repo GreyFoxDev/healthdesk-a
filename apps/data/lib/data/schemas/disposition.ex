@@ -1,7 +1,15 @@
 defmodule Data.Schema.Disposition do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a team's dispositions
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          team_id: binary(),
+          disposition_name: String.t(),
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   disposition_name

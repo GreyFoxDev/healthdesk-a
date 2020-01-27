@@ -1,7 +1,14 @@
 defmodule Data.Schema.ConversationDisposition do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a conversation's dispositions
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          conversation_id: binary(),
+          disposition_id: binary()
+        }
 
   @required_fields ~w|
   conversation_id

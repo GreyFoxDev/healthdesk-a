@@ -1,14 +1,13 @@
 defmodule MainWeb.Plug.CloseConversation do
   @moduledoc """
-
+  Module for the close conversation plug
   """
-
-  require Logger
-
   import Plug.Conn
 
-  alias Data.Commands.Conversations, as: C
-  alias Data.Commands.ConversationMessages, as: CM
+  alias Data.Conversations, as: C
+  alias Data.ConversationMessages, as: CM
+
+  require Logger
 
   @default "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
 
@@ -32,7 +31,11 @@ defmodule MainWeb.Plug.CloseConversation do
     |> Enum.count()
 
     if count < 2 && conn.assigns[:response] == @default do
-      CM.write_new_message(id, location, conn.assigns[:response])
+      CM.create(%{
+            "conversation_id" => id,
+            "phone_number" => location,
+            "message" => conn.assigns[:response],
+            "sent_at" => DateTime.utc_now()})
     end
 
     C.pending(id)
@@ -58,7 +61,12 @@ defmodule MainWeb.Plug.CloseConversation do
   """
   def call(%{assigns: %{convo: id, location: location} = assigns} = conn, _opts) do
     Logger.warn "STATUS: #{assigns.status}: #{inspect conn}"
-    CM.write_new_message(id, location, conn.assigns[:response])
+    CM.create(%{
+          "conversation_id" => id,
+          "phone_number" => location,
+          "message" => conn.assigns[:response],
+          "sent_at" => DateTime.utc_now()})
+
     C.close(id)
 
     conn

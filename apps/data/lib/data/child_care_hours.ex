@@ -1,36 +1,44 @@
 defmodule Data.ChildCareHours do
-  alias Data.Commands.ChildCareHours
+  @moduledoc """
+  This is the Child Care Hours API for the data layer
+  """
+  alias Data.Query.ChildCareHour, as: Query
+  alias Data.Schema.ChildCareHour, as: Schema
 
-  @roles ["admin", "teammate", "location-admin", "team-admin"]
+  @roles [
+    "admin",
+    "teammate",
+    "location-admin",
+    "team-admin"
+  ]
+
+  defdelegate create(params), to: Query
 
   def get_changeset(),
-    do: Data.Schema.ChildCareHour.changeset(%Data.Schema.ChildCareHour{})
+    do: Schema.changeset(%Schema{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> ChildCareHours.get()
-      |> Data.Schema.ChildCareHour.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
   end
 
   def all(%{role: role}, location_id) when role in @roles,
-    do: ChildCareHours.all(location_id)
+    do: Query.get_by_location_id(location_id)
 
-  def all(_), do: {:error, :invalid_permissions}
+  def all(_, _), do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: ChildCareHours.get(id)
+    do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-  def create(params),
-    do: ChildCareHours.write(params)
-
   def update(%{"id" => id} = params) do
     id
-    |> ChildCareHours.get()
-    |> ChildCareHours.write(params)
+    |> Query.get()
+    |> Query.update(params)
   end
 end

@@ -4,7 +4,7 @@ defmodule MainWeb.Intents.MonthPass do
   formatted message
   """
 
-  alias Data.Commands.{
+  alias Data.{
     PricingPlan,
     Location
   }

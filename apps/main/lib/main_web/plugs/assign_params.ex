@@ -18,8 +18,8 @@ defmodule MainWeb.Plug.AssignParams do
   @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t()
   def call(%{params: %{"Body" => body, "From" => member, "To" => location} = params} = conn, _opts) do
     if String.starts_with?(location, "messenger:") do
-      messanger_id = String.replace(location, "messenger:", "")
-      location = Location.get_by_messanger_id(messanger_id)
+      messenger_id = String.replace(location, "messenger:", "")
+      location = Location.get_by_messanger_id(messenger_id)
       conn
       |> assign(:message, body)
       |> assign(:member, member)
