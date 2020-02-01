@@ -77,21 +77,6 @@
 </div>
 <div class="metric-row">
     <!-- metric column -->
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> SESSIONS </h2>
-                <p class="metric-value h3">
-                    <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.total_sessions + acc end) %>
-                    </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <!-- metric column -->
     <div class="col-12 col-sm-6 col-lg-3">
         <!-- .metric -->
         <div class="card-metric" data-toggle="modal" data-target="#exampleModalLong">
