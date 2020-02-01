@@ -19,6 +19,7 @@ defmodule Data.Schema.Location do
           city: String.t() | nil,
           state: String.t() | nil,
           postal_code: String.t() | nil,
+          default_message: String.t() | nil,
           slack_integration: String.t() | nil,
           messenger_id: String.t() | nil,
           users: List.t() | nil,
@@ -44,6 +45,7 @@ defmodule Data.Schema.Location do
   city
   state
   postal_code
+  default_message
   slack_integration
   messenger_id
   deleted_at
@@ -66,6 +68,7 @@ defmodule Data.Schema.Location do
     field(:web_chat, :boolean)
     field(:slack_integration, :string)
     field(:messenger_id, :string)
+    field(:default_message, :string)
 
     field(:deleted_at, :utc_datetime)
 
@@ -89,6 +92,7 @@ defmodule Data.Schema.Location do
     |> validate_length(:city, max: 100)
     |> validate_length(:state, max: 2)
     |> validate_length(:postal_code, max: 20)
+    |> validate_length(:default_message, max: 500)
     |> generate_api_key()
   end
 
