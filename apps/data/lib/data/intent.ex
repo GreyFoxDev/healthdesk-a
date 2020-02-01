@@ -3,8 +3,6 @@ defmodule Data.Intent do
     Location,
     NormalHours,
     HolidayHours,
-    WifiNetwork,
-    PricingPlan,
     ChildCareHours,
     ClassSchedule
   }
