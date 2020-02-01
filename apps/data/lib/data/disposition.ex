@@ -30,12 +30,6 @@ defmodule Data.Disposition do
     {:ok, changeset}
   end
 
-  def all(%{role: role}) when role in @roles,
-    do: Query.all()
-
-  def all(_),
-    do: {:error, :invalid_permissions}
-
   def get(%{role: role}, id) when role in @roles,
     do: Query.get(id)
 

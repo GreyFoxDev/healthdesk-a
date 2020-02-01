@@ -105,7 +105,7 @@ defmodule Data.Intent do
 
   defp get_hours(location, {:normal, day_of_week}) do
     location.id
-    |> NormalHours.all()
+    |> NormalHours.get_by_location_id()
     |> Enum.filter(fn hour -> hour.day_of_week == day_of_week end)
   end
 

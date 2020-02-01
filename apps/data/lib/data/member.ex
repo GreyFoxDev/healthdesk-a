@@ -45,7 +45,7 @@ defmodule Data.Member do
     Query.get_by_phone(phone_number)
   end
 
-  def update(%{"id" => id} = params) do
+  def update(id, params) do
     id
     |> Query.get()
     |> Query.update(params)

@@ -9,10 +9,7 @@ defmodule MainWeb.NormalHourController do
       |> current_user()
       |> Location.get(location_id)
 
-    hours =
-      conn
-      |> current_user()
-      |> NormalHours.all(location_id)
+    hours = NormalHours.get_by_location_id(location_id)
 
     render conn, "index.html", location: location, hours: hours, teams: teams(conn), changeset: NormalHours.get_changeset()
   end

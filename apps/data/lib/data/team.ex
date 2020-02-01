@@ -44,7 +44,7 @@ defmodule Data.Team do
 
   def update(id, params) do
     id
-    |> Team.get()
-    |> Team.update(params)
+    |> Query.get()
+    |> Query.update(params)
   end
 end

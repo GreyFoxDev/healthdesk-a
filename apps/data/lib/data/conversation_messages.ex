@@ -36,10 +36,4 @@ defmodule Data.ConversationMessages do
     do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
-
-  def update(%{"id" => id} = params) do
-    id
-    |> Query.get()
-    |> Query.update(params)
-  end
 end

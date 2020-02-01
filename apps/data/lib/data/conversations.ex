@@ -30,8 +30,8 @@ defmodule Data.Conversations do
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> Conversations.get()
-      |> Data.Schema.Conversation.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
   end

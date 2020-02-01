@@ -28,7 +28,7 @@ defmodule Data.WifiNetwork do
   end
 
   def all(%{role: role}, location_id) when role in @roles,
-    do: WifiNetwork.get_by_location_id(location_id)
+    do: Query.get_by_location_id(location_id)
 
   def all(_), do: {:error, :invalid_permissions}
 

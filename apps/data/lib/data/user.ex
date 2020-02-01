@@ -28,17 +28,12 @@ defmodule Data.User do
     {:ok, changeset}
   end
 
-  def all(%{role: role}) when role in @roles,
-    do: User.all()
-
-  def all(_), do: {:error, :invalid_permissions}
-
   def get(%{role: role}, id) when role in @roles,
     do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-  def update(%{"id" => id} = params) do
+  def update(id, params) do
     id
     |> Query.get()
     |> Query.update(params)
