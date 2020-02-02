@@ -5,7 +5,7 @@ defmodule MainWeb.Notify do
 
   require Logger
 
-  alias Data.Location
+  alias Data.{Location, TeamMember, TimezoneOffset}
 
   @url "[url]/admin/teams/[team_id]/locations/[location_id]/conversations/[conversation_id]/conversation-messages"
   @super_admin Application.get_env(:main, :super_admin)
@@ -26,17 +26,45 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
+    body = Enum.join([message, link[:url]], "\n")
+
+
+    timezone_offset = TimezoneOffset.calculate(location.timezone)
+    current_time_string = Time.add(Time.utc_now(), timezone_offset)
+    location_admins =
+      location
+      |> TeamMember.get_available_by_location()
+      |> Enum.filter(&(&1.role == "location-admin"))
+
+    _ = Enum.each(location_admins, fn(admin) ->
+      if admin.use_sms do
+        message = %{
+          provider: :twilio,
+          from: location.phone_number,
+          to: admin.phone_number,
+          body: body
+        }
+
+        @chatbot.send(message)
+      end
+
+      if admin.use_email do
+      end
+    end)
+
     message = %{
       provider: :twilio,
       from: location.phone_number,
       to: member,
-      body: Enum.join([message, link[:url]], "\n")
+      body: body
     }
+
+    # @chatbot.send(message)
 
     if location.slack_integration && location.slack_integration != "" do
       headers = [{"content-type", "application/json"}]
 
-      body = Jason.encode! %{text: message.body}
+      body = Jason.encode! %{text: body}
 
       Tesla.post location.slack_integration, body, headers: headers
     end
@@ -45,7 +73,6 @@ defmodule MainWeb.Notify do
     MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)
     MainWeb.Endpoint.broadcast("alert:#{location.id}", "broadcast", alert_info)
 
-    @chatbot.send(message)
 
     :ok
   end

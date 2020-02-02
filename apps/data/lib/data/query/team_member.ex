@@ -3,10 +3,14 @@ defmodule Data.Query.TeamMember do
   Module for the Team Member queries
   """
   import Ecto.Query, only: [from: 2]
+  import Data.TimezoneOffset
 
-  alias Data.Schema.{TeamMember, User, TeamMemberLocation}
+  alias Data.Schema.{TeamMember, User, TeamMemberLocation, Location}
   alias Data.ReadOnly.Repo, as: Read
   alias Data.WriteOnly.Repo, as: Write
+  alias Ecto.Adapters.SQL
+
+  @available_function "SELECT * FROM find_available_team_members($1, $2);"
 
   @doc """
   Return a list of active locations
@@ -60,7 +64,7 @@ defmodule Data.Query.TeamMember do
   @doc """
   Return a list of active team members for a location
   """
-  @spec get_by_location_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [TeamMember.t()]
+  @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [TeamMember.t()]
   def get_by_location_id(location_id, repo \\ Read) do
     from(t in TeamMember,
       join: u in User,
@@ -72,6 +76,16 @@ defmodule Data.Query.TeamMember do
       preload: [:team_member_locations, :user]
     )
     |> repo.all()
+  end
+
+  @doc """
+  Returns a list of available team members for a location
+  """
+  @spec get_available_by_location(location :: Location.t(), time_string :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  def get_available_by_location(location, current_time, repo \\ Read) do
+    repo
+    |> SQL.query!(@available_function, [location.id, current_time])
+    |> build_results()
   end
 
   @doc """
@@ -139,5 +153,10 @@ defmodule Data.Query.TeamMember do
       |> TeamMemberLocation.changeset(%{location_id: location, team_member_id: id})
       |> repo.insert!()
     end)
+  end
+
+  defp build_results(results) do
+    cols = Enum.map(results.columns, &String.to_existing_atom/1)
+    Enum.map(results.rows, fn(row) -> Map.new(Enum.zip(cols, row)) end)
   end
 end

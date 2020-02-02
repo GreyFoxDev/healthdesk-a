@@ -49,7 +49,7 @@
                     <div class="form-group">
                         <h3>Do Not Disturb</h3>
                         <p>When Do Not Disturb is turned on, Healthdesk won't send you any SMS notifications. Your messages will still be available when you log in.</p>
-                        <label for="user_use_do_not_disturb" class="c-label c-label--inline c-label--pointer" data-qa-label="true" data-qa-label-type="inline">
+                        <label for="user_use_do_not_disturb">
                             <span>
                                 <%= checkbox f, :use_do_not_disturb %> 
                                 <span style="padding-left: 10px;">Automatically disable notifications from:</span>

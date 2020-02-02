@@ -56,7 +56,8 @@ defmodule Data.Conversations do
   Retrieves a conversation from the database. If one isn't found then it will create one
   and return it. Conversations are unique to locations.
   """
-  @spec find_or_start_conversation({member :: binary, location :: binary}) :: Conversation.t() | nil
+  @spec find_or_start_conversation({member :: binary, location :: binary}) ::
+          Conversation.t() | nil
   def find_or_start_conversation({member, location}) do
     with %Location{} = location <- Data.Query.Location.get_by_phone(location),
          {:ok, nil} <- get_by_phone(member, location.id) do

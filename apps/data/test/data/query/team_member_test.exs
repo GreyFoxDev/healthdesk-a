@@ -114,11 +114,11 @@ defmodule Data.Query.TeamMemberTest do
       {:ok, context}
     end
 
-    test "returns nil if record is not found" do
+    test "returns an empty list if record is not found" do
       assert [] = Query.get_by_team_id(UUID.uuid4(), Repo)
     end
 
-    test "returns a location using the team id", %{location: location} do
+    test "returns a team member using the location id", %{location: location} do
       team2 = insert(:team)
       location2 = insert(:location, %{team_id: team2.id})
       user = insert(:user)
@@ -133,6 +133,46 @@ defmodule Data.Query.TeamMemberTest do
 
       # User should be preloaded
       assert user.first_name == found.user.first_name
+    end
+  end
+
+  describe "get_available_by_location/1" do
+    setup context do
+      user1 = insert(:user, %{
+            use_sms: true,
+            use_do_not_disturb: true,
+            start_do_not_disturb: "18:00",
+            end_do_not_disturb: "07:00"})
+      user2 = insert(:user, %{
+            use_sms: true,
+            use_do_not_disturb: true,
+            start_do_not_disturb: "22:00",
+            end_do_not_disturb: "09:00"})
+      user3 = insert(:user, %{
+            use_sms: true,
+            use_do_not_disturb: false})
+
+      insert(
+        :team_member,
+        %{team_id: context.team.id, location_id: context.location.id, user_id: user1.id})
+      insert(
+        :team_member,
+        %{team_id: context.team.id, location_id: context.location.id, user_id: user2.id})
+      insert(
+        :team_member,
+        %{team_id: context.team.id, location_id: context.location.id, user_id: user3.id})
+
+      {:ok, [user: user2, location: context.location]}
+    end
+
+    test "during normal hours all are returned", %{location: location} do
+      assert 3 = Query.get_available_by_location(location, "10:00", Repo) |> Enum.count()
+    end
+
+    test "return only the 2 active team members contact information", %{location: location, user: user} do
+      team_members = Query.get_available_by_location(location, "19:00", Repo)
+      assert 2 = Enum.count(team_members)
+      assert user.email in Enum.map(team_members, &(&1.email))
     end
   end
 
