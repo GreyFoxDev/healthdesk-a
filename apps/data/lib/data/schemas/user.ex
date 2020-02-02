@@ -25,6 +25,12 @@ defmodule Data.Schema.User do
     last_name
     email
     avatar
+    use_email
+    use_sms
+    use_do_not_disturb
+    start_do_not_disturb
+    end_do_not_disturb
+    timezone
     deleted_at
   |a
 
@@ -37,6 +43,13 @@ defmodule Data.Schema.User do
     field(:last_name, :string)
     field(:email, :string)
     field(:avatar, :string)
+    field(:use_email, :boolean)
+    field(:use_sms, :boolean)
+    field(:use_do_not_disturb, :boolean)
+    field(:start_do_not_disturb, :string)
+    field(:end_do_not_disturb, :string)
+
+    field(:timezone, :string)
 
     field(:deleted_at, :utc_datetime)
 

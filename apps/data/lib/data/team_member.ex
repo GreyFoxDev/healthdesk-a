@@ -12,7 +12,6 @@ defmodule Data.TeamMember do
     "team-admin"
   ]
 
-  defdelegate create(params), to: Query
   defdelegate associate_locations(one, two), to: Query
 
   def get_changeset(),
