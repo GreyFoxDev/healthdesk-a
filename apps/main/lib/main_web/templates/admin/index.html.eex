@@ -201,10 +201,12 @@
             <div class="modal-body">
                 <ul class="list-group">
                     <%= for disposition <- @dispositions do %>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <%= disposition.name %>
-                            <span class="badge badge-primary badge-pill"><%= disposition.count %></span>
-                        </li>
+                        <%= if disposition.name not in ["Automated", "Call deflected"] do %>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <%= disposition.name %>
+                                <span class="badge badge-primary badge-pill"><%= disposition.count %></span>
+                            </li>
+                        <% end %>
                     <% end %>
                 </ul>
             </div>

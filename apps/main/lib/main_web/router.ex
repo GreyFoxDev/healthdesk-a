@@ -25,6 +25,8 @@ defmodule MainWeb.Router do
 
     get "/webchat/secret", PageController, :secret
     get "/webchat/:api_key", WebChatController, :index
+    get "/tsi/:api_key", TsiController, :new
+    post "/tsi/:api_key", TsiController, :create
   end
 
   scope "/admin", MainWeb do
