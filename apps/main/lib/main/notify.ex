@@ -15,7 +15,7 @@ defmodule MainWeb.Notify do
   @doc """
   Send a notification to the super admin defined in the config. It will create a short URL.
   """
-  def send_to_admin(conversation_id, message, location, member \\ @super_admin) do
+  def send_to_admin(conversation_id, message, location, _member \\ @super_admin) do
     location = Location.get_by_phone(location)
 
     %{data: link} =
@@ -59,15 +59,6 @@ defmodule MainWeb.Notify do
       end
     end)
 
-    message = %{
-      provider: :twilio,
-      from: location.phone_number,
-      to: member,
-      body: body
-    }
-
-    # @chatbot.send(message)
-
     if location.slack_integration && location.slack_integration != "" do
       headers = [{"content-type", "application/json"}]
 
@@ -79,7 +70,6 @@ defmodule MainWeb.Notify do
     alert_info = %{location: location, convo: conversation_id}
     MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)
     MainWeb.Endpoint.broadcast("alert:#{location.id}", "broadcast", alert_info)
-
 
     :ok
   end

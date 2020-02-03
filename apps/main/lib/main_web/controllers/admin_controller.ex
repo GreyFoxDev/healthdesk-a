@@ -1,7 +1,7 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Metrics, Disposition, Location, TeamMember}
+  alias Data.{Disposition, Location, TeamMember}
 
   def index(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)

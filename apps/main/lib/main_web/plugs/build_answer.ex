@@ -23,7 +23,6 @@ defmodule MainWeb.Plug.BuildAnswer do
   message in the queue.
   """
   def call(%{assigns: %{convo: id, opt_in: true, status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
-    IO.inspect assigns, label: "AM I HERE"
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
     :ok = notify_admin_user(assigns)
@@ -38,7 +37,6 @@ defmodule MainWeb.Plug.BuildAnswer do
   If there is a known intent then get the corresponding response.
   """
   def call(%{assigns: %{opt_in: true, status: "open", intent: intent, location: location}} = conn, _opts) do
-    IO.inspect conn.assigns, label: "OR HERE"
     response = Intents.get(intent, location)
 
     location = Location.get_by_phone(location)

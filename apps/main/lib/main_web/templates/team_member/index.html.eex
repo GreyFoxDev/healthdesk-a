@@ -12,7 +12,7 @@
     </div>
 </header>
 
-<%= if messsage = get_flash(@conn, :error) do %>
+<%= if get_flash(@conn, :error) do %>
   <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
 <% end %>
 

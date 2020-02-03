@@ -3,7 +3,7 @@ defmodule MainWeb.ChildCareHourController do
 
   alias Data.{ChildCareHours, Location}
 
-  def index(conn, %{"location_id" => location_id} = params) do
+  def index(conn, %{"location_id" => location_id}) do
     location =
       conn
       |> current_user()
@@ -45,7 +45,7 @@ defmodule MainWeb.ChildCareHourController do
     end
   end
 
-  def create(conn, %{"child_care_hour" => hours, "location_id" => location_id} = params) do
+  def create(conn, %{"child_care_hour" => hours, "location_id" => location_id}) do
     hours
     |> Map.put("location_id", location_id)
     |> ChildCareHours.create()
@@ -97,14 +97,14 @@ defmodule MainWeb.ChildCareHourController do
            |> put_flash(:success, "Child Care Hours deleted successfully.")
            |> redirect(to: team_location_child_care_hour_path(conn, :index, team_id, location_id))
 
-         {:error, changeset} ->
+         {:error, _changeset} ->
            conn
            |> put_flash(:error, "Child Care Hours failed to delete")
            |> render_page("index.html", team_id, location_id)
        end
   end
 
-  defp render_page(conn, page, changeset, errors \\ []) do
+  defp render_page(conn, page, changeset, errors) do
     render(conn, page,
       changeset: changeset,
       errors: errors)

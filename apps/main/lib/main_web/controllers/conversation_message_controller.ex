@@ -3,13 +3,12 @@ defmodule MainWeb.ConversationMessageController do
 
   alias Data.{ConversationMessages, Conversations, Location, MemberChannel, TeamMember}
   alias Data.Schema.MemberChannel, as: Channel
-  alias MainWeb.Endpoint
 
   require Logger
 
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
-  def index(conn, %{"location_id" => location_id, "conversation_id" => conversation_id} = params) do
+  def index(conn, %{"location_id" => location_id, "conversation_id" => conversation_id}) do
     location =
       conn
       |> current_user()
@@ -79,7 +78,7 @@ defmodule MainWeb.ConversationMessageController do
            message = %{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
            @chatbot.send(message)
            put_flash(conn, :success, "Sending message was successful")
-         {:error, changeset} ->
+         {:error, _changeset} ->
            put_flash(conn, :error, "Sending message failed")
        end
   end
@@ -95,15 +94,13 @@ defmodule MainWeb.ConversationMessageController do
            message = %Chatbot.Params{provider: :twilio, from: "messenger:#{location.messenger_id}", to: conversation.original_number, body: params["conversation_message"]["message"]}
            Chatbot.Client.Twilio.call(message)
            put_flash(conn, :success, "Sending message was successful")
-         {:error, changeset} ->
+         {:error, _changeset} ->
            put_flash(conn, :error, "Sending message failed")
        end
   end
 
   defp send_message(%{original_number: << "CH", _ :: binary >>} = conversation, conn, params, location) do
     user = current_user(conn)
-
-    [web_location] = Location.get_by_team_id(user, location.team_id) |> Enum.filter(&(&1.web_chat))
 
     from = if conversation.team_member do
       Enum.join([conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."], " ")
@@ -119,12 +116,12 @@ defmodule MainWeb.ConversationMessageController do
            message = %Chatbot.Params{provider: :twilio, from: from, to: conversation.original_number, body: params["conversation_message"]["message"]}
            Chatbot.Client.Twilio.channel(message)
            put_flash(conn, :success, "Sending message was successful")
-         {:error, changeset} ->
+         {:error, _changeset} ->
            put_flash(conn, :error, "Sending message failed")
        end
   end
 
-  defp render_page(conn, page, changeset, errors \\ []) do
+  defp render_page(conn, page, changeset, errors) do
     render(conn, page,
       changeset: changeset,
       errors: errors)
