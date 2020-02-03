@@ -1,7 +1,16 @@
 defmodule Data.Schema.ConversationMessage do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a conversation's messages
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          conversation_id: binary(),
+          phone_number: String.t(),
+          message: String.t(),
+          sent_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   conversation_id

@@ -1,14 +1,14 @@
 defmodule MainWeb.ConversationController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Commands.Conversations, ConversationMessages, Location, TeamMember, Member}
+  alias Data.{Conversations, ConversationMessages, Location, TeamMember}
   alias MainWeb.Helper.Formatters
 
   require Logger
 
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
-  def index(conn, %{"location_id" => location_id} = params) do
+  def index(conn, %{"location_id" => location_id}) do
     location =
       conn
       |> current_user()
@@ -17,7 +17,7 @@ defmodule MainWeb.ConversationController do
     conversations =
       conn
       |> current_user()
-      |> Data.Conversations.all(location_id)
+      |> Conversations.all(location_id)
 
     my_conversations =
       Enum.filter(conversations, fn(c) -> c.team_member && c.team_member.user_id == current_user(conn).id end)
@@ -38,7 +38,7 @@ defmodule MainWeb.ConversationController do
       |> Location.get(location_id)
 
     render(conn, "new.html",
-      changeset: Data.Conversations.get_changeset(),
+      changeset: Conversations.get_changeset(),
       location: location,
       teams: teams(conn),
       errors: [])
@@ -58,7 +58,7 @@ defmodule MainWeb.ConversationController do
     conversation =
       conn
       |> current_user()
-      |> Data.Conversations.get(id)
+      |> Conversations.get(id)
 
     messages =
       conn
@@ -93,12 +93,12 @@ defmodule MainWeb.ConversationController do
                 "sent_at" => DateTime.utc_now()}
 
 
-    with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "open"}),
+    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "open"}),
          {:ok, _} <- ConversationMessages.create(message) do
 
       redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id))
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Unable to open conversation")
         |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
@@ -113,8 +113,11 @@ defmodule MainWeb.ConversationController do
 
     user_info = Formatters.format_team_member(current_user(conn))
 
+    _ = ConCache.delete(:session_cache, id)
+
     message = if params["disposition_id"] do
       Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => params["disposition_id"]})
+
       disposition =
         conn
         |> current_user()
@@ -131,12 +134,12 @@ defmodule MainWeb.ConversationController do
           "sent_at" => DateTime.utc_now()}
     end
 
-    with {:ok, _pi} <- Data.Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
+    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
          {:ok, _} <- ConversationMessages.create(message) do
 
       redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Unable to close conversation")
         |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
@@ -187,7 +190,7 @@ defmodule MainWeb.ConversationController do
 
     :ok
   end
-  defp handle_sending_message({:error, _, params}), do: :error
+  defp handle_sending_message({:error, _, _params}), do: :error
 
   defp update_conn(:ok, conn), do: put_flash(conn, :success, "Sending message was successful")
   defp update_conn(:error, conn), do: put_flash(conn, :error, "Sending message failed")

@@ -3,6 +3,17 @@ defmodule Data.Schema.Team do
 
   use Data.Schema
 
+  @type t :: %__MODULE__{
+          id: binary(),
+          team_name: String.t() | nil,
+          website: String.t() | nil,
+          twilio_flow_id: String.t() | nil,
+          team_member_count: Integer.t() | nil,
+          locations: List.t() | nil,
+          team_members: List.t() | nil,
+          deleted_at: :utc_datetime | nil
+        }
+
   @required_fields ~w|
     team_name
     website

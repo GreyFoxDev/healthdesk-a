@@ -27,7 +27,7 @@ defmodule MainWeb.Helper.Formatters  do
   def format_phone(<< "messenger:", _rest :: binary >>), do: "Facebook Visitor"
 
   def format_phone(<< "CH", _rest :: binary >> = channel_id) do
-    with %Channel{} = channel <- MemberChannel.get_by_channel_id(%{role: "admin"}, channel_id) do
+    with %Channel{} = channel <- MemberChannel.get_by_channel_id(channel_id) do
       Enum.join([channel.member.first_name, channel.member.last_name], " ")
     else
       nil ->

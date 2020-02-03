@@ -1,7 +1,19 @@
 defmodule Data.Schema.User do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a healthdesk user
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          phone_number: String.t(),
+          role: String.t() | nil,
+          first_name: String.t() | nil,
+          last_name: String.t() | nil,
+          email: String.t() | nil,
+          avatar: String.t() | nil,
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
     phone_number
@@ -13,6 +25,12 @@ defmodule Data.Schema.User do
     last_name
     email
     avatar
+    use_email
+    use_sms
+    use_do_not_disturb
+    start_do_not_disturb
+    end_do_not_disturb
+    timezone
     deleted_at
   |a
 
@@ -25,6 +43,13 @@ defmodule Data.Schema.User do
     field(:last_name, :string)
     field(:email, :string)
     field(:avatar, :string)
+    field(:use_email, :boolean)
+    field(:use_sms, :boolean)
+    field(:use_do_not_disturb, :boolean)
+    field(:start_do_not_disturb, :string)
+    field(:end_do_not_disturb, :string)
+
+    field(:timezone, :string)
 
     field(:deleted_at, :utc_datetime)
 

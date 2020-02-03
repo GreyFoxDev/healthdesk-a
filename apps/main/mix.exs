@@ -36,12 +36,13 @@ defmodule Main.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bamboo, "~> 1.4"},
       {:bitly, "~> 0.1"},
       {:phoenix, "~> 1.4.9"},
       {:cors_plug, "~> 2.0"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.13.2"},
-      {:phoenix_ecto, "~> 3.3"},
+      {:phoenix_ecto, "~> 4.1"},
       {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.7"},
       {:calendar, "~> 0.17.4"},

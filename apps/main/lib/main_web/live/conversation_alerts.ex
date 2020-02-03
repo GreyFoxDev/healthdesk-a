@@ -30,7 +30,7 @@ defmodule MainWeb.Live.ConversationAlertsView do
   end
 
   def mount(%{team_member: %{location_id: location_id}} = session, socket) do
-    location = Data.Commands.Location.get(location_id)
+    location = Data.Location.get(location_id)
 
     MainWeb.Endpoint.subscribe("alert:#{location.phone_number}")
     {:ok, assign(socket, :session, session)}

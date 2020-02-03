@@ -1,7 +1,7 @@
 defmodule MainWeb.ClassScheduleController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Location, Commands.ClassSchedule}
+  alias Data.{Location, ClassSchedule}
 
   NimbleCSV.define(MyParser, [])
 
@@ -17,7 +17,7 @@ defmodule MainWeb.ClassScheduleController do
       teams: teams(conn))
   end
 
-  def create(conn, %{"location_id" => location_id, "csv" => upload} = params) do
+  def create(conn, %{"location_id" => location_id, "csv" => upload}) do
     location =
       conn
       |> current_user()
@@ -25,7 +25,7 @@ defmodule MainWeb.ClassScheduleController do
 
     # Clear out location schedules
     location_id
-    |> ClassSchedule.all()
+    |> ClassSchedule.get_by_location_id()
     |> Enum.each(&ClassSchedule.delete/1)
 
     count = upload.path

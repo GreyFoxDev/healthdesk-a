@@ -3,7 +3,7 @@ defmodule MainWeb.HolidayHourController do
 
   alias Data.{HolidayHours, Location}
 
-  def index(conn, %{"location_id" => location_id} = params) do
+  def index(conn, %{"location_id" => location_id}) do
     location =
       conn
       |> current_user()
@@ -17,7 +17,7 @@ defmodule MainWeb.HolidayHourController do
     render conn, "index.html", location: location, hours: hours, teams: teams(conn), changeset: HolidayHours.get_changeset()
   end
 
-  def create(conn, %{"holiday_hour" => hours, "team_id" => team_id, "location_id" => location_id} = params) do
+  def create(conn, %{"holiday_hour" => hours, "team_id" => team_id, "location_id" => location_id}) do
     location =
       conn
       |> current_user()
@@ -48,7 +48,7 @@ defmodule MainWeb.HolidayHourController do
            |> put_flash(:success, "Holiday Hours deleted successfully.")
            |> redirect(to: team_location_holiday_hour_path(conn, :index, team_id, location_id))
 
-         {:error, changeset} ->
+         {:error, _changeset} ->
            conn
            |> put_flash(:error, "Holiday Hours failed to delete")
            |> redirect(to: team_location_holiday_hour_path(conn, :index, team_id, location_id))

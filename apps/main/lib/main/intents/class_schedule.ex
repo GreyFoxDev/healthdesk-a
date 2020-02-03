@@ -3,7 +3,7 @@ defmodule MainWeb.Intents.ClassSchedule do
   This handles class schedule responses
   """
 
-  alias Data.Commands.{
+  alias Data.{
     ClassSchedule,
     Location
   }

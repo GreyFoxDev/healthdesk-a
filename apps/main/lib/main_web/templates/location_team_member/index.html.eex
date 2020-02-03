@@ -54,7 +54,7 @@
                             <div class="list-group-item d-flex justify-content-between align-items-center">
                                 <div class="alert alert-warning mx-3"> There are no members for this location. </div>
                             </div>
-                        <%= else %>
+                        <% else %>
                             <%= for member <- @location_team_members do %>
                                 <div class="list-group-item d-flex justify-content-between align-items-left">
                                     <span><b><%= member.user.first_name %> <%= member.user.last_name %></b></span>

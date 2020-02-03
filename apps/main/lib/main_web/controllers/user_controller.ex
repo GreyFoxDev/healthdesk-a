@@ -1,7 +1,7 @@
 defmodule MainWeb.UserController do
   use MainWeb.SecuredContoller
 
-  alias Data.{User, Location}
+  alias Data.User
 
   def edit(conn, %{"id" => id}) do
     with %Data.Schema.User{} = user <- current_user(conn),

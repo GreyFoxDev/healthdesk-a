@@ -14,7 +14,7 @@ defmodule MainWeb.FlowController do
 
   def flow(%{assigns: %{flow_name: flow_name} = attrs} = conn, _params) do
     params = build_chat_params(flow_name, attrs)
-    result = execute(%Chatbot.Params{
+    _ = execute(%Chatbot.Params{
           provider: :twilio,
           to: attrs.member,
           from: attrs.location,
@@ -35,7 +35,6 @@ defmodule MainWeb.FlowController do
       location_name: params.location_name,
       phone: params.member,
       barcode: params.barcode,
-      location_name: params.location_name,
       home_club: params.home_club,
       new_club: params.new_club,
       message: params.message,

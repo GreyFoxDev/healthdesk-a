@@ -69,14 +69,14 @@ defmodule MainWeb.TeamController do
         conn
         |> put_flash(:success, "Team deleted successfully.")
         |> redirect(to: team_path(conn, :index))
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Team failed to delete")
         |> render("index.html")
     end
   end
 
-  defp render_page(conn, page, changeset, errors \\ []) do
+  defp render_page(conn, page, changeset, errors) do
     render(conn, page,
       changeset: changeset,
       errors: errors)

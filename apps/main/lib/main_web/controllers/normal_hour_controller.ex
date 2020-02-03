@@ -3,16 +3,13 @@ defmodule MainWeb.NormalHourController do
 
   alias Data.{NormalHours, Location}
 
-  def index(conn, %{"location_id" => location_id} = params) do
+  def index(conn, %{"location_id" => location_id}) do
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
 
-    hours =
-      conn
-      |> current_user()
-      |> NormalHours.all(location_id)
+    hours = NormalHours.get_by_location_id(location_id)
 
     render conn, "index.html", location: location, hours: hours, teams: teams(conn), changeset: NormalHours.get_changeset()
   end
@@ -45,7 +42,7 @@ defmodule MainWeb.NormalHourController do
     end
   end
 
-  def create(conn, %{"normal_hour" => hours, "team_id" => team_id, "location_id" => location_id} = params) do
+  def create(conn, %{"normal_hour" => hours, "team_id" => team_id, "location_id" => location_id}) do
     hours
     |> Map.put("location_id", location_id)
     |> NormalHours.create()
@@ -87,14 +84,14 @@ defmodule MainWeb.NormalHourController do
            |> put_flash(:success, "Normal Hours deleted successfully.")
            |> redirect(to: team_location_normal_hour_path(conn, :index, team_id, location_id))
 
-         {:error, changeset} ->
+         {:error, _changeset} ->
            conn
            |> put_flash(:error, "Normal Hours failed to delete")
            |> render_page("index.html", team_id, location_id)
        end
   end
 
-  defp render_page(conn, page, changeset, errors \\ []) do
+  defp render_page(conn, page, changeset, errors) do
     render(conn, page,
       changeset: changeset,
       errors: errors)

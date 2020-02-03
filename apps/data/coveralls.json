@@ -1,0 +1,9 @@
+{
+    "skip_files": [
+        "test/support",
+        "lib/data/repos",
+        "lib/data/application.ex",
+        "lib/data/schema.ex",
+        "lib/data/schemas/metrics_team.ex"
+    ]
+}

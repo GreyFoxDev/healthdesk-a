@@ -3,7 +3,7 @@ defmodule MainWeb.DispositionController do
 
   alias Data.{Disposition, Team}
 
-  def index(conn, %{"team_id" => team_id} = params) do
+  def index(conn, %{"team_id" => team_id}) do
     team =
       conn
       |> current_user()
@@ -36,15 +36,18 @@ defmodule MainWeb.DispositionController do
   end
 
   def delete(conn, %{"id" => id, "team_id" => team_id}) do
-    id
-    |> Disposition.update(%{"deleted_at" => DateTime.utc_now()})
+    %{
+      "id" => id,
+      "deleted_at" => DateTime.utc_now()
+    }
+    |> Disposition.update()
     |> case do
          {:ok, _hours} ->
            conn
            |> put_flash(:success, "Disposition deleted successfully.")
            |> redirect(to: team_disposition_path(conn, :index, team_id))
 
-         {:error, changeset} ->
+         {:error, _changeset} ->
            conn
            |> put_flash(:error, "Disposition failed to delete")
            |> render_page("index.html", team_id)

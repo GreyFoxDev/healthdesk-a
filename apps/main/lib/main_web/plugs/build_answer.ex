@@ -8,6 +8,7 @@ defmodule MainWeb.Plug.BuildAnswer do
   import Plug.Conn
 
   alias MainWeb.{Intents, Notify}
+  alias Data.Location
 
   @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
 
@@ -21,9 +22,11 @@ defmodule MainWeb.Plug.BuildAnswer do
   If the intent is 'unknown' then the super admin for the location needs to be notified that there is a new
   message in the queue.
   """
-  def call(%{assigns: %{opt_in: true, status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
-    :ok = notify_admin_user(assigns)
+  def call(%{assigns: %{convo: id, opt_in: true, status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
+    pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
+    :ok = notify_admin_user(assigns)
+    :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
 
     conn
     |> assign(:status, "pending")
@@ -36,7 +39,9 @@ defmodule MainWeb.Plug.BuildAnswer do
   def call(%{assigns: %{opt_in: true, status: "open", intent: intent, location: location}} = conn, _opts) do
     response = Intents.get(intent, location)
 
-    if response == @default_response do
+    location = Location.get_by_phone(location)
+
+    if response == location.default_message do
       :ok = notify_admin_user(conn.assigns)
 
       conn
@@ -45,11 +50,6 @@ defmodule MainWeb.Plug.BuildAnswer do
     else
       assign(conn, :response, response)
     end
-  end
-
-  def call(%{assigns: %{opt_in: true, status: "pending"} = assigns} = conn, _opts) do
-    :ok = notify_admin_user(assigns)
-    conn
   end
 
   def call(conn, _opts), do: conn

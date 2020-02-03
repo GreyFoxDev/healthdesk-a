@@ -19,10 +19,11 @@ defmodule Chatbot.Client.Twilio do
 
   def execution(%Chatbot.Params{provider: :twilio} = params) do
     body = Poison.encode!(params.body)
+
     ExTwilio.Api.create(
       ExTwilio.Studio.Execution,
       [to: params.to, from: params.from, parameters: body],
-      [flow_sid: params.body.twilio_flow_id]
+      flow_sid: params.body.twilio_flow_id
     )
   end
 
@@ -34,7 +35,10 @@ defmodule Chatbot.Client.Twilio do
     ExTwilio.Api.create(
       ExTwilio.ProgrammableChat.Channel,
       [to: params.to, from: params.from, body: params.body, friendly_name: "Nick"],
-      [service_id: service_id, to: params.to, account: account, token: token]
+      service_id: service_id,
+      to: params.to,
+      account: account,
+      token: token
     )
   end
 

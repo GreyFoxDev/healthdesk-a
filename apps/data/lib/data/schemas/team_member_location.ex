@@ -1,11 +1,18 @@
 defmodule Data.Schema.TeamMemberLocation do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for associating team members with multiple locations
+  """
   use Data.Schema
 
+  @type t :: %__MODULE__{
+          id: binary(),
+          location_id: binary(),
+          team_member_id: binary()
+        }
+
   @required_fields ~w|
-  team_member_id
   location_id
+  team_member_id
   |a
 
   schema "team_member_locations" do

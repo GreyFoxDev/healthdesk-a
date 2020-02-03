@@ -3,7 +3,7 @@ defmodule MainWeb.LocationTeamMemberController do
 
   alias Data.{Location, Team, TeamMember}
 
-  def index(conn, %{"team_id" => team_id, "location_id" => location_id} = params) do
+  def index(conn, %{"team_id" => team_id, "location_id" => location_id}) do
     team =
       conn
       |> current_user()

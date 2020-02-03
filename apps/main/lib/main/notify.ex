@@ -5,7 +5,7 @@ defmodule MainWeb.Notify do
 
   require Logger
 
-  alias Data.Commands.Location
+  alias Data.{Location, TeamMember, TimezoneOffset}
 
   @url "[url]/admin/teams/[team_id]/locations/[location_id]/conversations/[conversation_id]/conversation-messages"
   @super_admin Application.get_env(:main, :super_admin)
@@ -15,7 +15,7 @@ defmodule MainWeb.Notify do
   @doc """
   Send a notification to the super admin defined in the config. It will create a short URL.
   """
-  def send_to_admin(conversation_id, message, location, member \\ @super_admin) do
+  def send_to_admin(conversation_id, message, location, _member \\ @super_admin) do
     location = Location.get_by_phone(location)
 
     %{data: link} =
@@ -26,17 +26,43 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
-    message = %{
-      provider: :twilio,
-      from: location.phone_number,
-      to: member,
-      body: Enum.join([message, link[:url]], "\n")
-    }
+    body = Enum.join([message, link[:url]], "\n")
+
+
+    timezone_offset = TimezoneOffset.calculate(location.timezone)
+    current_time_string =
+      Time.utc_now()
+      |> Time.add(timezone_offset)
+      |> to_string()
+
+    location_admins =
+      location
+      |> TeamMember.get_available_by_location(current_time_string)
+      |> Enum.filter(&(&1.role == "location-admin"))
+
+    _ = Enum.each(location_admins, fn(admin) ->
+      if admin.use_sms do
+        message = %{
+          provider: :twilio,
+          from: location.phone_number,
+          to: admin.phone_number,
+          body: body
+        }
+
+        @chatbot.send(message)
+      end
+
+      if admin.use_email do
+        admin.email
+        |> Main.Email.generate_email(body)
+        |> Main.Mailer.deliver_now()
+      end
+    end)
 
     if location.slack_integration && location.slack_integration != "" do
       headers = [{"content-type", "application/json"}]
 
-      body = Jason.encode! %{text: message.body}
+      body = Jason.encode! %{text: body}
 
       Tesla.post location.slack_integration, body, headers: headers
     end
@@ -44,8 +70,6 @@ defmodule MainWeb.Notify do
     alert_info = %{location: location, convo: conversation_id}
     MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)
     MainWeb.Endpoint.broadcast("alert:#{location.id}", "broadcast", alert_info)
-
-    @chatbot.send(message)
 
     :ok
   end

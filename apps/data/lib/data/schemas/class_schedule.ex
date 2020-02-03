@@ -1,7 +1,20 @@
 defmodule Data.Schema.ClassSchedule do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a location's class schedule
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          location_id: binary(),
+          date: Data.t() | nil,
+          start_time: String.t() | nil,
+          end_time: String.t() | nil,
+          instructor: String.t() | nil,
+          class_type: String.t() | nil,
+          class_category: String.t() | nil,
+          class_description: String.t() | nil
+        }
 
   @required_fields ~w|
   location_id
@@ -45,52 +58,63 @@ defmodule Data.Schema.ClassSchedule do
     |> validate_required(@required_fields)
   end
 
-  defp clean_date(%{"date" => date} = params) do
-    fmt =
-      case date do
-        <<m::binary-size(1), "/", d::binary-size(1), "/", y::binary-size(4)>> ->
-          "#{y}-0#{m}-0#{d}"
+  defp clean_date(%{"date" => date} = params),
+    do: Map.put(params, "date", format_date(date))
 
-        <<m::binary-size(1), "/", d::binary-size(2), "/", y::binary-size(4)>> ->
-          "#{y}-0#{m}-#{d}"
+  defp clean_date(%{date: date} = params),
+    do: Map.put(params, :date, format_date(date))
 
-        <<m::binary-size(2), "/", d::binary-size(1), "/", y::binary-size(4)>> ->
-          "#{y}-#{m}-0#{d}"
+  defp clean_date(params),
+    do: params
 
-        <<m::binary-size(2), "/", d::binary-size(2), "/", y::binary-size(4)>> ->
-          "#{y}-#{m}-#{d}"
+  defp format_date(<<m::binary-size(1), "/", d::binary-size(1), "/", y::binary-size(4)>>),
+    do: "#{y}-0#{m}-0#{d}"
 
-        date ->
-          date
-      end
+  defp format_date(<<m::binary-size(1), "/", d::binary-size(2), "/", y::binary-size(4)>>),
+    do: "#{y}-0#{m}-#{d}"
 
-    Map.merge(params, %{"date" => fmt})
+  defp format_date(<<m::binary-size(2), "/", d::binary-size(1), "/", y::binary-size(4)>>),
+    do: "#{y}-#{m}-0#{d}"
+
+  defp format_date(<<m::binary-size(2), "/", d::binary-size(2), "/", y::binary-size(4)>>),
+    do: "#{y}-#{m}-#{d}"
+
+  defp format_date(date), do: date
+
+  defp clean_times(%{start_time: start_time, end_time: end_time} = params) do
+    Map.merge(params, %{
+      start_time: adjust_time(start_time),
+      end_time: adjust_time(end_time)
+    })
   end
-
-  defp clean_date(params), do: params
 
   defp clean_times(%{"start_time" => start_time, "end_time" => end_time} = params) do
-    Map.merge(params, %{"start_time" => adjust_time(start_time), "end_time" => adjust_time(end_time)})
-  end
-
-  defp adjust_time(time) do
-    [hr,  << min::binary-size(2), " ", am_pm::binary-size(2)>>]  = String.split(time, ":")
-
-    min = String.to_integer(min)
-
-    hr = if am_pm == "AM" do
-      String.to_integer(hr)
-    else
-      hr = String.to_integer(hr)
-      if hr < 12 do
-        hr + 12
-      else
-        hr
-      end
-    end
-
-    Calendar.Time.from_erl!({hr, min, 0})
+    Map.merge(params, %{
+      "start_time" => adjust_time(start_time),
+      "end_time" => adjust_time(end_time)
+    })
   end
 
   defp clean_times(params), do: params
+
+  defp adjust_time(time) do
+    [hr, <<min::binary-size(2), " ", am_pm::binary-size(2)>>] = String.split(time, ":")
+
+    min = String.to_integer(min)
+
+    hr =
+      if am_pm == "AM" do
+        String.to_integer(hr)
+      else
+        hr = String.to_integer(hr)
+
+        if hr < 12 do
+          hr + 12
+        else
+          hr - 12
+        end
+      end
+
+    Time.from_erl!({hr, min, 0})
+  end
 end

@@ -311,7 +311,7 @@
                     <div class="form-label-group">
                         <label> Status</label>
                         <select id="member-status" name="member[status]" class="custom-select">
-                            <%= for {key, value} <- member_status do %>
+                            <%= for {key, value} <- member_status() do %>
                                 <%= if @conversation.member && @conversation.member.status == value do %>
                                     <option value="<%= value %>" selected><%= key %></option>
                                 <% else %>

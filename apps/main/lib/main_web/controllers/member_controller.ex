@@ -3,8 +3,7 @@ defmodule MainWeb.MemberController do
 
   alias Data.{Member, Team, Location}
 
-  def index(conn, %{"team_id" => team_id} = params) do
-
+  def index(conn, %{"team_id" => team_id}) do
     team =
       conn
       |> current_user()
@@ -76,7 +75,7 @@ defmodule MainWeb.MemberController do
         conn
         |> put_flash(:success, "Member updated successfully.")
         |> redirect(to: team_member_path(conn, :index, team_id))
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Member failed to update")
         |> redirect(to: team_member_path(conn, :index, team_id))
@@ -89,7 +88,7 @@ defmodule MainWeb.MemberController do
         conn
         |> put_flash(:success, "Member deleted successfully.")
         |> redirect(to: team_member_path(conn, :index, team_id))
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Member failed to delete")
         |> redirect(to: team_member_path(conn, :index, team_id))

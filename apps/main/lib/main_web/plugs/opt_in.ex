@@ -7,8 +7,6 @@ defmodule MainWeb.Plug.OptIn do
 
   import Plug.Conn
 
-  alias Data.Commands.{Member, Location}
-
   @spec init(list()) :: list()
   def init(opts), do: opts
 

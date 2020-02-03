@@ -40,7 +40,7 @@
                 <h2 class="metric-label"> LOCATIONS </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-fork"></i></sub> <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.locations + acc end) %>
+                        <%= @location_count %>
                     </span>
                 </p>
             </div>
@@ -54,7 +54,7 @@
                 <h2 class="metric-label"> ADMINS </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-people"></i></sub> <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.location_admins + acc end) %>
+                        <%= @team_admin_count %>
                     </span>
                 </p>
             </div>
@@ -68,29 +68,49 @@
                 <h2 class="metric-label"> TEAMMATES </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-people"></i></sub> <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.teammates + acc end) %>
+                        <%= @teammate_count %>
                     </span>
                 </p>
             </div>
         </div><!-- /.metric -->
     </div><!-- /metric column -->
 </div>
+
+<%= if @current_user.role in ["team-admin", "location-admin"] do %>
+    <div class="metric-row">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <h2 class="metric-label"> LOCATIONS </h2>
+            <select class="form-control" id="team_id" name="team[id]" onchange="filterLocation(this)">
+                <%= unless @team_id do %>
+                    <option selected value="-99">All Locations</option>
+                <% else %>
+                    <option value="-99">All Locations</option>
+                <% end %>
+                <%= for location <- @locations do %>
+                    <%= if location.id == @location_id do %>
+                        <option selected value="<%= location.id %>"><%= location.location_name %></option>
+                    <% else %>
+                        <option value="<%= location.id %>"><%= location.location_name %></option>
+                    <% end %>
+                <% end %>
+            </select>
+        </div><!-- /metric column -->
+    </div>
+    <script>
+     function filterLocation(e) {
+         if (e.value == "-99") {
+             window.location.href = window.location.origin + '/admin';
+         }
+         else
+         {
+             window.location.href = window.location.origin + '/admin?location_id=' + e.value ;
+         }
+     }
+    </script>
+
+<% end %>
+
 <div class="metric-row">
-    <!-- metric column -->
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> SESSIONS </h2>
-                <p class="metric-value h3">
-                    <span class="value">
-                        <%= Enum.reduce(@metrics, 0, fn(m, acc) -> m.total_sessions + acc end) %>
-                    </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
     <!-- metric column -->
     <div class="col-12 col-sm-6 col-lg-3">
         <!-- .metric -->
@@ -111,7 +131,8 @@
             <div class="metric">
                 <h2 class="metric-label"> SESSIONS PER DAY </h2>
                 <p class="metric-value h3">
-                    <span class="value">12
+                    <span class="value">
+                        <%= @dispositions_per_day.sessions_per_day %>
                     </span>
                 </p>
             </div>

@@ -1,51 +1,53 @@
 defmodule Data.Member do
-  alias Data.Commands.Member
+  @moduledoc """
+  This is the Member API for the data layer
+  """
+  alias Data.Query.Member, as: Query
+  alias Data.Schema.Member, as: Schema
 
   @roles [
     "admin",
-    "system",
     "teammate",
     "location-admin",
     "team-admin"
   ]
 
+  defdelegate create(params), to: Query
+  defdelegate get_by_phone(phone_number), to: Query
+
   def get_changeset(),
-    do: Data.Schema.Member.changeset(%Data.Schema.Member{})
+    do: Schema.changeset(%Schema{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> Member.get()
-      |> Data.Schema.Member.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
   end
 
   def all(%{role: role}) when role in @roles,
-    do: Member.all()
+    do: Query.all()
 
   def all(_),
     do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: Member.get(id)
+    do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-  def get_by_team_id(%{role: role}, id) when role in @roles,
-    do: Member.all(id)
+  def get_by_team_id(%{role: role}, team_id) when role in @roles,
+    do: Query.get_by_team_id(team_id)
 
   def get_by_phone_number(%{role: role}, phone_number) when role in @roles do
-    {:ok, member} = Member.get_by_phone(phone_number)
-    member
+    Query.get_by_phone(phone_number)
   end
-
-  def create(params),
-    do: Member.write(params)
 
   def update(id, params) do
     id
-    |> Member.get()
-    |> Member.write(params)
+    |> Query.get()
+    |> Query.update(params)
   end
 end

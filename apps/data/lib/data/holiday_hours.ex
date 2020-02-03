@@ -1,36 +1,45 @@
 defmodule Data.HolidayHours do
-  alias Data.Commands.HolidayHours
+  @moduledoc """
+  This is the Holiday Hours API for the data layer
+  """
+  alias Data.Query.HolidayHour, as: Query
+  alias Data.Schema.HolidayHour, as: Schema
 
-  @roles ["admin", "team-admin", "location-admin"]
+  @roles [
+    "admin",
+    "teammate",
+    "location-admin",
+    "team-admin"
+  ]
+
+  defdelegate create(params), to: Query
+  defdelegate get_by_location_id(location_id), to: Query
 
   def get_changeset(),
-    do: Data.Schema.HolidayHour.changeset(%Data.Schema.HolidayHour{})
+    do: Schema.changeset(%Schema{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> HolidayHours.get()
-      |> Data.Schema.HolidayHour.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
   end
 
   def all(%{role: role}, location_id) when role in @roles,
-    do: HolidayHours.all(location_id)
+    do: Query.get_by_location_id(location_id)
 
-  def all(_), do: {:error, :invalid_permissions}
+  def all(_, _), do: {:error, :invalid_permissions}
 
   def get(%{role: role}, id) when role in @roles,
-    do: HolidayHours.get(id)
+    do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-  def create(params),
-    do: HolidayHours.write(params)
-
   def update(%{"id" => id} = params) do
     id
-    |> HolidayHours.get()
-    |> HolidayHours.write(params)
+    |> Query.get()
+    |> Query.update(params)
   end
 end

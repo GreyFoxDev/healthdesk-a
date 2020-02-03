@@ -4,7 +4,10 @@ defmodule MainWeb.Intents.Wifi do
   formatted message.
   """
 
-  alias Data.Commands.WifiNetwork
+  alias Data.{
+    WifiNetwork,
+    Location
+  }
 
   @free_wifi """
   Free WiFi:
@@ -22,11 +25,14 @@ defmodule MainWeb.Intents.Wifi do
 
   @impl MainWeb.Intents
   def build_response(_args, location) do
-    case WifiNetwork.get_by_phone(location) do
-      nil ->
+    location
+    |> Location.get_by_phone()
+    |> WifiNetwork.get_by_location_id()
+    |> case do
+      [] ->
         @no_wifi
 
-      wifi ->
+      [wifi] ->
         @free_wifi
         |> String.replace("[wifi_name]", wifi.network_name)
         |> String.replace("[wifi_password]", wifi.network_pword)

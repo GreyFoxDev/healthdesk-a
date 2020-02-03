@@ -1,16 +1,11 @@
 defmodule MainWeb.Plug.CloseConversation do
   @moduledoc """
-
+  Module for the close conversation plug
   """
-
-  require Logger
-
   import Plug.Conn
 
-  alias Data.Commands.Conversations, as: C
-  alias Data.Commands.ConversationMessages, as: CM
-
-  @default "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
+  alias Data.Conversations, as: C
+  alias Data.ConversationMessages, as: CM
 
   @spec init(list()) :: list()
   def init(opts), do: opts
@@ -23,16 +18,15 @@ defmodule MainWeb.Plug.CloseConversation do
   then no need to do anything. Just return the connection.
   """
   def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
-    Logger.warn "STATUS: pending: #{inspect conn}"
-
     convo = C.get(id)
+    pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
-    count = convo.conversation_messages
-    |> Enum.filter(fn m -> m.message == @default end)
-    |> Enum.count()
-
-    if count < 2 && conn.assigns[:response] == @default do
-      CM.write_new_message(id, location, conn.assigns[:response])
+    if pending_message_count == 1 do
+      CM.create(%{
+            "conversation_id" => id,
+            "phone_number" => location,
+            "message" => conn.assigns[:response],
+            "sent_at" => DateTime.utc_now()})
     end
 
     C.pending(id)
@@ -57,9 +51,28 @@ defmodule MainWeb.Plug.CloseConversation do
   If the question has been answered then close the conversation
   """
   def call(%{assigns: %{convo: id, location: location} = assigns} = conn, _opts) do
-    Logger.warn "STATUS: #{assigns.status}: #{inspect conn}"
-    CM.write_new_message(id, location, conn.assigns[:response])
+    CM.create(%{
+          "conversation_id" => id,
+          "phone_number" => location,
+          "message" => conn.assigns[:response],
+          "sent_at" => DateTime.utc_now()})
+
+    convo = C.get(id)
+    location = Data.Location.get(convo.location_id)
+    dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
+    disposition = Enum.find(dispositions, &(&1.disposition_name == "Automated"))
+
+    Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
+
+    %{"conversation_id" => id,
+      "phone_number" => location.phone_number,
+      "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+      "sent_at" => DateTime.utc_now()}
+    |> CM.create()
+
     C.close(id)
+
+    _ = ConCache.delete(:session_cache, id)
 
     conn
   end

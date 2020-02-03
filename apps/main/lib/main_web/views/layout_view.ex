@@ -3,7 +3,7 @@ defmodule MainWeb.LayoutView do
 
   import Phoenix.HTML.Link
 
-  def settings_url(conn, %{ role: "admin"} = current_user) do
+  def settings_url(conn, %{ role: "admin"}) do
     team_path(conn, :index)
   end
 

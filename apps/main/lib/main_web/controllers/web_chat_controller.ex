@@ -4,7 +4,7 @@ defmodule MainWeb.WebChatController do
   plug :put_layout, {MainWeb.LayoutView, :web_chat}
   plug MainWeb.Plug.AllowFrom
 
-  def index(conn, %{"api_key" => api_key} = params) do
+  def index(conn, %{"api_key" => api_key}) do
     ip =
       conn.remote_ip
       |> Tuple.to_list()

@@ -1,43 +1,50 @@
 defmodule Data.Team do
-  alias Data.Commands.Team
+  @moduledoc """
+  This is the Team API for the data layer
+  """
 
-  @roles ["admin", "teammate", "location-admin", "team-admin"]
+  alias Data.Query.Team, as: Query
+  alias Data.Schema.Team, as: Schema
+
+  @roles [
+    "admin",
+    "teammate",
+    "location-admin",
+    "team-admin"
+  ]
 
   def get_changeset(),
-    do: Data.Schema.Team.changeset(%Data.Schema.Team{})
+    do: Schema.changeset(%Schema{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
-      |> Team.get()
-      |> Data.Schema.Team.changeset()
+      |> Query.get()
+      |> Schema.changeset()
 
     {:ok, changeset}
   end
 
   def all(%{role: role} = user) when role in ["team-admin", "location-admin"] do
-    Team.all() |> Enum.filter(&(&1.id == user.team_member.team_id))
+    Query.all() |> Enum.filter(&(&1.id == user.team_member.team_id))
   end
 
-
   def all(%{role: role}) when role in @roles,
-    do: Team.all()
+    do: Query.all()
 
   def all(_), do: []
 
-  def all(_), do: {:error, :invalid_permissions}
-
   def get(%{role: role}, id) when role in @roles,
-    do: Team.get(id)
+    do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
   def create(params),
-    do: Team.write(params)
+    do: Query.create(params)
 
   def update(id, params) do
     id
-    |> Team.get()
-    |> Team.write(params)
+    |> Query.get()
+    |> Query.update(params)
   end
 end

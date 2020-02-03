@@ -1,7 +1,16 @@
 defmodule Data.Schema.WifiNetwork do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a location's wifi information
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          location_id: binary(),
+          network_name: String.t() | nil,
+          network_pword: String.t() | nil,
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   location_id

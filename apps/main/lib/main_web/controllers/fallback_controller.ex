@@ -15,7 +15,7 @@ defmodule MainWeb.FallbackController do
     |> render(ErrorView, :"401", message: "You are not authorized for this page")
   end
 
-  def call(conn, {:error, reason}) do
+  def call(conn, {:error, _reason}) do
     conn
     |> put_status(:bad_request)
     |> render(ErrorView, :"400", message: "Internal server error")

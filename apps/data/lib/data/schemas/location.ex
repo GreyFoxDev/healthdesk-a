@@ -1,7 +1,32 @@
 defmodule Data.Schema.Location do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a team's location
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          team_id: binary(),
+          location_name: String.t() | nil,
+          phone_number: String.t() | nil,
+          api_key: String.t() | nil,
+          web_greeting: String.t() | nil,
+          web_handle: String.t() | nil,
+          web_chat: boolean() | nil,
+          timezone: String.t() | nil,
+          address_1: String.t() | nil,
+          address_2: String.t() | nil,
+          city: String.t() | nil,
+          state: String.t() | nil,
+          postal_code: String.t() | nil,
+          default_message: String.t() | nil,
+          slack_integration: String.t() | nil,
+          messenger_id: String.t() | nil,
+          users: List.t() | nil,
+          team_members: List.t() | nil,
+          conversations: List.t() | nil,
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   location_name
@@ -20,8 +45,9 @@ defmodule Data.Schema.Location do
   city
   state
   postal_code
+  default_message
   slack_integration
-  messanger_id
+  messenger_id
   deleted_at
   |a
 
@@ -41,7 +67,8 @@ defmodule Data.Schema.Location do
     field(:web_handle, :string)
     field(:web_chat, :boolean)
     field(:slack_integration, :string)
-    field(:messanger_id, :string)
+    field(:messenger_id, :string)
+    field(:default_message, :string)
 
     field(:deleted_at, :utc_datetime)
 
@@ -65,13 +92,13 @@ defmodule Data.Schema.Location do
     |> validate_length(:city, max: 100)
     |> validate_length(:state, max: 2)
     |> validate_length(:postal_code, max: 20)
+    |> validate_length(:default_message, max: 500)
     |> generate_api_key()
   end
 
   defp generate_api_key(changeset) do
     case get_field(changeset, :api_key) do
       nil -> put_change(changeset, :api_key, UUID.uuid4())
-      "" -> put_change(changeset, :api_key, UUID.uuid4())
       _ -> changeset
     end
   end

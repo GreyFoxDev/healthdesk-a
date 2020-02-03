@@ -1,7 +1,20 @@
 defmodule Data.Schema.ChildCareHour do
-  @moduledoc false
-
+  @moduledoc """
+  The schema for a location's child care hours
+  """
   use Data.Schema
+
+  @type t :: %__MODULE__{
+          id: binary(),
+          location_id: binary(),
+          day_of_week: String.t() | nil,
+          morning_open_at: String.t() | nil,
+          morning_close_at: String.t() | nil,
+          afternoon_open_at: String.t() | nil,
+          afternoon_close_at: String.t() | nil,
+          active: boolean() | nil,
+          deleted_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   location_id
