@@ -26,7 +26,7 @@ defmodule MainWeb.Plug.SaveMemberData do
           create_member_data(l.team_id, first_name, last_name, phone)
       end
 
-    if MemberChannel.get_by_channel_id(assigns.member) == nil do
+    if MemberChannel.get_by_channel_id(assigns.member) == [] do
       MemberChannel.create(%{member_id: member.id, channel_id: assigns.member})
     end
 

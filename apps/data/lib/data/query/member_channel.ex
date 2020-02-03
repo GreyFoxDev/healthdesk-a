@@ -22,8 +22,7 @@ defmodule Data.Query.MemberChannel do
   @doc """
   Return a single active member by a unique member id
   """
-  @spec get_by_member_id(member_id :: String.t(), repo :: Ecto.Repo.t()) ::
-          MemberChannel.t() | nil
+  @spec get_by_member_id(member_id :: String.t(), repo :: Ecto.Repo.t()) :: [MemberChannel.t()]
   def get_by_member_id(member_id, repo \\ Read) do
     from(t in MemberChannel,
       where: t.member_id == ^member_id
@@ -34,8 +33,7 @@ defmodule Data.Query.MemberChannel do
   @doc """
   Return a single active member by a unique channel id
   """
-  @spec get_by_channel_id(channel_id :: String.t(), repo :: Ecto.Repo.t()) ::
-          MemberChannel.t() | nil
+  @spec get_by_channel_id(channel_id :: String.t(), repo :: Ecto.Repo.t()) :: [MemberChannel.t()]
   def get_by_channel_id(channel_id, repo \\ Read) do
     from(t in MemberChannel,
       where: t.channel_id == ^channel_id,
