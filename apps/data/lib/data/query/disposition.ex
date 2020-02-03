@@ -7,6 +7,7 @@ defmodule Data.Query.Disposition do
   alias Data.Schema.Disposition
   alias Data.ReadOnly.Repo, as: Read
   alias Data.WriteOnly.Repo, as: Write
+  alias Ecto.Adapters.SQL
 
   @doc """
   Returns a disposition by id
@@ -69,6 +70,26 @@ defmodule Data.Query.Disposition do
     |> repo.one()
   end
 
+  def average_per_day(repo \\ Read) do
+    repo
+    |> SQL.query!("SELECT average_dispositions_per_day() AS #{:sessions_per_day};")
+    |> build_results()
+  end
+
+  def average_per_day_for_team(team_id, repo \\ Read) do
+    repo
+    |> SQL.query!("SELECT * FROM average_dispositions_per_day_by_team();")
+    |> build_results()
+    |> Enum.filter(&(&1.team_id == team_id))
+  end
+
+  def average_per_day_for_location(location_id, repo \\ Read) do
+    repo
+    |> SQL.query!("SELECT * FROM average_dispositions_per_day_by_location();")
+    |> build_results()
+    |> Enum.filter(&(&1.location_id == location_id))
+  end
+
   @doc """
   Creates a new disposition
   """
@@ -118,5 +139,10 @@ defmodule Data.Query.Disposition do
       nil ->
         {:error, :no_record_found}
     end
+  end
+
+  defp build_results(results) do
+    cols = Enum.map(results.columns, &String.to_existing_atom/1)
+    Enum.map(results.rows, fn(row) -> Map.new(Enum.zip(cols, row)) end)
   end
 end

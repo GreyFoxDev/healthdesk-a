@@ -27,7 +27,7 @@ defmodule MainWeb.Intents.Wifi do
   def build_response(_args, location) do
     location
     |> Location.get_by_phone()
-    |> WifiNletwork.get_by_location_id()
+    |> WifiNetwork.get_by_location_id()
     |> case do
       [] ->
         @no_wifi

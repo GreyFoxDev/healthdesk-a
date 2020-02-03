@@ -97,12 +97,12 @@ defmodule MainWeb.Intents.ChildCareHours do
   end
 
   defp get_hours(location) do
-    ChildCareHours.all(location)
+    ChildCareHours.all(%{role: "admin"}, location)
   end
 
   defp get_hours(location, {:normal, day_of_week}) do
-    location
-    |> ChildCareHours.all()
+    %{role: "admin"}
+    |> ChildCareHours.all(location)
     |> filter_hours(day_of_week)
   end
 

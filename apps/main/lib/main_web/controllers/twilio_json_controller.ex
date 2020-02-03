@@ -9,8 +9,6 @@ defmodule MainWeb.TwilioJsonController do
 
   require Logger
 
-  @default "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
-
   plug P.AssignParams
   plug P.SaveMemberData
   plug P.OpenConversation
@@ -35,17 +33,20 @@ defmodule MainWeb.TwilioJsonController do
   end
 
   def inbound(%Plug.Conn{assigns: %{status: "pending", convo: id}} = conn, _params) do
-
     convo = Conversations.get(id)
+    pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
-    count = convo.conversation_messages
-    |> Enum.filter(fn m -> m.message == @default end)
-    |> Enum.count()
-
-    conn
-    |> put_resp_content_type("application/json")
-    |> put_status(404)
-    |> json(%{message: "Not Found", count: count})
+    if pending_message_count > 1 do
+      conn
+      |> put_resp_content_type("application/json")
+      |> put_status(200)
+      |> json(%{message: "No response", count: pending_message_count})
+    else
+      conn
+      |> put_resp_content_type("application/json")
+      |> put_status(200)
+      |> json(%{message: conn.assigns[:response]})
+    end
   end
 
   @doc """

@@ -30,10 +30,14 @@ defmodule MainWeb.Notify do
 
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
-    current_time_string = Time.add(Time.utc_now(), timezone_offset)
+    current_time_string =
+      Time.utc_now()
+      |> Time.add(timezone_offset)
+      |> to_string()
+
     location_admins =
       location
-      |> TeamMember.get_available_by_location()
+      |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
 
     _ = Enum.each(location_admins, fn(admin) ->

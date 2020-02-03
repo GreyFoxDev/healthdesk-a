@@ -113,8 +113,11 @@ defmodule MainWeb.ConversationController do
 
     user_info = Formatters.format_team_member(current_user(conn))
 
+    _ = ConCache.delete(:session_cache, id)
+
     message = if params["disposition_id"] do
       Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => params["disposition_id"]})
+
       disposition =
         conn
         |> current_user()

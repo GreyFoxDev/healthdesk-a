@@ -8,6 +8,7 @@ defmodule Data.Schema.Disposition do
           id: binary(),
           team_id: binary(),
           disposition_name: String.t(),
+          is_system: boolean() | nil,
           deleted_at: :utc_datetime | nil
         }
 
@@ -17,6 +18,7 @@ defmodule Data.Schema.Disposition do
   |a
 
   @optional_fields ~w|
+  is_system
   deleted_at
   |a
 
@@ -24,6 +26,7 @@ defmodule Data.Schema.Disposition do
 
   schema "dispositions" do
     field(:disposition_name, :string)
+    field(:is_system, :boolean)
 
     field(:deleted_at, :utc_datetime)
 

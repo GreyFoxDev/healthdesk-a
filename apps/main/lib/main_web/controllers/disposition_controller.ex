@@ -36,8 +36,11 @@ defmodule MainWeb.DispositionController do
   end
 
   def delete(conn, %{"id" => id, "team_id" => team_id}) do
-    id
-    |> Disposition.update(%{"deleted_at" => DateTime.utc_now()})
+    %{
+      "id" => id,
+      "deleted_at" => DateTime.utc_now()
+    }
+    |> Disposition.update()
     |> case do
          {:ok, _hours} ->
            conn

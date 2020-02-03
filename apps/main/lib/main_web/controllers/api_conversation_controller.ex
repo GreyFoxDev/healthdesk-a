@@ -6,7 +6,7 @@ defmodule MainWeb.Api.ConversationController do
   alias Data.Location
 
   def create(conn, %{"location" => << "messenger:", location :: binary>>, "member" => << "messenger:", member :: binary>>}) do
-    location = Location.get_by_messanger_id(location)
+    location = Location.get_by_messenger_id(location)
 
     with {:ok, convo} <- C.find_or_start_conversation({member, location.phone_number}) do
       conn
@@ -60,8 +60,21 @@ defmodule MainWeb.Api.ConversationController do
             "phone_number" => from,
             "message" => message,
             "sent_at" => DateTime.utc_now()})
+    end
 
-      :ok = MainWeb.Notify.send_to_admin(id, message, from)
+    if params["disposition"] do
+      convo = C.get(id)
+      location = Location.get(convo.location_id)
+      dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
+      disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
+
+      Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
+
+      %{"conversation_id" => id,
+        "phone_number" => location.phone_number,
+        "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+        "sent_at" => DateTime.utc_now()}
+      |> CM.create()
     end
 
     C.close(id)

@@ -16,8 +16,14 @@ defmodule MainWeb.Plug.AskWit do
   @doc """
   Only once the member has opted in will the question be sent to Wit
   """
-  def call(%{assigns: %{opt_in: true, status: "open", message: message}} = conn, _opts),
-    do: assign(conn, :intent, ask_wit_ai(message))
+  def call(%{assigns: %{convo: id, opt_in: true, status: "open", message: message}} = conn, _opts) do
+    pending_message_count = (ConCache.get(:session_cache, id) || 0)
+    if pending_message_count = 0 do
+      assign(conn, :intent, ask_wit_ai(message))
+    else
+      assign(conn, :intent, {:unknown, []})
+    end
+  end
 
   def call(conn, _opts), do: conn
 
@@ -27,12 +33,11 @@ defmodule MainWeb.Plug.AskWit do
         {:response, response} ->
           response
         _ ->
-          :unknown_intent
+          {:unknown_intent, []}
       end
     else
       {:error, error} ->
-        Logger.error("AskWit Plug Error: #{inspect error}")
-        :unknown_intent
+        {:unknown_intent, []}
     end
   end
 end

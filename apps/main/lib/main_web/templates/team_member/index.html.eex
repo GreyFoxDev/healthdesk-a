@@ -82,7 +82,7 @@
                                     <div class="alert alert-warning mx-3"> There are no teammates for this location. </div>
                                 </td>
                             </tr>
-                        <%= else %>
+                        <% else %>
                             <%= for member <- @team_members do %>
                                 <tr>
                                     <td>

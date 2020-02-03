@@ -14,6 +14,7 @@ defmodule Data.TeamMember do
 
   defdelegate associate_locations(one, two), to: Query
   defdelegate get_available_by_location(location, current_time), to: Query
+  defdelegate all(), to: Query
 
   def get_changeset(),
     do: Schema.changeset(%Schema{})

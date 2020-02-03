@@ -103,7 +103,7 @@ defmodule MainWeb.TeamMemberController do
       |> put_flash(:success, "Team Member created successfully.")
       |> redirect(to: team_team_member_path(conn, :index, team_id))
     else
-      {:ok, %Data.Schema.User{} = user} ->
+      %Data.Schema.User{} = user ->
         conn
         |> put_flash(:error, "Error: Phone number already in the system")
         |> redirect(to: team_team_member_path(conn, :index, team_id))

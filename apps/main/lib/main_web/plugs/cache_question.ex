@@ -18,8 +18,8 @@ defmodule MainWeb.Plug.CacheQuestion do
   2. They opted in so retrieve the cached question
   3. They are not opting in so delete any cache they have stored
   """
-  @spec call(Plug.Conn.t(), list()) :: no_return()
-  def call(conn, opts \\ [])
+  @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t() | no_return()
+  def call(conn, _opts), do: conn
 
   def call(%{assigns: %{opt_in: true, member: member, message: message}} = conn, _opts) do
     downcased = String.downcase(message)

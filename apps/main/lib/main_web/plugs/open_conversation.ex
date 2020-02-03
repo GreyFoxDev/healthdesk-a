@@ -10,6 +10,7 @@ defmodule MainWeb.Plug.OpenConversation do
 
   alias Data.Conversations, as: C
   alias Data.ConversationMessages, as: CM
+  alias Data.Schema.Conversation, as: Schema
 
   @spec init(list()) :: list()
   def init(opts), do: opts
@@ -20,7 +21,7 @@ defmodule MainWeb.Plug.OpenConversation do
   @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t()
   def call(%{assigns: %{member: member, location: location}} = conn, _opts)
   when is_binary(member) and is_binary(location) do
-    with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
+    with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({member, location}) do
       CM.create(%{
             "conversation_id" => convo.id,
             "phone_number" => member,

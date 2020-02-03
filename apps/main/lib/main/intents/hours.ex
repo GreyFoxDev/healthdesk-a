@@ -20,7 +20,6 @@ defmodule MainWeb.Intents.Hours do
     do: build_response([datetime: datetime], location)
 
   def build_response([datetime: datetime], location) do
-
     location = Location.get_by_phone(location)
     <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
@@ -46,8 +45,12 @@ defmodule MainWeb.Intents.Hours do
 
         String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
       _ ->
-        @default_response
-    end
+        if location.default_message != "" do
+          location.default_message
+        else
+          @default_response
+        end
+      end
   end
 
   def build_response([], location) do
@@ -79,7 +82,11 @@ defmodule MainWeb.Intents.Hours do
 
       String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, erl_date, location.timezone))
       _ ->
-        @default_response
+        if location.default_message != "" do
+          location.default_message
+        else
+          @default_response
+        end
     end
   end
 
@@ -143,7 +150,7 @@ defmodule MainWeb.Intents.Hours do
 
   def find_holiday(location_id, erl_date) do
     location_id
-    |> HolidayHour.get_by_location_id()
+    |> HolidayHours.get_by_location_id()
     |> Enum.filter(fn d ->
       match_date?(d.holiday_date, erl_date)
     end)

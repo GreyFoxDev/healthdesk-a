@@ -37,7 +37,7 @@
                             <div class="list-group-item d-flex justify-content-between align-items-center">
                                 <div class="alert alert-warning mx-3"> There are no hours for this location. </div>
                             </div>
-                        <%= else %>
+                        <% else %>
                             <%= for hour <- @hours do %>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <span><b><%= hour.day_of_week %></b></span>

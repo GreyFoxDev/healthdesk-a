@@ -4,6 +4,7 @@ defmodule MainWeb.Plug.Broadcast do
   import Plug.Conn
 
   alias Data.{Member, Location}
+  alias Data.Schema.Member, as: MemberSchema
 
   @spec init(list()) :: list()
   def init(opts), do: opts
@@ -12,10 +13,10 @@ defmodule MainWeb.Plug.Broadcast do
   def call(conn, opts)
 
   def call(%{assigns: %{convo: convo, member: member, location: location, message: message} = assigns} = conn, _opts) do
-    with {:ok, nil} <- Member.get_by_phone(member) do
+    with nil <- Member.get_by_phone(member) do
       MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, phone_number: member})
     else
-      {:ok, member} ->
+      %MemberSchema{} = member ->
         name = Enum.join([member.first_name, member.last_name], " ")
         MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, name: name})
     end
