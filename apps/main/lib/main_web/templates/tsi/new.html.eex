@@ -6,13 +6,21 @@
     <div class="form-group">
         <fieldset>
             <legend><span class="number">1</span> Type of Concern</legend>
-            <%= select f, :comment, ["Equipment",
-                "Locker/bathroom",
-                "Lighting/fixtures",
-                "Wifi",
+            <%= select f, :comment, [
+                "Billing issues",
+                "Canceling membership",
                 "Class scheduling",
+                "Equipment",
+                "Lighting/fixtures",
+                "Locker/bathroom",
                 "Personal training",
-                "Other"] %>
+                "Rude club member".
+                "Rude employee",
+                "Unable to find any club employee",
+                "Unable to find manager",
+                "Wifi",
+                "Other"
+            ] %>
         </fieldset>
         <fieldset>
             <legend><span class="number">2</span> Comments</legend>
