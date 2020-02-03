@@ -65,6 +65,44 @@
                                         <%= text_input u, :email, class: "form-control" %>
                                     </span>
                                 </div>
+
+                                <div class="form-group">
+                                    <label for="">Use Email</label>
+                                    <%= checkbox u, :use_email, class: "form-control" %>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="">Use SMS</label>
+                                    <%= checkbox u, :use_sms, class: "form-control" %>
+                                </div>
+
+                                <div class="form-group">
+                                    <h3>Do Not Disturb</h3>
+                                    <p>When Do Not Disturb is turned on, Healthdesk won't send you any SMS notifications. Your messages will still be available when you log in.</p>
+                                    <label for="user_use_do_not_disturb">
+                                        <span>
+                                            <%= checkbox u, :use_do_not_disturb %> 
+                                            <span style="padding-left: 10px;">Automatically disable notifications from:</span>
+                                        </span>
+                                    </label>
+                                    <div class="row">
+                                        <!-- grid column -->
+                                        <div class="col-md-5">
+                                            <!-- .form-group -->
+                                            <div class="form-group">
+                                                <%= select u, :start_do_not_disturb, available_times(), class: "custom-select" %>
+                                            </div><!-- /.form-group -->
+                                        </div><!-- /grid column -->
+                                        <div class="col-md-2">
+                                            to
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <%= select u, :end_do_not_disturb, available_times(), class: "custom-select" %>
+                                            </div>
+                                        </div><!-- /grid column -->
+                                    </div>
+                                </div>
                                 <span>
 
                                     <%= if @data.data.user_id && @data.data.user.avatar != "" do %> 
