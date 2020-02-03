@@ -3,7 +3,7 @@ defmodule MainWeb.TeamMemberController do
 
   alias Data.{TeamMember, Team, User, Location}
 
-  def index(conn, %{"team_id" => team_id} = params) do
+  def index(conn, %{"team_id" => team_id}) do
     team =
       conn
       |> current_user()
@@ -67,7 +67,7 @@ defmodule MainWeb.TeamMemberController do
     end
   end
 
-  def create(conn, %{"team_member" => %{"user" => %{"image" => [image]}} = team_member, "team_id" => team_id} = params) do
+  def create(conn, %{"team_member" => %{"user" => %{"image" => [image]}} = team_member, "team_id" => team_id}) do
     with {:ok, avatar} <- Uploader.upload_image(image.path),
          user_params <- Map.merge(team_member["user"], %{"avatar" => avatar}),
          nil <- User.get_by_phone(team_member["user"]["phone_number"]),
@@ -77,7 +77,7 @@ defmodule MainWeb.TeamMemberController do
       |> put_flash(:success, "Team Member created successfully.")
       |> redirect(to: team_team_member_path(conn, :index, team_id))
     else
-      {:ok, %Data.Schema.User{} = user} ->
+      {:ok, %Data.Schema.User{}} ->
         conn
         |> put_flash(:error, "Error: Phone number already in the system")
         |> redirect(to: team_team_member_path(conn, :index, team_id))
@@ -95,7 +95,7 @@ defmodule MainWeb.TeamMemberController do
     end
   end
 
-  def create(conn, %{"team_member" => team_member, "team_id" => team_id} = params) do
+  def create(conn, %{"team_member" => team_member, "team_id" => team_id}) do
     with nil <- User.get_by_phone(team_member["user"]["phone_number"]),
          {:ok, %Data.Schema.User{} = user} <- User.create(team_member["user"]),
          {:ok, _pid} <- TeamMember.create(%{location_id: team_member["location_id"], locations: team_member["team_member_locations"], user_id: user.id, team_id: team_id}) do
@@ -103,7 +103,7 @@ defmodule MainWeb.TeamMemberController do
       |> put_flash(:success, "Team Member created successfully.")
       |> redirect(to: team_team_member_path(conn, :index, team_id))
     else
-      %Data.Schema.User{} = user ->
+      %Data.Schema.User{} ->
         conn
         |> put_flash(:error, "Error: Phone number already in the system")
         |> redirect(to: team_team_member_path(conn, :index, team_id))
@@ -174,7 +174,7 @@ defmodule MainWeb.TeamMemberController do
       |> put_flash(:success, "Team Member deleted successfully.")
       |> redirect(to: team_team_member_path(conn, :index, team_id))
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Team Member failed to delete")
         |> render("index.html", team_id)

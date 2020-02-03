@@ -16,7 +16,7 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
 
-  def create(conn, %{"location" => location, "member" => member} = params) do
+  def create(conn, %{"location" => location, "member" => member}) do
     with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
       conn
       |> put_status(200)
@@ -25,7 +25,7 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
 
-  def update(conn, %{"conversation_id" => id, "from" => from, "message" => message} = params) do
+  def update(conn, %{"conversation_id" => id, "from" => from, "message" => message}) do
     CM.create(%{
           "conversation_id" => id,
           "phone_number" => from,
@@ -38,7 +38,7 @@ defmodule MainWeb.Api.ConversationController do
     |> json(%{conversation_id: id, updated: true})
   end
 
-  def update(conn, params) do
+  def update(conn, _params) do
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")

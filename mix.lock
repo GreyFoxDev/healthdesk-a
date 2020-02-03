@@ -1,4 +1,5 @@
 %{
+  "bamboo": {:hex, :bamboo, "1.4.0", "7b9201c49a843e4802061cf45692405b2c00efcf1cebf8b7b64f015ead072392", [:mix], [{:hackney, ">= 1.13.0", [hex: :hackney, repo: "hexpm", optional: false]}, {:jason, "~> 1.1.0", [hex: :jason, repo: "hexpm", optional: true]}, {:plug, "~> 1.0", [hex: :plug, repo: "hexpm", optional: false]}], "hexpm"},
   "base64url": {:hex, :base64url, "0.0.1", "36a90125f5948e3afd7be97662a1504b934dd5dac78451ca6e9abf85a10286be", [:rebar], [], "hexpm"},
   "bcrypt_elixir": {:hex, :bcrypt_elixir, "1.1.1", "6b5560e47a02196ce5f0ab3f1d8265db79a23868c137e973b27afef928ed8006", [:make, :mix], [{:elixir_make, "~> 0.4", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm"},
   "bitly": {:hex, :bitly, "0.1.1", "2fbc4ca2117ffc739d2b114f158fdf4fee780b55563ba44835c6a112265ac8d6", [:mix], [{:jason, "~> 1.1", [hex: :jason, repo: "hexpm", optional: false]}, {:tesla, "~> 1.1", [hex: :tesla, repo: "hexpm", optional: false]}], "hexpm"},

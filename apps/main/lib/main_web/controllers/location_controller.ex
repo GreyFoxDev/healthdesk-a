@@ -3,7 +3,7 @@ defmodule MainWeb.LocationController do
 
   alias Data.{Location, Team}
 
-  def index(conn, %{"team_id" => team_id} = params) do
+  def index(conn, %{"team_id" => team_id}) do
     team =
       conn
       |> current_user()
@@ -47,7 +47,7 @@ defmodule MainWeb.LocationController do
     end
   end
 
-  def create(conn, %{"location" => location, "team_id" => team_id} = params) do
+  def create(conn, %{"location" => location, "team_id" => team_id}) do
     location
     |> Map.put("team_id", team_id)
     |> Location.create()
@@ -84,14 +84,14 @@ defmodule MainWeb.LocationController do
         conn
         |> put_flash(:success, "Location deleted successfully.")
         |> redirect(to: team_location_path(conn, :index, team_id))
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Location failed to delete")
         |> render("index.html", team_id)
     end
   end
 
-  defp render_page(conn, page, changeset, errors \\ []) do
+  defp render_page(conn, page, changeset, errors) do
     render(conn, page,
       changeset: changeset,
       errors: errors)

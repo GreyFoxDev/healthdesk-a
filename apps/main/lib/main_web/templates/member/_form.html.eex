@@ -26,7 +26,7 @@
                             <%=
                             select f,
                             :status,
-                            member_status,
+                            member_status(),
                             class: "form-control"
                             %>
                         </span>
@@ -38,7 +38,7 @@
                             <%=
                             select f,
                             :consent,
-                            member_consent,
+                            member_consent(),
                             class: "form-control"
                             %>
                         </span>

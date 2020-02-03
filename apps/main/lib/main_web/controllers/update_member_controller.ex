@@ -33,7 +33,7 @@ defmodule MainWeb.UpdateMemberController do
 
   def format_phone("N/A"), do: nil
 
-  def format_phone(<< "+1", number :: binary >> = phone),
+  def format_phone(<< "+1", number :: binary >>),
     do: format_phone(number)
 
   def format_phone(phone) do

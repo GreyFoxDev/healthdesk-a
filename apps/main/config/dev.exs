@@ -8,6 +8,8 @@ config :main, MainWeb.Endpoint,
   watchers: [node: ["node_modules/brunch/bin/brunch", "watch", "--stdin",
                     cd: Path.expand("../assets", __DIR__)]]
 
+config :main, Main.Mailer,
+  adapter: Bamboo.LocalAdapter
 
 # Watch static and templates for browser reloading.
 config :main, MainWeb.Endpoint,

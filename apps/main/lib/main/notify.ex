@@ -53,6 +53,9 @@ defmodule MainWeb.Notify do
       end
 
       if admin.use_email do
+        admin.email
+        |> Main.Email.generate_email(body)
+        |> Main.Mailer.deliver_now()
       end
     end)
 

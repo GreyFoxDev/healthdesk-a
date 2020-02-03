@@ -19,7 +19,7 @@ defmodule MainWeb.AdminController do
       |> Enum.map(&(&1.user.role == "teammate"))
       |> Enum.count()
 
-    locations = Location.get_by_team_id(team_id)
+    locations = Location.get_by_team_id(current_user, team_id)
 
     render(conn, "index.html",
       dispositions: dispositions,
@@ -50,7 +50,7 @@ defmodule MainWeb.AdminController do
       |> Enum.map(&(&1.user.role == "teammate"))
       |> Enum.count()
 
-    locations = Location.get_by_team_id(current_user.team_member.team_id)
+    locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
 
     render(conn, "index.html",
       dispositions: dispositions,

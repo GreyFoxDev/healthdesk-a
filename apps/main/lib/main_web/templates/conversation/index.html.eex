@@ -88,7 +88,6 @@
                 <table class="table no-first-border">
                     <tbody>
                         <%= for c <- Enum.filter(@conversations, &(&1.status == "closed")) do %>
-                            <% team_member = (c.team_member || default_user()) %>
                             <%= render("_conversation_row.html", c: c, conn: @conn, location: @location, dispositions: @dispositions) %>
                         <% end %>
                     </tbody>

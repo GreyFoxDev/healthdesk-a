@@ -17,7 +17,7 @@ defmodule MainWeb.ClassScheduleController do
       teams: teams(conn))
   end
 
-  def create(conn, %{"location_id" => location_id, "csv" => upload} = params) do
+  def create(conn, %{"location_id" => location_id, "csv" => upload}) do
     location =
       conn
       |> current_user()

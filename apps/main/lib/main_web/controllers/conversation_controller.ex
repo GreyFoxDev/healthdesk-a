@@ -1,14 +1,14 @@
 defmodule MainWeb.ConversationController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Conversations, ConversationMessages, Location, TeamMember, Member}
+  alias Data.{Conversations, ConversationMessages, Location, TeamMember}
   alias MainWeb.Helper.Formatters
 
   require Logger
 
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
-  def index(conn, %{"location_id" => location_id} = params) do
+  def index(conn, %{"location_id" => location_id}) do
     location =
       conn
       |> current_user()
@@ -98,7 +98,7 @@ defmodule MainWeb.ConversationController do
 
       redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id))
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Unable to open conversation")
         |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
@@ -139,7 +139,7 @@ defmodule MainWeb.ConversationController do
 
       redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Unable to close conversation")
         |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
@@ -190,7 +190,7 @@ defmodule MainWeb.ConversationController do
 
     :ok
   end
-  defp handle_sending_message({:error, _, params}), do: :error
+  defp handle_sending_message({:error, _, _params}), do: :error
 
   defp update_conn(:ok, conn), do: put_flash(conn, :success, "Sending message was successful")
   defp update_conn(:error, conn), do: put_flash(conn, :error, "Sending message failed")

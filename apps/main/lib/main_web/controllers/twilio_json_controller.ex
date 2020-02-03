@@ -5,7 +5,6 @@ defmodule MainWeb.TwilioJsonController do
   use MainWeb, :controller
 
   alias MainWeb.Plug, as: P
-  alias Data.Conversations
 
   require Logger
 
@@ -33,7 +32,6 @@ defmodule MainWeb.TwilioJsonController do
   end
 
   def inbound(%Plug.Conn{assigns: %{status: "pending", convo: id}} = conn, _params) do
-    convo = Conversations.get(id)
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
     if pending_message_count > 1 do
@@ -52,7 +50,7 @@ defmodule MainWeb.TwilioJsonController do
   @doc """
   Handle a successful communication with a member
   """
-  def inbound(%Plug.Conn{assigns: %{response: response}} = conn, params)
+  def inbound(%Plug.Conn{assigns: %{response: response}} = conn, _params)
   when is_binary(response) do
 
     conn
