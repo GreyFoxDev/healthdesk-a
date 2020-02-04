@@ -21,6 +21,8 @@ defmodule MainWeb.AdminController do
 
     locations = Location.get_by_team_id(current_user, team_id)
 
+    location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
+
     render(conn, "index.html",
       dispositions: dispositions,
       dispositions_per_day: dispositions_per_day,
@@ -30,7 +32,7 @@ defmodule MainWeb.AdminController do
       location_count: Enum.count(locations),
       teams: teams(conn),
       team_id: team_id,
-      location_id: current_user.team_member.location_id,
+      location_id: location_id,
       location: nil)
   end
 
@@ -61,7 +63,7 @@ defmodule MainWeb.AdminController do
       location_count: Enum.count(locations),
       teams: teams(conn),
       team_id: current_user.team_member.team_id,
-      location_id: current_user.team_member.location_id,
+      location_id: location_id,
       location: nil)
   end
 
@@ -95,11 +97,14 @@ defmodule MainWeb.AdminController do
         teammate_count: teammate_count,
         location_count: location_count,
         location: nil,
+        location_id: nil,
         team_id: nil)
     else
       dispositions = Disposition.count_by_team_id(current_user.team_member.team_id)
       [dispositions_per_day] = Disposition.average_per_day_for_team(current_user.team_member.team_id)
       locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
+
+      location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
 
       render(conn, "index.html",
         metrics: [],
