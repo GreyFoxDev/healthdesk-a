@@ -20,6 +20,9 @@
             </div>
         </div>
         <div class="col-lg-8">
+            <%= if get_flash(@conn, :success) do %>
+                <p class="alert alert-info" role="alert"><%= get_flash(@conn, :success) %></p>
+            <% end %>
             <div class="card card-fluid">
                 <div class="card-body">
 

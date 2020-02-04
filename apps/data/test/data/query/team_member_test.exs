@@ -138,29 +138,38 @@ defmodule Data.Query.TeamMemberTest do
 
   describe "get_available_by_location/1" do
     setup context do
-      user1 = insert(:user, %{
-            use_sms: true,
-            use_do_not_disturb: true,
-            start_do_not_disturb: "18:00",
-            end_do_not_disturb: "07:00"})
-      user2 = insert(:user, %{
-            use_sms: true,
-            use_do_not_disturb: true,
-            start_do_not_disturb: "22:00",
-            end_do_not_disturb: "09:00"})
-      user3 = insert(:user, %{
-            use_sms: true,
-            use_do_not_disturb: false})
+      user1 =
+        insert(:user, %{
+          use_sms: true,
+          use_do_not_disturb: true,
+          start_do_not_disturb: "18:00",
+          end_do_not_disturb: "07:00"
+        })
+
+      user2 =
+        insert(:user, %{
+          use_sms: true,
+          use_do_not_disturb: true,
+          start_do_not_disturb: "22:00",
+          end_do_not_disturb: "09:00"
+        })
+
+      user3 = insert(:user, %{use_sms: true, use_do_not_disturb: false})
 
       insert(
         :team_member,
-        %{team_id: context.team.id, location_id: context.location.id, user_id: user1.id})
+        %{team_id: context.team.id, location_id: context.location.id, user_id: user1.id}
+      )
+
       insert(
         :team_member,
-        %{team_id: context.team.id, location_id: context.location.id, user_id: user2.id})
+        %{team_id: context.team.id, location_id: context.location.id, user_id: user2.id}
+      )
+
       insert(
         :team_member,
-        %{team_id: context.team.id, location_id: context.location.id, user_id: user3.id})
+        %{team_id: context.team.id, location_id: context.location.id, user_id: user3.id}
+      )
 
       {:ok, [user: user2, location: context.location]}
     end
@@ -169,10 +178,13 @@ defmodule Data.Query.TeamMemberTest do
       assert 3 = Query.get_available_by_location(location, "10:00", Repo) |> Enum.count()
     end
 
-    test "return only the 2 active team members contact information", %{location: location, user: user} do
+    test "return only the 2 active team members contact information", %{
+      location: location,
+      user: user
+    } do
       team_members = Query.get_available_by_location(location, "19:00", Repo)
       assert 2 = Enum.count(team_members)
-      assert user.email in Enum.map(team_members, &(&1.email))
+      assert user.email in Enum.map(team_members, & &1.email)
     end
   end
 

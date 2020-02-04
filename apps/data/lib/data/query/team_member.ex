@@ -81,7 +81,11 @@ defmodule Data.Query.TeamMember do
   @doc """
   Returns a list of available team members for a location
   """
-  @spec get_available_by_location(location :: Location.t(), time_string :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  @spec get_available_by_location(
+          location :: Location.t(),
+          time_string :: String.t(),
+          repo :: Ecto.Repo.t()
+        ) :: [map()]
   def get_available_by_location(location, current_time, repo \\ Read) do
     repo
     |> SQL.query!(@available_function, [location.id, current_time])
@@ -157,6 +161,6 @@ defmodule Data.Query.TeamMember do
 
   defp build_results(results) do
     cols = Enum.map(results.columns, &String.to_existing_atom/1)
-    Enum.map(results.rows, fn(row) -> Map.new(Enum.zip(cols, row)) end)
+    Enum.map(results.rows, fn row -> Map.new(Enum.zip(cols, row)) end)
   end
 end

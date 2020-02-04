@@ -143,6 +143,6 @@ defmodule Data.Query.Disposition do
 
   defp build_results(results) do
     cols = Enum.map(results.columns, &String.to_existing_atom/1)
-    Enum.map(results.rows, fn(row) -> Map.new(Enum.zip(cols, row)) end)
+    Enum.map(results.rows, fn row -> Map.new(Enum.zip(cols, row)) end)
   end
 end
