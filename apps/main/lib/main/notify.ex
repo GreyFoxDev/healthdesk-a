@@ -35,12 +35,25 @@ defmodule MainWeb.Notify do
       |> Time.add(timezone_offset)
       |> to_string()
 
-    location_admins =
+    available_admins =
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
 
-    _ = Enum.each(location_admins, fn(admin) ->
+    all_admins =
+      %{role: "system"}
+      |> TeamMember.get_by_location_id(location.id)
+      |> Enum.filter(&(&1.user.role == "location-admin"))
+
+    _ = Enum.each(all_admins, fn(admin) ->
+      if admin.user.use_email do
+        admin.user.email
+        |> Main.Email.generate_email(body)
+        |> Main.Mailer.deliver_now()
+      end
+    end)
+
+    _ = Enum.each(available_admins, fn(admin) ->
       if admin.use_sms do
         message = %{
           provider: :twilio,
@@ -50,12 +63,6 @@ defmodule MainWeb.Notify do
         }
 
         @chatbot.send(message)
-      end
-
-      if admin.use_email do
-        admin.email
-        |> Main.Email.generate_email(body)
-        |> Main.Mailer.deliver_now()
       end
     end)
 

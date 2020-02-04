@@ -9,6 +9,7 @@ defmodule Data.TeamMember do
     "admin",
     "teammate",
     "location-admin",
+    "system",
     "team-admin"
   ]
 
