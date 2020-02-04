@@ -28,7 +28,7 @@ defmodule Data.Query.User do
       left_join: t in assoc(u, :team_member),
       where: is_nil(u.deleted_at),
       where: u.id == ^id,
-      preload: [team_member: {t, [team_member_locations: [location: :conversations]]}]
+      preload: [team_member: {t, [:location, team_member_locations: [location: :conversations]]}]
     )
     |> repo.one()
   end

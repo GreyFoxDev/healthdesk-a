@@ -20,6 +20,17 @@ defmodule MainWeb.SecuredContoller do
         |> current_user()
         |> Team.all()
       end
+
+      def teammate_locations(conn) do
+        current_user = current_user(conn)
+
+        current_user.team_member.team_member_locations
+        |> Stream.map(&(&1.location))
+        |> Stream.filter(&(&1.deleted_at == nil))
+        |> Enum.to_list()
+        |> Kernel.++([current_user.team_member.location])
+        |> Enum.dedup_by(&(&1.id))
+      end
     end
   end
 end

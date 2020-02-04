@@ -163,9 +163,7 @@
          ],
          datasets: [{
              data: [
-                 <%= Enum.reduce(@metrics, 0, fn(m, acc) -> (m.total_web_sessions || 0) + acc end) %>,
-                 <%= Enum.reduce(@metrics, 0, fn(m, acc) -> (m.total_sms_sessions || 0) + acc end) %>,
-                 <%= Enum.reduce(@metrics, 0, fn(m, acc) -> (m.total_facebook_sessions || 0) + acc end) %>
+                 10, 20, 30
              ],
              borderWidth: 5,
              backgroundColor: ['#2098d4', '#f8da50', '#9D17FA'],

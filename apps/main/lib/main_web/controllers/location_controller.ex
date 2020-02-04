@@ -4,14 +4,18 @@ defmodule MainWeb.LocationController do
   alias Data.{Location, Team}
 
   def index(conn, %{"team_id" => team_id}) do
-    team =
-      conn
-      |> current_user()
-      |> Team.get(team_id)
+    current_user = current_user(conn)
+    team = Team.get(current_user, team_id)
+    locations =
+    if current_user.role not in ["admin", "team-admin"] do
+      teammate_locations(conn)
+    else
+      team.locations
+    end
 
     render conn, "index.html",
       location: nil,
-      locations: team.locations,
+      locations: locations,
       team: team,
       teams: teams(conn)
   end
