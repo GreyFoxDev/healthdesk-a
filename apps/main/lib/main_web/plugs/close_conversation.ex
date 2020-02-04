@@ -60,15 +60,25 @@ defmodule MainWeb.Plug.CloseConversation do
     convo = C.get(id)
     location = Data.Location.get(convo.location_id)
     dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
-    disposition = Enum.find(dispositions, &(&1.disposition_name == "Automated"))
 
-    Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
+    if conn.assigns[:response] != "No sweat!" do
+      disposition = Enum.find(dispositions, &(&1.disposition_name == "Automated"))
 
-    %{"conversation_id" => id,
-      "phone_number" => location.phone_number,
-      "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
-      "sent_at" => DateTime.utc_now()}
-    |> CM.create()
+      Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
+
+      %{"conversation_id" => id,
+        "phone_number" => location.phone_number,
+        "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+        "sent_at" => DateTime.utc_now()}
+      |> CM.create()
+    else
+      %{"conversation_id" => id,
+        "phone_number" => location.phone_number,
+        "message" => "CLOSED: Closed by System",
+        "sent_at" => DateTime.utc_now()}
+      |> CM.create()
+    end
+
 
     C.close(id)
 
