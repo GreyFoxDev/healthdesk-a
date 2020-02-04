@@ -7,7 +7,7 @@ defmodule MainWeb.AdminController do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_team_id(current_user, team_id)
     dispositions = Disposition.count_by_team_id(team_id)
-    dispositions_per_day = Disposition.average_per_day_for_team(team_id)
+    [dispositions_per_day] = Disposition.average_per_day_for_team(team_id)
 
     team_admin_count =
       team_members
@@ -40,7 +40,7 @@ defmodule MainWeb.AdminController do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_location_id(current_user, location_id)
     dispositions = 0
-    dispositions_per_day = Disposition.average_per_day_for_location(location_id)
+    [dispositions_per_day] = Disposition.average_per_day_for_location(location_id)
 
     team_admin_count =
       team_members
