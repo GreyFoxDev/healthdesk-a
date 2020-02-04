@@ -123,7 +123,7 @@
                         <%= text_input f, :slack_integration, class: "form-control" %>
                         <label>Facebook Messenger ID</label>
                         <%= text_input f, :messenger_id, class: "form-control" %>
-                        <label>Defaul Message</label>
+                        <label>Default Message</label>
                         <%= textarea f, :default_message, class: "form-control" %>
                     </div>
                     <div class="form-actions">
