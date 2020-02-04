@@ -30,7 +30,9 @@ defmodule MainWeb.TsiController do
             "message" => Enum.join([params["comment"], ":\n", params["detail"]], ""),
             "sent_at" => DateTime.utc_now()})
 
-      render(conn, "new.html", api_key: params["api_key"], phone_number: params["phone-number"])
+      conn
+      |> put_flash(:info, "done")
+      |> render("new.html", api_key: params["api_key"], phone_number: params["phone-number"])
     end
   end
 
