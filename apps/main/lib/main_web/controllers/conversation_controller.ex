@@ -26,7 +26,9 @@ defmodule MainWeb.ConversationController do
       conn
       |> current_user()
       |> Data.Disposition.get_by_team_id(location.team_id)
-      |> Enum.map(fn disposition ->  {disposition.disposition_name, disposition.id} end)
+      |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
+      |> Stream.map(&({&1.disposition_name, &1.id}))
+      |> Enum.to_list()
 
     render conn, "index.html", location: location, conversations: conversations, my_conversations: my_conversations, teams: teams(conn), dispositions: dispositions
   end
