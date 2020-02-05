@@ -13,7 +13,7 @@ defmodule MainWeb.Intents.Wifi do
   Free WiFi:
   Network: [wifi_name]
   Password: [wifi_password]
-  
+
   Is there anything else we can assist you with?
   """
 
@@ -25,8 +25,9 @@ defmodule MainWeb.Intents.Wifi do
 
   @impl MainWeb.Intents
   def build_response(_args, location) do
-    location
-    |> Location.get_by_phone()
+    location = Location.get_by_phone(location)
+
+    location.id
     |> WifiNetwork.get_by_location_id()
     |> case do
       [] ->

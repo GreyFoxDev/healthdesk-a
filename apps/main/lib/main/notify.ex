@@ -36,12 +36,10 @@ defmodule MainWeb.Notify do
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
 
-    IO.inspect(team_member, label: "TEAMMATE********************************")
     if team_member.user.use_email do
       team_member.user.email
       |> Main.Email.generate_email(body)
       |> Main.Mailer.deliver_now()
-      |> IO.inspect(label: "SENDING EMAIL")
     end
 
     if available && available.use_sms do
