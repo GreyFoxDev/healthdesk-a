@@ -86,7 +86,8 @@ defmodule Data.Factory do
     %Disposition{
       id: UUID.uuid4(),
       team_id: nil,
-      disposition_name: sequence(:disposition_name, &"Disposition #{&1}")
+      disposition_name: sequence(:disposition_name, &"Disposition #{&1}"),
+      is_system: false
     }
   end
 

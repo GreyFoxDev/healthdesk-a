@@ -58,6 +58,10 @@ defmodule Data.Query.DispositionTest do
       assert [] = Query.count_by_team_id(UUID.uuid4(), Repo)
     end
 
+    test "count_by_location_id/1 returns an empty list if not found" do
+      assert [] = Query.count_by_location_id(UUID.uuid4(), Repo)
+    end
+
     test "count/1 returns 0 if no records found" do
       assert 0 = Query.count(UUID.uuid4(), Repo)
     end
@@ -87,7 +91,7 @@ defmodule Data.Query.DispositionTest do
         disposition_id: team2_disposition.id
       })
 
-      {:ok, disposition: team2_disposition}
+      {:ok, disposition: team2_disposition, location: location1}
     end
 
     test "count_all/0 returns a list of maps with disposition name & count" do
@@ -101,6 +105,11 @@ defmodule Data.Query.DispositionTest do
 
     test "count_by_team_id/1 returns a list of maps with disposition name & count", %{team: team} do
       assert [%{count: count}] = Query.count_by_team_id(team.id, Repo)
+      assert count == 1
+    end
+
+    test "count_by_location_id/1 returns a list of maps with disposition name & count", %{location: location} do
+      assert [%{count: count}] = Query.count_by_location_id(location.id, Repo)
       assert count == 1
     end
 
