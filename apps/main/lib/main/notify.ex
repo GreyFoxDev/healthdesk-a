@@ -12,10 +12,7 @@ defmodule MainWeb.Notify do
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
   @endpoint Application.get_env(:main, :endpoint)
 
-  @doc """
-  Send a notification to the super admin defined in the config. It will create a short URL.
-  """
-  def send_to_admin(conversation_id, message, location, _member \\ @super_admin) do
+  def send_to_teammate(conversation_id, message, location, team_member) do
     location = Location.get_by_phone(location)
 
     %{data: link} =
@@ -28,6 +25,52 @@ defmodule MainWeb.Notify do
 
     body = Enum.join([message, link[:url]], "\n")
 
+    timezone_offset = TimezoneOffset.calculate(location.timezone)
+    current_time_string =
+      Time.utc_now()
+      |> Time.add(timezone_offset)
+      |> to_string()
+
+    [available] =
+      location
+      |> TeamMember.get_available_by_location(current_time_string)
+      |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
+
+    if team_member.user.use_email do
+      team_member.user.email
+      |> Main.Email.generate_email(body)
+      |> Main.Mailer.deliver_now()
+    end
+
+    if available && available.use_sms do
+      message = %{
+        provider: :twilio,
+        from: location.phone_number,
+        to: available.phone_number,
+        body: body
+      }
+
+      @chatbot.send(message)
+    end
+
+    :ok
+  end
+
+  @doc """
+  Send a notification to the super admin defined in the config. It will create a short URL.
+  """
+  def send_to_admin(conversation_id, message, location, member \\ @super_admin) do
+    location = Location.get_by_phone(location)
+
+    %{data: link} =
+      @url
+      |> String.replace("[url]", @endpoint)
+      |> String.replace("[team_id]", location.team_id)
+      |> String.replace("[location_id]", location.id)
+      |> String.replace("[conversation_id]", conversation_id)
+      |> Bitly.Link.shorten()
+
+    body = Enum.join([message, link[:url]], "\n")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =

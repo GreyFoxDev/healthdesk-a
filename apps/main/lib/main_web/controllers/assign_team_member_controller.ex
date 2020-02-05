@@ -32,7 +32,7 @@ defmodule MainWeb.AssignTeamMemberController do
         |> String.replace("[phone_number]", original_message.phone_number)
         |> String.replace("[message]", original_message.message)
 
-      Notify.send_to_admin(id, message, location.phone_number, team_member.user.phone_number)
+      Notify.send_to_teammate(id, message, location.phone_number, team_member)
 
       render(conn, "ok.json")
     else
