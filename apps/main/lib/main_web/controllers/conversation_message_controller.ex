@@ -34,7 +34,8 @@ defmodule MainWeb.ConversationMessageController do
       conn
       |> current_user()
       |> Data.Disposition.get_by_team_id(location.team_id)
-      |> Enum.map(fn disposition ->  {disposition.disposition_name, disposition.id} end)
+      |> Enum.reject(&(&1.name in ["Automated", "Call deflected"]))
+      |> Enum.map(&({&1.disposition_name, &1.id}))
 
     render conn, "index.html",
       location: location,
