@@ -129,7 +129,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> SESSIONS PER DAY </h2>
+                <h2 class="metric-label"> AVG. PER DAY </h2>
                 <p class="metric-value h3">
                     <span class="value">
                         <%= @dispositions_per_day.sessions_per_day %>

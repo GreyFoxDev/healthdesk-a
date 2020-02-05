@@ -60,6 +60,21 @@ defmodule Data.Query.Disposition do
     |> repo.all()
   end
 
+  @doc """
+  Return a list of dispositions with count of usage by location
+  """
+  @spec count_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_location_id(location_id, repo \\ Read) do
+    from(d in Disposition,
+      join: cd in assoc(d, :conversation_dispositions),
+      join: c in assoc(cd, :conversation),
+      group_by: d.disposition_name,
+      where: c.location_id == ^location_id,
+      select: %{name: d.disposition_name, count: count(cd.id)}
+    )
+    |> repo.all()
+  end
+
   def count(disposition_id, repo \\ Read) do
     from(cd in Data.Schema.ConversationDisposition,
       join: d in Disposition,
