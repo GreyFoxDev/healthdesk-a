@@ -76,6 +76,7 @@ defmodule Data.Query.TeamMember do
       preload: [:team_member_locations, :user]
     )
     |> repo.all()
+    |> Enum.dedup_by(&(&1.id))
   end
 
   @doc """

@@ -68,7 +68,7 @@ defmodule MainWeb.AdminController do
   end
 
   def index(conn, _params) do
-    current_user = current_user(conn) |> IO.inspect()
+    current_user = current_user(conn)
     teams = teams(conn)
 
     team_members = TeamMember.all()
