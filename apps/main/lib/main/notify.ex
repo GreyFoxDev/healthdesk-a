@@ -41,6 +41,7 @@ defmodule MainWeb.Notify do
       team_member.user.email
       |> Main.Email.generate_email(body)
       |> Main.Mailer.deliver_now()
+      |> IO.inspect(label: "SENDING EMAIL")
     end
 
     if available && available.use_sms do
