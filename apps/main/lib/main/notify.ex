@@ -23,7 +23,7 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
-    body = Enum.join([message, link[:url]], "\n")
+    body = Enum.join(["You've been assigned to a conversation", link[:url]], "\n")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =
@@ -36,6 +36,7 @@ defmodule MainWeb.Notify do
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
 
+    IO.inspect(team_member, label: "TEAMMATE********************************")
     if team_member.user.use_email do
       team_member.user.email
       |> Main.Email.generate_email(body)
