@@ -1,7 +1,7 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Disposition, Location, TeamMember}
+  alias Data.{Disposition, Location, TeamMember, ConversationDisposition}
 
   def index(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
@@ -30,6 +30,9 @@ defmodule MainWeb.AdminController do
     render(conn, "index.html",
       dispositions: dispositions,
       dispositions_per_day: dispositions_per_day,
+      web_totals: team_totals_by_channel("WEB", team_id),
+      sms_totals: team_totals_by_channel("SMS", team_id),
+      facebook_totals: team_totals_by_channel("FACEBOOK", team_id),
       team_admin_count: team_admin_count,
       teammate_count: teammate_count,
       locations: locations,
@@ -65,6 +68,9 @@ defmodule MainWeb.AdminController do
     render(conn, "index.html",
       dispositions: dispositions,
       dispositions_per_day: dispositions_per_day,
+      web_totals: location_totals_by_channel("WEB", location_id),
+      sms_totals: location_totals_by_channel("SMS", location_id),
+      facebook_totals: location_totals_by_channel("FACEBOOK", location_id),
       team_admin_count: team_admin_count,
       teammate_count: teammate_count,
       locations: locations,
@@ -100,6 +106,9 @@ defmodule MainWeb.AdminController do
         metrics: [],
         dispositions: dispositions,
         dispositions_per_day: dispositions_per_day,
+        web_totals: totals_by_channel("WEB"),
+        sms_totals: totals_by_channel("SMS"),
+        facebook_totals: totals_by_channel("FACEBOOK"),
         teams: teams,
         team_admin_count: team_admin_count,
         teammate_count: teammate_count,
@@ -118,6 +127,9 @@ defmodule MainWeb.AdminController do
         metrics: [],
         dispositions: dispositions,
         dispositions_per_day: dispositions_per_day,
+        web_totals: totals_by_channel("WEB"),
+        sms_totals: totals_by_channel("SMS"),
+        facebook_totals: totals_by_channel("FACEBOOK"),
         teams: teams,
         team_admin_count: team_admin_count,
         teammate_count: teammate_count,
@@ -129,4 +141,24 @@ defmodule MainWeb.AdminController do
     end
   end
 
+  defp totals_by_channel(channel_type) do
+    results = ConversationDisposition.count_all_by_channel_type(channel_type)
+    sum(results)
+  end
+
+  defp team_totals_by_channel(channel_type, team_id) do
+    results = ConversationDisposition.count_channel_type_by_team_id(channel_type, team_id)
+    sum(results)
+  end
+
+  defp location_totals_by_channel(channel_type, location_id) do
+    results = ConversationDisposition.count_channel_type_by_location_id(channel_type, location_id)
+    sum(results)
+  end
+
+  defp sum(results) do
+    results
+    |> Enum.map(&(&1.disposition_count))
+    |> Enum.sum()
+  end
 end

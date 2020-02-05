@@ -9,6 +9,7 @@ defmodule Data.Schema.Conversation do
           location_id: binary(),
           team_member_id: binary() | nil,
           original_number: String.t(),
+          channel_type: String.t() | nil,
           status: String.t() | nil,
           started_at: :utc_datetime | nil
         }
@@ -22,6 +23,7 @@ defmodule Data.Schema.Conversation do
   status
   started_at
   team_member_id
+  channel_type
   |a
 
   @all_fields @required_fields ++ @optional_fields
@@ -30,6 +32,7 @@ defmodule Data.Schema.Conversation do
     field(:original_number, :string)
     field(:status, :string)
     field(:started_at, :utc_datetime)
+    field(:channel_type, :string)
 
     field(:member, :map, virtual: true, default: %Data.Schema.Member{})
 
@@ -45,5 +48,33 @@ defmodule Data.Schema.Conversation do
     model
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
+    |> put_channel_type()
+  end
+
+  defp put_channel_type(changeset) do
+    changeset
+    |> get_field(:channel_type)
+    |> case do
+         nil ->
+           changeset
+           |> get_field(:original_number)
+           |> set_channel_type(changeset)
+         _channel_type ->
+           changeset
+       end
+  end
+
+  defp set_channel_type(nil, changeset), do: changeset
+
+  defp set_channel_type(<< "messenger:", _ :: binary >>, changeset) do
+    put_change(changeset, :channel_type, "FACEBOOK")
+  end
+
+  defp set_channel_type(<< "CH", _ :: binary >>, changeset) do
+    put_change(changeset, :channel_type, "WEB")
+  end
+
+  defp set_channel_type(<< "+1", _ :: binary >>, changeset) do
+    put_change(changeset, :channel_type, "SMS")
   end
 end

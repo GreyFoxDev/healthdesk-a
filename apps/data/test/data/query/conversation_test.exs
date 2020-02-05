@@ -105,8 +105,50 @@ defmodule Data.Query.ConversationTest do
 
       assert {:ok, %Conversation{} = new_record} = Query.create(params, Repo)
       assert params.original_number == new_record.original_number
+      assert "SMS" == new_record.channel_type
       assert "open" == new_record.status
     end
+
+    test "set the channel type to WEB", %{location: location} do
+      params = %{
+        location_id: location.id,
+        original_number: "CH1234566",
+        status: "open"
+      }
+
+      assert {:ok, %Conversation{} = new_record} = Query.create(params, Repo)
+      assert params.original_number == new_record.original_number
+      assert "WEB" == new_record.channel_type
+      assert "open" == new_record.status
+    end
+
+    test "set the channel type to FACEBOOK", %{location: location} do
+      params = %{
+        location_id: location.id,
+        original_number: "messenger:1234566",
+        status: "open"
+      }
+
+      assert {:ok, %Conversation{} = new_record} = Query.create(params, Repo)
+      assert params.original_number == new_record.original_number
+      assert "FACEBOOK" == new_record.channel_type
+      assert "open" == new_record.status
+    end
+
+    test "set the channel type to WEB when value passed in", %{location: location} do
+      params = %{
+        location_id: location.id,
+        original_number: phone_number(),
+        channel_type: "WEB",
+        status: "open"
+      }
+
+      assert {:ok, %Conversation{} = new_record} = Query.create(params, Repo)
+      assert params.original_number == new_record.original_number
+      assert "WEB" == new_record.channel_type
+      assert "open" == new_record.status
+    end
+
   end
 
   describe "update/1" do
@@ -131,6 +173,7 @@ defmodule Data.Query.ConversationTest do
 
       assert {:ok, %Conversation{} = updated} = Query.update(conversation, params, Repo)
       assert updated.id == conversation.id
+      assert "SMS" == updated.channel_type
       assert "closed" = updated.status
     end
   end

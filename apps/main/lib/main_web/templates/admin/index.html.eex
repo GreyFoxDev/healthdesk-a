@@ -163,7 +163,9 @@
          ],
          datasets: [{
              data: [
-                 10, 20, 30
+                 <%= @web_totals %>,
+                 <%= @sms_totals %>,
+                 <%= @facebook_totals %>
              ],
              borderWidth: 5,
              backgroundColor: ['#2098d4', '#f8da50', '#9D17FA'],

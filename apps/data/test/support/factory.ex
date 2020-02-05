@@ -60,6 +60,7 @@ defmodule Data.Factory do
       team_member_id: nil,
       original_number: phone_number(),
       status: "open",
+      channel_type: "SMS",
       started_at: DateTime.utc_now()
     }
   end
