@@ -10,7 +10,7 @@ defmodule MainWeb.LocationController do
     if current_user.role not in ["admin", "team-admin"] do
       teammate_locations(conn)
     else
-      team.locations
+      Enum.dedup_by(team.locations, &(&1.id))
     end
 
     render conn, "index.html",
