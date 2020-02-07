@@ -25,11 +25,11 @@ defmodule MainWeb.Intents.DayPass do
   def build_response(_args, location) do
     location = Location.get_by_phone(location)
     case PricingPlan.price_plans(:daily, location.id) do
-      {:ok, nil} ->
+      nil ->
         @no_pass
 
-      {:ok, pass} ->
-        String.replace(@pass, "[day_pass_price]", pass.pass_price)
+      %{pass_price: pass_price} ->
+        String.replace(@pass, "[day_pass_price]", pass_price)
 
       {:error, reason} ->
         Logger.error reason

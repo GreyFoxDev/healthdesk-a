@@ -25,11 +25,11 @@ defmodule MainWeb.Intents.MonthPass do
   def build_response(_args, location) do
     location = Location.get_by_phone(location)
     case PricingPlan.price_plans(:monthly, location.id) do
-      {:ok, nil} ->
+      nil ->
         @no_pass
 
-      {:ok, pass} ->
-        String.replace(@pass, "[month_pass_price]", pass.pass_price)
+      %{pass_price: pass_price} ->
+        String.replace(@pass, "[month_pass_price]", pass_price)
 
       {:error, reason} ->
         Logger.error reason
