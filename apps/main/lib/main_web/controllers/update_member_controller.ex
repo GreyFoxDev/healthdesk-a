@@ -4,6 +4,8 @@ defmodule MainWeb.UpdateMemberController do
   alias Data.Member
 
   def update(conn, %{"id" => id, "member" => member}) do
+    phone = format_phone(member["phone_number"])
+    member = Map.put(member, "phone_number", phone)
     case Member.update(id, member) do
       {:ok, _member} ->
         render(conn, "ok.json")
@@ -14,6 +16,7 @@ defmodule MainWeb.UpdateMemberController do
 
   def update(conn, %{"member" => member}) do
     phone = format_phone(member["phone_number"])
+    member = Map.put(member, "phone_number", phone)
 
     if phone do
       with %Data.Schema.Member{} = member <- Member.get_by_phone_number(%{role: "admin"}, phone) do

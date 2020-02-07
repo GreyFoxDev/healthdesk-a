@@ -33,6 +33,19 @@ defmodule MainWeb.Plug.SaveMemberData do
     conn
   end
 
+  def call(%{assigns: %{member: phone, location: location}} = conn, _opts) when phone != nil do
+    l = Location.get_by_phone(location)
+    {:ok, member} =
+      with nil <- Member.get_by_phone_number(@role, phone) do
+        create_member_data(l.team_id, "", "", phone)
+      else
+        %Data.Schema.Member{} = member ->
+          {:ok, member}
+
+      end
+    conn
+  end
+
   def call(conn, _opts), do: conn
 
   defp create_member_data(team_id, first_name, nil, phone) do
