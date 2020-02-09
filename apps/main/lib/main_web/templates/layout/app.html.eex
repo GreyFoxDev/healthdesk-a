@@ -1,175 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="/images/healthdesk.jpg" />
-    <title>Healthdesk.ai - Admin Portal</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="/images/healthdesk.jpg" />
+        <title>Healthdesk.ai - Admin Portal</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
-    <script src="<%= static_path(@conn, "/js/stacked-menu/stacked-menu.min.js") %>"></script>
-    <script src="<%= static_path(@conn, "/js/perfect-scrollbar/perfect-scrollbar.min.js") %>"></script>
-    <script src="<%= static_path(@conn, "/js/theme.js") %>"></script>
+        <script src="<%= static_path(@conn, "/js/stacked-menu/stacked-menu.min.js") %>"></script>
+        <script src="<%= static_path(@conn, "/js/perfect-scrollbar/perfect-scrollbar.min.js") %>"></script>
+        <script src="<%= static_path(@conn, "/js/theme.js") %>"></script>
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>" />
 
-  </head>
+    </head>
 
-  <body>
-    <div class="app">
-      <header class="app-header app-header-dark">
-          <div class="top-bar">
-              <div class="top-bar-brand">
+    <body>
+        <div class="app">
+            <header class="app-header app-header-dark">
+                <div class="top-bar">
+                    <div class="top-bar-brand">
+                        <%= if @current_user.role != "teammate" do %>
+                            <a href="/admin"><img src="/images/healthdesk-logo.png"/></a>
+                        <% else %>
+                            <a href="<%= team_location_conversation_path(@conn, :index, @current_user.team_member.team_id, @current_user.team_member.location_id) %>">
+                                <img src="/images/healthdesk-logo.png"/>
+                            </a>
+                        <% end %>
+                    </div>
+                    <div class="top-bar-list">
+                        <div class="top-bar-item px-2 d-md-none d-lg-none d-xl-none">
+                            <button class="hamburger hamburger-squeeze" type="button" data-toggle="aside" aria-label="toggle menu">
+                                <span class="hamburger-box">
+                                    <span class="hamburger-inner"></span>
+                                </span>
+                            </button>
+                        </div>
+                        <div>
+                            <%= live_render(@conn, MainWeb.Live.ConversationAlertsView, session: @current_user) %>
+                        </div>
+                    </div>
 
-                  <a href="/admin"><img src="/images/healthdesk-logo.png"/></a>
-              </div>
-              <div class="top-bar-list">
-                  <div class="top-bar-item px-2 d-md-none d-lg-none d-xl-none">
-                      <button class="hamburger hamburger-squeeze" type="button" data-toggle="aside" aria-label="toggle menu">
-                          <span class="hamburger-box">
-                              <span class="hamburger-inner"></span>
-                          </span>
-                      </button>
-                  </div>
-                  <div>
-                      <%= live_render(@conn, MainWeb.Live.ConversationAlertsView, session: @current_user) %>
-                  </div>
-              </div>
 
+                    <div class="top-bar-item top-bar-item-right px-0 d-none d-sm-flex">
+                        <%= if current_user = assigns[:current_user] do %> 
+                            <div class="dropdown">
+                                <button class="btn-account d-none d-md-flex" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="user-avatar user-avatar-md">
+                                        <img src="<%= if current_user.avatar != "", do: current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt=""></span>
+                                        <span class="account-summary pr-lg-4 d-none d-lg-block">
+                                            <span class="account-name">
+                                                <%= current_user.first_name %>
+                                                <%= current_user.last_name %>
+                                            </span>
+                                            <span class="account-description">
+                                                <%= MainWeb.Helper.Formatters.format_role(current_user.role) %>
+                                            </span>
+                                        </span>
+                                </button>
 
-              <div class="top-bar-item top-bar-item-right px-0 d-none d-sm-flex">
-                  <%= if current_user = assigns[:current_user] do %> 
-                      <div class="dropdown">
-                          <button class="btn-account d-none d-md-flex" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <span class="user-avatar user-avatar-md">
-                                  <img src="<%= if current_user.avatar != "", do: current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt=""></span>
-                                  <span class="account-summary pr-lg-4 d-none d-lg-block">
-                                      <span class="account-name">
-                                          <%= current_user.first_name %>
-                                          <%= current_user.last_name %>
-                                      </span>
-                                      <span class="account-description">
-                                          <%= MainWeb.Helper.Formatters.format_role(current_user.role) %>
-                                      </span>
-                                  </span>
-                          </button>
+                                <div class="dropdown-arrow dropdown-arrow-left"></div><!-- .dropdown-menu -->
+                                <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; top: 56px; left: 0px; will-change: top, left;">
+                                    <h6 class="dropdown-header d-none d-md-block d-lg-none">
+                                        <%= current_user.first_name %>&nbsp
+                                        <%= current_user.last_name %>
+                                    </h6>
+                                    <%= link "Profile", to: user_path(@conn, :edit, current_user), class: "dropdown-item" %>
+                                    <%= link "Logout", to: session_path(@conn, :delete, current_user), method: "delete", class: "dropdown-item" %>
+                                    <hr />
+                                    <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
+                                        <%= link "Analytics", to: admin_path(@conn, :index), class: "dropdown-item" %>
+                                    <% end %>
+                                    <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
+                                        <%= link "Settings", to: settings_url(@conn, current_user), class: "dropdown-item" %>
+                                    <% end %>
+                                    <%= link "Get support", to: "mailto:support@healthdesk.ai", method: "delete", class: "dropdown-item" %>
+                                    <%= link "Terms of use", to: "https://healthdesk.ai/terms", target: "_blank", class: "dropdown-item" %>
+                                    <%= link "Privacy policy", to: "https://healthdesk.ai/privacy", target: "_blank", class: "dropdown-item" %>
+                                </div><!-- /.dropdown-menu -->
+                            </div>
+                        <% end %>
 
-                          <div class="dropdown-arrow dropdown-arrow-left"></div><!-- .dropdown-menu -->
-                          <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; top: 56px; left: 0px; will-change: top, left;">
-                              <h6 class="dropdown-header d-none d-md-block d-lg-none">
-                                  <%= current_user.first_name %>&nbsp
-                                  <%= current_user.last_name %>
-                              </h6>
-                              <%= link "Profile", to: user_path(@conn, :edit, current_user), class: "dropdown-item" %>
-                              <%= link "Logout", to: session_path(@conn, :delete, current_user), method: "delete", class: "dropdown-item" %>
-                              <hr />
-                              <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
-                                  <%= link "Analytics", to: admin_path(@conn, :index), class: "dropdown-item" %>
-                              <% end %>
-                              <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
-                                  <%= link "Settings", to: settings_url(@conn, current_user), class: "dropdown-item" %>
-                              <% end %>
-                              <%= link "Get support", to: "mailto:support@healthdesk.ai", method: "delete", class: "dropdown-item" %>
-                              <%= link "Terms of use", to: "https://healthdesk.ai/terms", target: "_blank", class: "dropdown-item" %>
-                              <%= link "Privacy policy", to: "https://healthdesk.ai/privacy", target: "_blank", class: "dropdown-item" %>
-                          </div><!-- /.dropdown-menu -->
-                      </div>
-                  <% end %>
+                    </div>
+            </header>
+            <aside class="app-aside app-aside-expand-md app-aside-light">
+                <div class="aside-content">
+                    <section class="aside-menu overflow-hidden ps">
+                        <nav id="stacked-menu" class="stacked-menu stacked-menu-has-collapsible">
+                            <ul class="menu">
+                                <%= if @current_user.role == "admin" do %>
+                                    <li class="menu-item has-active">
+                                        <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>Teams</span>"}, to: team_path(@conn, :index), class: "menu-link" %>
+                                    </li>
+                                <% end %>
 
-              </div>
-      </header>
-      <aside class="app-aside app-aside-expand-md app-aside-light">
-          <div class="aside-content">
-              <section class="aside-menu overflow-hidden ps">
-                  <nav id="stacked-menu" class="stacked-menu stacked-menu-has-collapsible">
-                      <ul class="menu">
-                          <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
-                              <%= if @current_user.role == "admin" do %>
-                                  <li class="menu-item has-active">
-                                      <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>Teams</span>"}, to: team_path(@conn, :index), class: "menu-link" %>
-                                  </li>
-                              <% end %>
+                                <%= for team <- @teams do %>
+                                    <%= if @current_user.role in ["location-admin", "team-admin"] do %>
+                                        <li class="menu-item has-active">
+                                            <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>My Team</span>"},
+                                                     to: team_location_path(@conn, :index, team.id), class: "menu-link" %>
+                                        </li>
+                                    <% end %>
 
-                              <%= for team <- @teams do %>
-                                  <%= if @current_user.role in ["location-admin", "team-admin"] do %>
-                                      <li class="menu-item has-active">
-                                          <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>My Team</span>"}, to: team_location_path(@conn, :index, team.id), class: "menu-link" %>
-                                      </li>
-                                  <% end %>
+                                    <%= if @current_user.role in ["team-admin", "admin"] do %>
+                                        <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
+                                            <a href="http://google.com" class="menu-link">
+                                                <span class="menu-icon oi oi-browser"></span>
+                                                <span class="menu-text">
+                                                    <%= team.team_name %>
+                                                </span>
+                                            </a> <!-- child menu -->
+                                            <ul class="menu">
+                                                <li class="menu-subhead"><%= team.team_name %></li>
+                                                <%= for location <- Enum.filter(team.locations, &(&1.deleted_at == nil)) do %>
+                                                    <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
+                                                        <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
+                                                            <%= location.location_name %>
+                                                            <span class="badge badge-subtle">
+                                                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{location_id: location.id}) %>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                <% end %>
+                                            </ul>
+                                        </li>
+                                    <% end %>
 
-                                  <%= if @current_user.role in ["team-admin", "admin"] do %>
-                                      <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
-                                          <a href="http://google.com" class="menu-link">
-                                              <span class="menu-icon oi oi-browser"></span>
-                                              <span class="menu-text">
-                                                  <%= team.team_name %>
-                                              </span>
-                                          </a> <!-- child menu -->
-                                          <ul class="menu">
-                                              <li class="menu-subhead"><%= team.team_name %></li>
-                                              <%= for location <- Enum.filter(team.locations, &(&1.deleted_at == nil)) do %>
-                                                  <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                                      <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
-                                                          <%= location.location_name %>
-                                                          <span class="badge badge-subtle">
-                                                              <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{location_id: location.id}) %>
-                                                          </span>
-                                                      </a>
-                                                  </li>
-                                              <% end %>
-                                          </ul>
-                                      </li>
-                                  <% else %>
-                                      <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
-                                          <a href="http://google.com" class="menu-link">
-                                              <span class="menu-icon oi oi-browser"></span>
-                                              <span class="menu-text">
-                                                  <%= team.team_name %>
-                                              </span>
-                                          </a> <!-- child menu -->
-                                          <ul class="menu">
-                                              <li class="menu-subhead"><%= team.team_name %></li>
-                                              <%= for location <- teammate_locations(@conn) do %>
-                                                  <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                                      <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
-                                                          <%= location.location_name %>
-                                                          <span class="badge badge-subtle">
-                                                              <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{location_id: location.id}) %>
-                                                          </span>
-                                                      </a>
-                                                  </li>
-                                              <% end %>
-                                          </ul>
-                                      </li>
+                                    <%= if @current_user.role == "location-admin" && @current_user.team_member.team_id == team.id do %>
+                                        <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
+                                            <a href="http://google.com" class="menu-link">
+                                                <span class="menu-icon oi oi-browser"></span>
+                                                <span class="menu-text">
+                                                    <%= team.team_name %>
+                                                </span>
+                                            </a> <!-- child menu -->
+                                            <ul class="menu">
+                                                <li class="menu-subhead"><%= team.team_name %></li>
+                                                <%= for location <- teammate_locations(@conn) do %>
+                                                    <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
+                                                        <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
+                                                            <%= location.location_name %>
+                                                            <span class="badge badge-subtle">
+                                                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{location_id: location.id}) %>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                <% end %>
+                                            </ul>
+                                        </li>
+                                    <% end %>
 
-                                  <% end %>
-                              <% end %>
-                          <% end %>
+                                    <%= if @current_user.role == "teammate" && @current_user.team_member.team_id == team.id do %>
+                                        <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
+                                            <a href="http://google.com" class="menu-link">
+                                                <span class="menu-icon oi oi-browser"></span>
+                                                <span class="menu-text">
+                                                    <%= team.team_name %>
+                                                </span>
+                                            </a> <!-- child menu -->
+                                            <ul class="menu">
+                                                <li class="menu-subhead"><%= team.team_name %></li>
+                                                <%= for location <- teammate_locations(@conn) do %>
+                                                    <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
+                                                        <a href="<%= team_location_conversation_path(@conn, :index, team.id, location.id) %>" class="menu-link">
+                                                            <%= location.location_name %>
+                                                            <span class="badge badge-subtle">
+                                                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{location_id: location.id}) %>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                <% end %>
+                                            </ul>
+                                        </li>
+                                    <% end %>
+                                <% end %>
+                            </ul>
+                        </nav>
+                    </section>
+                </div>
+            </aside>
 
-                      </ul>
-                  </nav>
-              </section>
-          </div>
-      </aside>
+            <main class="app-main">
+                <div class="wrapper">
+                    <div class="page has-sidebar has-sidebar-expand-xl">
+                        <div class="page-inner">
+                            <%= render @view_module, @view_template, assigns %>
+                        </div>
+                    </div>
+                </div>
+            </main>
 
-      <main class="app-main">
-          <div class="wrapper">
-              <div class="page has-sidebar has-sidebar-expand-xl">
-                  <div class="page-inner">
-                      <%= render @view_module, @view_template, assigns %>
-                  </div>
-              </div>
-          </div>
-      </main>
-
-    </div> <!-- /container -->
-    <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
-  </body>
+                </div> <!-- /container -->
+                <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+    </body>
 </html>

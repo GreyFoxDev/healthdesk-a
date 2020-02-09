@@ -6,7 +6,12 @@ defmodule MainWeb.LocationController do
   def index(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
     team = Team.get(current_user, team_id)
-    locations = teammate_locations(conn)
+    locations = if current_user.role in ["admin", "team-admin"] do
+      team.locations
+    else
+      teammate_locations(conn)
+    end
+
 
     render conn, "index.html",
       location: nil,
