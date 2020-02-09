@@ -6,12 +6,7 @@ defmodule MainWeb.LocationController do
   def index(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
     team = Team.get(current_user, team_id)
-    locations =
-    if current_user.role not in ["admin", "team-admin"] do
-      teammate_locations(conn)
-    else
-      Enum.dedup_by(team.locations, &(&1.id))
-    end
+    locations = teammate_locations(conn)
 
     render conn, "index.html",
       location: nil,

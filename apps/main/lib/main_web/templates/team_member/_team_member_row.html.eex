@@ -1,0 +1,22 @@
+<tr>
+    <td>
+        <b><a href="<%= team_team_member_path(@conn, :edit, @member.team_id, @member.id) %>"><%= @member.user.first_name %> <%= @member.user.last_name %></a></b>
+    </td>
+    <td>
+        <span><%= format_phone(@member.user.phone_number) %></span>
+    </td>
+    <td>
+        <span><%= @member.user.email %></span>
+    </td>
+    <td>
+        <span><%= format_role(@member.user.role) %></span>
+    </td>
+    <td>
+        <%= if @current_user.role in ["admin", "team-admin", "location-admin"] && @member.user.role != "team-admin" do %>
+            <%= link {:safe, "<i class=\"fas fa-edit\"></i>"}, to: team_team_member_path(@conn, :edit, @member.team_id, @member.id) %>
+        <% end %>
+        <%= if @current_user.role in ["admin", "team-admin"] do %>
+            <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_team_member_path(@conn, :delete, @member.team_id, @member.id), method: "delete" %>
+        <% end %>
+    </td>
+</tr>
