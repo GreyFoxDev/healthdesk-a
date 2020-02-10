@@ -62,7 +62,7 @@ defmodule Data.TeamMember do
       |> Query.get()
       |> Query.update(params)
 
-    if params.locations && params.locations != [] do
+    if params.locations do
       associate_locations(id, params.locations)
     end
 

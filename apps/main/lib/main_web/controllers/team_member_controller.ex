@@ -145,8 +145,9 @@ defmodule MainWeb.TeamMemberController do
   end
 
   def update(conn, %{"id" => id, "team_member" => team_member, "team_id" => team_id}) do
+    locations = (team_member["team_member_locations"] || [])
     with %Data.Schema.TeamMember{} = member <- TeamMember.get(current_user(conn), id),
-         {:ok, _pid} <- TeamMember.update(id, %{location_id: team_member["location_id"], locations: team_member["team_member_locations"]}),
+         {:ok, _pid} <- TeamMember.update(id, %{location_id: team_member["location_id"], locations: locations}),
          {:ok, _pid} <- User.update(member.user_id, team_member["user"]) do
 
       conn
