@@ -5,6 +5,7 @@ defmodule MainWeb.Intents.ClassSchedule do
 
   alias Data.{
     ClassSchedule,
+    HolidayHours,
     Location
   }
 
@@ -42,7 +43,7 @@ defmodule MainWeb.Intents.ClassSchedule do
       |> String.replace("[classes]", classes)
 
     else
-      {term, day_of_week} = get_day_of_week({year, month, day})
+      {term, day_of_week} = get_day_of_week({year, month, day}, location.id)
 
       String.replace(@no_classes, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
     end
@@ -89,12 +90,12 @@ defmodule MainWeb.Intents.ClassSchedule do
     "#{start_time} #{class.class_type} (#{class.instructor})"
   end
 
-  defp get_day_of_week({year, month, day} = date) do
-    with nil <- MainWeb.HolidayDates.is_holiday?(date) do
-      {:normal, lookup_day_of_week(date)}
+  defp get_day_of_week({year, month, day} = date, location) do
+    with [holiday] <- find_holiday(location, date) do
+      {:holiday, holiday}
     else
-      holiday ->
-        {:holiday, holiday}
+      _ ->
+        {:normal, lookup_day_of_week(date)}
     end
   end
 
@@ -122,4 +123,17 @@ defmodule MainWeb.Intents.ClassSchedule do
   defp check_binary(value) when is_binary(value), do: String.to_integer(value)
   defp check_binary(value) when is_integer(value), do: value
 
+  defp find_holiday(location_id, erl_date) do
+    location_id
+    |> HolidayHours.get_by_location_id()
+    |> Enum.filter(fn d ->
+      match_date?(d.holiday_date, erl_date)
+    end)
+  end
+
+  defp match_date?(nil, _), do: false
+
+  defp match_date?(date, erl_date) do
+    Date.to_erl(date) == erl_date
+  end
 end

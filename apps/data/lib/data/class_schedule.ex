@@ -2,7 +2,7 @@ defmodule Data.ClassSchedule do
   @moduledoc """
   This is the Child Care Hours API for the data layer
   """
-  alias Data.Query.ChildCareHour, as: Query
+  alias Data.Query.ClassSchedule, as: Query
 
   defdelegate create(params), to: Query
   defdelegate delete(params), to: Query
