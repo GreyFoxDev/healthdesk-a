@@ -90,25 +90,25 @@ defmodule MainWeb.Intents do
 
   def get({"routeLostFound", _}, location) do
     """
-    Thank you for your message. We are notifying our front desk now to check our Lost & Found. Can I please have your first and last name?
+    Thank you for your message. We are notifying our front desk now to check our Lost & Found. Would you like us to follow-up with you?
     """
   end
 
   def get({"routeRetention", _}, location) do
     """
-    Thank you for your message. May I ask, why are you looking to cancel today? 
+    Thank you for your message. May I ask, why are you looking to cancel today?
     """
   end
 
   def get({"routeFrontDesk", _}, location) do
     """
-    Thank you for your message. Can I please have your first and last name? 
+    Thank you for your message. How can our front desk help you today?
     """
   end
 
   def get({"routeSupport", _}, location) do
     """
-    Thank you for your message. Can I please have your first and last name? 
+    Thank you for your message. Can you please confirm your first and last name?
     """
   end
 
