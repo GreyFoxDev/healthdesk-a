@@ -27,4 +27,4 @@ config :bitly, access_token: System.get_env("BITLY_ACCESS_TOKEN")
 
 config :main,
   super_admin: System.get_env("SUPER_ADMIN_PHONE"),
-  endpoint: "https://healthdesk-ai.herokuapp.com/"
+  endpoint: "https://#{System.get_env("HOST_URL")}/"
