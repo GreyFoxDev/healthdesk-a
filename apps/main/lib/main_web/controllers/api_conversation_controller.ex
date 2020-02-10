@@ -5,7 +5,7 @@ defmodule MainWeb.Api.ConversationController do
   alias Data.ConversationMessages, as: CM
   alias Data.Location
 
-  def create(conn, %{"location" => << "messenger:", location :: binary>>, "member" => << "messenger:", member :: binary>>}) do
+  def create(conn, %{"location" => << "messenger:", location :: binary>>, "member" => << "messenger:", _ :: binary>> = member}) do
     location = Location.get_by_messenger_id(location)
 
     with {:ok, convo} <- C.find_or_start_conversation({member, location.phone_number}) do
