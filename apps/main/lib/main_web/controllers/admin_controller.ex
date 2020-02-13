@@ -99,7 +99,11 @@ defmodule MainWeb.AdminController do
 
     if current_user.role == "admin" do
       dispositions = Disposition.count_all()
-      [dispositions_per_day] = Disposition.average_per_day()
+      dispositions_per_day =
+        case Disposition.average_per_day_for_team() do
+          [result] -> result
+          _ -> %{sessions_per_day: 0}
+        end
       location_count = Location.all() |> Enum.count()
 
       render(conn, "index.html",
@@ -118,7 +122,11 @@ defmodule MainWeb.AdminController do
         team_id: nil)
     else
       dispositions = Disposition.count_by_team_id(current_user.team_member.team_id)
-      [dispositions_per_day] = Disposition.average_per_day_for_team(current_user.team_member.team_id)
+      dispositions_per_day =
+        case Disposition.average_per_day_for_team(current_user.team_member.team_id) do
+          [result] -> result
+          _ -> %{sessions_per_day: 0}
+        end
       locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
 
       location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
