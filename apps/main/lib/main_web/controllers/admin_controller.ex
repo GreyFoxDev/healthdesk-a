@@ -99,11 +99,7 @@ defmodule MainWeb.AdminController do
 
     if current_user.role == "admin" do
       dispositions = Disposition.count_all()
-      dispositions_per_day =
-        case Disposition.average_per_day_for_team() do
-          [result] -> result
-          _ -> %{sessions_per_day: 0}
-        end
+      [dispositions_per_day] = Disposition.average_per_day()
       location_count = Location.all() |> Enum.count()
 
       render(conn, "index.html",
@@ -135,9 +131,9 @@ defmodule MainWeb.AdminController do
         metrics: [],
         dispositions: dispositions,
         dispositions_per_day: dispositions_per_day,
-        web_totals: totals_by_channel("WEB"),
-        sms_totals: totals_by_channel("SMS"),
-        facebook_totals: totals_by_channel("FACEBOOK"),
+        web_totals: team_totals_by_channel("WEB", current_user.team_member.team_id),
+        sms_totals: team_totals_by_channel("SMS", current_user.team_member.team_id),
+        facebook_totals: team_totals_by_channel("FACEBOOK", current_user.team_member.team_id),
         teams: teams,
         team_admin_count: team_admin_count,
         teammate_count: teammate_count,
