@@ -86,7 +86,6 @@ defmodule MainWeb.ConversationController do
       |> current_user()
       |> Location.get(location_id)
 
-
     user_info = Formatters.format_team_member(current_user(conn))
 
     message = %{"conversation_id" => id,
@@ -95,8 +94,11 @@ defmodule MainWeb.ConversationController do
                 "sent_at" => DateTime.utc_now()}
 
 
-    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "open"}),
+    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "pending"}),
          {:ok, _} <- ConversationMessages.create(message) do
+
+      pending_message_count = (ConCache.get(:session_cache, id) || 0)
+      :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
 
       redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id))
     else
