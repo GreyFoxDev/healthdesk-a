@@ -10,8 +10,6 @@ defmodule MainWeb.Plug.BuildAnswer do
   alias MainWeb.{Intents, Notify}
   alias Data.Location
 
-  @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
-
   @spec init(list()) :: list()
   def init(opts), do: opts
 
@@ -36,13 +34,16 @@ defmodule MainWeb.Plug.BuildAnswer do
   @doc """
   If there is a known intent then get the corresponding response.
   """
-  def call(%{assigns: %{opt_in: true, status: "open", intent: intent, location: location}} = conn, _opts) do
+  def call(%{assigns: %{convo: id, opt_in: true, status: "open", intent: intent, location: location}} = conn, _opts) do
     response = Intents.get(intent, location)
 
     location = Location.get_by_phone(location)
 
     if response == location.default_message do
+      pending_message_count = (ConCache.get(:session_cache, id) || 0)
+
       :ok = notify_admin_user(conn.assigns)
+      :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
 
       conn
       |> assign(:status, "pending")
@@ -54,9 +55,10 @@ defmodule MainWeb.Plug.BuildAnswer do
 
   def call(conn, _opts), do: conn
 
+
   defp notify_admin_user(%{message: message, member: member, convo: convo, location: location}) do
     message = """
-    Test Message From: #{member}\n
+    Message From: #{member}\n
     #{message}
     """
 

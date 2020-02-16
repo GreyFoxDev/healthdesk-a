@@ -18,6 +18,7 @@ defmodule MainWeb.Plug.AskWit do
   """
   def call(%{assigns: %{convo: id, opt_in: true, status: "open", message: message}} = conn, _opts) do
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
+
     if pending_message_count = 0 do
       assign(conn, :intent, ask_wit_ai(message))
     else

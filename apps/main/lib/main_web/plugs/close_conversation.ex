@@ -21,7 +21,7 @@ defmodule MainWeb.Plug.CloseConversation do
     convo = C.get(id)
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
-    if pending_message_count == 1 do
+    if pending_message_count <= 1 do
       CM.create(%{
             "conversation_id" => id,
             "phone_number" => location,
@@ -78,7 +78,6 @@ defmodule MainWeb.Plug.CloseConversation do
         "sent_at" => DateTime.utc_now()}
       |> CM.create()
     end
-
 
     C.close(id)
 
