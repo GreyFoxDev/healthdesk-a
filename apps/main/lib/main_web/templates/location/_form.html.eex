@@ -126,6 +126,10 @@
                         <label>Default Message</label>
                         <%= textarea f, :default_message, class: "form-control" %>
                     </div>
+                    <%= if @conn.assigns.current_user.role == "admin" && @conn.assigns.team.use_mindbody do %>
+                        <label>Mindbody Location ID</label>
+                        <%= text_input f, :mindbody_location_id, class: "form-control" %>
+                    <% end %>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>
                     </div>

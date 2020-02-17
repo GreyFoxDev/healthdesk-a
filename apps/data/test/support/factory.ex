@@ -116,7 +116,8 @@ defmodule Data.Factory do
       city: Faker.Address.city(),
       state: Faker.Address.state_abbr(),
       postal_code: Faker.Address.postcode(),
-      messenger_id: nil
+      messenger_id: nil,
+      mindbody_location_id: nil
     }
   end
 
@@ -173,7 +174,9 @@ defmodule Data.Factory do
       team_name: sequence(:team_name, &"Team #{&1}"),
       website: "www.example.com",
       twilio_flow_id: nil,
-      team_member_count: 0
+      team_member_count: 0,
+      use_mindbody: false,
+      mindbody_site_id: nil
     }
   end
 

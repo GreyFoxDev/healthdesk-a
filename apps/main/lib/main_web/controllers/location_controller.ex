@@ -30,9 +30,13 @@ defmodule MainWeb.LocationController do
   end
 
   def new(conn, %{"team_id" => team_id}) do
+    current_user = current_user(conn)
+    team = Team.get(current_user, team_id)
+
     render(conn, "new.html",
       changeset: Location.get_changeset(),
       team_id: team_id,
+      team: team,
       location: nil,
       teams: teams(conn),
       errors: [])
@@ -42,10 +46,13 @@ defmodule MainWeb.LocationController do
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- Location.get_changeset(id, user) do
 
+      team = Team.get(user, team_id)
+
       render(conn, "edit.html",
         changeset: changeset,
         team_id: team_id,
         teams: teams(conn),
+        team: team,
         location: changeset.data,
         errors: [])
     end

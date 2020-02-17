@@ -142,5 +142,18 @@ defmodule Data.Schema.LocationTest do
                   [count: 20, validation: :length, kind: :max, type: :string]}
              ]
     end
+
+    test "mindbody_location_id <= 20" do
+      long_mindbody_location_id = "123456789012345678901"
+      params = Map.put(@test_data, :mindbody_location_id, long_mindbody_location_id)
+
+      assert %{valid?: false, errors: errors} = Location.changeset(%Location{}, params)
+
+      assert errors == [
+        mindbody_location_id:
+        {"should be at most %{count} character(s)",
+         [count: 20, validation: :length, kind: :max, type: :string]}
+      ]
+    end
   end
 end

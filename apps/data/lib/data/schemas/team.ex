@@ -11,6 +11,8 @@ defmodule Data.Schema.Team do
           team_member_count: Integer.t() | nil,
           locations: List.t() | nil,
           team_members: List.t() | nil,
+          use_mindbody: :boolean | nil,
+          mindbody_site_id: String.t() | nil,
           deleted_at: :utc_datetime | nil
         }
 
@@ -22,6 +24,8 @@ defmodule Data.Schema.Team do
   @optional_fields ~w|
     team_member_count
     twilio_flow_id
+    use_mindbody
+    mindbody_site_id
     deleted_at
   |a
 
@@ -32,6 +36,8 @@ defmodule Data.Schema.Team do
     field(:website, :string)
     field(:team_member_count, :integer)
     field(:twilio_flow_id, :string)
+    field(:use_mindbody, :boolean)
+    field(:mindbody_site_id, :string)
 
     field(:deleted_at, :utc_datetime)
 

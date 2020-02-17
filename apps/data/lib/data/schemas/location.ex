@@ -25,6 +25,7 @@ defmodule Data.Schema.Location do
           users: List.t() | nil,
           team_members: List.t() | nil,
           conversations: List.t() | nil,
+          mindbody_location_id: String.t() | nil,
           deleted_at: :utc_datetime | nil
         }
 
@@ -48,6 +49,7 @@ defmodule Data.Schema.Location do
   default_message
   slack_integration
   messenger_id
+  mindbody_location_id
   deleted_at
   |a
 
@@ -69,6 +71,7 @@ defmodule Data.Schema.Location do
     field(:slack_integration, :string)
     field(:messenger_id, :string)
     field(:default_message, :string)
+    field(:mindbody_location_id, :string)
 
     field(:deleted_at, :utc_datetime)
 
@@ -93,6 +96,7 @@ defmodule Data.Schema.Location do
     |> validate_length(:state, max: 2)
     |> validate_length(:postal_code, max: 20)
     |> validate_length(:default_message, max: 500)
+    |> validate_length(:mindbody_location_id, max: 20)
     |> generate_api_key()
   end
 
