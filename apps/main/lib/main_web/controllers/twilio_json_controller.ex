@@ -38,7 +38,7 @@ defmodule MainWeb.TwilioJsonController do
       conn
       |> put_resp_content_type("application/json")
       |> put_status(200)
-      |> json(%{message: "No response", count: pending_message_count})
+      |> json(%{message: "", count: pending_message_count})
     else
       conn
       |> put_resp_content_type("application/json")
