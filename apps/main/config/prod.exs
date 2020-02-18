@@ -27,4 +27,5 @@ config :bitly, access_token: System.get_env("BITLY_ACCESS_TOKEN")
 
 config :main,
   super_admin: System.get_env("SUPER_ADMIN_PHONE"),
-  endpoint: "https://#{System.get_env("HOST_URL")}/"
+  endpoint: "https://#{System.get_env("HOST_URL")}/",
+  mindbody_api_key: System.get_env("MINDBODY_API_KEY")

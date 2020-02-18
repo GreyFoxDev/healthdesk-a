@@ -45,4 +45,6 @@ config :bitly, access_token: System.get_env("BITLY_ACCESS_TOKEN")
 
 config :main,
   super_admin: System.get_env("SUPER_ADMIN_PHONE"),
-  endpoint: "http://b07ad92e.ngrok.io"
+  endpoint: "http://b07ad92e.ngrok.io",
+  mindbody_api_key: System.get_env("MINDBODY_API_KEY")
+

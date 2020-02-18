@@ -83,7 +83,12 @@ defmodule WitClient.MessageHandler do
 
   defp set_value(value, key) do
     try do
-      {String.to_existing_atom(key), value}
+      key =
+        key
+        |> String.downcase()
+        |> String.to_existing_atom()
+
+      {key, value}
     rescue
       _error in ArgumentError ->
         Logger.error("Invalid key from Wit.AI: #{inspect(key)} value: #{inspect(value)}")

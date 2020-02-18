@@ -3,6 +3,8 @@ defmodule MainWeb.Intents.ClassSchedule do
   This handles class schedule responses
   """
 
+  alias Main.Integrations.Mindbody
+
   alias Data.{
     ClassSchedule,
     HolidayHours,
@@ -12,17 +14,40 @@ defmodule MainWeb.Intents.ClassSchedule do
   @behaviour MainWeb.Intents
 
   @classes "[date]:\n[classes]"
-  @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
   @no_classes "There are no classes scheduled for [date_prefix]. Please ask about a different day."
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
   @impl MainWeb.Intents
-  def build_response([datetime: {datetime, _}], location),
+  def build_response(args, location) when is_binary(location),
+    do: build_response(args, Location.get_by_phone(location))
+
+  def build_response([datetime: {datetime, _}] = args, location),
     do: build_response([datetime: datetime], location)
 
-  def build_response([datetime: datetime], location) do
-    location = Location.get_by_phone(location)
+  def build_response([datetime: datetime], %{mindbody_location_id: mb_id} = location) when mb_id not in [nil, ""] do
+    <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
+    date = "#{year}-#{month}-#{day}"
+
+    classes =
+      location
+      |> Mindbody.get_classes(date, date)
+      |> Stream.map(&format_schedule/1)
+      |> Enum.join("\n")
+
+    if classes != "" do
+      @classes
+      |> String.replace("[date]", "#{month}-#{day}-#{year}")
+      |> String.replace("[classes]", classes)
+
+    else
+      {term, day_of_week} = get_day_of_week({year, month, day}, location.id)
+
+      String.replace(@no_classes, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
+    end
+  end
+
+  def build_response([datetime: datetime], location) do
     <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
     date =
@@ -49,9 +74,29 @@ defmodule MainWeb.Intents.ClassSchedule do
     end
   end
 
-  def build_response(args, location) do
-    location = Location.get_by_phone(location)
+  def build_response([], %{mindbody_location_id: mb_id} = location) when mb_id not in [nil, ""] do
+    date =
+      location.timezone
+      |> Calendar.Date.today!()
+      |> to_string()
 
+    classes =
+      location
+      |> Mindbody.get_classes(date, date)
+      |> Stream.map(&format_schedule/1)
+      |> Enum.join("\n")
+
+    if classes != "" do
+      @classes
+      |> String.replace("[date]", "#{date.month}-#{date.day}-#{date.year}")
+      |> String.replace("[classes]", classes)
+
+    else
+      String.replace(@no_classes, "[date_prefix]", "Today")
+    end
+  end
+
+  def build_response([], location) do
     date =
       location.timezone
       |> Calendar.Date.today!()

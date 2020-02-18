@@ -3,6 +3,7 @@ defmodule MainWeb.Intents.InstructorSchedule do
   This handles instructor schedule responses
   """
 
+  alias Main.Integrations.Mindbody
   alias Data.{
     ClassSchedule,
     Location
@@ -10,13 +11,40 @@ defmodule MainWeb.Intents.InstructorSchedule do
 
   @behaviour MainWeb.Intents
 
-  @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
+  @keys [:instructor]
   @no_classes "It doesn't look like we have an instructor here by that name. (Please ensure correct spelling)"
-  @days_of_week ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+  @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
   @impl MainWeb.Intents
-  def build_response([{"Instructor", [%{"value" => instructor}]}], location) do
-    location = Location.get_by_phone(location)
+  def build_response(args, location) when is_binary(location),
+    do: build_response(args, Location.get_by_phone(location))
+
+  def build_response([instructor: [%{"value" => instructor}]], %{mindbody_location_id: mb_id} = location) when mb_id not in [nil, ""] do
+    now = Calendar.DateTime.now!(location.timezone)
+    date = Calendar.Date.from_erl!({now.year, now.month, now.day})
+    time = Calendar.Time.from_erl!({now.hour, now.minute, 0})
+
+    start_date =
+      location.timezone
+      |> Calendar.Date.today!()
+      |> to_string()
+
+    end_date =
+      location.timezone
+      |> Calendar.Date.today!()
+      |> Calendar.Date.add!(7)
+      |> to_string()
+
+    class =
+      location
+      |> Mindbody.get_classes(start_date, end_date)
+      |> Enum.find(&find_classes(&1, date, time, instructor))
+      |> format_schedule()
+
+    (class || @no_classes)
+  end
+
+  def build_response([instructor: [%{"value" => instructor}]], location) do
     now = Calendar.DateTime.now!(location.timezone)
     date = Calendar.Date.from_erl!({now.year, now.month, now.day})
     time = Calendar.Time.from_erl!({now.hour, now.minute, 0})
@@ -30,8 +58,7 @@ defmodule MainWeb.Intents.InstructorSchedule do
     (class || @no_classes)
   end
 
-  def build_response(_args, _location),
-    do: @default_response
+  def build_response(_args, location), do: location.default_message
 
   defp format_schedule(nil), do: nil
   defp format_schedule(class) do
