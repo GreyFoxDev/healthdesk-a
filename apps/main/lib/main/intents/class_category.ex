@@ -121,6 +121,9 @@ defmodule MainWeb.Intents.ClassCategory do
     end
   end
 
+  def build_response(_, location),
+    do: location.default_message
+
   defp find_classes(class, date, category) do
     with true <- class.date == date,
          class_cat <- String.downcase(class.class_category()),

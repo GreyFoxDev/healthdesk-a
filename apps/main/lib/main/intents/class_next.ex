@@ -77,6 +77,9 @@ defmodule MainWeb.Intents.ClassNext do
       |> format_schedule()
   end
 
+  def build_response(_args, location),
+    do: location.default_message
+
   defp format_schedule(nil), do: nil
   defp format_schedule(class) do
     day_of_week = lookup_day_of_week(class.date)

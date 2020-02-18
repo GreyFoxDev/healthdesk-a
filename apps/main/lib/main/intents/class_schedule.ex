@@ -118,6 +118,9 @@ defmodule MainWeb.Intents.ClassSchedule do
     end
   end
 
+  def build_response(_, location),
+    do: location.default_message
+
   def format_schedule(class) do
     {h, m, _} = Time.to_erl(class.start_time)
 

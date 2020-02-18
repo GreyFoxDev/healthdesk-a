@@ -48,9 +48,8 @@ defmodule MainWeb.Intents.ClassDescription do
     end
   end
 
-  def build_response([], location)do
-    @no_classes
-  end
+  def build_response(_, location),
+    do: location.default_message
 
   defp find_classes(class, class_type) do
     with type <- String.downcase(class.class_type()),

@@ -58,7 +58,8 @@ defmodule MainWeb.Intents.InstructorSchedule do
     (class || @no_classes)
   end
 
-  def build_response(_args, location), do: location.default_message
+  def build_response(_args, location),
+    do: location.default_message
 
   defp format_schedule(nil), do: nil
   defp format_schedule(class) do
