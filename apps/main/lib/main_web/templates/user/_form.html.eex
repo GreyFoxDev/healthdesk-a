@@ -36,46 +36,75 @@
                         <%#= error_tag @errors, :website %>
                     </div>
 
-                    <div class="form-group">
-                        <label for="">Use Email</label>
-                        <%= checkbox f, :use_email, class: "form-control" %>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="">Use SMS</label>
-                        <%= checkbox f, :use_sms, class: "form-control" %>
-                    </div>
-
-                    <div class="form-group">
-                        <h3>Do Not Disturb</h3>
-                        <p>When Do Not Disturb is turned on, Healthdesk won't send you any SMS notifications. Your messages will still be available when you log in.</p>
-                        <label for="user_use_do_not_disturb">
-                            <span>
-                                <%= checkbox f, :use_do_not_disturb %> 
-                                <span style="padding-left: 10px;">Automatically disable notifications from:</span>
-                            </span>
-                        </label>
-                        <div class="row">
-                            <!-- grid column -->
-                            <div class="col-md-5">
-                                <!-- .form-group -->
-                                <div class="form-group">
-                                    <%= select f, :start_do_not_disturb, available_times(), class: "custom-select" %>
-                                </div><!-- /.form-group -->
-                            </div><!-- /grid column -->
-                            <div class="col-md-2">
-                                to
-                            </div>
-                            <div class="col-md-5">
-                                <div class="form-group">
-                                    <%= select f, :end_do_not_disturb, available_times(), class: "custom-select" %>
+                    <hr class="mb-4">
+                    <div class="row mt-4">
+                        <div class="col-sm-6 col-xs-12 col-lg-6">
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <%= checkbox f, :use_email, class: "custom-control-input" %>
+                                    <label class="custom-control-label" for="user_use_email">Use Email</label>
                                 </div>
-                            </div><!-- /grid column -->
+                                <div class="custom-control custom-checkbox">
+                                    <%= checkbox f, :use_sms, class: "custom-control-input" %>
+                                    <input class="custom-control-input" id="user_use_sms" name="user[use_sms]" type="checkbox" value="true">
+                                    <label class="custom-control-label" for="user_use_sms">Use SMS</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="form-actions">
-                        <%= submit "Save", class: "btn btn-primary" %>
+                    <hr class="mb-4">
+                    <div class="row">
+                        <div class="col-sm-12 col-xs-12 col-lg-12">
+                            <div class="form-group">
+                                <h3>Do Not Disturb</h3>
+                                <p>When Do Not Disturb is turned on, Healthdesk won't send you any notifications. Your messages will still be available when you log in.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-sm-6 col-xs-12 col-lg-12">
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <%= checkbox f, :use_do_not_disturb, class: "custom-control-input" %>
+                                    <label class="custom-control-label" for="user_use_do_not_disturb">Automatically disable notifications from:</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12 col-lg-3">
+                            <div class="form-group">
+                                <div class="form-label-group">
+                                    <label for="user_start_do_not_disturb">Starting Time</label>
+                                    <%= select f, :start_do_not_disturb, available_times(), class: "custom-select" %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12 col-lg-3">
+                            <div class="form-group">
+                                <div class="form-label-group">
+                                    <label for="user_end_do_not_disturb">Ending Time</label>
+                                    <%= select f, :end_do_not_disturb, available_times(), class: "custom-select" %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12 col-lg-6">
+                            <div class="form-group">
+                                <div class="form-label-group">
+                                    <label for="time_zone">Time Zone</label>
+                                    <select class="custom-select" id="time_zone" name="user[time_zone]">
+                                        <option value="PST">Pacific Standard Time</option>
+                                        <option value="MST">Mountain Standard Time</option>
+                                        <option value="CST">Central Standard Time</option>
+                                        <option value="EST">Eastern Standard Time</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="mb-4">
+                    <div class="row mt-3">
+                        <div class="col-sm-6 col-xs-12 col-lg-6">
+                            <%= submit "Save", class: "btn btn-block btn-primary" %>
+                        </div>
                     </div>
                 </fieldset>
             <% end %>
