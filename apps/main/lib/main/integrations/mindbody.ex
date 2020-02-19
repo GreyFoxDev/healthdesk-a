@@ -140,7 +140,12 @@ defmodule Main.Integrations.Mindbody do
     Jason.decode!(response.body)["ClassDescriptions"]
     |> Stream.dedup()
     |> Stream.map(fn class ->
-      %{class_type: class["Name"], class_description: class["Description"], class_category: class["Category"]}
+      %{
+        location_id: location.id,
+        class_type: class["Name"],
+        class_description: String.replace(class["Description"], ~r/<[a-z]*>|<\/[a-z]*>/, ""),
+        class_category: class["Category"]
+       }
     end)
     |> Enum.to_list()
   end
