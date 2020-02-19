@@ -108,7 +108,9 @@ defmodule Data.Query.DispositionTest do
       assert count == 1
     end
 
-    test "count_by_location_id/1 returns a list of maps with disposition name & count", %{location: location} do
+    test "count_by_location_id/1 returns a list of maps with disposition name & count", %{
+      location: location
+    } do
       assert [%{count: count}] = Query.count_by_location_id(location.id, Repo)
       assert count == 1
     end

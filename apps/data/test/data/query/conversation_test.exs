@@ -148,7 +148,6 @@ defmodule Data.Query.ConversationTest do
       assert "WEB" == new_record.channel_type
       assert "open" == new_record.status
     end
-
   end
 
   describe "update/1" do

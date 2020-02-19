@@ -55,26 +55,27 @@ defmodule Data.Schema.Conversation do
     changeset
     |> get_field(:channel_type)
     |> case do
-         nil ->
-           changeset
-           |> get_field(:original_number)
-           |> set_channel_type(changeset)
-         _channel_type ->
-           changeset
-       end
+      nil ->
+        changeset
+        |> get_field(:original_number)
+        |> set_channel_type(changeset)
+
+      _channel_type ->
+        changeset
+    end
   end
 
   defp set_channel_type(nil, changeset), do: changeset
 
-  defp set_channel_type(<< "messenger:", _ :: binary >>, changeset) do
+  defp set_channel_type(<<"messenger:", _::binary>>, changeset) do
     put_change(changeset, :channel_type, "FACEBOOK")
   end
 
-  defp set_channel_type(<< "CH", _ :: binary >>, changeset) do
+  defp set_channel_type(<<"CH", _::binary>>, changeset) do
     put_change(changeset, :channel_type, "WEB")
   end
 
-  defp set_channel_type(<< "+1", _ :: binary >>, changeset) do
+  defp set_channel_type(<<"+1", _::binary>>, changeset) do
     put_change(changeset, :channel_type, "SMS")
   end
 end

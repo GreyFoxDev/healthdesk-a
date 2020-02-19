@@ -150,10 +150,10 @@ defmodule Data.Schema.LocationTest do
       assert %{valid?: false, errors: errors} = Location.changeset(%Location{}, params)
 
       assert errors == [
-        mindbody_location_id:
-        {"should be at most %{count} character(s)",
-         [count: 20, validation: :length, kind: :max, type: :string]}
-      ]
+               mindbody_location_id:
+                 {"should be at most %{count} character(s)",
+                  [count: 20, validation: :length, kind: :max, type: :string]}
+             ]
     end
   end
 end

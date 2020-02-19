@@ -103,6 +103,8 @@ defmodule WitClient.MessageHandler do
        ]),
        do: {from, to}
 
+  defp parse_datetime(_), do: nil
+
   def handle_info(_, state) do
     Logger.error("Unkown message: #{inspect(state)}")
     {:stop, :normal, state}
