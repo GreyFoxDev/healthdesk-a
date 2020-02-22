@@ -23,7 +23,7 @@ defmodule Main.Mixfile do
   def application do
     [
       mod: {Main.Application, []},
-      extra_applications: [:logger, :runtime_tools, :con_cache, :data, :chatbot, :nimble_csv]
+      extra_applications: [:logger, :runtime_tools, :con_cache, :data, :chatbot, :nimble_csv, :honeybadger]
     ]
   end
 
@@ -48,6 +48,7 @@ defmodule Main.Mixfile do
       {:calendar, "~> 0.17.4"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:phoenix_live_view, "~> 0.1.1"},
+      {:honeybadger, "~> 0.13.1"},
       {:gettext, "~> 0.11"},
       {:guardian, "~> 1.0"},
       {:con_cache, "~> 0.13.0"},

@@ -1,5 +1,6 @@
 defmodule MainWeb.Router do
   use MainWeb, :router
+  use Honeybadger.Plug
 
   pipeline :browser do
     plug :accepts, ["html"]
