@@ -77,5 +77,7 @@ defmodule MainWeb.Router do
     put "/remove-avatar", AvatarController, :remove_avatar
     put "/assign-team-member", AssignTeamMemberController, :assign
     put "/update-member", UpdateMemberController, :update
+
+    get "/healthcheck", HealthCheckController, :status
   end
 end
