@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    </head>
+
+    <style>
+
+     body { padding-top: 90px; }
+
+     .bg-p {
+         background-color: #FF745C;
+     }
+
+     .fa {
+         color: #FF745C;
+     }
+
+     .bg-s {
+         background-color: #e2e2e2;
+     }
+
+     .bg-i {
+         background-color: #f8f9fa!important;
+     }
+
+     .text-receive {
+         color: #676463;
+     }
+
+     .text-small {
+         font-size: 1rem;
+     }
+
+     .text-muted {
+         color: #e2e2e2;
+     }
+
+     .btn-outline-primary {
+         color: #676463;
+         border-color: #676463;
+     }
+     .messages-box,
+     .chat-box {
+         overflow-y: scroll;
+         margin: 10px 16px;
+         height: 100%;
+         padding-bottom: 40px !important;
+         overflow: auto;
+     }
+
+     .rounded-lg {
+         border-radius: 0.5rem;
+     }
+
+     input::placeholder {
+         font-size: 1rem;
+         color: #999;
+     }
+
+     .scrollable {
+         height: 70vh; /* or any value */
+         overflow-y: auto;
+     }
+
+    </style>
+    <body>
+        <!-- Just an image -->
+        <nav class="navbar navbar-light bg-light fixed-top shadow-sm">
+            <a class="navbar-brand" href="#">
+                <img src="https://i.ibb.co/M5YdtLy/logo.png" width="150px" border="0"/>
+                <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>">
+                    <button type="button" class="btn btn-outline-primary btn-sm">Reset Chat</button>
+                </a>
+            </a>
+        </nav>
+        <div id="scroll-message" class="px-0 py-0 chat-box bg-white scrollable">
+            <%= render @view_module, @view_template, assigns %>
+        </div>
+
+        <!-- Typing area -->
+
+        <%= form_for @conn, tsi_path(@conn, :update, @api_key, @convo_id), [method: "put", class: "bg-light fixed-bottom shadow-lg"], fn f -> %>
+            <div class="input-group">
+                <%= text_input f, :message, class: "form-control bg-i rounded-0 border-0 py-4 bg-s", placeholder: "Type a message" %>
+                <div class="input-group-append">
+                    <button id="button-addon2" type="submit" class="btn btn-link bg-i"> <i class="fa fa-paper-plane"></i></button>
+                </div>
+            </div>
+        <% end %>
+
+        <script>
+         var div = document.getElementById("scroll-message");
+         div.scrollTop = div.scrollHeight;
+        </script>
+    </body>
+</html>

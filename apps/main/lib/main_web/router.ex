@@ -1,5 +1,6 @@
 defmodule MainWeb.Router do
   use MainWeb, :router
+  use Honeybadger.Plug
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -25,8 +26,7 @@ defmodule MainWeb.Router do
 
     get "/webchat/secret", PageController, :secret
     get "/webchat/:api_key", WebChatController, :index
-    get "/tsi/:api_key", TsiController, :new
-    post "/tsi/:api_key", TsiController, :create
+    resources "/tsi/:api_key", TsiController, except: [:delete, :index, :show]
   end
 
   scope "/admin", MainWeb do
@@ -76,5 +76,7 @@ defmodule MainWeb.Router do
     put "/remove-avatar", AvatarController, :remove_avatar
     put "/assign-team-member", AssignTeamMemberController, :assign
     put "/update-member", UpdateMemberController, :update
+
+    get "/healthcheck", HealthCheckController, :status
   end
 end

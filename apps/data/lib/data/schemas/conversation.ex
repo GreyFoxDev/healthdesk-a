@@ -78,4 +78,8 @@ defmodule Data.Schema.Conversation do
   defp set_channel_type(<<"+1", _::binary>>, changeset) do
     put_change(changeset, :channel_type, "SMS")
   end
+
+  defp set_channel_type(<<"APP", _::binary>>, changeset) do
+    put_change(changeset, :channel_type, "APP")
+  end
 end

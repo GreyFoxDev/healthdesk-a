@@ -10,7 +10,7 @@ defmodule MainWeb.Plug.ValidateApiKey do
   @spec call(Plug.Conn.t(), list()) :: no_return()
   def call(%{params: %{"api_key" => api_key}} = conn, _opts) do
     with %Schema{} = location <- Location.get_by_api_key(api_key) do
-      conn
+      assign(conn, :location,  location)
     else
       nil ->
         conn
