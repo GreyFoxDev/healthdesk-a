@@ -14,11 +14,11 @@ defmodule MainWeb.TsiController do
 
   alias Data.{Location, Conversation}
 
-  def new(conn, %{"phone-number" => phone_number, "api_key" => api_key} = params) do
-    conn
-    |> put_layout({MainWeb.LayoutView, :tsi})
-    |> render("new.html", api_key: api_key, phone_number: phone_number)
-  end
+  def new(conn, %{"phone-number" => phone_number, "api_key" => api_key} = params),
+   do: render_new(conn, phone_number, api_key)
+
+  def new(conn, %{"unique-id" => unique_id, "api_key" => api_key} = params),
+    do: render_new(conn, unique_id, api_key)
 
   def new(conn, _params),
     do: send_resp(conn, 400, "Bad request")
@@ -126,20 +126,34 @@ defmodule MainWeb.TsiController do
     "We've received your request. You may leave a comment below if you'd like."
   end
 
-  def format_phone(<< "1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  defp format_phone(<< "1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
     "+1#{Enum.join([area_code, prefix, line])}"
   end
 
-  def format_phone(<< " 1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  defp format_phone(<< " 1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
     "+1#{Enum.join([area_code, prefix, line])}"
   end
 
-  def format_phone(<< "+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  defp format_phone(<< "+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
     "+1#{Enum.join([area_code, prefix, line])}"
   end
 
-  def format_phone(<< area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  defp format_phone(<< area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
     "+1#{Enum.join([area_code, prefix, line])}"
+  end
+
+  defp format_phone(unique_id) do
+    String.replace(unique_id, " ", "")
+  end
+
+  defp render_new(conn, unique_id, api_key) do
+    if String.length(unique_id) >= 10 do
+      conn
+      |> put_layout({MainWeb.LayoutView, :tsi})
+      |> render("new.html", api_key: api_key, phone_number: unique_id)
+    else
+      send_resp(conn, 400, "Bad request")
+    end
   end
 
   defp ask_wit_ai(question, location) do

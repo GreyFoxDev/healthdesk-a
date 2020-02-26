@@ -160,7 +160,7 @@
              'Web',
              'SMS',
              'Facebook',
-             'APP'
+             'App'
          ],
          datasets: [{
              data: [
