@@ -242,7 +242,7 @@
                     <% end %>
 
                 <% end %>
-                <%= live_render(@conn, MainWeb.Live.ConversationMessageUpdatesView, session: %{ user: @current_user, conversation: @conversation.id }) %>
+                <%= live_render(@conn, MainWeb.Live.ConversationMessageUpdatesView, session: %{"user" => @current_user, "conversation" => @conversation.id }) %>
             </ul>
         </section>
     </div>

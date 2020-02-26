@@ -1,7 +1,15 @@
 defmodule MainWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :main
 
-  socket "/live", Phoenix.LiveView.Socket
+  @session_options [
+    store: :cookie,
+    key: "_main_key",
+    signing_salt: "DB7cogdWkr8c5msHfATVNjMIaN0BvJO1iWYhg1RhqVVMVjWj2XS8Ia8KoX3bwjis"
+  ]
+
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [session: @session_options]]
+
   socket "/socket", MainWeb.UserSocket,
     websocket: true
 
@@ -34,10 +42,7 @@ defmodule MainWeb.Endpoint do
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
-  plug Plug.Session,
-    store: :cookie,
-    key: "_main_key",
-    signing_salt: "EG6uBS60"
+  plug Plug.Session, @session_options
 
   plug CORSPlug
 

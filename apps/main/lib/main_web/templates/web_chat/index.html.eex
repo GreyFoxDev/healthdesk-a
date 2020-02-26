@@ -14,7 +14,7 @@
 
 <div id="healthdesk-ai-chat-window" style="margin: 5px;">
     <%=
-    live_render(@conn, MainWeb.Live.WebChat.Index, session: %{api_key: @api_key, remote_id: @ip})
+    live_render(@conn, MainWeb.Live.WebChat.Index, session: %{"api_key" => @api_key, "remote_id" => @ip})
     %>
 </div>
 <script>

@@ -10,7 +10,7 @@ defmodule MainWeb.TsiController do
   alias Data.ConversationMessages, as: CM
   alias Data.Schema.Conversation, as: Schema
 
-  alias MainWeb.Notify
+  alias MainWeb.{Notify, Intents}
 
   alias Data.{Location, Conversation}
 
@@ -54,15 +54,9 @@ defmodule MainWeb.TsiController do
             "conversation_id" => convo.id,
             "phone_number" => location.phone_number,
             "message" => build_answer(params),
-            "sent_at" => DateTime.utc_now()})
+            "sent_at" => DateTime.add(DateTime.utc_now(), 2)})
 
-      << "APP:", phone_number :: binary >> = convo.original_number
-      message = """
-      Message From: #{phone_number}\n
-      #{params["message"]}
-      """
-
-      Notify.send_to_admin(convo.id, message, location.phone_number)
+      close_conversation(convo.id, location)
 
       redirect(conn, to: tsi_path(conn, :edit, api_key, convo.id))
     end
@@ -84,13 +78,33 @@ defmodule MainWeb.TsiController do
             "message" => params["message"],
             "sent_at" => DateTime.utc_now()})
 
+      if convo.status == "closed" do
+        params["message"]
+        |> ask_wit_ai(location)
+        |> case do
+             {:ok, response} ->
+               CM.create(%{
+                     "conversation_id" => convo.id,
+                     "phone_number" => location.phone_number,
+                     "message" => response,
+                     "sent_at" => DateTime.add(DateTime.utc_now(), 2)})
 
-      message = """
-      Message From: #{phone_number}\n
-      #{params["message"]}
-      """
+               close_conversation(convo_id, location)
+             {:unknown, response} ->
+               CM.create(%{
+                     "conversation_id" => convo.id,
+                     "phone_number" => location.phone_number,
+                     "message" => response,
+                     "sent_at" => DateTime.add(DateTime.utc_now(), 2)})
 
-      Notify.send_to_admin(convo.id, message, location.phone_number)
+               C.pending(convo_id)
+
+               :ok =
+                 Notify.send_to_admin(convo.id,
+                   "Message From: #{convo.original_number}\n#{params["message"]}",
+                   location.phone_number)
+           end
+      end
 
       redirect(conn, to: tsi_path(conn, :edit, api_key, convo.id))
     end
@@ -101,11 +115,16 @@ defmodule MainWeb.TsiController do
   defp extract_question(%{"member_services" => question}), do: question
   defp extract_question(_), do: "No message sent"
 
-  defp build_answer(%{"member_services" => _}),
-    do: "Please contact Member Services at 877.258.2311 between the hours of 9:30 am – 5:30 pm ET M-F."
+  defp build_answer(%{"member_services" => _}) do
+    """
+    Please contact Member Services at 877.258.2311 between the hours of 9:30 am
+    – 5:30 pm ET M-F.
+    """
+  end
 
-  defp build_answer(_),
-    do: "We've received your request. You may leave a comment below if you'd like."
+  defp build_answer(_) do
+    "We've received your request. You may leave a comment below if you'd like."
+  end
 
   def format_phone(<< "1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
     "+1#{Enum.join([area_code, prefix, line])}"
@@ -121,6 +140,46 @@ defmodule MainWeb.TsiController do
 
   def format_phone(<< area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
     "+1#{Enum.join([area_code, prefix, line])}"
+  end
+
+  defp ask_wit_ai(question, location) do
+    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
+      receive do
+        {:response, response} ->
+          message = Intents.get(response, location.phone_number)
+          if message == location.default_message do
+            {:unknown, location.default_message}
+          else
+            {:ok, message}
+          end
+        _ ->
+          {:unknown, location.default_message}
+      end
+    else
+      {:error, error} ->
+        {:unknown, location.default_message}
+    end
+  end
+
+  defp close_conversation(convo_id, location) do
+    disposition =
+      %{role: "system"}
+      |> Data.Disposition.get_by_team_id(location.team_id)
+      |> Enum.find(&(&1.disposition_name == "Automated"))
+
+    Data.ConversationDisposition.create(%{
+          "conversation_id" => convo_id,
+          "disposition_id" => disposition.id
+                                        })
+
+    %{"conversation_id" => convo_id,
+      "phone_number" => location.phone_number,
+      "message" =>
+        "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+      "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
+    |> CM.create()
+
+    C.close(convo_id)
   end
 
 end

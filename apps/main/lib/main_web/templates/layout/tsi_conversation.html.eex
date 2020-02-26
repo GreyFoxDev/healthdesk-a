@@ -8,6 +8,8 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <%= csrf_meta_tag() %>
+        <script type="text/javascript" src="<%= static_path(@conn, "/js/app.js") %>"></script>
     </head>
 
     <style>
@@ -65,7 +67,7 @@
      }
 
      .scrollable {
-         height: 70vh; /* or any value */
+         height: 90vh; /* or any value */
          overflow-y: auto;
      }
 
@@ -83,7 +85,6 @@
         <div id="scroll-message" class="px-0 py-0 chat-box bg-white scrollable">
             <%= render @view_module, @view_template, assigns %>
         </div>
-
         <!-- Typing area -->
 
         <%= form_for @conn, tsi_path(@conn, :update, @api_key, @convo_id), [method: "put", class: "bg-light fixed-bottom shadow-lg"], fn f -> %>

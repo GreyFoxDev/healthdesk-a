@@ -4,7 +4,7 @@ defmodule MainWeb.Live.OpenConverationsView do
 
   alias Data.Conversations, as: C
 
-  def mount(%{location_id: location_id, header: true} = session, socket) do
+  def mount(_params, %{"location_id" => location_id, "header" => true} = session, socket) do
     MainWeb.Endpoint.subscribe("alert:#{location_id}")
     socket =
       socket
@@ -15,7 +15,7 @@ defmodule MainWeb.Live.OpenConverationsView do
     {:ok, socket}
   end
 
-  def mount(%{location_id: location_id} = session, socket) do
+  def mount(_params, %{"location_id" => location_id} = session, socket) do
     timer = Enum.random(1000..10_000)
     :timer.send_interval(timer, self(), :update)
     socket =

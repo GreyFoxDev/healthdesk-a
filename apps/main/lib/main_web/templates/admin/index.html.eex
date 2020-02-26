@@ -159,17 +159,19 @@
          labels: [
              'Web',
              'SMS',
-             'Facebook'
+             'Facebook',
+             'APP'
          ],
          datasets: [{
              data: [
                  <%= @web_totals %>,
                  <%= @sms_totals %>,
+                 <%= @app_totals %>,
                  <%= @facebook_totals %>
              ],
              borderWidth: 5,
-             backgroundColor: ['#2098d4', '#f8da50', '#9D17FA'],
-             hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC'],
+             backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40'],
+             hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70'],
          }],
      };
      new Chart(ctx, {
@@ -181,8 +183,8 @@
              legend: {
                  display: true,
                  position: 'left'
-             },
          },
+     },
      });
     </script>
 </div>

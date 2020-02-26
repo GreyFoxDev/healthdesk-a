@@ -16,12 +16,12 @@ defmodule MainWeb.Live.ConversationAlertsView do
     ~L[]
   end
 
-  def mount(%{role: "admin"} = session, socket) do
+  def mount(_params, %{"current_user" => %{role: "admin"}} = session, socket) do
     MainWeb.Endpoint.subscribe("alert:admin")
     {:ok, assign(socket, :session, session)}
   end
 
-  def mount(%{team_member: %{locations: locations}} = session, socket) when is_list(locations) do
+  def mount(_params, %{"current_user" => %{team_member: %{locations: locations}}} = session, socket) when is_list(locations) do
     Enum.each(locations, fn(location) ->
       MainWeb.Endpoint.subscribe("alert:#{location.phone_number}")
     end)
@@ -29,14 +29,14 @@ defmodule MainWeb.Live.ConversationAlertsView do
     {:ok, assign(socket, :session, session)}
   end
 
-  def mount(%{team_member: %{location_id: location_id}} = session, socket) do
+  def mount(_params, %{"current_user" => %{team_member: %{location_id: location_id}}} = session, socket) do
     location = Data.Location.get(location_id)
 
     MainWeb.Endpoint.subscribe("alert:#{location.phone_number}")
     {:ok, assign(socket, :session, session)}
   end
 
-  def mount(session, socket) do
+  def mount(_params, session, socket) do
     {:ok, assign(socket, :session, session)}
   end
 

@@ -23,6 +23,7 @@ defmodule MainWeb do
       import Plug.Conn
       import MainWeb.Router.Helpers
       import MainWeb.Gettext
+      import Phoenix.LiveView.Controller
     end
   end
 
@@ -36,10 +37,7 @@ defmodule MainWeb do
         get_flash: 2,
         view_module: 1
       ]
-      import Phoenix.LiveView, only: [
-        live_render: 2,
-        live_render: 3
-      ]
+      import Phoenix.LiveView.Helpers
 
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
