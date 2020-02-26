@@ -16,8 +16,19 @@ defmodule MainWeb.Helper.Formatters  do
     |> Enum.join(" ")
   end
 
+  def format_phone(<< "1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+    "+1 #{Enum.join([area_code, prefix, line], "-")}"
+  end
+
+  def format_phone(<< " 1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+    "+1 #{Enum.join([area_code, prefix, line], "-")}"
+  end
+
   def format_phone(<< "+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
     "+1 #{Enum.join([area_code, prefix, line], "-")}"
+  end
+  def format_phone(<< "APP:+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+    "App Visitor: +1 #{Enum.join([area_code, prefix, line], "-")}"
   end
 
   def format_phone(<< area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
@@ -36,12 +47,14 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_phone(phone_number) do
+    IO.inspect phone_number, label: "FORMATED"
     "Unknown Visitor"
   end
 
   def format_assigned(<< "+1", _rest :: binary >>), do: "SMS Bot"
   def format_assigned(<< "messenger:", _rest :: binary >>), do: "Facebook Bot"
   def format_assigned(<< "CH", _rest :: binary >>), do: "Website Bot"
+  def format_assigned(<< "APP", _rest :: binary >>), do: "App Bot"
   def format_assigned(_), do: "Unknown"
 
   def format_team_member(team_member) do
