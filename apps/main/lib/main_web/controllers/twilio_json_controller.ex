@@ -38,12 +38,12 @@ defmodule MainWeb.TwilioJsonController do
       conn
       |> put_resp_content_type("application/json")
       |> put_status(200)
-      |> json(%{message: "", count: pending_message_count})
+      |> json(%{message: "", count: pending_message_count, pending: 1})
     else
       conn
       |> put_resp_content_type("application/json")
       |> put_status(200)
-      |> json(%{message: conn.assigns[:response]})
+      |> json(%{message: conn.assigns[:response], pending: 1})
     end
   end
 
@@ -56,7 +56,7 @@ defmodule MainWeb.TwilioJsonController do
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
-    |> json(%{message: response})
+    |> json(%{message: response, pending: 0})
   end
 
   @doc """
