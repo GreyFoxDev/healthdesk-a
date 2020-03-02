@@ -81,34 +81,41 @@ defmodule MainWeb.ConversationController do
   end
 
   def open(conn, %{"conversation_id" => id, "location_id" => location_id}) do
+    conversation = Conversations.get(id)
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
 
-    user_info = Formatters.format_team_member(current_user(conn))
+    if conversation.status == "closed" do
 
-    message = %{"conversation_id" => id,
-                "phone_number" => current_user(conn).phone_number,
-                "message" => "OPENED: Opened by #{user_info}",
-                "sent_at" => DateTime.utc_now()}
+      user_info = Formatters.format_team_member(current_user(conn))
 
-    Logger.info("OPENING conversation #{id} ****************")
+      message = %{"conversation_id" => id,
+                  "phone_number" => current_user(conn).phone_number,
+                  "message" => "OPENED: Opened by #{user_info}",
+                  "sent_at" => DateTime.utc_now()}
 
-    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "pending"}),
-         {:ok, saved} <- ConversationMessages.create(message) do
+      Logger.info("OPENING conversation #{id} ****************")
 
-      Logger.info inspect saved
+      with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "pending"}),
+           {:ok, saved} <- ConversationMessages.create(message) do
 
-      pending_message_count = (ConCache.get(:session_cache, id) || 0)
-      :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
+        Logger.info inspect saved
+
+        pending_message_count = (ConCache.get(:session_cache, id) || 0)
+        :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
+
+        redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id))
+      else
+        {:error, _changeset} ->
+          conn
+          |> put_flash(:error, "Unable to open conversation")
+          |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
+      end
+    else
 
       redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id))
-    else
-      {:error, _changeset} ->
-        conn
-        |> put_flash(:error, "Unable to open conversation")
-        |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
     end
   end
 
