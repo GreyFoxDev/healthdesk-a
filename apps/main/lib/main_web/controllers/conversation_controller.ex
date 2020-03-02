@@ -125,39 +125,47 @@ defmodule MainWeb.ConversationController do
       |> current_user()
       |> Location.get(location_id)
 
-    user_info = Formatters.format_team_member(current_user(conn))
+    conversation = Conversations.get(id)
 
-    _ = ConCache.delete(:session_cache, id)
+    if conversation.status != "closed" do
+      user_info = Formatters.format_team_member(current_user(conn))
 
-    message = if params["disposition_id"] do
-      Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => params["disposition_id"]})
+      _ = ConCache.delete(:session_cache, id)
 
-      disposition =
-        conn
-        |> current_user()
-        |> Data.Disposition.get(params["disposition_id"])
+      message = if params["disposition_id"] do
+        Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => params["disposition_id"]})
 
-      %{"conversation_id" => id,
-        "phone_number" => current_user(conn).phone_number,
-        "message" => "CLOSED: Closed by #{user_info} with disposition #{disposition.disposition_name}",
-        "sent_at" => DateTime.utc_now()}
-    else
+        disposition =
+          conn
+          |> current_user()
+          |> Data.Disposition.get(params["disposition_id"])
+
         %{"conversation_id" => id,
           "phone_number" => current_user(conn).phone_number,
-          "message" => "CLOSED: Closed by #{user_info}",
+          "message" => "CLOSED: Closed by #{user_info} with disposition #{disposition.disposition_name}",
           "sent_at" => DateTime.utc_now()}
-    end
+      else
+          %{"conversation_id" => id,
+            "phone_number" => current_user(conn).phone_number,
+            "message" => "CLOSED: Closed by #{user_info}",
+            "sent_at" => DateTime.utc_now()}
+      end
 
-    with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
-         {:ok, _} <- ConversationMessages.create(message) do
+      with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
+           {:ok, _} <- ConversationMessages.create(message) do
+
+        redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
+      else
+        {:error, _changeset} ->
+          conn
+          |> put_flash(:error, "Unable to close conversation")
+          |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
+      end
+    else
 
       redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
-    else
-      {:error, _changeset} ->
-        conn
-        |> put_flash(:error, "Unable to close conversation")
-        |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
     end
+
   end
 
   def create(conn, %{"location_id" => location_id} = params) do
