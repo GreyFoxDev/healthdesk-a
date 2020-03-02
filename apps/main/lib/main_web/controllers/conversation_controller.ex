@@ -87,7 +87,9 @@ defmodule MainWeb.ConversationController do
       |> current_user()
       |> Location.get(location_id)
 
+
     Logger.info("PUT /open for #{id} with status #{conversation.status} ****************")
+    Logger.info inspect conn
 
     if conversation.status == "closed" do
 
