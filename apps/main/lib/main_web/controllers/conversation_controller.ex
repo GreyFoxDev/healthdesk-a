@@ -93,9 +93,12 @@ defmodule MainWeb.ConversationController do
                 "message" => "OPENED: Opened by #{user_info}",
                 "sent_at" => DateTime.utc_now()}
 
+    Logger.info("OPENING conversation #{id} ****************")
 
     with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "pending"}),
-         {:ok, _} <- ConversationMessages.create(message) do
+         {:ok, saved} <- ConversationMessages.create(message) do
+
+      Logger.info inspect saved
 
       pending_message_count = (ConCache.get(:session_cache, id) || 0)
       :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
