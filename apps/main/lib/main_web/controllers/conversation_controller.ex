@@ -87,6 +87,8 @@ defmodule MainWeb.ConversationController do
       |> current_user()
       |> Location.get(location_id)
 
+    Logger.info("PUT /open for #{id} with status #{conversation.status} ****************")
+
     if conversation.status == "closed" do
 
       user_info = Formatters.format_team_member(current_user(conn))
@@ -96,7 +98,7 @@ defmodule MainWeb.ConversationController do
                   "message" => "OPENED: Opened by #{user_info}",
                   "sent_at" => DateTime.utc_now()}
 
-      Logger.info("OPENING conversation #{id} ****************")
+      Logger.info "OPENING #{id}"
 
       with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "pending"}),
            {:ok, saved} <- ConversationMessages.create(message) do
