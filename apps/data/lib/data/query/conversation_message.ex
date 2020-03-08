@@ -28,7 +28,9 @@ defmodule Data.Query.ConversationMessage do
   def get_by_conversation_id(conversation_id, repo \\ Read) do
     from(c in ConversationMessage,
       where: c.conversation_id == ^conversation_id,
-      order_by: c.sent_at
+      distinct: [c.sent_at],
+      order_by: c.sent_at,
+      select: c
     )
     |> repo.all()
   end
