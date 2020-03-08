@@ -69,13 +69,13 @@ defmodule MainWeb.Plug.CloseConversation do
       %{"conversation_id" => id,
         "phone_number" => location.phone_number,
         "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
-        "sent_at" => DateTime.utc_now()}
+        "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
       |> CM.create()
     else
       %{"conversation_id" => id,
         "phone_number" => location.phone_number,
         "message" => "CLOSED: Closed by System",
-        "sent_at" => DateTime.utc_now()}
+        "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
       |> CM.create()
     end
 
