@@ -34,17 +34,10 @@ defmodule MainWeb.TwilioJsonController do
   def inbound(%Plug.Conn{assigns: %{status: "pending", convo: id}} = conn, _params) do
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
-    if pending_message_count > 1 do
-      conn
-      |> put_resp_content_type("application/json")
-      |> put_status(200)
-      |> json(%{message: "", count: pending_message_count, pending: 1})
-    else
-      conn
-      |> put_resp_content_type("application/json")
-      |> put_status(200)
-      |> json(%{message: conn.assigns[:response], pending: 1})
-    end
+    conn
+    |> put_resp_content_type("application/json")
+    |> put_status(200)
+    |> json(%{message: conn.assigns[:response], pending: pending_message_count})
   end
 
   @doc """
