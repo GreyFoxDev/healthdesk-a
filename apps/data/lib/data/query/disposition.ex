@@ -40,7 +40,8 @@ defmodule Data.Query.Disposition do
   def count_all(repo \\ Read) do
     from(d in Data.Schema.Disposition,
       join: cd in assoc(d, :conversation_dispositions),
-      group_by: d.disposition_name,
+      group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
       select: %{name: d.disposition_name, count: count(cd.id)}
     )
     |> repo.all()
@@ -53,8 +54,9 @@ defmodule Data.Query.Disposition do
   def count_by_team_id(team_id, repo \\ Read) do
     from(d in Disposition,
       join: cd in assoc(d, :conversation_dispositions),
-      group_by: d.disposition_name,
+      group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
       where: d.team_id == ^team_id,
+      distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
       select: %{name: d.disposition_name, count: count(cd.id)}
     )
     |> repo.all()
@@ -68,8 +70,9 @@ defmodule Data.Query.Disposition do
     from(d in Disposition,
       join: cd in assoc(d, :conversation_dispositions),
       join: c in assoc(cd, :conversation),
-      group_by: d.disposition_name,
+      group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
       where: c.location_id == ^location_id,
+      distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
       select: %{name: d.disposition_name, count: count(cd.id)}
     )
     |> repo.all()
