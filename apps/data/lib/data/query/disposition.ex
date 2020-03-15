@@ -42,6 +42,7 @@ defmodule Data.Query.Disposition do
       join: cd in assoc(d, :conversation_dispositions),
       group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
       distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      order_by: d.disposition_name,
       select: %{name: d.disposition_name, count: count(cd.id)}
     )
     |> repo.all()
@@ -57,6 +58,7 @@ defmodule Data.Query.Disposition do
       group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
       where: d.team_id == ^team_id,
       distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      order_by: d.disposition_name,
       select: %{name: d.disposition_name, count: count(cd.id)}
     )
     |> repo.all()
@@ -73,6 +75,7 @@ defmodule Data.Query.Disposition do
       group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
       where: c.location_id == ^location_id,
       distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      order_by: d.disposition_name,
       select: %{name: d.disposition_name, count: count(cd.id)}
     )
     |> repo.all()

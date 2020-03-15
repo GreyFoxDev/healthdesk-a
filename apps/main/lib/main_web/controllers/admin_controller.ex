@@ -169,4 +169,5 @@ defmodule MainWeb.AdminController do
     |> Enum.map(&(&1.disposition_count))
     |> Enum.sum()
   end
+
 end
