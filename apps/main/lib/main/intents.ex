@@ -78,7 +78,7 @@ defmodule MainWeb.Intents do
 
   def get({"routeNewSales", _}, location) do
     """
-    We'd be happy to share information about our membership plans and pricing. When are you able to stop by for a tour? Or if you'd prefer, when's the best time to give you a call? 
+    We'd be happy to share information about our membership plans and pricing. When are you able to stop by for a tour? Or if you'd prefer, when's the best time to give you a call?
     """
   end
 
