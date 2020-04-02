@@ -21,6 +21,7 @@ erl_crash.dump
 
 .iex.exs
 
+*.csv
 .env
 .DS_Store
 latest.dump*

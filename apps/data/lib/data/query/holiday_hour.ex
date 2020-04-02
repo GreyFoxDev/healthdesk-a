@@ -52,7 +52,7 @@ defmodule Data.Query.HolidayHour do
   @doc """
   Updates an existing holiday hour
   """
-  @spec update(child_care_hour :: HolidayHour.t(), params :: map(), repo :: Ecto.Repo.t()) ::
+  @spec update(holiday_hour :: HolidayHour.t(), params :: map(), repo :: Ecto.Repo.t()) ::
           {:ok, HolidayHour.t()} | {:error, Ecto.Changeset.t()}
   def update(%HolidayHour{} = original, params, repo \\ Write) when is_map(params) do
     original
@@ -69,14 +69,14 @@ defmodule Data.Query.HolidayHour do
   @doc """
   Deletes a holiday hour. This is a logical delete
   """
-  @spec delete(child_care_hour :: HolidayHour.t(), repo :: Ecto.Repo.t()) ::
+  @spec delete(holiday_hour :: HolidayHour.t(), repo :: Ecto.Repo.t()) ::
           {:ok, HolidayHour.t()} | {:error, :no_record_found}
   def delete(%HolidayHour{id: id}, repo \\ Write) do
     id
     |> get(repo)
     |> case do
-      %HolidayHour{} = child_care_hour ->
-        update(child_care_hour, %{deleted_at: DateTime.utc_now()}, repo)
+      %HolidayHour{} = holiday_hour ->
+        update(holiday_hour, %{deleted_at: DateTime.utc_now()}, repo)
 
       nil ->
         {:error, :no_record_found}

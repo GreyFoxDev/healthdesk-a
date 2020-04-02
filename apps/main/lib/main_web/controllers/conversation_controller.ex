@@ -1,12 +1,21 @@
 defmodule MainWeb.ConversationController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Conversations, ConversationMessages, Location, TeamMember}
+  alias Data.{
+    Campaign,
+    CampaignRecipient,
+    Conversations,
+    ConversationMessages,
+    Location,
+    TeamMember,
+    TimezoneOffset}
   alias MainWeb.Helper.Formatters
 
   require Logger
 
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
+
+  NimbleCSV.define(MyParser, [])
 
   def index(conn, %{"location_id" => location_id}) do
     location =
@@ -172,13 +181,61 @@ defmodule MainWeb.ConversationController do
 
   end
 
-  def create(conn, %{"location_id" => location_id} = params) do
+  def create(conn, %{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name} = params}) when campaign_name != "" do
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
 
-    %{member: params["conversation"]["original_number"],
+    send_at_utc = if params["scheduled"] && params["send_at"] do
+      offest =
+        location.timezone
+        |> TimezoneOffset.calculate()
+        |> abs()
+
+      params["send_at"]
+      |> Kernel.<>(":00")
+      |> NaiveDateTime.from_iso8601!()
+      |> NaiveDateTime.add(offest, :second)
+      |> DateTime.from_naive!("Etc/UTC")
+    else
+      DateTime.utc_now
+    end
+
+    scheduled = if params["scheduled"], do: true, else: false
+
+    with %{"send_at" => ^send_at_utc} = params <- Map.put(params, "send_at", send_at_utc),
+         %{} = params <- Map.merge(params, %{"location_id" => location.id, "scheduled" => scheduled}),
+         {:ok, campaign} <- Campaign.create(params) do
+
+      params["csv"].path
+      |> File.stream!
+      |> MyParser.parse_stream
+      |> Stream.map(fn [first_name, last_name, phone_number] ->
+        %{
+          "recipient_name" => "#{first_name} #{last_name}",
+          "phone_number" => phone_number,
+          "campaign_id" => campaign.id}
+      end)
+      |> Stream.map(fn(row) -> CampaignRecipient.create(row) end)
+      |> Enum.count()
+
+      redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+    else
+      {:error, changeset} ->
+        conn
+        |> put_flash(:error, "Unable to create campaign")
+        |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
+    end
+  end
+
+  def create(conn, %{"location_id" => location_id, "conversation" => %{"original_number" => original_number}} = params) when original_number != "" do
+    location =
+      conn
+      |> current_user()
+      |> Location.get(location_id)
+
+    %{member: original_number,
       message: params["conversation"]["message"],
       location_number: location.phone_number,
       team_member_number: current_user(conn).phone_number}
@@ -220,4 +277,5 @@ defmodule MainWeb.ConversationController do
 
   defp update_conn(:ok, conn), do: put_flash(conn, :success, "Sending message was successful")
   defp update_conn(:error, conn), do: put_flash(conn, :error, "Sending message failed")
+
 end

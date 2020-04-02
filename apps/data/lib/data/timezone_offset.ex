@@ -13,6 +13,7 @@ defmodule Data.TimezoneOffset do
       when timezone in @timezones do
     hour
     |> String.to_integer()
+    |> Kernel.-(1) # Temp because of daylight savings
     |> Kernel.*(-3600)
   end
 

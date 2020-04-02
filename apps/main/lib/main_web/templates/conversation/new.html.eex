@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="https://uselooper.com/assets/vendor/flatpickr/flatpickr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.3/flatpickr.min.js" integrity="sha256-/irFIZmSo2CKXJ4rxHWfrI+yGJuI16Z005X/bENdpTY=" crossorigin="anonymous"></script>
+
 <header class="page-title-bar">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -7,31 +10,130 @@
         </ol>
     </nav>
     <h1 class="page-title">New Conversation</h1>
-
-    <div class="panel-body">
-        <section id="base-style" class="card">
-            <div class="card-body">
-                <%= form_for @changeset, team_location_conversation_path(@conn, :create, @location.team_id, @location.id), fn f -> %>
-                    <fieldset>
-                        <div class="form-group">
-                            <label>To</label>
-                            <%= text_input f, :original_number, class: "form-control" %>
-                        </div>
-                        <div class="form-group">
-                            <label>Message</label>
-                            <%= textarea f, :message, class: "form-control", place_holder: "Type a message" %>
-                        </div>
-                        <div class="media mb-1">
-                            <div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="far fa-paper-plane"></i>
-                                    Send Message
-                                </button>
-                            </div>
-                        </div><!-- /.media -->
-                    </fieldset>
-                <% end %>
-            </div>
-        </section>
-    </div>
 </header>
+
+<div class="panel-body">
+    <section id="base-style" class="card">
+        <div class="card-header nav-scroller">
+            <!-- .nav-tabs -->
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link show active" id="rd1" href="#">Personal</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="rd2" href="#">Campaign</a>
+                </li>
+            </ul><!-- /.nav-tabs -->
+        </div>
+        <div class="card-body">
+            <%= form_for @changeset, team_location_conversation_path(@conn, :create, @location.team_id, @location.id), [multipart: true], fn f -> %>
+                <fieldset>
+                    <div class="form-group form_csv">
+                        <label for="tf3">CSV Upload</label>
+                        <div class="custom-file">
+                            <%= file_input f, :csv, accept: "text/csv, .csv", class: "custom-file-input", placeholder: "Choose file" %>
+                            <label class="custom-file-label" for="tf3">Choose file</label>
+                            <small id="tf1Help" class="form-text text-muted">Please upload a csv file with Firstname, Lastname and Mobile Number. <a href="#">Click here</a> to download a sample csv.</small>
+                        </div>
+                    </div>
+                    <div class="form-group form_to">
+                        <label>To</label>
+                        <%= text_input f, :original_number, class: "form-control" %>
+                    </div>
+                    <div class="form-group form_name">
+                        <label>Campaign Name</label>
+                        <%= text_input f, :campaign_name, class: "form-control" %>
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <%= textarea f, :message, class: "form-control", place_holder: "Type a message", rows: 6 %>
+                    </div>
+                    <div class="form-group form_schedule">
+                        <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="conversation_scheduled" name="conversation[scheduled]">
+                            <label class="custom-control-label" for="conversation_scheduled">Schedule Campaign</label>
+                            <div class="invalid-tooltip"> You must agree before submitting. </div>
+                        </div>
+                    </div>
+                    <div class="form-group form_date">
+                        <label class="control-label" for="flatpickr02">Date and Time</label>
+                        <input id="conversation_send_at"
+                               name="conversation[send_at]"
+                               type="text"
+                               class="form-control flatpickr-input active"
+                               data-toggle="flatpickr"
+                               data-enable-time="true"
+                               data-date-format="Y-m-d H:i"
+                               readonly="readonly">
+                    </div>
+                    <div class="media mb-1">
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="far fa-paper-plane"></i>
+                                <span class="form_btn">Send Now</span>
+                            </button>
+                        </div>
+                    </div><!-- /.media -->
+                </fieldset>
+            <% end %>
+        </div>
+    </section>
+</div>
+
+<div class="aside-backdrop"></div></div> <!-- /container -->
+
+<script>
+ $( "#rd2" ).on( "click", function() {
+     $( ".form_to" ).hide(500);
+     $( ".form_name" ).show(500);
+     $( ".form_name" ).show(500);
+     $(".form_schedule").show(500);
+     $( "#rd2" ).addClass( "show active" );
+     $( "#rd1" ).removeClass( "show active" );
+     $( "#conversation_csv" ).prop('required',true);
+     $( "#conversation_campaign_name" ).prop('required',true);
+     $("#conversation_original_number").removeAttr('required');
+     $( "#conversation_original_number" ).val('');
+     $( ".form_csv" ).show(500);
+     if($('#conversation_scheduled').is(':checked') )
+     {
+         $( ".form_date" ).show(500);
+         $(".form_btn").html("Schedule");
+     }
+ });
+ $( "#rd1" ).on( "click", function() {
+     $( ".form_to" ).show(500);
+     $( "#rd1" ).addClass( "show active" );
+     $( "#rd2" ).removeClass( "show active" );
+     $( ".form_name" ).hide(500);
+     $(".form_schedule").hide(500);
+     $("#conversation_csv").removeAttr('required');
+     $("#conversation_campaign_name").removeAttr('required');
+     $( "#conversation_original_number" ).prop('required',true);
+     $( "#conversation_campaign_name" ).val('');
+     $( ".form_csv" ).hide(500);
+     $( ".form_date" ).hide(500);
+ });
+ if($('#conversation_scheduled').is(':checked') )
+ {
+     $( ".form_date" ).show(500);
+     $(".form_btn").html("Schedule");
+ }
+ $("#conversation_scheduled").on("click", function(){
+     if(conversation_scheduled.checked) {
+         $( ".form_date" ).show(500);
+         $(".form_btn").html("Schedule");
+     } else {
+         $( ".form_date" ).hide(500);
+         $(".form_btn").html("Send Now");
+     }
+ });
+
+ $( "#conversation_original_number" ).prop('required',true);
+ $( "#conversation_message" ).prop('required',true);
+ $( ".form_name" ).hide();
+ $( ".form_csv" ).hide();
+ $( ".form_date" ).hide();
+ $(".form_schedule").hide();
+
+</script>

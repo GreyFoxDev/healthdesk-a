@@ -7,6 +7,7 @@ defmodule Main.Application do
     children = [
       supervisor(MainWeb.Endpoint, []),
       {Main.WebChat.Supervisor, []},
+      {Main.CampaignManager, []},
       {Registry, [keys: :unique, name: Registry.WebChat]},
       {ConCache, [
             name: :session_cache,

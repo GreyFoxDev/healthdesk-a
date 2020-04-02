@@ -7,6 +7,8 @@ defmodule Data.Factory do
   import Data.TestHelper, only: [phone_number: 0]
 
   alias Data.Schema.{
+    Campaign,
+    CampaignRecipient,
     ChildCareHour,
     ClassSchedule,
     Conversation,
@@ -24,6 +26,24 @@ defmodule Data.Factory do
     User,
     WifiNetwork
   }
+
+  def campaign_factory do
+    %Campaign{
+      id: UUID.uuid4(),
+      location_id: nil,
+      campaign_name: "My Campaign",
+      send_at: DateTime.utc_now()
+    }
+  end
+
+  def campaign_recipient_factory do
+    %CampaignRecipient{
+      id: UUID.uuid4(),
+      campaign_id: nil,
+      recipient_name: "Bob Dobbs",
+      phone_number: "000 555-1212"
+    }
+  end
 
   def child_care_hour_factory do
     %ChildCareHour{
