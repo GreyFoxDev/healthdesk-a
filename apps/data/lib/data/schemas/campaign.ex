@@ -39,6 +39,9 @@ defmodule Data.Schema.Campaign do
     field(:deleted_at, :utc_datetime)
 
     belongs_to(:location, Data.Schema.Location)
+
+    has_many(:campaign_recipients, Data.Schema.CampaignRecipient)
+
     timestamps()
   end
 

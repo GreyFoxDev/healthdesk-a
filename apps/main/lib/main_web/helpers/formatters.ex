@@ -67,6 +67,11 @@ defmodule MainWeb.Helper.Formatters  do
     end
   end
 
+  def format_date_time_split(datetime, timezone \\ "PST8PDT") do
+    datetime = Calendar.DateTime.shift_zone!(datetime, timezone)
+    Strftime.strftime!(datetime, "%m/%d/%Y | %I:%M %p")
+  end
+
   def format_date(datetime, timezone \\ "PST8PDT") do
     datetime = Calendar.DateTime.shift_zone!(datetime, timezone)
     now = Calendar.DateTime.shift_zone!(DateTime.utc_now(), timezone)

@@ -7,4 +7,5 @@ defmodule Data.Campaign do
   defdelegate create(params), to: Query
   defdelegate update(campaign, params), to: Query
   defdelegate active_campaigns(), to: Query
+  defdelegate get_by_location_id(location_id), to: Query
 end

@@ -1,7 +1,7 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Disposition, Location, TeamMember, ConversationDisposition}
+  alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition}
 
   def index(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
@@ -26,9 +26,19 @@ defmodule MainWeb.AdminController do
     locations = Location.get_by_team_id(current_user, team_id)
 
     location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
+    campaigns = if location_id do
+      Campaign.get_by_location_id(location_id)
+    else
+      locations
+      |> Enum.map(fn(location) ->
+        Campaign.get_by_location_id(location.id)
+      end)
+      |> List.flatten()
+    end
 
     render(conn, "index.html",
       dispositions: dispositions,
+      campaigns: campaigns,
       dispositions_per_day: dispositions_per_day,
       web_totals: team_totals_by_channel("WEB", team_id),
       sms_totals: team_totals_by_channel("SMS", team_id),
@@ -68,6 +78,7 @@ defmodule MainWeb.AdminController do
 
     render(conn, "index.html",
       dispositions: dispositions,
+      campaigns: Campaign.get_by_location_id(location_id),
       dispositions_per_day: dispositions_per_day,
       web_totals: location_totals_by_channel("WEB", location_id),
       sms_totals: location_totals_by_channel("SMS", location_id),
@@ -102,10 +113,17 @@ defmodule MainWeb.AdminController do
     if current_user.role == "admin" do
       dispositions = Disposition.count_all()
       [dispositions_per_day] = Disposition.average_per_day()
-      location_count = Location.all() |> Enum.count()
+      locations = Location.all()
+
+      campaigns = locations
+      |> Enum.map(fn(location) ->
+        Campaign.get_by_location_id(location.id)
+      end)
+      |> List.flatten()
 
       render(conn, "index.html",
         metrics: [],
+        campaigns: campaigns,
         dispositions: dispositions,
         dispositions_per_day: dispositions_per_day,
         web_totals: totals_by_channel("WEB"),
@@ -115,7 +133,7 @@ defmodule MainWeb.AdminController do
         teams: teams,
         team_admin_count: team_admin_count,
         teammate_count: teammate_count,
-        location_count: location_count,
+        location_count: Enum.count(locations),
         location: nil,
         location_id: nil,
         team_id: nil)
@@ -129,9 +147,19 @@ defmodule MainWeb.AdminController do
       locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
 
       location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
+      campaigns = if location_id do
+        Campaign.get_by_location_id(location_id)
+      else
+        locations
+        |> Enum.map(fn(location) ->
+          Campaign.get_by_location_id(location.id)
+        end)
+        |> List.flatten()
+      end
 
       render(conn, "index.html",
         metrics: [],
+        campaigns: campaigns,
         dispositions: dispositions,
         dispositions_per_day: dispositions_per_day,
         web_totals: team_totals_by_channel("WEB", current_user.team_member.team_id),
