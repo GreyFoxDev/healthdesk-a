@@ -40,6 +40,7 @@ defmodule Main.Mixfile do
       {:bitly, "~> 0.1"},
       {:phoenix, "~> 1.4.9"},
       {:cors_plug, "~> 2.0"},
+      {:csv, "~> 2.3"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.14"},
       {:phoenix_ecto, "~> 4.1"},

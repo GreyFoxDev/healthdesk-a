@@ -32,6 +32,8 @@ defmodule MainWeb.Router do
     pipe_through [:browser, :auth]
 
     get "/", AdminController, :index
+    get "/export/campaign-recipients/:campaign_id", CampaignController, :export
+    delete "/campaign/:campaign_id", CampaignController, :delete
 
     delete "/logout/:id", SessionController, :delete
 
