@@ -28,6 +28,7 @@ defmodule Data.Query.Campaign do
     from(t in Campaign,
       where: is_nil(t.deleted_at),
       where: t.location_id == ^location_id,
+      order_by: [desc: :send_at],
       preload: [:location, :campaign_recipients]
     )
     |> repo.all()
