@@ -196,7 +196,7 @@
             <div class="card-metric">
                 <div class="metric">
                     <h2 class="metric-label"> BROADCASTS </h2>
-                    <table class=“table” style=“text-align:left;“>
+                    <table class="table" style="text-align:left;">
                         <thead>
                             <tr>
                                 <th class="align-middle">
@@ -236,9 +236,14 @@
                                         <%= campaign.location.location_name %>
                                     </td>
                                     <td class="align-middle">
-                                        <a href="#" data-toggle="modal" data-target="#CampaignMsg">
+                                        <a href="#" data-toggle="collapse" data-target="#message">
                                             <%= campaign.campaign_name %>
                                         </a>
+                                             <div id="message" class="collapse">
+                                                Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                                                sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                            </div>
                                     </td>
                                     <td class="align-middle">
                                         <%= link "Download", to: campaign_path(@conn, :export, campaign.id), class: "nav-link" %>
