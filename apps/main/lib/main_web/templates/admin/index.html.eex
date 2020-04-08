@@ -220,7 +220,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <%= for campaign <- @campaigns do %>
+                            <%= for {campaign, i} <- Enum.with_index(@campaigns) do %>
                                 <tr>
                                     <td class="align-middle">
                                         <%= format_date_time_split(campaign.send_at, campaign.location.timezone) %>
@@ -236,7 +236,7 @@
                                         <%= campaign.location.location_name %>
                                     </td>
                                     <td class="align-middle">
-                                        <a href="#" data-toggle="collapse" data-target="#message1">
+                                        <a href="#" data-toggle="collapse" data-target="#message<%= i %>">
                                             <%= campaign.campaign_name %>
                                         </a>
                                     </td>
@@ -253,8 +253,8 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="5" class="collapse align-middle" id="message1">
-                                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga error tenetur laborum provident! Assumenda explicabo deserunt possimus deleniti, perferendis esse quo? Sunt vitae unde praesentium, amet, numquam, nam rerum voluptatem assumenda modi sed deleniti ea fugiat. Vitae fuga id rem recusandae, possimus vel tempora molestiae unde! Sint cupiditate aspernatur id?
+                                    <td colspan="5" class="collapse align-middle" id="message<%= i %>">
+                                       <%= campaign.message %>
                                     <td>
                                 </tr>
                             <% end %>
