@@ -60,6 +60,7 @@ defmodule MainWeb.NormalHourController do
   end
 
   def update(conn, %{"id" => id, "normal_hour" => hours, "team_id" => team_id, "location_id" => location_id}) do
+    IO.inspect("AM I BEING CALLED TOO?")
     hours
     |> Map.merge(%{"id" => id, "location_id" => location_id})
     |> NormalHours.update()
@@ -76,6 +77,7 @@ defmodule MainWeb.NormalHourController do
   end
 
   def delete(conn, %{"id" => id, "team_id" => team_id, "location_id" => location_id}) do
+    IO.inspect("DELETING NORMAL HOURS")
     %{"id" => id, "deleted_at" => DateTime.utc_now()}
     |> NormalHours.update()
     |> case do

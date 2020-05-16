@@ -39,7 +39,9 @@ defmodule Data.NormalHours do
 
   def update(%{"id" => id} = params) do
     id
+    |> IO.inspect(label: "ID FOR NORMAL HOURS GET")
     |> Query.get()
+    |> IO.inspect(label: "GET/1")
     |> Query.update(params)
   end
 end
