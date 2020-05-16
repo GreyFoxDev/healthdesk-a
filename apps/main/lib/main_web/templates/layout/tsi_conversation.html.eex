@@ -69,6 +69,8 @@
      .scrollable {
          height: 90vh; /* or any value */
          overflow-y: auto;
+             display: flex;
+    flex-direction: column-reverse;
      }
 
     </style>
