@@ -36,10 +36,9 @@ defmodule MainWeb.Notify do
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
 
-    IO.inspect team_member.user, label: "*******Notifying"
     if team_member.user.use_email do
       conversation = Conversations.get(conversation_id)
-      member = conversation[:member]
+      member = conversation.member
       subject = if member do
         member = [
           member.first_name,
@@ -114,7 +113,7 @@ defmodule MainWeb.Notify do
     _ = Enum.each(all_admins, fn(admin) ->
       if admin.user.use_email do
         conversation = Conversations.get(conversation_id)
-        member = conversation[:member]
+        member = conversation.member
         subject = if member do
           member = [
             member.first_name,
