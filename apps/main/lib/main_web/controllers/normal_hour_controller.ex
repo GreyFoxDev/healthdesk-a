@@ -78,18 +78,28 @@ defmodule MainWeb.NormalHourController do
 
   def delete(conn, %{"id" => id, "team_id" => team_id, "location_id" => location_id}) do
     IO.inspect("DELETING NORMAL HOURS")
+    location =
+      conn
+      |> current_user()
+      |> Location.get(location_id)
+
     %{"id" => id, "deleted_at" => DateTime.utc_now()}
     |> NormalHours.update()
     |> case do
          {:ok, _hours} ->
+           hours = NormalHours.get_by_location_id(location_id)
+
            conn
            |> put_flash(:success, "Normal Hours deleted successfully.")
-           |> render_page("index.html", team_id, location_id)
+           |> render "index.html", location: location, hours: hours, teams: teams(conn), changeset: NormalHours.get_changeset()
            # |> redirect(to: team_location_normal_hour_path(conn, :index, team_id, location_id))
 
          {:error, _changeset} ->
+           hours = NormalHours.get_by_location_id(location_id)
+
            conn
            |> put_flash(:error, "Normal Hours failed to delete")
+           |> render conn, "index.html", location: location, hours: hours, teams: teams(conn), changeset: NormalHours.get_changeset()
            |> render_page("index.html", team_id, location_id)
        end
   end
