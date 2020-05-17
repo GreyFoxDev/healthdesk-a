@@ -70,8 +70,10 @@
                 </a>
             </a>
         </nav>
+        <div class="p-3">
         <div id="scroll-message" class="px-0 py-0 chat-box bg-white scrollable">
             <%= render @view_module, @view_template, assigns %>
+        </div>
         </div>
         <!-- Typing area -->
 
