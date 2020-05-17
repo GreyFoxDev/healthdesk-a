@@ -13,37 +13,27 @@
     </head>
 
     <style>
-
-     body { padding-top: 90px; }
-
      .bg-p {
          background-color: #FF745C;
      }
-
      .fa {
          color: #FF745C;
      }
-
      .bg-s {
          background-color: #e2e2e2;
      }
-
      .bg-i {
          background-color: #f8f9fa!important;
      }
-
      .text-receive {
          color: #676463;
      }
-
      .text-small {
          font-size: 1rem;
      }
-
      .text-muted {
          color: #e2e2e2;
      }
-
      .btn-outline-primary {
          color: #676463;
          border-color: #676463;
@@ -53,30 +43,25 @@
          overflow-y: scroll;
          margin: 10px 16px;
          height: 100%;
-         padding-bottom: 40px !important;
          overflow: auto;
      }
-
      .rounded-lg {
          border-radius: 0.5rem;
      }
-
      input::placeholder {
          font-size: 1rem;
          color: #999;
      }
-
      .scrollable {
-         height: 90vh; /* or any value */
+         height: 85vh; /* or any value */
          overflow-y: auto;
              display: flex;
     flex-direction: column-reverse;
      }
-
     </style>
     <body>
         <!-- Just an image -->
-        <nav class="navbar navbar-light bg-light fixed-top shadow-sm">
+        <nav class="navbar navbar-light bg-light navbar-fixed-top shadow-sm">
             <a class="navbar-brand" href="#">
                 <img src="https://i.ibb.co/M5YdtLy/logo.png" width="150px" border="0"/>
                 <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>">
