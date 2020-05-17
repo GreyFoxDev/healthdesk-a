@@ -60,7 +60,6 @@ defmodule MainWeb.NormalHourController do
   end
 
   def update(conn, %{"id" => id, "normal_hour" => hours, "team_id" => team_id, "location_id" => location_id}) do
-    IO.inspect("AM I BEING CALLED TOO?")
     hours
     |> Map.merge(%{"id" => id, "location_id" => location_id})
     |> NormalHours.update()
@@ -77,7 +76,6 @@ defmodule MainWeb.NormalHourController do
   end
 
   def delete(conn, %{"id" => id, "team_id" => team_id, "location_id" => location_id}) do
-    IO.inspect("DELETING NORMAL HOURS")
     location =
       conn
       |> current_user()
@@ -92,7 +90,6 @@ defmodule MainWeb.NormalHourController do
            conn
            |> put_flash(:success, "Normal Hours deleted successfully.")
            |> render "index.html", location: location, hours: hours, teams: teams(conn), changeset: NormalHours.get_changeset()
-           # |> redirect(to: team_location_normal_hour_path(conn, :index, team_id, location_id))
 
          {:error, _changeset} ->
            hours = NormalHours.get_by_location_id(location_id)

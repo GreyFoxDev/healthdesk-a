@@ -47,7 +47,6 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_phone(phone_number) do
-    IO.inspect phone_number, label: "FORMATED"
     "Unknown Visitor"
   end
 
