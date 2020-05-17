@@ -113,8 +113,25 @@ defmodule MainWeb.Notify do
 
     _ = Enum.each(all_admins, fn(admin) ->
       if admin.user.use_email do
+        conversation = Conversation.get(conversation_id)
+        member = conversation[:member]
+        subject = if member do
+          member = [
+            member.first_name,
+            member.last_name,
+            conversation.original_number
+          ] |> Enum.join(" ")
+
+          "New message from #{member}"
+        else
+          "New message from #{conversation.original_phone}"
+        end
+
+        IO.inspect subject, label: "SUBJECT"
+        IO.inspect body, label: "BODY"
+
         admin.user.email
-        |> Main.Email.generate_email(body)
+        |> Main.Email.generate_email(body, subject)
         |> Main.Mailer.deliver_now()
       end
     end)
