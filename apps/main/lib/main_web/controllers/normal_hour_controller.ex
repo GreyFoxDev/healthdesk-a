@@ -84,7 +84,8 @@ defmodule MainWeb.NormalHourController do
          {:ok, _hours} ->
            conn
            |> put_flash(:success, "Normal Hours deleted successfully.")
-           |> redirect(to: team_location_normal_hour_path(conn, :index, team_id, location_id))
+           |> render_page("index.html", team_id, location_id)
+           # |> redirect(to: team_location_normal_hour_path(conn, :index, team_id, location_id))
 
          {:error, _changeset} ->
            conn
