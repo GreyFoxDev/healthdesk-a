@@ -5,7 +5,7 @@ defmodule MainWeb.Notify do
 
   require Logger
 
-  alias Data.{Location, TeamMember, TimezoneOffset}
+  alias Data.{Location, Conversation, TeamMember, TimezoneOffset}
 
   @url "[url]/admin/teams/[team_id]/locations/[location_id]/conversations/[conversation_id]/conversation-messages"
   @super_admin Application.get_env(:main, :super_admin)
@@ -37,8 +37,22 @@ defmodule MainWeb.Notify do
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
 
     if team_member.user.use_email do
+      conversation = Conversation.get(conversation_id)
+      member = conversation[:member]
+      subject = if member do
+        member = [
+          member.first_name,
+          member.last_name,
+          conversation.original_number
+        ] |> Enum.join(" ")
+
+        "New message from #{member}"
+      else
+        "New message from #{conversation.original_phone}"
+      end
+
       team_member.user.email
-      |> Main.Email.generate_email(body)
+      |> Main.Email.generate_email(body, subject)
       |> Main.Mailer.deliver_now()
     end
 
@@ -70,7 +84,12 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
-    body = Enum.join([message, link[:url]], "\n")
+    body =
+      [
+        "You've been assigned to this conversation:",
+        message,
+        link[:url]
+      ] |> Enum.join("/n")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =
