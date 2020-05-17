@@ -9,7 +9,8 @@
         <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <%= csrf_meta_tag() %>
-        <script type="text/javascript" src="<%= static_path(@conn, "/js/app.js") %>"></script>
+        <script type="text/javascript" src="<%= static_path(@conn, "/js/app.js") %>"></script>            
+        <script type="text/javascript" src="<%= static_path(@conn, "/js/perfect-scrollbar/perfect-scrollbar.min-4a10bcfa0a9c9fa9d503b5a498cac31e.js?vsn=d") %>"></script>
     </head>
 
     <style>
