@@ -36,6 +36,7 @@ defmodule MainWeb.Notify do
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
 
+    IO.inspect team_member.user, label: "*******Notifying"
     if team_member.user.use_email do
       conversation = Conversation.get(conversation_id)
       member = conversation[:member]
@@ -50,6 +51,9 @@ defmodule MainWeb.Notify do
       else
         "New message from #{conversation.original_phone}"
       end
+
+      IO.inspect subject, label: "SUBJECT"
+      IO.inspect body, label: "BODY"
 
       team_member.user.email
       |> Main.Email.generate_email(body, subject)
