@@ -5,7 +5,7 @@ defmodule MainWeb.Notify do
 
   require Logger
 
-  alias Data.{Location, Conversation, TeamMember, TimezoneOffset}
+  alias Data.{Location, Conversations, TeamMember, TimezoneOffset}
 
   @url "[url]/admin/teams/[team_id]/locations/[location_id]/conversations/[conversation_id]/conversation-messages"
   @super_admin Application.get_env(:main, :super_admin)
@@ -38,7 +38,7 @@ defmodule MainWeb.Notify do
 
     IO.inspect team_member.user, label: "*******Notifying"
     if team_member.user.use_email do
-      conversation = Conversation.get(conversation_id)
+      conversation = Conversations.get(conversation_id)
       member = conversation[:member]
       subject = if member do
         member = [
@@ -113,7 +113,7 @@ defmodule MainWeb.Notify do
 
     _ = Enum.each(all_admins, fn(admin) ->
       if admin.user.use_email do
-        conversation = Conversation.get(conversation_id)
+        conversation = Conversations.get(conversation_id)
         member = conversation[:member]
         subject = if member do
           member = [
