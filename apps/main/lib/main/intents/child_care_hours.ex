@@ -57,7 +57,11 @@ defmodule MainWeb.Intents.ChildCareHours do
 
         String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
       _ ->
-        @default_response
+        if location.default_message != "" do
+          location.default_message
+        else
+          @default_response
+        end
     end
   end
 
@@ -76,8 +80,6 @@ defmodule MainWeb.Intents.ChildCareHours do
       String.replace(@all_hours, "[schedule]", schedule)
     end
   end
-
-  def build_response(_, _), do: @default_response
 
   defp get_day_of_week({year, month, day} = date) do
     with nil <- MainWeb.HolidayDates.is_holiday?(date) do

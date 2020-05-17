@@ -91,7 +91,13 @@ defmodule MainWeb.Intents.Hours do
     end
   end
 
-  def build_response(_, _), do: @default_response
+  def build_response(_, location) do
+    if location.default_message != "" do
+      location.default_message
+    else
+      @default_response
+    end
+  end
 
   defp get_day_of_week({year, _, _} = day, location) when is_binary(year) do
     day
