@@ -23,7 +23,7 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
-    body = Enum.join(["You've been assigned to a conversation", link[:url]], "\n")
+    body = Enum.join(["You've been assigned to this conversation:", message, link[:url]], "\n")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =
