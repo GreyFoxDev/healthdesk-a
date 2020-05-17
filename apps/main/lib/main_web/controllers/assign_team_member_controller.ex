@@ -16,7 +16,7 @@ defmodule MainWeb.AssignTeamMemberController do
     team_member =
       TeamMember.get(%{role: "admin"}, team_member_id)
 
-    [original_message] = ConversationMessages.all(%{role: "admin"}, id) |> Enum.take(-1)
+    [original_message] = ConversationMessages.all(%{role: "admin"}, id) |> Enum.reject(&(&1.phone_number == location.phone_number)) |> Enum.take(-1)
 
     message = %{"conversation_id" => id,
                 "phone_number" => team_member.user.phone_number,
