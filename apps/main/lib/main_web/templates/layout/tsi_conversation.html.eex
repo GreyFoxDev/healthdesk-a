@@ -14,8 +14,15 @@
     </head>
 
     <style>
+*, :after, :before {
+    box-sizing: border-box;
+}
      .bg-p {
          background-color: #FF745C;
+     }
+     
+     .chat-div {
+
      }
      .fa {
          color: #FF745C;
@@ -42,8 +49,6 @@
      .messages-box,
      .chat-box {
          overflow-y: scroll;
-         margin: 10px 16px;
-         height: 100%;
          overflow: auto;
      }
      .rounded-lg {
@@ -54,15 +59,15 @@
          color: #999;
      }
      .scrollable {
-         height: 85vh; /* or any value */
-         overflow-y: auto;
-             display: flex;
-    flex-direction: column-reverse;
+      padding: 24px;
+    overflow-y: auto;
+    padding-bottom: 50px;
      }
+     
     </style>
     <body>
         <!-- Just an image -->
-        <nav class="navbar navbar-light bg-light navbar-fixed-top shadow-sm">
+        <nav class="navbar navbar-light bg-light sticky-top shadow-sm">
             <a class="navbar-brand" href="#">
                 <img src="https://i.ibb.co/M5YdtLy/logo.png" width="150px" border="0"/>
                 <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>">
@@ -70,8 +75,8 @@
                 </a>
             </a>
         </nav>
-        <div class="p-3">
-        <div id="scroll-message" class="px-0 py-0 chat-box bg-white scrollable">
+        <div class="chat-div">
+        <div id="scroll-message" class="bg-white scrollable">
             <%= render @view_module, @view_template, assigns %>
         </div>
         </div>
