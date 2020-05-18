@@ -12,10 +12,24 @@ defmodule MainWeb.TsiController do
 
   alias MainWeb.{Notify, Intents}
 
-  alias Data.{Location, Conversation}
+  alias Data.{Location, Member, Conversation}
 
-  def new(conn, %{"phone-number" => phone_number, "api_key" => api_key} = params),
-   do: render_new(conn, phone_number, api_key)
+  @role %{role: "admin"}
+
+  def new(conn, %{"phone-number" => phone_number, "member-first" => first_name, "member-last" => last_name, "api_key" => api_key} = params) do
+    location = conn.assigns.location
+    phone = format_phone(phone_number)
+
+    {:ok, _member} =
+      with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
+        update_member_data(member.id, first_name, last_name)
+      else
+        nil ->
+          create_member_data(location.team_id, first_name, last_name, phone)
+      end
+
+    render_new(conn, phone_number, api_key)
+  end
 
   def new(conn, %{"unique-id" => unique_id, "api_key" => api_key} = params),
     do: render_new(conn, unique_id, api_key)
