@@ -16,7 +16,11 @@ defmodule MainWeb.AssignTeamMemberController do
     team_member =
       TeamMember.get(%{role: "admin"}, team_member_id)
 
-    [original_message] = ConversationMessages.all(%{role: "admin"}, id) |> Enum.reject(&(&1.phone_number == location.phone_number)) |> Enum.take(-1)
+    [original_message] =
+      %{role: "admin"}
+      |> ConversationMessages.all(id)
+      |> Enum.reject(&(reject_location_messages(&1, location, team_member)))
+      |> Enum.take(-1)
 
     message = %{"conversation_id" => id,
                 "phone_number" => team_member.user.phone_number,
@@ -39,6 +43,10 @@ defmodule MainWeb.AssignTeamMemberController do
       {:error, _changeset} ->
         render(conn, "error.json")
     end
+  end
+
+  defp reject_location_messages(original_message, location, team_member) do
+    if original_message.phone_number == location.phone_number or original_message.phone_number == team_member.user.phone_number, do: true, else: false
   end
 
 end
