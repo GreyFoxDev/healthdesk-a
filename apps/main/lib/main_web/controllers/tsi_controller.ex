@@ -16,11 +16,14 @@ defmodule MainWeb.TsiController do
 
   @role %{role: "admin"}
 
-  def new(conn, %{"phone-number" => phone_number, "member-first" => first_name, "member-last" => last_name, "api_key" => api_key} = params) do
+  def new(conn, %{"phone-number" => phone_number, "api_key" => api_key} = params) do
     location = conn.assigns.location
-    phone = format_phone(phone_number)
+    phone = "APP:#{format_phone(phone_number)}"
 
-    {:ok, _member} =
+    first_name = params["member-first"]
+    last_name = params["member-last"]
+
+    {:ok, member} =
       with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
         update_member_data(member.id, first_name, last_name)
       else
@@ -208,6 +211,31 @@ defmodule MainWeb.TsiController do
     |> CM.create()
 
     C.close(convo_id)
+  end
+
+  defp create_member_data(team_id, first_name, nil, phone) do
+    Member.create(%{
+          team_id: team_id,
+          first_name: first_name,
+          phone_number: phone})
+  end
+
+  defp create_member_data(team_id, first_name, last_name, phone) do
+    Member.create(%{
+          team_id: team_id,
+          first_name: first_name,
+          last_name: last_name,
+          phone_number: phone})
+  end
+
+  defp update_member_data(member_id, nil, nil), do: {:ok, member_id}
+
+  defp update_member_data(member_id, first_name, nil) do
+    Member.update(member_id, %{first_name: first_name})
+  end
+
+  defp update_member_data(member_id, first_name, last_name) do
+    Member.update(member_id, %{first_name: first_name, last_name: last_name})
   end
 
 end

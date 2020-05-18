@@ -28,7 +28,7 @@ defmodule MainWeb.Helper.Formatters  do
     "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
   def format_phone(<< "APP:+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
-    "App Visitor: +1 #{Enum.join([area_code, prefix, line], "-")}"
+    "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
 
   def format_phone(<< area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do

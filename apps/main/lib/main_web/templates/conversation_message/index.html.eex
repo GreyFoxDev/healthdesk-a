@@ -299,7 +299,7 @@
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <div class="form-label-group">
-                        <input name="member[phone_number]" type="text" class="form-control" value="<%= if @conversation.member, do: @conversation.member.phone_number, else: "N/A" %>"> <label for="fl1"> Phone Numbers</label>
+                        <input name="member[phone_number]" type="text" class="form-control" value="<%= if @conversation.member, do: format_phone(@conversation.member.phone_number), else: "N/A" %>"> <label for="fl1"> Phone Numbers</label>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
