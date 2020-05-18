@@ -92,9 +92,14 @@
         <% end %>
 
         <script>
-         var div = document.getElementById("scroll-message");
-         div.scrollTop = div.scrollHeight;
+
             $('#scroll-message').bind('DOMNodeInserted', function(e) {
+    $('html, body').animate({
+              scrollTop: $("#scroll-message").offset().top + $("#scroll-message")[0].scrollHeight
+          }, 2000);
+});
+
+$( document ).ready(function() {
     $('html, body').animate({
               scrollTop: $("#scroll-message").offset().top + $("#scroll-message")[0].scrollHeight
           }, 2000);
