@@ -51,9 +51,6 @@ defmodule MainWeb.Notify do
         "New message from #{conversation.original_phone}"
       end
 
-      IO.inspect subject, label: "SUBJECT"
-      IO.inspect body, label: "BODY"
-
       team_member.user.email
       |> Main.Email.generate_email(body, subject)
       |> Main.Mailer.deliver_now()
@@ -125,9 +122,6 @@ defmodule MainWeb.Notify do
         else
           "New message from #{conversation.original_phone}"
         end
-
-        IO.inspect subject, label: "SUBJECT"
-        IO.inspect body, label: "BODY"
 
         admin.user.email
         |> Main.Email.generate_email(body, subject)

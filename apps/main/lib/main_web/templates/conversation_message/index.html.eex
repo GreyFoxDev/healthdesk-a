@@ -350,8 +350,10 @@
 </div>
 
 <script>
- var div = document.getElementById("scroll-message");
- div.scrollTop = div.scrollHeight;
+    $('body').on('DOMSubtreeModified', '#scroll-message', function(){
+        var div = document.getElementById("scroll-message");
+        div.scrollTop = div.scrollHeight;
+    });
 </script>
 <!-- Modal -->
 <div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">

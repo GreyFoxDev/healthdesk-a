@@ -4,16 +4,18 @@ defmodule MainWeb.Live.ConversationMessageUpdatesView do
 
   alias MainWeb.ConversationMessageUpdatesView, as: View
 
-  def render(%{"messages" => _messages} = assigns),
-    do: View.render("index.html", assigns)
-
   def render(assigns) do
-    ~L[]
+    View.render("index.html", assigns)
   end
 
   def mount(_params, %{"conversation" => id} = session, socket) do
     MainWeb.Endpoint.subscribe("convo:#{id}")
-    {:ok, assign(socket, :session, session)}
+
+    socket =
+      socket
+      |> assign(:session, session)
+      |> assign(:messages, [])
+    {:ok, socket}
   end
 
   def handle_info(broadcast = %{topic: << "convo:", _id :: binary >>}, socket) do
