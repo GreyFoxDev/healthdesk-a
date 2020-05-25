@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <%= csrf_meta_tag() %>
+        <script type="text/javascript" src="<%= static_path(@conn, "/js/app.js") %>"></script>            
+        <script type="text/javascript" src="<%= static_path(@conn, "/js/perfect-scrollbar/perfect-scrollbar.min-4a10bcfa0a9c9fa9d503b5a498cac31e.js?vsn=d") %>"></script>
+    </head>
+
+    <style>
+*, :after, :before {
+    box-sizing: border-box;
+}
+     .bg-p {
+         background-color: #FF745C;
+     }
+     
+     .chat-div {
+
+     }
+     .fa {
+         color: #FF745C;
+     }
+     .bg-s {
+         background-color: #e2e2e2;
+     }
+     .bg-i {
+         background-color: #f8f9fa!important;
+     }
+     .text-receive {
+         color: #676463;
+     }
+     .text-small {
+         font-size: 1rem;
+     }
+     .text-muted {
+         color: #e2e2e2;
+     }
+     .btn-outline-primary {
+         color: #676463;
+         border-color: #676463;
+     }
+     .messages-box,
+     .chat-box {
+         overflow-y: scroll;
+         overflow: auto;
+     }
+     .rounded-lg {
+         border-radius: 0.5rem;
+     }
+     input::placeholder {
+         font-size: 1rem;
+         color: #999;
+     }
+     .scrollable {
+      padding: 24px;
+    overflow-y: auto;
+    padding-bottom: 50px;
+     }
+     
+    </style>
+    <body>
+        <!-- Just an image -->
+        <nav class="navbar navbar-light bg-light sticky-top shadow-sm">
+            <a class="navbar-brand" href="#">
+                <img src="https://i.ibb.co/M5YdtLy/logo.png" width="150px" border="0"/>
+                <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>">
+                    <button type="button" class="btn btn-outline-primary btn-sm">Reset Chat</button>
+                </a>
+            </a>
+        </nav>
+        <div class="chat-div">
+        <div id="scroll-message" class="bg-white scrollable">
+            <%= render @view_module, @view_template, assigns %>
+        </div>
+        </div>
+        <!-- Typing area -->
+
+        Palm Beach Sports Club
+
+        <%= form_for @conn, tsi_path(@conn, :update, @api_key, @convo_id), [method: "put", class: "bg-light fixed-bottom shadow-lg"], fn f -> %>
+            <div class="input-group">
+                <%= text_input f, :message, class: "form-control bg-i rounded-0 border-0 py-4 bg-s", placeholder: "Type a message" %>
+                <div class="input-group-append">
+                    <button id="button-addon2" type="submit" class="btn btn-link bg-i"> <i class="fa fa-paper-plane"></i></button>
+                </div>
+            </div>
+        <% end %>
+
+        <script>
+
+            $('#scroll-message').bind('DOMNodeInserted', function(e) {
+    $('html, body').animate({
+              scrollTop: $("#scroll-message").offset().top + $("#scroll-message")[0].scrollHeight
+          }, 2000);
+});
+
+$( document ).ready(function() {
+    $('html, body').animate({
+              scrollTop: $("#scroll-message").offset().top + $("#scroll-message")[0].scrollHeight
+          }, 2000);
+});
+        </script>
+    </body>
+</html>

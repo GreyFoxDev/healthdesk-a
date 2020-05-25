@@ -46,8 +46,10 @@ defmodule MainWeb.TsiController do
     with %Schema{} = convo <- C.get(convo_id) do
       << "APP:", phone_number :: binary >> = convo.original_number
 
+      layout = get_edit_layout_for_team(conn)
+
       conn
-      |> put_layout({MainWeb.LayoutView, :tsi_conversation})
+      |> put_layout({MainWeb.LayoutView, layout})
       |> render("edit.html", api_key: api_key, convo_id: convo_id, phone_number: phone_number, changeset: CM.get_changeset())
     end
   end
@@ -244,6 +246,14 @@ defmodule MainWeb.TsiController do
 
   defp update_member_data(member_id, first_name, last_name) do
     Member.update(member_id, %{first_name: first_name, last_name: last_name})
+  end
+
+  defp get_edit_layout_for_team(conn) do
+    case conn.assignslocation.team.team_name do
+      "Total Woman Spa" -> :tsi_conversation
+      "Around the Clock Fitness" -> :around_the_clock_fitness_conversation
+      "Palm Beach Sports Club" -> :palm_beach_sports_club_conversation
+    end
   end
 
 end
