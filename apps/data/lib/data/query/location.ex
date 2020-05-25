@@ -67,7 +67,8 @@ defmodule Data.Query.Location do
     from(t in Location,
       where: is_nil(t.deleted_at),
       where: t.api_key == ^key,
-      limit: 1
+      limit: 1,
+      preload: [:team]
     )
     |> repo.one()
   end
