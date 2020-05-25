@@ -208,17 +208,26 @@ defmodule MainWeb.TsiController do
       |> Data.Disposition.get_by_team_id(location.team_id)
       |> Enum.find(&(&1.disposition_name == "Automated"))
 
-    Data.ConversationDisposition.create(%{
-          "conversation_id" => convo_id,
-          "disposition_id" => disposition.id
-                                        })
+    if disposition do
+      Data.ConversationDisposition.create(%{
+            "conversation_id" => convo_id,
+            "disposition_id" => disposition.id
+                                          })
 
-    %{"conversation_id" => convo_id,
-      "phone_number" => location.phone_number,
-      "message" =>
-        "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
-      "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
-    |> CM.create()
+      %{"conversation_id" => convo_id,
+        "phone_number" => location.phone_number,
+        "message" =>
+          "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+        "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
+      |> CM.create()
+    else
+        %{"conversation_id" => convo_id,
+          "phone_number" => location.phone_number,
+          "message" =>
+            "CLOSED: Closed by System",
+          "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
+        |> CM.create()
+    end
 
     C.close(convo_id)
   end
