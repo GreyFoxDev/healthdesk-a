@@ -43,9 +43,9 @@
             <%  end %>
             <%= if @c.status != "closed" do %>
                 <%= if @dispositions != [] do %>
-                    <button type="button" class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" data-toggle="modal" data-target="#exampleModalScrollable">...</button>
+                    <button type="button" class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" data-toggle="modal" data-target="#modal<%= @c.id %>">...</button>
                       <!-- Modal -->
-                    <div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+                    <div class="modal fade" id="modal<%= @c.id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
                         <div class="modal-content">
                         <div class="modal-header">
