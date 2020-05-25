@@ -1,0 +1,296 @@
+<img src="/images/total-woman-logo.png" id="logo"/>
+<h1>Greetings! Please select one option below:</h1>
+
+Palm Beach Sports Club
+
+<%= form_for @conn, tsi_path(@conn, :create, @api_key), fn f -> %>
+    <%= hidden_input f, :phone_number, value: @phone_number %>
+    <%= hidden_input f, :api_key, value: @api_key %>
+    <div class="form-group">
+        <div class="p-2 banner text-center"><p>Type of Concern</p></div>
+        <fieldset>
+            <%= select f, :facilities, [
+                {"Facilities", nil},
+                {"Equipment", "Facilities: Equipment"},
+                {"Locker/Bathroom", "Facilities: Locker/Bathroom"},
+                {"Lighting/Fixtures", "Facilities: Lighting/Fixtures"},
+                {"WiFi", "Facilities: WiFi"},
+                {"Class Scheduling", "Facilities: Class Scheduling"},
+                {"Personal Training", "Facilities: Personal Training"},
+                {"Other", "Facilities: Other"}
+            ], class: "selectpicker", title: "Facilities" %>
+            <%= select f, :personnel, [
+                {"Personnel", nil},
+                {"Unable to find manager", "Personnel: Unable to find manager"},
+                {"Unable to find any employee", "Personnel: Unable to find any employee"},
+                {"Rude employee", "Personnel: Rude employee"},
+                {"Rude member", "Personnel: Rude member"},
+                {"Other", "Personnel: Other"}
+            ], class: "selectpicker", title: "Personnel" %>
+            <%= select f, :member_services, [
+                {"Member Services", nil},
+                {"Billing Issue", "Member Services: Billing Issue"},
+                {"Canceling Membership", "Member Services: Canceling Membership"},
+                {"Other", "Member Services: Other"}
+            ], class: "selectpicker", title: "Personnel" %>
+        </fieldset>
+        <%= submit "OK, LET'S GO", [class: "submit", data_toggle: "modal", data_target: "#exampleModalCenter"] %>
+        <a class="reset">Reset Form</a>
+    </div>
+    <!-- Modal -->
+<% end %>
+
+<style>
+
+ .banner {
+     background-color: #FF745C;
+     border-radius: 3px;
+     border: 1px solid #ff745c;
+ }
+ .banner p {
+     color: white !important;
+     display:block;
+     margin: 0;
+ }
+ .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+     width: 100% !important;
+ }
+
+ bootstrap-select {
+     display:none;
+ }
+ .btn-light {
+     border-bottom: solid 1px #676463;
+ }
+
+ .bootstrap-select>.dropdown-toggle.bs-placeholder, .bootstrap-select>.dropdown-toggle.bs-placeholder:active, .bootstrap-select>.dropdown-toggle.bs-placeholder:focus, .bootstrap-select>.dropdown-toggle.bs-placeholder:hover {
+     color: #817d7c !important;
+ }
+
+ .dropdown-item.active, .dropdown-item:active {
+     background-color: #FF745C;
+ }
+
+ *,
+ *:before,
+ *:after {
+     -moz-box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     box-sizing: border-box;
+     padding: 0;
+     margin: 0;
+ }
+
+ html, body {
+     font-family: 'Poppins', sans-serif;
+     color: #676463;
+     height: 100%;
+     width:100%;
+     overflow: hidden;
+     background-color: #F1F3F4;
+ }
+
+ form {
+     margin: 3rem auto;
+     padding: 10px 20px
+     border-radius: 8px;
+ }
+
+ .form-group {
+     text-align: center;
+     padding: 1rem;
+ }
+
+ #logo {
+     max-width: 150px;
+     margin: 1.5rem auto 4rem auto;
+     display:block;
+ }
+
+ h1 {
+     margin: 0 0 1.5rem 0;
+     font-size: 1.5rem;
+     color: #FF745C;
+     text-align: center;
+ }
+
+ textarea,
+ select {
+     -webkit-transition: all 0.30s ease-in-out;
+     -moz-transition: all 0.30s ease-in-out;
+     -ms-transition: all 0.30s ease-in-out;
+     -o-transition: all 0.30s ease-in-out;
+     background: #676463;
+     border: none;
+     font-size: 16px;
+     height: auto;
+     margin: 0;
+     outline: 0;
+     padding: 15px;
+     width: 100%;
+     background-color: #e8eeef;
+     color: #000;
+     margin-bottom: 20px;
+ }
+
+ textarea:focus,
+ select:focus {
+     -webkit-transition: all 0.30s ease-in-out;
+     -moz-transition: all 0.30s ease-in-out;
+     -ms-transition: all 0.30s ease-in-out;
+     -o-transition: all 0.30s ease-in-out;
+ }
+
+ select {
+     padding: 6px;
+     height: 32px;
+     border-radius: 2px;
+ }
+
+ .submit {
+     padding: 15px 30px;
+     color: #FFF;
+     background-color: #FF745C;
+     font-size: 18px;
+     letter-spacing: 0.07em;
+     text-align: center;
+     font-style: normal;
+     border-radius: 5px;
+     margin: 10px 0;
+     width: 100%;
+     border: 1px solid #FF745C;
+     border-width: 1px;
+ }
+
+ .reset {
+     color: #676463;
+
+     font-size: 18px;
+     letter-spacing: 0.07em;
+     text-align: center;
+     font-style: normal;
+     margin: 10px auto;}
+
+ .reset:hover {
+     cursor: pointer;
+ }
+
+ .submit:hover {
+     cursor: pointer;
+ }
+
+ .submit-disabled {
+     cursor: auto;
+     border: 1px solid #e8eeef;
+     background-color: #e8eeef;
+ }
+
+ fieldset {
+     margin-bottom: 2rem;
+     border: none;
+     padding: 0;
+ }
+
+ legend {
+     font-size: 1.4em;
+     font-weight: 700;
+     margin-bottom: 10px;
+ }
+
+ label {
+     display: block;
+     margin-bottom: 8px;
+ }
+
+ label.light {
+     display: inline;
+ }
+
+
+ @media screen and (min-width: 480px) {
+     textarea {
+         max-width: 440px;
+         resize: vertical;
+     }
+ }
+
+ .container {
+     height: 100%;
+     background-color: white;
+     max-width: 500px;
+     padding: 1rem;
+     width: 100%;
+     position: relative;
+     margin: 0 auto;
+ }
+
+
+</style>
+
+<script>
+
+ $(document).ready(function() {
+     function disable_submit() {
+         $(".submit").prop("disabled", true);
+         $(".submit").addClass("submit-disabled");
+     }
+
+     function enable_submit() {
+         $(".submit").prop("disabled", false);
+         $(".submit").removeClass("submit-disabled");
+     }
+
+	 	 $(".reset").click(function(event){
+         $("#facilities").val(null);
+         $("#personnel").val(null);
+         $("#member_services").val(null);
+
+         $("#facilities").prop("disabled", false);
+         $("#personnel").prop("disabled", false);
+         $("#member_services").prop("disabled", false);
+         disable_submit();
+	 	 });
+
+     $("#facilities").change(function() {
+         value = $("#facilities").val();
+         if (value) {
+             $("#personnel").prop("disabled", "disabled");
+             $("#member_services").prop("disabled", "disabled");
+             enable_submit();
+         } else {
+             $("#personnel").prop("disabled", false);
+             $("#member_services").prop("disabled", false);
+             disable_submit();
+         }
+     });
+
+     $("#personnel").change(function() {
+         value = $("#personnel").val();
+         if (value) {
+             $("#facilities").prop("disabled", "disabled");
+             $("#member_services").prop("disabled", "disabled");
+             enable_submit();
+         } else {
+             $("#facilities").prop("disabled", false);
+             $("#member_services").prop("disabled", false);
+             disable_submit();
+         }
+     });
+
+     $("#member_services").change(function() {
+         value = $("#member_services").val();
+         if (value) {
+             $("#facilities").prop("disabled", "disabled");
+             $("#personnel").prop("disabled", "disabled");
+             enable_submit();
+         } else {
+             $("#facilities").prop("disabled", false);
+             $("#personnel").prop("disabled", false);
+             disable_submit();
+         }
+     });
+
+     disable_submit();
+ });
+
+</script>

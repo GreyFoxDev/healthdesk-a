@@ -165,9 +165,17 @@ defmodule MainWeb.TsiController do
 
   defp render_new(conn, unique_id, api_key) do
     if String.length(unique_id) >= 10 do
+      location = conn.assigns.location
+      template_name =
+        case location.team.team_name do
+          "Total Woman Spa" -> "new.html"
+          "Around the Clock Fitness" -> "around_the_clock_fitness_new.html"
+          "Palm Beach Sports Club" -> "palm_beach_sports_club_new.html"
+        end
+
       conn
       |> put_layout({MainWeb.LayoutView, :tsi})
-      |> render("new.html", api_key: api_key, phone_number: unique_id)
+      |> render(template_name, api_key: api_key, phone_number: unique_id)
     else
       send_resp(conn, 400, "Bad request")
     end
