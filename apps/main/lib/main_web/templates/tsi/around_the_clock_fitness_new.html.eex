@@ -1,8 +1,6 @@
 <img src="http://myaroundtheclockfitness.com/wp-content/uploads/2017/04/ATC-Logo-60px-Trans.png" id="logo"/>
 <h1>Greetings! Please select one option below:</h1>
 
-Around the Clock Fitness
-
 <%= form_for @conn, tsi_path(@conn, :create, @api_key), fn f -> %>
     <%= hidden_input f, :phone_number, value: @phone_number %>
     <%= hidden_input f, :api_key, value: @api_key %>
