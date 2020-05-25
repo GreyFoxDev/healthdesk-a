@@ -249,7 +249,7 @@ defmodule MainWeb.TsiController do
   end
 
   defp get_edit_layout_for_team(conn) do
-    case conn.assignslocation.team.team_name do
+    case conn.assigns.location.team.team_name do
       "Total Woman Spa" -> :tsi_conversation
       "Around the Clock Fitness" -> :around_the_clock_fitness_conversation
       "Palm Beach Sports Club" -> :palm_beach_sports_club_conversation
