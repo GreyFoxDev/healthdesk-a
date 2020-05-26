@@ -18,14 +18,14 @@
     box-sizing: border-box;
 }
      .bg-p {
-         background-color: #FF745C;
+         background-color: #565756;
      }
      
      .chat-div {
 
      }
      .fa {
-         color: #FF745C;
+         color: #565756;
      }
      .bg-s {
          background-color: #e2e2e2;
@@ -51,6 +51,10 @@
          overflow-y: scroll;
          overflow: auto;
      }
+
+     #logo1 {
+         max-width: 75px;
+     }
      .rounded-lg {
          border-radius: 0.5rem;
      }
@@ -69,7 +73,7 @@
         <!-- Just an image -->
         <nav class="navbar navbar-light bg-light sticky-top shadow-sm">
             <a class="navbar-brand" href="#">
-                <img src="https://i.ibb.co/M5YdtLy/logo.png" width="150px" border="0"/>
+                <img src="https://i.ibb.co/QJPCxFt/palmbeach2.png" id="logo1" border="0"/>
                 <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>">
                     <button type="button" class="btn btn-outline-primary btn-sm">Reset Chat</button>
                 </a>
@@ -81,8 +85,6 @@
         </div>
         </div>
         <!-- Typing area -->
-
-        Palm Beach Sports Club
 
         <%= form_for @conn, tsi_path(@conn, :update, @api_key, @convo_id), [method: "put", class: "bg-light fixed-bottom shadow-lg"], fn f -> %>
             <div class="input-group">
