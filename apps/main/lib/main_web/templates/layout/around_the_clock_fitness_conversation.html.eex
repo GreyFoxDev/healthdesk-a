@@ -69,7 +69,7 @@
         <!-- Just an image -->
         <nav class="navbar navbar-light bg-light sticky-top shadow-sm">
             <a class="navbar-brand" href="#">
-                <img src="https://i.ibb.co/M5YdtLy/logo.png" width="150px" border="0"/>
+                <img src="http://myaroundtheclockfitness.com/wp-content/uploads/2017/04/ATC-Logo-60px-Trans.png" border="0"/>
                 <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>">
                     <button type="button" class="btn btn-outline-primary btn-sm">Reset Chat</button>
                 </a>
