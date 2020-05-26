@@ -18,14 +18,14 @@
     box-sizing: border-box;
 }
      .bg-p {
-         background-color: #FF745C;
+         background-color: #0052a2;
      }
      
      .chat-div {
 
      }
      .fa {
-         color: #FF745C;
+         color: #0052a2;
      }
      .bg-s {
          background-color: #e2e2e2;
@@ -81,8 +81,6 @@
         </div>
         </div>
         <!-- Typing area -->
-
-        Around the Clock Fitness
 
         <%= form_for @conn, tsi_path(@conn, :update, @api_key, @convo_id), [method: "put", class: "bg-light fixed-bottom shadow-lg"], fn f -> %>
             <div class="input-group">
