@@ -1,7 +1,5 @@
-<img src="/images/total-woman-logo.png" id="logo"/>
+<img src="https://i.ibb.co/QJPCxFt/palmbeach2.png" id="logo"/>
 <h1>Greetings! Please select one option below:</h1>
-
-Palm Beach Sports Club
 
 <%= form_for @conn, tsi_path(@conn, :create, @api_key), fn f -> %>
     <%= hidden_input f, :phone_number, value: @phone_number %>
@@ -43,9 +41,9 @@ Palm Beach Sports Club
 <style>
 
  .banner {
-     background-color: #FF745C;
+     background-color: #565756;
      border-radius: 3px;
-     border: 1px solid #ff745c;
+     border: 1px solid #565756;
  }
  .banner p {
      color: white !important;
@@ -68,7 +66,7 @@ Palm Beach Sports Club
  }
 
  .dropdown-item.active, .dropdown-item:active {
-     background-color: #FF745C;
+     background-color: #565756;
  }
 
  *,
@@ -110,7 +108,7 @@ Palm Beach Sports Club
  h1 {
      margin: 0 0 1.5rem 0;
      font-size: 1.5rem;
-     color: #FF745C;
+     color: #565756;
      text-align: center;
  }
 
@@ -150,7 +148,7 @@ Palm Beach Sports Club
  .submit {
      padding: 15px 30px;
      color: #FFF;
-     background-color: #FF745C;
+     background-color: #565756;
      font-size: 18px;
      letter-spacing: 0.07em;
      text-align: center;
@@ -158,7 +156,7 @@ Palm Beach Sports Club
      border-radius: 5px;
      margin: 10px 0;
      width: 100%;
-     border: 1px solid #FF745C;
+     border: 1px solid #565756;
      border-width: 1px;
  }
 
