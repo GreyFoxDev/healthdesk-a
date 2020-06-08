@@ -94,13 +94,22 @@ defmodule MainWeb.TsiController do
     location = conn.assigns.location
 
     with %Schema{} = convo <- C.get(convo_id) do
-      << "APP:", phone_number :: binary >> = convo.original_number
+      << "APP:+1", phone_number :: binary >> = convo.original_number
 
       CM.create(%{
             "conversation_id" => convo.id,
             "phone_number" => convo.original_number,
             "message" => params["message"],
             "sent_at" => DateTime.utc_now()})
+
+      member =  Member.get_by_phone_number(@role, convo.original_number)
+
+      if member do
+        name = Enum.join([member.first_name, member.last_name], " ")
+        MainWeb.Endpoint.broadcast("convo:#{convo_id}", "broadcast", %{message: params["message"], name: name})
+      else
+        MainWeb.Endpoint.broadcast("convo:#{convo_id}", "broadcast", %{message: params["message"], phone_number: phone_number})
+      end
 
       if convo.status == "closed" do
         params["message"]

@@ -10,7 +10,6 @@ defmodule MainWeb.Live.ConversationMessageUpdatesView do
 
   def mount(_params, %{"conversation" => id} = session, socket) do
     MainWeb.Endpoint.subscribe("convo:#{id}")
-
     socket =
       socket
       |> assign(:session, session)

@@ -6,7 +6,7 @@
     <div class="conversation-message">
     <div class="conversation-message-text"> <%= message.message %></div>
     <div class="conversation-meta">
-      <%= if message[:name] && message.name != " ", do: message.name, else: "+1 #{format_phone(message.phone_number)}" %>
+      <%= if message[:name] && message.name != " ", do: message.name, else: "#{format_phone(message.phone_number)}" %>
           ·
       now
     </div>
