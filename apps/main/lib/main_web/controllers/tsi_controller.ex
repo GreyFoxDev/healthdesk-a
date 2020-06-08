@@ -1,7 +1,7 @@
 defmodule MainWeb.TsiController do
   use MainWeb, :controller
 
-  import Plug.Conn, only: [send_resp: 3]
+  import Plug.Conn, only: [send_resp: 3, assign: 3]
 
   plug MainWeb.Plug.AllowFrom
   plug MainWeb.Plug.ValidateApiKey
@@ -31,7 +31,9 @@ defmodule MainWeb.TsiController do
           create_member_data(location.team_id, first_name, last_name, phone)
       end
 
-    render_new(conn, phone_number, api_key)
+    conn
+    |> assign(:title, location.team.team_name)
+    |> render_new(phone_number, api_key)
   end
 
   def new(conn, %{"unique-id" => unique_id, "api_key" => api_key} = params),
@@ -50,6 +52,7 @@ defmodule MainWeb.TsiController do
 
       conn
       |> put_layout({MainWeb.LayoutView, layout})
+      |> assign(:title, location.team.team_name)
       |> render("edit.html", api_key: api_key, convo_id: convo_id, phone_number: phone_number, changeset: CM.get_changeset())
     end
   end
@@ -77,7 +80,9 @@ defmodule MainWeb.TsiController do
 
       close_conversation(convo.id, location)
 
-      redirect(conn, to: tsi_path(conn, :edit, api_key, convo.id))
+      conn
+      |> assign(:title, location.team.team_name)
+      |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
     end
   end
 
@@ -125,7 +130,9 @@ defmodule MainWeb.TsiController do
            end
       end
 
-      redirect(conn, to: tsi_path(conn, :edit, api_key, convo.id))
+      conn
+      |> assign(:title, location.team.team_name)
+      |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
     end
   end
 
@@ -170,9 +177,9 @@ defmodule MainWeb.TsiController do
       location = conn.assigns.location
       template_name =
         case location.team.team_name do
-          "Total Woman Spa" -> "new.html"
           "Around the Clock Fitness" -> "around_the_clock_fitness_new.html"
           "Palm Beach Sports Club" -> "palm_beach_sports_club_new.html"
+          _ -> "new.html"
         end
 
       conn
@@ -259,9 +266,9 @@ defmodule MainWeb.TsiController do
 
   defp get_edit_layout_for_team(conn) do
     case conn.assigns.location.team.team_name do
-      "Total Woman Spa" -> :tsi_conversation
       "Around the Clock Fitness" -> :around_the_clock_fitness_conversation
       "Palm Beach Sports Club" -> :palm_beach_sports_club_conversation
+      _ -> :tsi_conversation
     end
   end
 
