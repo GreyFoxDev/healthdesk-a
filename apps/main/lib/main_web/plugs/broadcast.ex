@@ -17,8 +17,12 @@ defmodule MainWeb.Plug.Broadcast do
       MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, phone_number: member})
     else
       %MemberSchema{} = member ->
+      if member.first_name && member.last_name do
         name = Enum.join([member.first_name, member.last_name], " ")
         MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, name: name, phone_number: member.phone_number})
+      else
+        MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, phone_number: member.phone_number})
+      end
     end
 
     case Location.get_by_phone(location) do
