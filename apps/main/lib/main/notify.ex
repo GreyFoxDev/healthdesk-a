@@ -23,7 +23,7 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
-    body = Enum.join(["You've been assigned to this conversation:", message, link[:url]], "\n")
+    body = Enum.join(["You've been assigned to this conversation:", message, link[:url]], " ")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =
@@ -89,7 +89,7 @@ defmodule MainWeb.Notify do
         "You've been assigned to this conversation:",
         message,
         link[:url]
-      ] |> Enum.join("/n")
+      ] |> Enum.join(" ")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =
@@ -145,7 +145,7 @@ defmodule MainWeb.Notify do
     if location.slack_integration && location.slack_integration != "" do
       headers = [{"content-type", "application/json"}]
 
-      body = Jason.encode! %{text: body}
+      body = Jason.encode! %{text: String.replace(body, "\n", " ")}
 
       Tesla.post location.slack_integration, body, headers: headers
     end
