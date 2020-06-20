@@ -11,8 +11,8 @@ defmodule MainWeb.FallbackController do
 
   def call(conn, {:error, :unauthorized}) do
     conn
-    |> put_status(:unauthorized)
-    |> render(ErrorView, :"401", message: "You are not authorized for this page")
+    |> put_flash(:error, "You are unauthorized to view this page. It could be due to inactivity. Please login to continue.")
+    |> redirect(to: "/")
   end
 
   def call(conn, {:error, _reason}) do
