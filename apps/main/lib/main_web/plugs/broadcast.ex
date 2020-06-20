@@ -20,7 +20,7 @@ defmodule MainWeb.Plug.Broadcast do
       %MemberSchema{} = member ->
         IO.inspect "AM I BROADCASTING WITH MEMBER INFORMATION"
         name = Enum.join([member.first_name, member.last_name], " ")
-        MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, name: name})
+        MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, name: name, phone_number: member})
     end
 
     case Location.get_by_phone(location) do
