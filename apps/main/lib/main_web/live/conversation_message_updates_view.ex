@@ -19,6 +19,7 @@ defmodule MainWeb.Live.ConversationMessageUpdatesView do
 
   def handle_info(broadcast = %{topic: << "convo:", _id :: binary >>}, socket) do
     messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
+    IO.inspect broadcast.payload, label: "BROADCAST PAYLOAD"
     {:noreply, assign(socket, :messages, [broadcast.payload|messages])}
   end
 end

@@ -14,9 +14,11 @@ defmodule MainWeb.Plug.Broadcast do
 
   def call(%{assigns: %{convo: convo, member: member, location: location, message: message} = assigns} = conn, _opts) do
     with nil <- Member.get_by_phone(member) do
+      IO.inspect "AM I BROADCASTING WITHOUT MEMBER INFORMATION"
       MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, phone_number: member})
     else
       %MemberSchema{} = member ->
+        IO.inspect "AM I BROADCASTING WITH MEMBER INFORMATION"
         name = Enum.join([member.first_name, member.last_name], " ")
         MainWeb.Endpoint.broadcast("convo:#{convo}", "broadcast", %{message: message, name: name})
     end
