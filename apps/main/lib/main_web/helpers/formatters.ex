@@ -117,7 +117,7 @@ defmodule MainWeb.Helper.Formatters  do
     hour = String.to_integer(hour)
 
     cond do
-      hour - 12 == 0 ->
+      hour - 12 == 0 or hour === 0 ->
         "12:#{minute} AM"
       hour > 12 ->
         "#{hour - 12}:#{minute} PM"
