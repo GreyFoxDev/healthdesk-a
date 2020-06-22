@@ -107,15 +107,16 @@ defmodule MainWeb.Notify do
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin"))
 
+    conversation = Conversations.get(conversation_id) |> IO.inspect(label: "CONVERSATION IN NOTIFY")
+
     _ = Enum.each(all_admins, fn(admin) ->
       if admin.user.use_email do
-        conversation = Conversations.get(conversation_id)
         member = conversation.member
         subject = if member do
           member = [
             member.first_name,
             member.last_name,
-            conversation.original_number
+            conversation[:original_number]
           ] |> Enum.join(" ")
 
           "New message from #{member}"
