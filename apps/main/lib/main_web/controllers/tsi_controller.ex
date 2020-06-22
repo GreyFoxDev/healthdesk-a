@@ -184,10 +184,11 @@ defmodule MainWeb.TsiController do
   defp render_new(conn, unique_id, api_key) do
     if String.length(unique_id) >= 10 do
       location = conn.assigns.location
+      IO.inspect location.location_name
       template_name =
-        case location.team.team_name do
-          "Around the Clock Fitness" -> "around_the_clock_fitness_new.html"
-          "Palm Beach Sports Club" -> "palm_beach_sports_club_new.html"
+        case location.location_name do
+          << "ATC - ", _rest::binary>> -> "around_the_clock_fitness_new.html"
+          << "PB - ", _rest::binary>> -> "palm_beach_sports_club_new.html"
           _ -> "new.html"
         end
 
@@ -274,9 +275,9 @@ defmodule MainWeb.TsiController do
   end
 
   defp get_edit_layout_for_team(conn) do
-    case conn.assigns.location.team.team_name do
-      "Around the Clock Fitness" -> :around_the_clock_fitness_conversation
-      "Palm Beach Sports Club" -> :palm_beach_sports_club_conversation
+    case conn.assigns.location.location_name do
+      << "ATC - ", _rest::binary >> -> :around_the_clock_fitness_conversation
+      << "PB - ", _rest::binary >> -> :palm_beach_sports_club_conversation
       _ -> :tsi_conversation
     end
   end
