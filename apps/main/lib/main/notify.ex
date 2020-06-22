@@ -48,7 +48,7 @@ defmodule MainWeb.Notify do
 
         "New message from #{member}"
       else
-        "New message from #{conversation.original_phone}"
+        "New message from #{conversation.original_number}"
       end
 
       team_member.user.email
@@ -107,7 +107,7 @@ defmodule MainWeb.Notify do
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin"))
 
-    conversation = Conversations.get(conversation_id) |> IO.inspect(label: "CONVERSATION IN NOTIFY")
+    conversation = Conversations.get(conversation_id)
 
     _ = Enum.each(all_admins, fn(admin) ->
       if admin.user.use_email do
@@ -121,7 +121,7 @@ defmodule MainWeb.Notify do
 
           "New message from #{member}"
         else
-          "New message from #{conversation.original_phone}"
+          "New message from #{conversation.original_number}"
         end
 
         admin.user.email
