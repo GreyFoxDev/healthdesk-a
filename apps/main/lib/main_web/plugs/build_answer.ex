@@ -21,6 +21,7 @@ defmodule MainWeb.Plug.BuildAnswer do
   message in the queue.
   """
   def call(%{assigns: %{convo: id, opt_in: true, status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
+    IO.inspect assigns, label: "HERE IN BUILD ANSWER????"
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
     :ok = notify_admin_user(assigns)
@@ -39,6 +40,9 @@ defmodule MainWeb.Plug.BuildAnswer do
 
     location = Location.get_by_phone(location)
 
+    IO.inspect response, label: "RESPONSE"
+    IO.inspect location.default_message, label: "DEFAULT MESSAGE"
+
     if response == location.default_message do
       pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
@@ -53,7 +57,7 @@ defmodule MainWeb.Plug.BuildAnswer do
     end
   end
 
-  def call(conn, _opts), do: conn
+  def call(conn, _opts), do: IO.inspect(conn, label: "CATCH ALL IN BUILD ANSWER")
 
 
   defp notify_admin_user(%{message: message, member: member, convo: convo, location: location}) do
