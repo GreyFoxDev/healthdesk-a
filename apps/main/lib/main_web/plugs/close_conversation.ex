@@ -18,7 +18,6 @@ defmodule MainWeb.Plug.CloseConversation do
   then no need to do anything. Just return the connection.
   """
   def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
-    IO.inspect "HERE IN CLOSE CONVERSATOIN?"
     convo = C.get(id)
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
@@ -39,13 +38,11 @@ defmodule MainWeb.Plug.CloseConversation do
   an admin addresses the member.
   """
   def call(%{assigns: %{convo: id, intent: {:unknown, []}}} = conn, _opts) do
-    IO.inspect "OR {:unknown, []} HERE IN CLOSE CONVERSATOIN?"
     C.pending(id)
     conn
   end
 
   def call(%{assigns: %{convo: id, intent: :unknown_intent}} = conn, _opts) do
-    IO.inspect "OR :unknown_intent HERE IN CLOSE CONVERSATOIN?"
     C.pending(id)
     conn
   end
@@ -54,7 +51,6 @@ defmodule MainWeb.Plug.CloseConversation do
   If the question has been answered then close the conversation
   """
   def call(%{assigns: %{convo: id, location: location} = assigns} = conn, _opts) do
-    IO.inspect "MAYBE HERE?"
     datetime = DateTime.utc_now()
     CM.create(%{
           "conversation_id" => id,
@@ -91,6 +87,6 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
 
-  def call(conn, _opts), do: IO.inspect(conn, label: " CATCH ALL CLOSE CONVERSATION")
+  def call(conn, _opts), do: conn
 
 end

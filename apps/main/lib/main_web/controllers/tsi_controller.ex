@@ -184,7 +184,6 @@ defmodule MainWeb.TsiController do
   defp render_new(conn, unique_id, api_key) do
     if String.length(unique_id) >= 10 do
       location = conn.assigns.location
-      IO.inspect location.location_name
       template_name =
         case location.location_name do
           << "ATC - ", _rest::binary>> -> "around_the_clock_fitness_new.html"
