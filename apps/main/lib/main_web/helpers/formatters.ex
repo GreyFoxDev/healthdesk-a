@@ -121,6 +121,8 @@ defmodule MainWeb.Helper.Formatters  do
         "12:#{minute} AM"
       hour > 12 ->
         "#{hour - 12}:#{minute} PM"
+      hour == 12 ->
+        "12:#{minute} PM"
       true ->
         "#{hour}:#{minute} AM"
     end
