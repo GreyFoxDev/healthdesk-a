@@ -35,6 +35,9 @@ defmodule MainWeb.Notify do
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
+      |> IO.inspect(label: "AVAILABLE TEAMMATE")
+
+    IO.inspect(team_member.user, label: "SEND TO TEAMMATE")
 
     if team_member.user.use_email do
       conversation = Conversations.get(conversation_id)
@@ -101,11 +104,13 @@ defmodule MainWeb.Notify do
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
+      |> IO.inspect(label: "AVAILABLE ADMINS")
 
     all_admins =
       %{role: "system"}
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin"))
+      |> IO.inspect(label: "ALL ADMINS")
 
     conversation = Conversations.get(conversation_id)
 
