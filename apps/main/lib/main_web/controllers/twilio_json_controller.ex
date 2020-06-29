@@ -25,6 +25,7 @@ defmodule MainWeb.TwilioJsonController do
   This catches an explicit error that was raied in the pipeling
   """
   def inbound(%Plug.Conn{assigns: %{error: true}} = conn, _params) do
+    IO.inspect conn.assigns, label: "AN ERROR HAPPEND"
     conn
     |> put_resp_content_type("application/json")
     |> put_status(500)
@@ -32,6 +33,7 @@ defmodule MainWeb.TwilioJsonController do
   end
 
   def inbound(%Plug.Conn{assigns: %{status: "pending", convo: id}} = conn, _params) do
+    IO.inspect conn.assigns[:response], label: "SENDING RESPONSE FOR PENDING"
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
     conn
@@ -45,7 +47,7 @@ defmodule MainWeb.TwilioJsonController do
   """
   def inbound(%Plug.Conn{assigns: %{response: response}} = conn, _params)
   when is_binary(response) do
-
+    IO.inspect response, label: "SENDING RESPONSE"
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
@@ -56,6 +58,7 @@ defmodule MainWeb.TwilioJsonController do
   Handle an error back to member. This is a catch all function
   """
   def inbound(conn, _params) do
+    IO.inspect conn.assigns, label: "A NON COVERED ERROR HAPPEND"
     conn
     |> put_resp_content_type("application/json")
     |> put_status(500)
