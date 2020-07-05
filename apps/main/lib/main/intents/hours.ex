@@ -29,16 +29,20 @@ defmodule MainWeb.Intents.Hours do
 
       prefix = date_prefix({term, day_of_week}, {year, month, day}, location.timezone)
 
-      if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
-        @alt_response
-        |> String.replace("[date_prefix]", prefix)
-        |> String.replace("[open]", hours.open_at)
-        |> String.replace("[close]", hours.close_at)
+      if hours.open_at && hours.close_at do
+        if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
+          @alt_response
+          |> String.replace("[date_prefix]", prefix)
+          |> String.replace("[open]", hours.open_at)
+          |> String.replace("[close]", hours.close_at)
+        else
+          @hours
+          |> String.replace("[date_prefix]", prefix)
+          |> String.replace("[open]", hours.open_at)
+          |> String.replace("[close]", hours.close_at)
+        end
       else
-        @hours
-        |> String.replace("[date_prefix]", prefix)
-        |> String.replace("[open]", hours.open_at)
-        |> String.replace("[close]", hours.close_at)
+        String.replace(@closed, "[data_prefix]", prefix)
       end
     else
       [] ->
@@ -65,18 +69,21 @@ defmodule MainWeb.Intents.Hours do
     with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week(erl_date, location.id),
          [hours] <- get_hours(location.id, {term, day_of_week}) do
 
-      if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
-        @alt_response
-        |> String.replace("[date_prefix]", "Today")
-        |> String.replace("[open]", hours.open_at)
-        |> String.replace("[close]", hours.close_at)
+      if hours.open_at && hours.close_at do
+        if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
+          @alt_response
+          |> String.replace("[date_prefix]", "Today")
+          |> String.replace("[open]", hours.open_at)
+          |> String.replace("[close]", hours.close_at)
+        else
+          @hours
+          |> String.replace("[date_prefix]", "Today")
+          |> String.replace("[open]", hours.open_at)
+          |> String.replace("[close]", hours.close_at)
+        end
       else
-        @hours
-        |> String.replace("[date_prefix]", "Today")
-        |> String.replace("[open]", hours.open_at)
-        |> String.replace("[close]", hours.close_at)
+        String.replace(@closed, "[data_prefix]", "Today")
       end
-
     else
       [] ->
         {term, day_of_week} = get_day_of_week(erl_date, location.id)
