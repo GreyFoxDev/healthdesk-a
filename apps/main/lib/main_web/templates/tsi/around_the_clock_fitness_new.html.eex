@@ -253,7 +253,9 @@
          value = $("#facilities").val();
          if (value) {
              $("#personnel").prop("disabled", "disabled");
+             $("#personnel").css("color", "white");
              $("#member_services").prop("disabled", "disabled");
+             $("#member_services").css("color", "white");
              enable_submit();
          } else {
              $("#personnel").prop("disabled", false);
@@ -266,6 +268,8 @@
          value = $("#personnel").val();
          if (value) {
              $("#facilities").prop("disabled", "disabled");
+             $("#facilities").css("color", "white");
+             $("#member_services").css("color", "white");
              $("#member_services").prop("disabled", "disabled");
              enable_submit();
          } else {
@@ -279,7 +283,9 @@
          value = $("#member_services").val();
          if (value) {
              $("#facilities").prop("disabled", "disabled");
+             $("#facilities").css("color", "white");
              $("#personnel").prop("disabled", "disabled");
+             $("#personnel").css("color", "white");
              enable_submit();
          } else {
              $("#facilities").prop("disabled", false);

@@ -96,13 +96,13 @@
             $('#scroll-message').bind('DOMNodeInserted', function(e) {
     $('html, body').animate({
               scrollTop: $("#scroll-message").offset().top + $("#scroll-message")[0].scrollHeight
-          }, 2000);
+          }, 200);
 });
 
 $( document ).ready(function() {
     $('html, body').animate({
               scrollTop: $("#scroll-message").offset().top + $("#scroll-message")[0].scrollHeight
-          }, 2000);
+          }, 200);
 });
         </script>
     </body>
