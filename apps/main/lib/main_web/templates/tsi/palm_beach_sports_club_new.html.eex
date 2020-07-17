@@ -246,6 +246,11 @@
          $("#facilities").prop("disabled", false);
          $("#personnel").prop("disabled", false);
          $("#member_services").prop("disabled", false);
+
+         $("#personnel").css("color", "black");
+        $("#member_services").css("color", "black");
+        $("#facilities").css("color", "black");
+
          disable_submit();
 	 	 });
 
@@ -259,7 +264,9 @@
              enable_submit();
          } else {
              $("#personnel").prop("disabled", false);
+             $("#personnel").css("color", "black");
              $("#member_services").prop("disabled", false);
+             $("#member_services").css("color", "black");
              disable_submit();
          }
      });
@@ -274,7 +281,9 @@
              enable_submit();
          } else {
              $("#facilities").prop("disabled", false);
+             $("#facilities").css("color", "black");
              $("#member_services").prop("disabled", false);
+             $("#member_services").css("color", "black");
              disable_submit();
          }
      });
@@ -289,7 +298,9 @@
              enable_submit();
          } else {
              $("#facilities").prop("disabled", false);
+             $("#facilities").css("color", "black");
              $("#personnel").prop("disabled", false);
+             $("#personnel").css("color", "black");
              disable_submit();
          }
      });
