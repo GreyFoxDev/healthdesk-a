@@ -83,7 +83,6 @@
 
         select {
         padding: 6px;
-        height: 32px;
         border-radius: 2px;
         }
 
