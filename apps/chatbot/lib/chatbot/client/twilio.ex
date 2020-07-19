@@ -32,6 +32,7 @@ defmodule Chatbot.Client.Twilio do
     token = Application.get_env(:ex_twilio, :flex_auth_token)
     service_id = Application.get_env(:ex_twilio, :flex_service_id)
 
+    IO.inspect params, label: "CHANNEL PARAMS"
     ExTwilio.Api.create(
       ExTwilio.ProgrammableChat.Channel,
       [to: params.to, from: params.from, body: params.body, friendly_name: "Nick"],
@@ -39,7 +40,7 @@ defmodule Chatbot.Client.Twilio do
       to: params.to,
       account: account,
       token: token
-    )
+    ) |> IO.inspect("RESULT")
   end
 
   def verify(phone_number) do
