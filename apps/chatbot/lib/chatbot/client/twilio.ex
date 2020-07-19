@@ -40,7 +40,7 @@ defmodule Chatbot.Client.Twilio do
       to: params.to,
       account: account,
       token: token
-    ) |> IO.inspect("RESULT")
+    ) |> IO.inspect(label: "RESULT")
   end
 
   def verify(phone_number) do

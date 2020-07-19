@@ -105,7 +105,7 @@ defmodule MainWeb.ConversationMessageController do
   defp send_message(%{original_number: << "CH", _ :: binary >>} = conversation, conn, params, location) do
     user = current_user(conn)
 
-    from = if conversation.team_member do
+    from_name = if conversation.team_member do
       Enum.join([conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."], " ")
     else
       location.location_name
@@ -116,7 +116,7 @@ defmodule MainWeb.ConversationMessageController do
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-           message = %Chatbot.Params{provider: :twilio, from: from, to: conversation.original_number, body: params["conversation_message"]["message"]}
+           message = %Chatbot.Params{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
            Chatbot.Client.Twilio.channel(message)
            put_flash(conn, :success, "Sending message was successful")
          {:error, _changeset} ->
