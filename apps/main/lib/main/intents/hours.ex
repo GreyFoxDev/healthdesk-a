@@ -99,7 +99,6 @@ defmodule MainWeb.Intents.Hours do
   end
 
   def build_response(wtf, location) do
-    IO.inspect wtf, label: "WTF?"
     location = Location.get_by_phone(location)
 
     if location.default_message != "" do
