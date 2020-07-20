@@ -106,7 +106,7 @@ defmodule MainWeb.TsiController do
 
       if member do
         name = Enum.join([member.first_name, member.last_name], " ")
-        MainWeb.Endpoint.broadcast("convo:#{convo_id}", "broadcast", %{message: params["message"], name: name})
+        MainWeb.Endpoint.broadcast("convo:#{convo_id}", "broadcast", %{message: params["message"], name: name, phone_number: phone_number})
       else
         MainWeb.Endpoint.broadcast("convo:#{convo_id}", "broadcast", %{message: params["message"], phone_number: phone_number})
       end
