@@ -89,7 +89,7 @@ defmodule MainWeb.Helper.Formatters  do
         |> Calendar.Time.Format.iso8601()
         |> to_time(:yesterday)
       _ ->
-        Strftime.strftime!(datetime, "%m/%d/%Y")
+        Strftime.strftime!(datetime, "%m/%d/%Y %I:%M %p")
     end
   end
 
