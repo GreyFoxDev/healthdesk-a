@@ -7,7 +7,9 @@ defmodule MainWeb.Live.ConversationAlertsView do
   def render(%{alert: %{convo: convo, location: location}} = assigns) do
     ~L[
     <div class="alert alert-info alert-dismissible fade show" phx-hook="NotificationHook">
+    <div class="notifications">
       <b>New message for <%= link location.location_name, to: "/admin/teams/#{location.team_id}/locations/#{location.id}/conversations/#{convo}/conversation-messages" %> location</b>
+    </div>
     </div>
     ]
   end
