@@ -166,8 +166,8 @@
              data: [
                  <%= @web_totals %>,
                  <%= @sms_totals %>,
-                 <%= @app_totals %>,
-                 <%= @facebook_totals %>
+                 <%= @facebook_totals %>,
+                 <%= @app_totals %>
              ],
              borderWidth: 5,
              backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40'],
