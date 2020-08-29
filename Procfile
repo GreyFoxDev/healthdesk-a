@@ -1,2 +1,2 @@
-web: MIX_ENV=prod mix phx.server
+web: MIX_ENV=prod elixir --sname healthdesk -S mix phx.server
 release: mix ecto.migrate
