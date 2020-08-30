@@ -144,13 +144,13 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   defp sec_string(s) when s ==0, do: "N/A"
-  defp sec_string(s) when s < 10, do: "0#{s} seconds"
-  defp sec_string(s), do: "#{s} seconds"
+  defp sec_string(s) when s < 10, do: "0#{s} secs"
+  defp sec_string(s), do: "#{s} secs"
   defp min_string(s) when s == 0, do: ""
-  defp min_string(s) when s < 10, do: "0#{s} minutes, "
-  defp min_string(s), do: "#{s} minutes, "
+  defp min_string(s) when s < 10, do: "0#{s} mins, "
+  defp min_string(s), do: "#{s} mins, "
   defp hour_string(s) when s == 0, do: ""
-  defp hour_string(s) when s < 10, do: "0#{s} hours, "
-  defp hour_string(s), do: "#{s} hours, "
+  defp hour_string(s) when s < 10, do: "0#{s} hrs, "
+  defp hour_string(s), do: "#{s} hrs, "
 
 end
