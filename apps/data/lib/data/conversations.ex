@@ -98,7 +98,7 @@ defmodule Data.Conversations do
       nil
     else
       %Schema{status: "closed"} = conversation ->
-        nil
+        {:ok, conversation}
       %Schema{} = convo ->
         {:ok, convo}
     end

@@ -50,12 +50,16 @@ defmodule MainWeb.TsiController do
           nil ->
             create_member_data(location.team_id, first_name, last_name, phone)
         end
-    with {:ok, %Schema{} = convo} <- C.find_and_open_conversation({phone, location.phone_number}) do
+    with {:ok, %Schema{} = convo} <- C.find_conversation({phone, location.phone_number}) do
       conn
       |> assign(:title, location.team.team_name)
       |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
     else
     err ->
+      IO.inspect("###################")
+      IO.inspect(err)
+      IO.inspect("###################")
+
       conn
       |> assign(:title, location.team.team_name)
       |> render_new(phone_number, api_key)
@@ -77,7 +81,7 @@ defmodule MainWeb.TsiController do
           nil ->
             create_member_data(location.team_id, first_name, last_name, phone)
         end
-    with {:ok, %Schema{} = convo} <- C.find_conversation({phone, location.phone_number}) do
+    with {:ok, %Schema{status: "open"} = convo} <- C.find_conversation({phone, location.phone_number}) do
       conn
       |> assign(:title, location.team.team_name)
       |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))

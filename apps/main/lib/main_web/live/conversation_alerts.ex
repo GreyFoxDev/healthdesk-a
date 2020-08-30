@@ -33,11 +33,6 @@ defmodule MainWeb.Live.ConversationAlertsView do
     {:ok, assign(socket, :session, session)}
   end
 
-  def handle_info(broadcast = %{topic: << "alert:", _loation :: binary >>,payload: %{convo: convo, location: location}}, socket) do
-    socket = assign(socket, :alert, broadcast.payload)
-    {:noreply, push_event(socket, "new_msg", %{convo: convo, location: location})}
-    {:noreply, socket}
-  end
   def handle_info(broadcast = %{topic: << "alert:", _loation :: binary >>}, socket) do
     {:noreply, assign(socket, :alert, broadcast.payload)}
   end
