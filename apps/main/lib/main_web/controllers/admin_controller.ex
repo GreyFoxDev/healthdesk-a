@@ -1,7 +1,7 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition}
+  alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages}
 
   def index(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
@@ -26,6 +26,7 @@ defmodule MainWeb.AdminController do
     locations = Location.get_by_team_id(current_user, team_id)
 
     location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
+    response_time=ConversationMessages.count_by_team_id(team_id)
     campaigns = if location_id do
       Campaign.get_by_location_id(location_id)
     else
@@ -44,6 +45,7 @@ defmodule MainWeb.AdminController do
       sms_totals: team_totals_by_channel("SMS", team_id),
       app_totals: team_totals_by_channel("APP", team_id),
       facebook_totals: team_totals_by_channel("FACEBOOK", team_id),
+      response_time: response_time.median_response_time||0,
       team_admin_count: team_admin_count,
       teammate_count: teammate_count,
       locations: locations,
@@ -58,6 +60,7 @@ defmodule MainWeb.AdminController do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_location_id(current_user, location_id)
     dispositions = Disposition.count_by_location_id(location_id)
+    response_time = ConversationMessages.count_by_location_id(location_id)
     dispositions_per_day =
       case Disposition.average_per_day_for_location(location_id) do
         [result] -> result
@@ -80,6 +83,7 @@ defmodule MainWeb.AdminController do
       dispositions: dispositions,
       campaigns: Campaign.get_by_location_id(location_id),
       dispositions_per_day: dispositions_per_day,
+      response_time: response_time.median_response_time||0,
       web_totals: location_totals_by_channel("WEB", location_id),
       sms_totals: location_totals_by_channel("SMS", location_id),
       app_totals: location_totals_by_channel("APP", location_id),
@@ -126,6 +130,7 @@ defmodule MainWeb.AdminController do
         campaigns: campaigns,
         dispositions: dispositions,
         dispositions_per_day: dispositions_per_day,
+        response_time: nil,
         web_totals: totals_by_channel("WEB"),
         sms_totals: totals_by_channel("SMS"),
         app_totals: totals_by_channel("APP"),
@@ -145,7 +150,7 @@ defmodule MainWeb.AdminController do
           _ -> %{sessions_per_day: 0}
         end
       locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
-
+      response_time=ConversationMessages.count_by_team_id(current_user.team_member.team_id)
       location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
       campaigns = if location_id do
         Campaign.get_by_location_id(location_id)
@@ -162,6 +167,7 @@ defmodule MainWeb.AdminController do
         campaigns: campaigns,
         dispositions: dispositions,
         dispositions_per_day: dispositions_per_day,
+        response_time: response_time.median_response_time||0,
         web_totals: team_totals_by_channel("WEB", current_user.team_member.team_id),
         sms_totals: team_totals_by_channel("SMS", current_user.team_member.team_id),
         app_totals: team_totals_by_channel("APP", current_user.team_member.team_id),

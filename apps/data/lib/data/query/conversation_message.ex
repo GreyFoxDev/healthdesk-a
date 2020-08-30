@@ -5,8 +5,10 @@ defmodule Data.Query.ConversationMessage do
   import Ecto.Query, only: [from: 2]
 
   alias Data.Schema.ConversationMessage
+  alias Data.Schema.Conversation
   alias Data.ReadOnly.Repo, as: Read
   alias Data.WriteOnly.Repo, as: Write
+  alias Ecto.Adapters.SQL
 
   @doc """
   Returns a conversation message by id
@@ -17,6 +19,28 @@ defmodule Data.Query.ConversationMessage do
       where: t.id == ^id
     )
     |> repo.one()
+  end
+  @doc """
+  Return median response time based on location
+  """
+  @spec count_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_location_id(location_id, repo \\ Read) do
+
+    repo
+    |> SQL.query!("SELECT count_messages_by_location_id('#{location_id}') AS #{:median_response_time}")
+    |> build_results()
+
+  end
+  @doc """
+  Return median response time based on team
+  """
+  @spec count_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_team_id(team_id, repo \\ Read) do
+
+    repo
+    |> SQL.query!("SELECT count_messages_by_team_id('#{team_id}') AS #{:median_response_time}")
+    |> build_results()
+
   end
 
   @doc """
@@ -50,5 +74,10 @@ defmodule Data.Query.ConversationMessage do
       changeset ->
         {:error, changeset}
     end
+  end
+
+  defp build_results(results) do
+    cols = Enum.map(results.columns, &String.to_existing_atom/1)
+    Enum.map(results.rows, fn row -> Map.new(Enum.zip(cols, row)) end) |> List.first
   end
 end
