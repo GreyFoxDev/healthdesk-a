@@ -84,8 +84,7 @@ defmodule Data.Conversations do
       nil
     else
       %Schema{status: "closed"} = conversation ->
-        Query.update(conversation, @open)
-
+        nil
       %Schema{} = convo ->
         {:ok, convo}
     end

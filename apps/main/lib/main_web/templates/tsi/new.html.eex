@@ -34,11 +34,21 @@
         </fieldset>
         <%= submit "SUBMIT REQUEST", [class: "submit", data_toggle: "modal", data_target: "#exampleModalCenter"] %>
         <a class="reset">Reset Form</a>
+
     </div>
     <!-- Modal -->
 <% end %>
+<a class="prev-chat" href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>&ticket=open">
+    Go to previous chat
+</a>
 
 <style>
+    a.prev-chat {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        color: black;
+    }
 
  .banner {
      background-color: #FF745C;
