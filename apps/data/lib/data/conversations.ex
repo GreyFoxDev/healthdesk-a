@@ -74,6 +74,24 @@ defmodule Data.Conversations do
   end
 
   @doc """
+  Retrieves a conversation from the database. . Conversations are unique to locations.
+  """
+  @spec find_conversation({member :: binary, location :: binary}) ::
+          Conversation.t() | nil
+  def find_conversation({member, location}) do
+    with %Location{} = location <- Data.Query.Location.get_by_phone(location),
+         nil <- get_by_phone(member, location.id) do
+      nil
+    else
+      %Schema{status: "closed"} = conversation ->
+        Query.update(conversation, @open)
+
+      %Schema{} = convo ->
+        {:ok, convo}
+    end
+  end
+
+  @doc """
   Sets the status to pending for an existing conversation
   """
   @spec pending(id :: binary) :: {:ok, Conversation.t()} | {:error, String.t()}

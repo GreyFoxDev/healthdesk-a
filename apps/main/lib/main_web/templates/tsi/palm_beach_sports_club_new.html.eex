@@ -5,7 +5,7 @@
     <%= hidden_input f, :phone_number, value: @phone_number %>
     <%= hidden_input f, :api_key, value: @api_key %>
     <div class="form-group">
-        <div class="p-2 banner text-center"><p>Type of Concern</p></div>
+        <div class="p-2 banner text-center"><p>Ticket Type</p></div>
         <fieldset>
             <%= select f, :facilities, [
                 {"Facilities", nil},
