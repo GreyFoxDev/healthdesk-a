@@ -1,0 +1,9 @@
+<div phx-hook="NotificationHook">
+    <%= if assigns[:location] do %>
+    <div class="alert alert-info alert-dismissible fade show notifications">
+        <b>New message for
+            <%= link @location.location_name, to: "/admin/teams/#{@location.team_id}/locations/#{@location.id}/conversations/#{@convo}/conversation-messages" %>
+            location</b>
+       <% end %>
+    </div>
+</div>

@@ -4,18 +4,12 @@ defmodule MainWeb.Live.ConversationAlertsView do
 
   alias MainWeb.Router.Helpers, as: Routes
 
-  def render(%{alert: %{convo: convo, location: location}} = assigns) do
-    ~L[
-<div phx-hook="NotificationHook">
-    <div class="alert alert-info alert-dismissible fade show notifications">
-      <b>New message for <%= link location.location_name, to: "/admin/teams/#{location.team_id}/locations/#{location.id}/conversations/#{convo}/conversation-messages" %> location</b>
-    </div>
-    </div>
-    ]
-  end
+  alias MainWeb.ConversationAlertsView, as: View
+
+
 
   def render(assigns) do
-    ~L[<div phx-hook="NotificationHook"></div>]
+    View.render("index.html", assigns)
   end
 
   def mount(_params, %{"current_user" => %{role: "admin"}} = session, socket) do
