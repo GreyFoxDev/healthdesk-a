@@ -1,6 +1,6 @@
 <div phx-hook="NotificationHook">
     <%= if assigns[:alert] do %>
-    <div class="alert alert-info alert-dismissible fade show" data-id="<%= UUID.uuid4() %>">
+    <div class="alert alert-info alert-dismissible fade show" data-id="<%= @randid %>">
         <div class="notifications">
         <b>New message for
             <%= link @alert.location.location_name, to: "/admin/teams/#{@alert.location.team_id}/locations/#{@alert.location.id}/conversations/#{@alert.convo}/conversation-messages" %>

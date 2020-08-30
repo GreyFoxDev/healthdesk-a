@@ -34,6 +34,6 @@ defmodule MainWeb.Live.ConversationAlertsView do
   end
 
   def handle_info(broadcast = %{topic: << "alert:", _loation :: binary >>}, socket) do
-    {:noreply, assign(socket, :alert, broadcast.payload)}
+    {:noreply, assign(socket, alert: broadcast.payload, randid: UUID.uuid4())}
   end
 end
