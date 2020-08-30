@@ -70,8 +70,8 @@
         <nav class="navbar navbar-light bg-light sticky-top shadow-sm">
             <a class="navbar-brand" href="#">
                 <img src="https://i.ibb.co/M5YdtLy/logo.png" width="150px" border="0"/>
-                <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>">
-                    <button type="button" class="btn btn-outline-primary btn-sm">Reset Chat</button>
+                <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>&ticket=new">
+                    <button type="button" class="btn btn-outline-primary btn-sm">New Ticket</button>
                 </a>
             </a>
         </nav>

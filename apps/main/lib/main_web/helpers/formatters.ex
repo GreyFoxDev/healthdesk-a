@@ -16,28 +16,28 @@ defmodule MainWeb.Helper.Formatters  do
     |> Enum.join(" ")
   end
 
-  def format_phone(<< "1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  def format_phone(<<"1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
     "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
 
-  def format_phone(<< " 1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  def format_phone(<<" 1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
     "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
 
-  def format_phone(<< "+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  def format_phone(<<"+1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
     "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
-  def format_phone(<< "APP:+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
-    "+1 #{Enum.join([area_code, prefix, line], "-")}"
-  end
-
-  def format_phone(<< area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  def format_phone(<<"APP:+1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
     "+1 #{Enum.join([area_code, prefix, line], "-")}"
   end
 
-  def format_phone(<< "messenger:", _rest :: binary >>), do: "Facebook Visitor"
+  def format_phone(<<area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
+    "+1 #{Enum.join([area_code, prefix, line], "-")}"
+  end
 
-  def format_phone(<< "CH", _rest :: binary >> = channel_id) do
+  def format_phone(<<"messenger:", _rest :: binary>>), do: "Facebook Visitor"
+
+  def format_phone(<<"CH", _rest :: binary>> = channel_id) do
     with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel_id) do
       Enum.join([channel.member.first_name, channel.member.last_name], " ")
     else
@@ -50,10 +50,10 @@ defmodule MainWeb.Helper.Formatters  do
     "Unknown Visitor"
   end
 
-  def format_assigned(<< "+1", _rest :: binary >>), do: "SMS Bot"
-  def format_assigned(<< "messenger:", _rest :: binary >>), do: "Facebook Bot"
-  def format_assigned(<< "CH", _rest :: binary >>), do: "Website Bot"
-  def format_assigned(<< "APP", _rest :: binary >>), do: "App Bot"
+  def format_assigned(<<"+1", _rest :: binary>>), do: "SMS Bot"
+  def format_assigned(<<"messenger:", _rest :: binary>>), do: "Facebook Bot"
+  def format_assigned(<<"CH", _rest :: binary>>), do: "Website Bot"
+  def format_assigned(<<"APP", _rest :: binary>>), do: "App Bot"
   def format_assigned(_), do: "Unknown"
 
   def format_team_member(team_member) do
@@ -105,11 +105,11 @@ defmodule MainWeb.Helper.Formatters  do
     |> to_time(:today)
   end
 
-  defp to_time(<< hour::binary-size(2), ":", minute::binary-size(2), _rest::binary >>, :today) do
+  defp to_time(<<hour :: binary - size(2), ":", minute :: binary - size(2), _rest :: binary>>, :today) do
     "Today at #{adjust_hour(hour, minute)}"
   end
 
-  defp to_time(<< hour::binary-size(2), ":", minute::binary-size(2), _rest::binary >>, :yesterday) do
+  defp to_time(<<hour :: binary - size(2), ":", minute :: binary - size(2), _rest :: binary>>, :yesterday) do
     "Yesterday at #{adjust_hour(hour, minute)}"
   end
 
@@ -127,5 +127,30 @@ defmodule MainWeb.Helper.Formatters  do
         "#{hour}:#{minute} AM"
     end
   end
+
+  def format_time_sec(s) when s == nil do
+    "N\A"
+  end
+  def format_time_sec(seconds)do
+    sec = rem(seconds, 60)
+          |> sec_string
+    minutes = div(seconds, 60)
+    hours = div(minutes, 60)
+            |> hour_string
+    minutes = rem(minutes, 60)
+              |> min_string
+    hours <> minutes <> sec
+
+  end
+
+  defp sec_string(s) when s ==0, do: "N/A"
+  defp sec_string(s) when s < 10, do: "0#{s} seconds"
+  defp sec_string(s), do: "#{s} seconds"
+  defp min_string(s) when s == 0, do: ""
+  defp min_string(s) when s < 10, do: "0#{s} minutes, "
+  defp min_string(s), do: "#{s} minutes, "
+  defp hour_string(s) when s == 0, do: ""
+  defp hour_string(s) when s < 10, do: "0#{s} hours, "
+  defp hour_string(s), do: "#{s} hours, "
 
 end

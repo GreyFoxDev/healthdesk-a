@@ -16,7 +16,11 @@ defmodule MainWeb.TsiController do
 
   @role %{role: "admin"}
 
-  def new(conn, %{"phone-number" => phone_number, "api_key" => api_key} = params) do
+  def new(conn, %{"phone-number" => phone_number, "api_key" => api_key, "ticket" => "new"} = params) do
+    IO.inspect("###################")
+    IO.inspect(params)
+    IO.inspect("###################")
+
     location = conn.assigns.location
     phone = "APP:#{format_phone(phone_number)}"
 
@@ -34,6 +38,40 @@ defmodule MainWeb.TsiController do
     conn
     |> assign(:title, location.team.team_name)
     |> render_new(phone_number, api_key)
+  end
+  def new(conn, %{"phone-number" => phone_number, "api_key" => api_key} = params) do
+    IO.inspect("###################")
+    IO.inspect(params)
+    IO.inspect(conn.assigns.location)
+    IO.inspect("###################")
+
+    location = conn.assigns.location
+      phone = "APP:#{format_phone(phone_number)}"
+
+      first_name = params["member-first"]
+      last_name = params["member-last"]
+
+      {:ok, member} =
+        with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
+          update_member_data(member.id, first_name, last_name)
+        else
+          nil ->
+            create_member_data(location.team_id, first_name, last_name, phone)
+        end
+    with {:ok, %Schema{} = convo} <- C.find_conversation({phone, location.phone_number}) do
+      conn
+      |> assign(:title, location.team.team_name)
+      |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
+    else
+    err ->
+      IO.inspect("###################")
+      IO.inspect(err)
+      IO.inspect("###################")
+
+      conn
+      |> assign(:title, location.team.team_name)
+      |> render_new(phone_number, api_key)
+    end
   end
 
   def new(conn, %{"unique-id" => unique_id, "api_key" => api_key} = params),

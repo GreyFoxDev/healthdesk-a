@@ -3,7 +3,7 @@ defmodule MainWeb.ClassScheduleController do
 
   alias Data.{Location, ClassSchedule}
 
-  NimbleCSV.define(MyParser, [])
+  NimbleCSV.define(ScheduleParser, [])
 
   def new(conn, %{"location_id" => location_id}) do
     location =
@@ -30,7 +30,7 @@ defmodule MainWeb.ClassScheduleController do
 
     count = upload.path
     |> File.stream!
-    |> MyParser.parse_stream
+    |> ScheduleParser.parse_stream
     |> Stream.map(fn [date, start_time, end_time, name, instructor, category, description] ->
       %{
         "date" => date,

@@ -138,6 +138,19 @@
             </div>
         </div><!-- /.metric -->
     </div><!-- /metric column -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <!-- .metric -->
+        <div class="card-metric">
+            <div class="metric">
+                <h2 class="metric-label"> Median Response Time </h2>
+                <p class="metric-value h3">
+                    <span class="value">
+                        <%= format_time_sec(@response_time)%>
+                    </span>
+                </p>
+            </div>
+        </div><!-- /.metric -->
+    </div><!-- /metric column -->
 </div>
 <div class="metric-row">
     <!-- metric column -->
@@ -166,8 +179,8 @@
              data: [
                  <%= @web_totals %>,
                  <%= @sms_totals %>,
-                 <%= @app_totals %>,
-                 <%= @facebook_totals %>
+                 <%= @facebook_totals %>,
+                 <%= @app_totals %>
              ],
              borderWidth: 5,
              backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40'],
