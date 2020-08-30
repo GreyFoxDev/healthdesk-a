@@ -3,11 +3,8 @@ defmodule MainWeb.Live.ConversationAlertsView do
   use Phoenix.LiveView
 
   alias MainWeb.Router.Helpers, as: Routes
-
   alias MainWeb.ConversationAlertsView, as: View
-
-
-
+  
   def render(assigns) do
     View.render("index.html", assigns)
   end
