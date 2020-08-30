@@ -5,6 +5,9 @@
     "deploy": "brunch build --production",
     "watch": "brunch watch --stdin"
   },
+  "engines": {
+    "node": "10.16.x"
+  },
   "dependencies": {
     "bootstrap": "^4.5.2",
     "jquery": "^3.5.1",
