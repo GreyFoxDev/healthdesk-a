@@ -39,7 +39,7 @@ defmodule Data.MixProject do
   defp deps do
     [
       {:elixir_uuid, "~> 1.2"},
-      {:ecto_sql, "~> 3.1"},
+      {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
       {:ex_machina, "~> 2.3", only: :test},
       {:faker, "~> 0.13.0", only: :test},
