@@ -144,9 +144,7 @@
             <div class="metric">
                 <h2 class="metric-label"> Median Response Time </h2>
                 <p class="metric-value h3">
-                    <span class="value">
                         <%= format_time_sec(@response_time)%>
-                    </span>
                 </p>
             </div>
         </div><!-- /.metric -->
