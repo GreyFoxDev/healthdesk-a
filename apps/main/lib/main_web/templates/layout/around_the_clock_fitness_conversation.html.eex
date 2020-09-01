@@ -71,7 +71,7 @@
             <a class="navbar-brand" href="#">
                 <img src="http://myaroundtheclockfitness.com/wp-content/uploads/2017/04/ATC-Logo-60px-Trans.png" border="0"/>
                 <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>&ticket=new">
-                    <button type="button" class="btn btn-outline-primary btn-sm">New Ticket</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">Submit New Request</button>
                 </a>
             </a>
         </nav>

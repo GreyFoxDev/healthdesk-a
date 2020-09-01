@@ -5,7 +5,7 @@
     <%= hidden_input f, :phone_number, value: @phone_number %>
     <%= hidden_input f, :api_key, value: @api_key %>
     <div class="form-group">
-        <div class="p-2 banner text-center"><p>Ticket Type</p></div>
+        <div class="p-2 banner text-center"><p>Request Type</p></div>
         <fieldset>
             <%= select f, :facilities, [
                 {"Facilities", nil},
@@ -32,14 +32,21 @@
                 {"Other", "Member Services: Other"}
             ], class: "selectpicker", title: "Personnel" %>
         </fieldset>
-        <%= submit "OK, LET'S GO", [class: "submit", data_toggle: "modal", data_target: "#exampleModalCenter"] %>
+        <%= submit "SUBMIT REQUEST", [class: "submit", data_toggle: "modal", data_target: "#exampleModalCenter"] %>
         <a class="reset">Reset Form</a>
     </div>
     <!-- Modal -->
 <% end %>
-
+<a class="prev-chat" href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>&ticket=open">
+    Go to previous chat
+</a>
 <style>
-
+    a.prev-chat {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        color: black;
+    }
  .banner {
      background-color: #565756;
      border-radius: 3px;

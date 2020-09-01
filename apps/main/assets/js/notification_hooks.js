@@ -1,13 +1,11 @@
 const NotificationHook = {
     mounted(){
-        this.handleEvent("new_msg", ({msg}) => {
-            var localtion = msg.location
-            var convo = msg.convo
-            let notification = new Notification("New message for "+localtion.location_name)
-            notification.onclick = () => window.open("/admin/teams/"+location.team_id+"/locations/"+location.id+"/conversations/"+convo+"/conversation-messages")
-        })
+       console.log("mounted");
     },
     updated() {
+        console.log("updated");
+        console.log(this.el);
+
         let newConversationLink = this.el.querySelector('[class="notifications"]')
         if (!newConversationLink) return
 

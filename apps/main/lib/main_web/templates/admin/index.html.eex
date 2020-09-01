@@ -142,12 +142,14 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> Median Response Time </h2>
+                <h2 class="metric-label"> RESPONSIVENESS </h2>
                 <p class="metric-value h3">
                     <span class="value">
                         <%= format_time_sec(@response_time)%>
                     </span>
                 </p>
+                <p class="metric-label">
+                    <span style="color: #2198d4">Median Response Time</span></p>
             </div>
         </div><!-- /.metric -->
     </div><!-- /metric column -->
