@@ -149,7 +149,7 @@
                     </span>
                 </p>
                 <p class="metric-label">
-                    <span style="color: #2198d4">Median Response Time</span></p>
+                    <span>Median Response Time</span></p>
             </div>
         </div><!-- /.metric -->
     </div><!-- /metric column -->

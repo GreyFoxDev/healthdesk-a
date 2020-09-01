@@ -38,84 +38,93 @@ defmodule MainWeb.TsiController do
   def new(conn, %{"phone-number" => phone_number, "api_key" => api_key, "ticket" => "open"} = params) do
 
     location = conn.assigns.location
-      phone = "APP:#{format_phone(phone_number)}"
+    phone = "APP:#{format_phone(phone_number)}"
 
-      first_name = params["member-first"]
-      last_name = params["member-last"]
+    first_name = params["member-first"]
+    last_name = params["member-last"]
 
-      {:ok, member} =
-        with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
-          update_member_data(member.id, first_name, last_name)
-        else
-          nil ->
-            create_member_data(location.team_id, first_name, last_name, phone)
-        end
+    {:ok, member} =
+      with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
+        update_member_data(member.id, first_name, last_name)
+      else
+        nil ->
+          create_member_data(location.team_id, first_name, last_name, phone)
+      end
     with {:ok, %Schema{} = convo} <- C.find_conversation({phone, location.phone_number}) do
       conn
       |> assign(:title, location.team.team_name)
       |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
     else
-    err ->
-      IO.inspect("###################")
-      IO.inspect(err)
-      IO.inspect("###################")
+      err ->
+        IO.inspect("###################")
+        IO.inspect(err)
+        IO.inspect("###################")
 
-      conn
-      |> assign(:title, location.team.team_name)
-      |> render_new(phone_number, api_key)
+        conn
+        |> assign(:title, location.team.team_name)
+        |> render_new(phone_number, api_key)
     end
   end
 
   def new(conn, %{"phone-number" => phone_number, "api_key" => api_key} = params) do
 
     location = conn.assigns.location
-      phone = "APP:#{format_phone(phone_number)}"
+    phone = "APP:#{format_phone(phone_number)}"
 
-      first_name = params["member-first"]
-      last_name = params["member-last"]
+    first_name = params["member-first"]
+    last_name = params["member-last"]
 
-      {:ok, member} =
-        with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
-          update_member_data(member.id, first_name, last_name)
-        else
-          nil ->
-            create_member_data(location.team_id, first_name, last_name, phone)
-        end
+    {:ok, member} =
+      with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
+        update_member_data(member.id, first_name, last_name)
+      else
+        nil ->
+          create_member_data(location.team_id, first_name, last_name, phone)
+      end
     with {:ok, %Schema{status: "open"} = convo} <- C.find_conversation({phone, location.phone_number}) do
       conn
       |> assign(:title, location.team.team_name)
       |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
     else
-    err ->
-      conn
-      |> assign(:title, location.team.team_name)
-      |> render_new(phone_number, api_key)
+      {:ok, %Schema{status: "pending"} = convo} -> conn
+                                                |> assign(:title, location.team.team_name)
+                                                |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
+      err ->
+        conn
+        |> assign(:title, location.team.team_name)
+        |> render_new(phone_number, api_key)
     end
   end
 
   def new(conn, %{"unique-id" => unique_id, "api_key" => api_key} = params),
-    do: render_new(conn, unique_id, api_key)
+      do: render_new(conn, unique_id, api_key)
 
   def new(conn, _params),
-    do: send_resp(conn, 400, "Bad request")
+      do: send_resp(conn, 400, "Bad request")
 
   def edit(conn, %{"id" => convo_id, "api_key" => api_key} = params) do
     location = conn.assigns.location
 
     with %Schema{} = convo <- C.get(convo_id) do
-      << "APP:", phone_number :: binary >> = convo.original_number
+      <<"APP:", phone_number :: binary>> = convo.original_number
 
       layout = get_edit_layout_for_team(conn)
 
       conn
       |> put_layout({MainWeb.LayoutView, layout})
       |> assign(:title, location.team.team_name)
-      |> render("edit.html", api_key: api_key, convo_id: convo_id, phone_number: phone_number, changeset: CM.get_changeset())
+      |> render(
+           "edit.html",
+           api_key: api_key,
+           convo_id: convo_id,
+           phone_number: phone_number,
+           changeset: CM.get_changeset()
+         )
     end
   end
 
   def edit(conn, _params),
-    do: send_resp(conn, 400, "Bad request")
+      do: send_resp(conn, 400, "Bad request")
 
   def create(conn, %{"phone_number" => phone_number, "api_key" => api_key} = params) do
     phone_number = "APP:#{format_phone(phone_number)}"
@@ -123,17 +132,23 @@ defmodule MainWeb.TsiController do
 
     with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({phone_number, location.phone_number}) do
       message = extract_question(params)
-      CM.create(%{
-            "conversation_id" => convo.id,
-            "phone_number" => phone_number,
-            "message" => message,
-            "sent_at" => DateTime.utc_now()})
+      CM.create(
+        %{
+          "conversation_id" => convo.id,
+          "phone_number" => phone_number,
+          "message" => message,
+          "sent_at" => DateTime.utc_now()
+        }
+      )
 
-      CM.create(%{
-            "conversation_id" => convo.id,
-            "phone_number" => location.phone_number,
-            "message" => build_answer(params),
-            "sent_at" => DateTime.add(DateTime.utc_now(), 2)})
+      CM.create(
+        %{
+          "conversation_id" => convo.id,
+          "phone_number" => location.phone_number,
+          "message" => build_answer(params),
+          "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+        }
+      )
 
       close_conversation(convo.id, location)
 
@@ -151,21 +166,32 @@ defmodule MainWeb.TsiController do
     location = conn.assigns.location
 
     with %Schema{} = convo <- C.get(convo_id) do
-      << "APP:+1", phone_number :: binary >> = convo.original_number
+      <<"APP:+1", phone_number :: binary>> = convo.original_number
 
-      CM.create(%{
-            "conversation_id" => convo.id,
-            "phone_number" => convo.original_number,
-            "message" => params["message"],
-            "sent_at" => DateTime.utc_now()})
+      CM.create(
+        %{
+          "conversation_id" => convo.id,
+          "phone_number" => convo.original_number,
+          "message" => params["message"],
+          "sent_at" => DateTime.utc_now()
+        }
+      )
 
-      member =  Member.get_by_phone_number(@role, convo.original_number)
+      member = Member.get_by_phone_number(@role, convo.original_number)
 
       if member do
         name = Enum.join([member.first_name, member.last_name], " ")
-        MainWeb.Endpoint.broadcast("convo:#{convo_id}", "broadcast", %{message: params["message"], name: name, phone_number: phone_number})
+        MainWeb.Endpoint.broadcast(
+          "convo:#{convo_id}",
+          "broadcast",
+          %{message: params["message"], name: name, phone_number: phone_number}
+        )
       else
-        MainWeb.Endpoint.broadcast("convo:#{convo_id}", "broadcast", %{message: params["message"], phone_number: phone_number})
+        MainWeb.Endpoint.broadcast(
+          "convo:#{convo_id}",
+          "broadcast",
+          %{message: params["message"], phone_number: phone_number}
+        )
       end
 
       if convo.status == "closed" do
@@ -173,26 +199,34 @@ defmodule MainWeb.TsiController do
         |> ask_wit_ai(location)
         |> case do
              {:ok, response} ->
-               CM.create(%{
-                     "conversation_id" => convo.id,
-                     "phone_number" => location.phone_number,
-                     "message" => response,
-                     "sent_at" => DateTime.add(DateTime.utc_now(), 2)})
+               CM.create(
+                 %{
+                   "conversation_id" => convo.id,
+                   "phone_number" => location.phone_number,
+                   "message" => response,
+                   "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                 }
+               )
 
                close_conversation(convo_id, location)
              {:unknown, response} ->
-               CM.create(%{
-                     "conversation_id" => convo.id,
-                     "phone_number" => location.phone_number,
-                     "message" => response,
-                     "sent_at" => DateTime.add(DateTime.utc_now(), 2)})
+               CM.create(
+                 %{
+                   "conversation_id" => convo.id,
+                   "phone_number" => location.phone_number,
+                   "message" => response,
+                   "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                 }
+               )
 
                C.pending(convo_id)
 
                :ok =
-                 Notify.send_to_admin(convo.id,
+                 Notify.send_to_admin(
+                   convo.id,
                    "Message From: #{convo.original_number}\n#{params["message"]}",
-                   location.phone_number)
+                   location.phone_number
+                 )
            end
       end
 
@@ -218,19 +252,19 @@ defmodule MainWeb.TsiController do
     "We've received your request. You may leave a comment below if you'd like."
   end
 
-  defp format_phone(<< "1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  defp format_phone(<<"1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
     "+1#{Enum.join([area_code, prefix, line])}"
   end
 
-  defp format_phone(<< " 1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  defp format_phone(<<" 1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
     "+1#{Enum.join([area_code, prefix, line])}"
   end
 
-  defp format_phone(<< "+1", area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  defp format_phone(<<"+1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
     "+1#{Enum.join([area_code, prefix, line])}"
   end
 
-  defp format_phone(<< area_code::binary-size(3), prefix::binary-size(3), line::binary-size(4) >>) do
+  defp format_phone(<<area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
     "+1#{Enum.join([area_code, prefix, line])}"
   end
 
@@ -243,8 +277,8 @@ defmodule MainWeb.TsiController do
       location = conn.assigns.location
       template_name =
         case location.location_name do
-          << "ATC - ", _rest::binary>> -> "around_the_clock_fitness_new.html"
-          << "PB - ", _rest::binary>> -> "palm_beach_sports_club_new.html"
+          <<"ATC - ", _rest :: binary>> -> "around_the_clock_fitness_new.html"
+          <<"PB - ", _rest :: binary>> -> "palm_beach_sports_club_new.html"
           _ -> "new.html"
         end
 
@@ -282,42 +316,54 @@ defmodule MainWeb.TsiController do
       |> Enum.find(&(&1.disposition_name == "Automated"))
 
     if disposition do
-      Data.ConversationDisposition.create(%{
-            "conversation_id" => convo_id,
-            "disposition_id" => disposition.id
-                                          })
+      Data.ConversationDisposition.create(
+        %{
+          "conversation_id" => convo_id,
+          "disposition_id" => disposition.id
+        }
+      )
 
-      %{"conversation_id" => convo_id,
+      %{
+        "conversation_id" => convo_id,
         "phone_number" => location.phone_number,
         "message" =>
           "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
-        "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
+        "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+      }
       |> CM.create()
     else
-        %{"conversation_id" => convo_id,
-          "phone_number" => location.phone_number,
-          "message" =>
-            "CLOSED: Closed by System",
-          "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
-        |> CM.create()
+      %{
+        "conversation_id" => convo_id,
+        "phone_number" => location.phone_number,
+        "message" =>
+          "CLOSED: Closed by System",
+        "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+      }
+      |> CM.create()
     end
 
     C.close(convo_id)
   end
 
   defp create_member_data(team_id, first_name, nil, phone) do
-    Member.create(%{
-          team_id: team_id,
-          first_name: first_name,
-          phone_number: phone})
+    Member.create(
+      %{
+        team_id: team_id,
+        first_name: first_name,
+        phone_number: phone
+      }
+    )
   end
 
   defp create_member_data(team_id, first_name, last_name, phone) do
-    Member.create(%{
-          team_id: team_id,
-          first_name: first_name,
-          last_name: last_name,
-          phone_number: phone})
+    Member.create(
+      %{
+        team_id: team_id,
+        first_name: first_name,
+        last_name: last_name,
+        phone_number: phone
+      }
+    )
   end
 
   defp update_member_data(member_id, nil, nil), do: {:ok, member_id}
@@ -332,8 +378,8 @@ defmodule MainWeb.TsiController do
 
   defp get_edit_layout_for_team(conn) do
     case conn.assigns.location.location_name do
-      << "ATC - ", _rest::binary >> -> :around_the_clock_fitness_conversation
-      << "PB - ", _rest::binary >> -> :palm_beach_sports_club_conversation
+      <<"ATC - ", _rest :: binary>> -> :around_the_clock_fitness_conversation
+      <<"PB - ", _rest :: binary>> -> :palm_beach_sports_club_conversation
       _ -> :tsi_conversation
     end
   end
