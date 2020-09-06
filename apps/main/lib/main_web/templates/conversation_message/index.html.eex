@@ -254,7 +254,7 @@
         <%= form_for @changeset, team_location_conversation_conversation_message_path(@conn, :create, @location.team_id, @location.id, @conversation.id), fn f -> %>
             <div class="media mb-1">
                 <div class="media-body">
-                    <%= text_input f, :message, class: "form-control border-0 shadow-none", place_holder: "Type a message" %>
+                    <%= text_input f, :message, id: "reply_matches", class: "form-control border-0 shadow-none", place_holder: "Type a message" %>
                 </div>
                 <div>
                     <button type="submit" class="btn btn-light btn-icon">
@@ -326,6 +326,35 @@
                     <input type="button" value="Update" id="update_member" class="btn btn-primary">
                 </div>
                 <script>
+
+                    $( function() {
+                        var availableTags = [
+                            <%= for saved_reply <- @saved_replies do %>
+                            {value: "<%= saved_reply.draft %>",label: "<%= saved_reply.title %>"},
+                            <% end %>
+                        ];
+                        $( "#reply_matches" ).autocomplete({
+                            source: function (request, response) {
+                                var term_ = request.term
+                                if(term_=="#"){
+                                    response(availableTags)
+                                }
+                                else {
+                                    var term = term_.replace("#", "");
+                                    var reg = new RegExp($.ui.autocomplete.escapeRegex(term), "i")
+                                    if (term !== "") response($.grep(availableTags, function (tag) {
+                                        return tag.label.match(reg)
+                                    }))
+                                }
+                            },
+                            position: {  my: "left bottom",
+                                at: "left top-9",
+                                },
+                            _resizeMenu: function() {
+                                this.menu.element.outerWidth( 250 );
+                            }
+                        });
+                    } );
                  $("#update_member").click(function(e) {
                      e.preventDefault(); // prevent default action of link
 
