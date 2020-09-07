@@ -290,16 +290,16 @@ defmodule MainWeb.ConversationController do
       else
         user_info = Formatters.format_team_member(current_user(conn))
         message = %{
-          "conversation_id" => id,
+          "conversation_id" => conversation.id,
           "phone_number" => current_user.phone_number,
           "message" => "CLOSED: Closed by #{user_info}",
           "sent_at" => DateTime.utc_now()
         }
-        with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
+        with {:ok, _pi} <- Conversations.update(%{"id" => conversation.id, "status" => "closed", "team_member_id" => nil}),
              {:ok, _} <- ConversationMessages.create(message) do
           nil
         else
-          nils
+        _ -> nil
         end
       end
       res
