@@ -25,3 +25,10 @@ erl_crash.dump
 .env
 .DS_Store
 latest.dump*
+.idea/
+
+apps/data/data.iml
+
+apps/main/main.iml
+
+*.iml
