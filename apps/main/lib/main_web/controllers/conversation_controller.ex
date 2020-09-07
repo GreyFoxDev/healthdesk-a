@@ -245,7 +245,9 @@ defmodule MainWeb.ConversationController do
 
       res={:ok, conversation, params}
                  |> handle_sending_message()
-      AssignTeamMemberController.assign(%{"id" => conversation.id, "location_id" => location_id, "team_member_id" => current_user.team_member.id})
+      if(current_user.team_member != nil) do
+        AssignTeamMemberController.assign(%{"id" => conversation.id, "location_id" => location_id, "team_member_id" => current_user.team_member.id})
+      end
       res
       |> update_conn(conn)
       |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
