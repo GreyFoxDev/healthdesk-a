@@ -31,11 +31,11 @@ defmodule MainWeb.Notify do
       |> Time.add(timezone_offset)
       |> to_string()
 
-    [available] =
+    available=
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
-      |> IO.inspect(label: "AVAILABLE TEAMMATE")
+      |> List.first
 
     IO.inspect(team_member.user, label: "SEND TO TEAMMATE")
 
