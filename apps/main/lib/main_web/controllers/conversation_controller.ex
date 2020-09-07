@@ -10,6 +10,7 @@ defmodule MainWeb.ConversationController do
     TeamMember,
     TimezoneOffset}
   alias MainWeb.Helper.Formatters
+  alias MainWeb.AssignTeamMemberController
 
   require Logger
 
@@ -80,12 +81,12 @@ defmodule MainWeb.ConversationController do
          {:ok, changeset} <- Conversations.get_changeset(id, user) do
 
       render conn, "edit.html",
-        location: location,
-        conversation: conversation,
-        messages: messages,
-        team_members: team_members,
-        teams: teams(conn),
-        changeset: changeset
+             location: location,
+             conversation: conversation,
+             messages: messages,
+             team_members: team_members,
+             teams: teams(conn),
+             changeset: changeset
     end
   end
 
@@ -105,9 +106,9 @@ defmodule MainWeb.ConversationController do
       user_info = Formatters.format_team_member(current_user(conn))
 
       message = %{"conversation_id" => id,
-                  "phone_number" => current_user(conn).phone_number,
-                  "message" => "OPENED: Opened by #{user_info}",
-                  "sent_at" => DateTime.utc_now()}
+        "phone_number" => current_user(conn).phone_number,
+        "message" => "OPENED: Opened by #{user_info}",
+        "sent_at" => DateTime.utc_now()}
 
       Logger.info "OPENING #{id}"
 
@@ -158,10 +159,10 @@ defmodule MainWeb.ConversationController do
           "message" => "CLOSED: Closed by #{user_info} with disposition #{disposition.disposition_name}",
           "sent_at" => DateTime.utc_now()}
       else
-          %{"conversation_id" => id,
-            "phone_number" => current_user(conn).phone_number,
-            "message" => "CLOSED: Closed by #{user_info}",
-            "sent_at" => DateTime.utc_now()}
+        %{"conversation_id" => id,
+          "phone_number" => current_user(conn).phone_number,
+          "message" => "CLOSED: Closed by #{user_info}",
+          "sent_at" => DateTime.utc_now()}
       end
 
       with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
@@ -230,19 +231,31 @@ defmodule MainWeb.ConversationController do
   end
 
   def create(conn, %{"location_id" => location_id, "conversation" => %{"original_number" => original_number}} = params) when original_number != "" do
-    location =
-      conn
-      |> current_user()
-      |> Location.get(location_id)
 
-    %{member: original_number,
+    current_user=conn
+                 |> current_user()
+    location =current_user
+              |> Location.get(location_id)
+
+    with {:ok, conversation, params}  <- find_or_start_conversation(%{member: original_number,
       message: params["conversation"]["message"],
       location_number: location.phone_number,
-      team_member_number: current_user(conn).phone_number}
-      |> find_or_start_conversation()
-      |> handle_sending_message()
+      team_member_number: current_user(conn).phone_number})
+      do
+
+      res={:ok, conversation, params}
+                 |> handle_sending_message()
+      AssignTeamMemberController.assign(%{"id" => conversation.id, "location_id" => location_id, "team_member_id" => current_user.team_member.id})
+      res
       |> update_conn(conn)
       |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+    else
+      err ->
+
+        conn|> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+        conn
+    end
+
   end
 
   defp find_or_start_conversation(%{member: member, location_number: location} = params) do
