@@ -8,40 +8,50 @@ defmodule MainWeb.AssignTeamMemberController do
 
   @assign_message "Message From: [phone_number]\n[message]"
 
-  def assign(conn, %{"id" => id, "location_id" => location_id, "team_member_id" => team_member_id}) do
+  def assign(conn, %{"id" => id, "location_id" => location_id, "team_member_id" => team_member_id}=params) do
+    with {:ok, _} <- assign(params) do
+      render(conn, "ok.json")
+    else
+      {:error, _changeset} ->
+      render(conn, "error.json")
+    end
 
+
+  end
+  def assign(%{"id" => id, "location_id" => location_id, "team_member_id" => team_member_id}) do
     location =
       Location.get(%{role: "admin"}, location_id)
 
     team_member =
       TeamMember.get(%{role: "admin"}, team_member_id)
 
-    [original_message] =
+    original_message =
       %{role: "admin"}
       |> ConversationMessages.all(id)
       |> Enum.reject(&(reject_location_messages(&1, location, team_member)))
-      |> Enum.take(-1)
+      |> List.first()
 
     message = %{"conversation_id" => id,
-                "phone_number" => team_member.user.phone_number,
-                "message" => "ASSIGNED: #{team_member.user.first_name} #{team_member.user.last_name} was assigned to the conversation.",
-                "sent_at" => DateTime.utc_now()}
+      "phone_number" => team_member.user.phone_number,
+      "message" => "ASSIGNED: #{team_member.user.first_name} #{team_member.user.last_name} was assigned to the conversation.",
+      "sent_at" => DateTime.utc_now()}
 
 
     with {:ok, _pi} <- Conversations.update(%{"id" => id, "team_member_id" => team_member_id}),
          {:ok, _} <- ConversationMessages.create(message) do
+      if original_message != nil do
+        message =
+          @assign_message
+          |> String.replace("[phone_number]", original_message.phone_number)
+          |> String.replace("[message]", original_message.message)
 
-      message =
-        @assign_message
-        |> String.replace("[phone_number]", original_message.phone_number)
-        |> String.replace("[message]", original_message.message)
+        Notify.send_to_teammate(id, message, location.phone_number, team_member)
+      end
 
-      Notify.send_to_teammate(id, message, location.phone_number, team_member)
-
-      render(conn, "ok.json")
+      {:ok,%{}}
     else
-      {:error, _changeset} ->
-        render(conn, "error.json")
+      {:error, changeset} ->
+        {:error,changeset}
     end
   end
 

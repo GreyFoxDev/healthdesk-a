@@ -129,7 +129,7 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_time_sec(s) when s == nil do
-    "N\A"
+    "0m 0s"
   end
   def format_time_sec(seconds)do
     sec = rem(seconds, 60)
@@ -152,5 +152,24 @@ defmodule MainWeb.Helper.Formatters  do
   defp hour_string(s) when s == 0, do: ""
   defp hour_string(s) when s < 10, do: "#{s}h "
   defp hour_string(s), do: "#{s}h "
+
+  def format_comma_numbers(value)do
+     delimit_integer(value,",")
+     |> String.Chars.to_string
+  end
+  defp delimit_integer(number, delimiter) do
+    abs(number)
+    |> Integer.to_charlist()
+    |> :lists.reverse()
+    |> delimit_integer(delimiter, [])
+  end
+
+  defp delimit_integer([a, b, c, d | tail], delimiter, acc) do
+    delimit_integer([d | tail], delimiter, [delimiter, c, b, a | acc])
+  end
+
+  defp delimit_integer(list, _, acc) do
+    :lists.reverse(list) ++ acc
+  end
 
 end

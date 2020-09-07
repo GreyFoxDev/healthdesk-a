@@ -54,6 +54,7 @@ defmodule MainWeb.Router do
         resources "/child-care-hours", ChildCareHourController
         resources "/wifi-network", WifiNetworkController
         resources "/pricing-plans", PricingPlanController
+        resources "/saved-replies", SavedReplyController
       end
     end
 

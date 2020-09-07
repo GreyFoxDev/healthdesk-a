@@ -40,7 +40,7 @@
                 <h2 class="metric-label"> LOCATIONS </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-fork"></i></sub> <span class="value">
-                        <%= @location_count %>
+                        <%= @location_count |> format_comma_numbers %>
                     </span>
                 </p>
             </div>
@@ -54,7 +54,7 @@
                 <h2 class="metric-label"> ADMINS </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-people"></i></sub> <span class="value">
-                        <%= @team_admin_count %>
+                        <%= @team_admin_count |> format_comma_numbers %>
                     </span>
                 </p>
             </div>
@@ -68,7 +68,7 @@
                 <h2 class="metric-label"> TEAMMATES </h2>
                 <p class="metric-value h3">
                     <sub><i class="oi oi-people"></i></sub> <span class="value">
-                        <%= @teammate_count %>
+                        <%= @teammate_count |> format_comma_numbers %>
                     </span>
                 </p>
             </div>
@@ -118,7 +118,7 @@
             <div class="metric">
                 <h2 class="metric-label"> DISPOSITIONS </h2>
                 <p class="metric-value h3">
-                    <span class="value"><%= Enum.map(@dispositions, &(&1.count)) |> Enum.sum() %>
+                    <span class="value"><%= Enum.map(@dispositions, &(&1.count)) |> Enum.sum() |> format_comma_numbers %>
                     </span>
                 </p>
             </div>
@@ -132,7 +132,7 @@
                 <h2 class="metric-label"> AVG. PER DAY </h2>
                 <p class="metric-value h3">
                     <span class="value">
-                        <%= @dispositions_per_day.sessions_per_day %>
+                        <%= format_comma_numbers(@dispositions_per_day.sessions_per_day) %>
                     </span>
                 </p>
             </div>
@@ -298,7 +298,7 @@
                     <%= for disposition <- @dispositions |> Enum.sort_by(&(&1.name)) |> Enum.uniq_by(&(&1.name)) |> Enum.map(&(&1.name)) do %>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <%= disposition %>
-                            <span class="badge badge-primary badge-pill"><%= Enum.filter(@dispositions, &(&1.name == disposition)) |> Enum.map(&(&1.count)) |> Enum.sum() %></span>
+                            <span class="badge badge-primary badge-pill"><%= Enum.filter(@dispositions, &(&1.name == disposition)) |> Enum.map(&(&1.count)) |> Enum.sum() |> format_comma_numbers %></span>
                         </li>
                     <% end %>
                 </ul>

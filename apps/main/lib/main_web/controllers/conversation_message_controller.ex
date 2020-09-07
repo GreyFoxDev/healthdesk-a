@@ -1,7 +1,7 @@
 defmodule MainWeb.ConversationMessageController do
   use MainWeb.SecuredContoller
 
-  alias Data.{ConversationMessages, Conversations, Location, MemberChannel, TeamMember}
+  alias Data.{ConversationMessages, Conversations, Location, MemberChannel, TeamMember, SavedReply}
   alias Data.Schema.MemberChannel, as: Channel
 
   require Logger
@@ -37,10 +37,12 @@ defmodule MainWeb.ConversationMessageController do
       |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
       |> Stream.map(&({&1.disposition_name, &1.id}))
       |> Enum.to_list()
+    saved_replies = SavedReply.get_by_location_id(location_id)
 
     render conn, "index.html",
       location: location,
       conversation: conversation,
+      saved_replies: saved_replies,
       messages: messages,
       team_members: team_members,
       teams: teams(conn),

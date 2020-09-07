@@ -47,6 +47,7 @@ defmodule Data.Conversations do
   def get(_, _), do: {:error, :invalid_permissions}
 
   def update(%{"id" => id} = params) do
+
     id
     |> Query.get()
     |> Query.update(params)
@@ -76,20 +77,6 @@ defmodule Data.Conversations do
   @doc """
   Retrieves a conversation from the database. . Conversations are unique to locations.
   """
-  @spec find_and_open_conversation({member :: binary, location :: binary}) ::
-          Conversation.t() | nil
-  def find_and_open_conversation({member, location}) do
-    with %Location{} = location <- Data.Query.Location.get_by_phone(location),
-         nil <- get_by_phone(member, location.id) do
-      nil
-    else
-      %Schema{status: "closed"} = conversation ->
-        Query.update(conversation, @open)
-      %Schema{} = convo ->
-        {:ok, convo}
-    end
-  end
-
   @spec find_conversation({member :: binary, location :: binary}) ::
           Conversation.t() | nil
   def find_conversation({member, location}) do
@@ -98,11 +85,13 @@ defmodule Data.Conversations do
       nil
     else
       %Schema{status: "closed"} = conversation ->
-        {:ok, conversation}
+        Query.update(conversation, @open)
+
       %Schema{} = convo ->
         {:ok, convo}
     end
   end
+
   @doc """
   Sets the status to pending for an existing conversation
   """
