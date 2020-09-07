@@ -129,7 +129,7 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_time_sec(s) when s == nil do
-    "N\A"
+    "0m 0s"
   end
   def format_time_sec(seconds)do
     sec = rem(seconds, 60)
