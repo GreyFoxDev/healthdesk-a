@@ -121,7 +121,7 @@ defmodule MainWeb.Notify do
           member = [
             member.first_name,
             member.last_name,
-            conversation[:original_number]
+            conversation.original_number
           ] |> Enum.join(" ")
 
           "New message from #{member}"
