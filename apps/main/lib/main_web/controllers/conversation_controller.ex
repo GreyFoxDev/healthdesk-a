@@ -30,7 +30,7 @@ defmodule MainWeb.ConversationController do
       |> Conversations.all(location_id)
 
     my_conversations =
-      Enum.filter(conversations, fn(c) -> c.team_member && c.team_member.user_id == current_user(conn).id end)
+      Enum.filter(conversations, fn (c) -> c.team_member && c.team_member.user_id == current_user(conn).id end)
 
     dispositions =
       conn
@@ -40,7 +40,13 @@ defmodule MainWeb.ConversationController do
       |> Stream.map(&({&1.disposition_name, &1.id}))
       |> Enum.to_list()
 
-    render conn, "index.html", location: location, conversations: conversations, my_conversations: my_conversations, teams: teams(conn), dispositions: dispositions
+    render conn,
+           "index.html",
+           location: location,
+           conversations: conversations,
+           my_conversations: my_conversations,
+           teams: teams(conn),
+           dispositions: dispositions
   end
 
   def new(conn, %{"location_id" => location_id}) do
@@ -49,11 +55,14 @@ defmodule MainWeb.ConversationController do
       |> current_user()
       |> Location.get(location_id)
 
-    render(conn, "new.html",
+    render(
+      conn,
+      "new.html",
       changeset: Conversations.get_changeset(),
       location: location,
       teams: teams(conn),
-      errors: [])
+      errors: []
+    )
   end
 
   def edit(conn, %{"location_id" => location_id, "id" => id}) do
@@ -80,7 +89,8 @@ defmodule MainWeb.ConversationController do
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- Conversations.get_changeset(id, user) do
 
-      render conn, "edit.html",
+      render conn,
+             "edit.html",
              location: location,
              conversation: conversation,
              messages: messages,
@@ -105,10 +115,12 @@ defmodule MainWeb.ConversationController do
 
       user_info = Formatters.format_team_member(current_user(conn))
 
-      message = %{"conversation_id" => id,
+      message = %{
+        "conversation_id" => id,
         "phone_number" => current_user(conn).phone_number,
         "message" => "OPENED: Opened by #{user_info}",
-        "sent_at" => DateTime.utc_now()}
+        "sent_at" => DateTime.utc_now()
+      }
 
       Logger.info "OPENING #{id}"
 
@@ -120,7 +132,10 @@ defmodule MainWeb.ConversationController do
         pending_message_count = (ConCache.get(:session_cache, id) || 0)
         :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
 
-        redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id))
+        redirect(
+          conn,
+          to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id)
+        )
       else
         {:error, _changeset} ->
           conn
@@ -129,7 +144,10 @@ defmodule MainWeb.ConversationController do
       end
     else
 
-      redirect(conn, to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id))
+      redirect(
+        conn,
+        to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id)
+      )
     end
   end
 
@@ -154,15 +172,19 @@ defmodule MainWeb.ConversationController do
           |> current_user()
           |> Data.Disposition.get(params["disposition_id"])
 
-        %{"conversation_id" => id,
+        %{
+          "conversation_id" => id,
           "phone_number" => current_user(conn).phone_number,
           "message" => "CLOSED: Closed by #{user_info} with disposition #{disposition.disposition_name}",
-          "sent_at" => DateTime.utc_now()}
+          "sent_at" => DateTime.utc_now()
+        }
       else
-        %{"conversation_id" => id,
+        %{
+          "conversation_id" => id,
           "phone_number" => current_user(conn).phone_number,
           "message" => "CLOSED: Closed by #{user_info}",
-          "sent_at" => DateTime.utc_now()}
+          "sent_at" => DateTime.utc_now()
+        }
       end
 
       with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
@@ -182,7 +204,8 @@ defmodule MainWeb.ConversationController do
 
   end
 
-  def create(conn, %{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name} = params}) when campaign_name != "" do
+  def create(conn, %{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name} = params})
+      when campaign_name != "" do
     location =
       conn
       |> current_user()
@@ -212,13 +235,16 @@ defmodule MainWeb.ConversationController do
       params["csv"].path
       |> File.stream!
       |> MyParser.parse_stream
-      |> Stream.map(fn [first_name, last_name, phone_number] ->
-        %{
-          "recipient_name" => "#{first_name} #{last_name}",
-          "phone_number" => phone_number,
-          "campaign_id" => campaign.id}
-      end)
-      |> Stream.map(fn(row) -> CampaignRecipient.create(row) end)
+      |> Stream.map(
+           fn [first_name, last_name, phone_number] ->
+             %{
+               "recipient_name" => "#{first_name} #{last_name}",
+               "phone_number" => phone_number,
+               "campaign_id" => campaign.id
+             }
+           end
+         )
+      |> Stream.map(fn (row) -> CampaignRecipient.create(row) end)
       |> Enum.count()
 
       redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location.id))
@@ -230,23 +256,51 @@ defmodule MainWeb.ConversationController do
     end
   end
 
-  def create(conn, %{"location_id" => location_id, "conversation" => %{"original_number" => original_number}} = params) when original_number != "" do
+  def create(
+        conn,
+        %{
+          "location_id" => location_id,
+          "conversation" => %{
+            "original_number" => original_number
+          }
+        } = params
+      ) when original_number != "" do
 
-    current_user=conn
-                 |> current_user()
-    location =current_user
-              |> Location.get(location_id)
+    current_user = conn
+                   |> current_user()
+    location = current_user
+               |> Location.get(location_id)
 
-    with {:ok, conversation, params}  <- find_or_start_conversation(%{member: original_number,
-      message: params["conversation"]["message"],
-      location_number: location.phone_number,
-      team_member_number: current_user(conn).phone_number})
+    with {:ok, conversation, params} <- find_or_start_conversation(
+      %{
+        member: original_number,
+        message: params["conversation"]["message"],
+        location_number: location.phone_number,
+        team_member_number: current_user(conn).phone_number
+      }
+    )
       do
 
-      res={:ok, conversation, params}
-                 |> handle_sending_message()
+      res = {:ok, conversation, params}
+            |> handle_sending_message()
       if(current_user.team_member != nil) do
-        AssignTeamMemberController.assign(%{"id" => conversation.id, "location_id" => location_id, "team_member_id" => current_user.team_member.id})
+        AssignTeamMemberController.assign(
+          %{"id" => conversation.id, "location_id" => location_id, "team_member_id" => current_user.team_member.id}
+        )
+      else
+        user_info = Formatters.format_team_member(current_user(conn))
+        message = %{
+          "conversation_id" => id,
+          "phone_number" => current_user.phone_number,
+          "message" => "CLOSED: Closed by #{user_info}",
+          "sent_at" => DateTime.utc_now()
+        }
+        with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
+             {:ok, _} <- ConversationMessages.create(message) do
+          nil
+        else
+          nils
+        end
       end
       res
       |> update_conn(conn)
@@ -254,7 +308,8 @@ defmodule MainWeb.ConversationController do
     else
       err ->
 
-        conn|> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+        conn
+        |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
         conn
     end
 
@@ -277,7 +332,8 @@ defmodule MainWeb.ConversationController do
   end
 
   defp handle_sending_message({:ok, conversation, params}) do
-    %{"conversation_id" => conversation.id,
+    %{
+      "conversation_id" => conversation.id,
       "phone_number" => params.team_member_number,
       "message" => params.message,
       "sent_at" => Calendar.DateTime.now!("Etc/UTC")
