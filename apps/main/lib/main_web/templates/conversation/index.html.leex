@@ -6,7 +6,7 @@
             <a class="nav-link" data-toggle="tab" href="#project-assigned">Me (<%= Enum.count(@my_conversations, &(&1.status in ["open", "pending"])) %>)</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#project-open"><%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"location_id" => @location.id, "header" => true}) %></a>
+            <a class="nav-link" data-toggle="tab" href="#project-open"><%= live_render(@socket, MainWeb.Live.OpenConverationsView, session: %{"location_id" => @location.id, "header" => true},id: @user.id) %></a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#project-closed">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>
@@ -34,8 +34,8 @@
 <header class="page-title-bar">
     <div class="d-flex justify-content-between">
         &nbsp;
-        <%= if assigns[:current_user].role in ["admin", "team-admin", "location-admin"] do %> 
-            <a href="<%= team_location_conversation_path(@conn, :new, @location.team_id, @location.id) %>" class="btn btn-primary">
+        <%= if @user.role in ["admin", "team-admin", "location-admin"] do %> 
+            <a href="<%= team_location_conversation_path(@socket, :new, @location.team_id, @location.id) %>" class="btn btn-primary">
                 <i class="fas fa-plus">&nbsp;</i>
                 New Message
             </a>
@@ -58,7 +58,7 @@
                 <table class="table no-first-border">
                     <tbody>
                         <%= for c <- @my_conversations do %>
-                            <%= render("_conversation_row.html", c: c, conn: @conn, location: @location, dispositions: @dispositions) %>
+                            <%= render("_conversation_row.html", c: c, conn: @socket, location: @location, dispositions: @dispositions) %>
                         <% end %>
                     </tbody>
                 </table>
@@ -72,7 +72,7 @@
                 <table class="table no-first-border">
                     <tbody>
                         <%= for c <- Enum.filter(@conversations, &(&1.status in ["open", "pending"])) do %>
-                            <%= render("_conversation_row.html", c: c, conn: @conn, location: @location, dispositions: @dispositions) %>
+                            <%= render("_conversation_row.html", c: c, conn: @socket, location: @location, dispositions: @dispositions) %>
                         <% end %>
                     </tbody>
                 </table>
@@ -86,7 +86,7 @@
                 <table class="table no-first-border">
                     <tbody>
                         <%= for c <- Enum.filter(@conversations, &(&1.status == "closed")) do %>
-                            <%= render("_conversation_row.html", c: c, conn: @conn, location: @location, dispositions: @dispositions) %>
+                            <%= render("_conversation_row.html", c: c, conn: @socket, location: @location, dispositions: @dispositions) %>
                         <% end %>
                     </tbody>
                 </table>
