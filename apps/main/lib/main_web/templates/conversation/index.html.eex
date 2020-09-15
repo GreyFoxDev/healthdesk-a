@@ -6,7 +6,7 @@
             <a class="nav-link" data-toggle="tab" href="#project-assigned">Me (<%= Enum.count(@my_conversations, &(&1.status in ["open", "pending"])) %>)</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#project-open"><%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"location_id" => @location.id, "header" => true},id: @user.id) %></a>
+            <a class="nav-link" data-toggle="tab" href="#project-open"><%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"location_id" => @location.id, "header" => true}) %></a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#project-closed">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>
