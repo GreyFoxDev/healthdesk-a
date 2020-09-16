@@ -21,7 +21,10 @@ let Hooks = { NotificationHook };
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken},hooks: Hooks });
 liveSocket.connect()
-Notification.requestPermission()
+if(Notification.permission != "denied" && Notification.permission != "granted") {
+    console.log("123")
+    Notification.requestPermission()
+}
 // Import local files
 //
 // Local files can be imported directly using relative
