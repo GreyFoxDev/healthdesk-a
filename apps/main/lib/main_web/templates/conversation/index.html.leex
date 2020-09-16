@@ -136,6 +136,7 @@
                         <button type="submit" class="btn btn-primary">
                             Assign
                         </button>
+                        </form>
 
                     </div>
                 </div><!-- /.dropdown-menu -->
@@ -451,7 +452,7 @@
     </div>
 </div>
 
-<% else %>
+<% else  %>
 <header id="conversation-tabs" class="section-menu nav-scroller">
     <!-- .nav-tabs -->
     <ul class="nav nav-tabs card-header-tabs">
@@ -789,7 +790,7 @@
                 // window.location.reload();
             },
             error: function (data) {
-                response = data.responseJSON.message;
+                var response = data.responseJSON.message;
                 alert(response);
             }
         });
