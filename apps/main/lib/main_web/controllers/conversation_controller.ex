@@ -1,6 +1,6 @@
 defmodule MainWeb.ConversationController do
   use MainWeb.SecuredContoller
-
+  alias Main.LiveUpdates
   alias Data.{
     Campaign,
     CampaignRecipient,
@@ -19,34 +19,9 @@ defmodule MainWeb.ConversationController do
   NimbleCSV.define(MyParser, [])
 
   def index(conn, %{"location_id" => location_id}) do
-    location =
-      conn
-      |> current_user()
-      |> Location.get(location_id)
-
-    conversations =
-      conn
-      |> current_user()
-      |> Conversations.all(location_id)
-
-    my_conversations =
-      Enum.filter(conversations, fn (c) -> c.team_member && c.team_member.user_id == current_user(conn).id end)
-
-    dispositions =
-      conn
-      |> current_user()
-      |> Data.Disposition.get_by_team_id(location.team_id)
-      |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
-      |> Stream.map(&({&1.disposition_name, &1.id}))
-      |> Enum.to_list()
-
-    render conn,
-           "index.html",
-           location: location,
-           conversations: conversations,
-           my_conversations: my_conversations,
-           teams: teams(conn),
-           dispositions: dispositions
+    user = conn
+          |> current_user()
+    live_render(conn, MainWeb.Live.ConversationsView, session: %{"location_id" => location_id, "user" => user})
   end
 
   def new(conn, %{"location_id" => location_id}) do
@@ -131,7 +106,7 @@ defmodule MainWeb.ConversationController do
 
         pending_message_count = (ConCache.get(:session_cache, id) || 0)
         :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
-
+        LiveUpdates.notify_live_view({__MODULE__, :updated_open})
         redirect(
           conn,
           to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id)
@@ -189,7 +164,7 @@ defmodule MainWeb.ConversationController do
 
       with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
            {:ok, _} <- ConversationMessages.create(message) do
-
+        Main.LiveUpdates.notify_live_view({__MODULE__, :updated_open})
         redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
       else
         {:error, _changeset} ->
@@ -204,13 +179,36 @@ defmodule MainWeb.ConversationController do
 
   end
 
-  def create(conn, %{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name} = params})
-      when campaign_name != "" do
-    location =
-      conn
-      |> current_user()
-      |> Location.get(location_id)
+  def create(conn, %{"location_id" => location_id} = params) do
 
+    current_user = conn
+                   |> current_user()
+    location =
+      current_user
+      |> Location.get(location_id)
+    case create_convo(params,location,current_user) do
+      {:ok, _} ->
+        Main.LiveUpdates.notify_live_view({__MODULE__, :updated_open})
+        redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+      {:error,:error} ->
+
+        conn
+        |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+        conn
+      {:error, changeset} ->
+        conn
+        |> put_flash(:error, "Unable to create campaign")
+        |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
+      :ok ->
+        update_conn(:ok,conn)
+              |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+      :error ->  update_conn(:error,conn)
+                 |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+    end
+
+  end
+
+  def create_convo(%{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name} = params},location,current_user) when campaign_name != "" do
     send_at_utc = if params["scheduled"] && params["send_at"] do
       offest =
         location.timezone
@@ -246,37 +244,18 @@ defmodule MainWeb.ConversationController do
          )
       |> Stream.map(fn (row) -> CampaignRecipient.create(row) end)
       |> Enum.count()
-
-      redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+      {:ok, %{}}
     else
-      {:error, changeset} ->
-        conn
-        |> put_flash(:error, "Unable to create campaign")
-        |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
+      {:error, changeset} -> {:error, changeset}
     end
   end
-
-  def create(
-        conn,
-        %{
-          "location_id" => location_id,
-          "conversation" => %{
-            "original_number" => original_number
-          }
-        } = params
-      ) when original_number != "" do
-
-    current_user = conn
-                   |> current_user()
-    location = current_user
-               |> Location.get(location_id)
-
+  def create_convo(%{"location_id" => location_id, "conversation" => %{"original_number" => original_number}} = params,location,current_user) when original_number != ""do
     with {:ok, conversation, params} <- find_or_start_conversation(
       %{
         member: original_number,
         message: params["conversation"]["message"],
         location_number: location.phone_number,
-        team_member_number: current_user(conn).phone_number
+        team_member_number: current_user.phone_number
       }
     )
       do
@@ -288,7 +267,7 @@ defmodule MainWeb.ConversationController do
           %{"id" => conversation.id, "location_id" => location_id, "team_member_id" => current_user.team_member.id}
         )
       else
-        user_info = Formatters.format_team_member(current_user(conn))
+        user_info = Formatters.format_team_member(current_user)
         message = %{
           "conversation_id" => conversation.id,
           "phone_number" => current_user.phone_number,
@@ -299,20 +278,14 @@ defmodule MainWeb.ConversationController do
              {:ok, _} <- ConversationMessages.create(message) do
           nil
         else
-        _ -> nil
+          _ -> nil
         end
       end
       res
-      |> update_conn(conn)
-      |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
+
     else
-      err ->
-
-        conn
-        |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
-        conn
+      err -> {:error,:error}
     end
-
   end
 
   defp find_or_start_conversation(%{member: member, location_number: location} = params) do

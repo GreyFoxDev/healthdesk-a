@@ -17,7 +17,7 @@ defmodule MainWeb.Live.OpenConverationsView do
 
   def mount(_params, %{"location_id" => location_id} = session, socket) do
     timer = Enum.random(1000..10_000)
-    :timer.send_interval(timer, self(), :update)
+    Main.LiveUpdates.subscribe_live_view()
     socket =
       socket
       |> assign(:count, open_convos(location_id))
@@ -46,16 +46,8 @@ defmodule MainWeb.Live.OpenConverationsView do
 
     {:noreply, assign(socket, %{count: count})}
   end
-
-  def handle_info(:update, socket) do
-    count =
-      try do
-        open_convos(socket.assigns.location_id)
-      rescue
-        _ ->
-          socket.assigns.count
-      end
-
+  def handle_info({_requesting_module, :updated_open}, socket) do
+    count = open_convos(socket.assigns.location_id)
     {:noreply, assign(socket, %{count: count})}
   end
 

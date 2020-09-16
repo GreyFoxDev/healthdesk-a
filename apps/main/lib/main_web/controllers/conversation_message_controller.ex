@@ -9,46 +9,9 @@ defmodule MainWeb.ConversationMessageController do
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
   def index(conn, %{"location_id" => location_id, "conversation_id" => conversation_id}) do
-    location =
-      conn
-      |> current_user()
-      |> Location.get(location_id)
-
-    team_members =
-      conn
-      |> current_user()
-      |> TeamMember.all(location_id)
-
-    conversation =
-      conn
-      |> current_user()
-      |> Conversations.get(conversation_id)
-      |> fetch_member()
-
-    messages =
-      conn
-      |> current_user()
-      |> ConversationMessages.all(conversation_id)
-
-    dispositions =
-      conn
-      |> current_user()
-      |> Data.Disposition.get_by_team_id(location.team_id)
-      |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
-      |> Stream.map(&({&1.disposition_name, &1.id}))
-      |> Enum.to_list()
-    saved_replies = SavedReply.get_by_location_id(location_id)
-
-    render conn, "index.html",
-      location: location,
-      conversation: conversation,
-      saved_replies: saved_replies,
-      messages: messages,
-      team_members: team_members,
-      teams: teams(conn),
-      dispositions: dispositions,
-      has_sidebar: True,
-      changeset: ConversationMessages.get_changeset()
+    user = conn
+           |> current_user()
+    live_render(conn, MainWeb.Live.ConversationsView, session: %{"location_id" => location_id,"conversation_id" => conversation_id, "user" => user})
   end
 
   def fetch_member(%{original_number: << "CH", _rest :: binary >> = channel} = conversation) do
