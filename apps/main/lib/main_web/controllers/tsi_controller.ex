@@ -56,9 +56,6 @@ defmodule MainWeb.TsiController do
       |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
     else
       err ->
-        IO.inspect("###################")
-        IO.inspect(err)
-        IO.inspect("###################")
 
         conn
         |> assign(:title, location.team.team_name)

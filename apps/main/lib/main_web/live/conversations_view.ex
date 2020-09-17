@@ -165,7 +165,7 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket |> assign(:tab, tab)}
   end
 
-  def handle_event("save", %{"conversation_message" => params}, socket) do
+  def handle_event("save", %{"conversation_message" => c_params}=params, socket) do
     location = socket.assigns.location
     user = socket.assigns.user
     conversation = socket.assigns.conversation
@@ -188,7 +188,7 @@ defmodule MainWeb.Live.ConversationsView do
   end
   defp send_message(%{original_number: << "+1", _ :: binary >>} = conversation, params, location,user) do
 
-    params
+    params["conversation_message"]
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
     |> case do
@@ -200,7 +200,8 @@ defmodule MainWeb.Live.ConversationsView do
        end
   end
   defp send_message(%{original_number: << "messenger:", _ :: binary>>} = conversation, params, location,user) do
-    params
+
+    params["conversation_message"]
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
     |> case do
@@ -220,7 +221,7 @@ defmodule MainWeb.Live.ConversationsView do
       location.location_name
     end
 
-    params
+    params["conversation_message"]
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
     |> case do
@@ -238,7 +239,7 @@ defmodule MainWeb.Live.ConversationsView do
       location.location_name
     end
 
-    params
+    params["conversation_message"]
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
   end
@@ -444,9 +445,6 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
   def handle_event("new_msg",params,socket)do
-    IO.inspect("###################")
-    IO.inspect(params)
-    IO.inspect("###################")
 
     location = socket.assigns.location
     user = socket.assigns.user
