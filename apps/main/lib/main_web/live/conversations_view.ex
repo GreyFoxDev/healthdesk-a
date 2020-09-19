@@ -67,9 +67,29 @@ defmodule MainWeb.Live.ConversationsView do
     {:ok, socket}
   end
   def mount(_params, %{"location_id" => location_id, "user" => user}, socket) do
+    if connected?(socket), do: send( self(), {:fetch, %{user: user, location_id: location_id}} )
     location = user
                |> Location.get(location_id)
+    teams= user |> Data.Team.all()
     Main.LiveUpdates.subscribe_live_view()
+
+    socket =
+      socket
+      |> assign(:location, location)
+      |> assign(:conversations, [])
+      |> assign(:my_conversations, [])
+      |> assign(:teams, teams)
+      |> assign(:dispositions, [])
+      |> assign(:user, user)
+      |> assign(:count, 0)
+      |> assign(:tab, "me")
+
+    {:ok, socket}
+  end
+
+  def handle_info( {:fetch, %{user: user, location_id: location_id}}, socket ) do
+    location = user
+               |> Location.get(location_id)
     conversations =
       user
       |> Conversations.all(location_id)
@@ -84,23 +104,19 @@ defmodule MainWeb.Live.ConversationsView do
       |> Stream.map(&({&1.disposition_name, &1.id}))
       |> Enum.to_list()
 
-    teams= user |> Data.Team.all()
 
     socket =
       socket
       |> assign(:location, location)
       |> assign(:conversations, conversations)
       |> assign(:my_conversations, my_conversations)
-      |> assign(:teams, teams)
       |> assign(:dispositions, dispositions)
       |> assign(:user, user)
       |> assign(:count, count)
-      |> assign(:tab, "me")
 
 
-    {:ok, socket}
+    {:noreply, socket}
   end
-
   def fetch_member(%{original_number: << "CH", _rest :: binary >> = channel} = conversation) do
     with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
       Map.put(conversation, :member, channel.member)
