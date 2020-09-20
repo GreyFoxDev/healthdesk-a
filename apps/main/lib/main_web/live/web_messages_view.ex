@@ -61,24 +61,12 @@ defmodule MainWeb.Live.WebMessagesView do
     {:noreply, assign(socket, %{typing: false})}
   end
   def handle_info({_requesting_module, {:new_msg,msg}}, socket) do
-    IO.inspect("###################")
-    IO.inspect(msg)
-    IO.inspect("###################")
 
     messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
-    IO.inspect("###################")
-    IO.inspect(length(messages))
-    IO.inspect("###################")
-    messages = [msg | messages]
-    IO.inspect("###################")
-    IO.inspect(length(messages))
-    IO.inspect("###################")
-   socket =
+    messages = messages ++ [msg]
+    socket =
       socket
       |> assign(:messages, messages)
-    IO.inspect("###################")
-    IO.inspect(length(socket.assigns[:messages]))
-    IO.inspect("###################")
     {:noreply, socket}
   end
   def handle_info(_, socket) do
