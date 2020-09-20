@@ -1,6 +1,6 @@
 defmodule MainWeb.CampaignController do
   use MainWeb.SecuredContoller
-
+  alias Main.Scheduler
   alias Data.{Campaign, CampaignRecipient}
 
   def export(conn, %{"campaign_id" => campaign_id}) do
@@ -21,11 +21,14 @@ defmodule MainWeb.CampaignController do
   end
 
   def delete(conn, %{"campaign_id" => campaign_id}) do
-    campaign_id
+   campaign =  campaign_id
     |> Campaign.get()
+
+   campaign
     |> Campaign.delete()
     |> case do
          {:ok, _} ->
+            Scheduler.delete_job(String.to_atom(campaign.campaign_name))
            conn
            |> put_flash(:success, "Campaign deleted successfully.")
            |> redirect(to: "/admin")

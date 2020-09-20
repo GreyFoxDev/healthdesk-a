@@ -14,7 +14,8 @@ defmodule MainWeb.Live.ConversationsView do
   def mount(_params, %{"location_id" => location_id,"conversation_id" => conversation_id, "user" => user}, socket) do
     location = user
                |> Location.get(location_id)
-    Main.LiveUpdates.subscribe_live_view()
+    Main.LiveUpdates.subscribe_live_view(location_id)
+    Main.LiveUpdates.subscribe_live_view(conversation_id)
     conversations =
       user
       |> Conversations.all(location_id)
@@ -62,7 +63,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:user, user)
       |> assign(:count, count)
       |> assign(:tab, "open")
-      
+
 
     {:ok, socket}
   end
@@ -71,7 +72,7 @@ defmodule MainWeb.Live.ConversationsView do
     location = user
                |> Location.get(location_id)
     teams= user |> Data.Team.all()
-    Main.LiveUpdates.subscribe_live_view()
+    Main.LiveUpdates.subscribe_live_view(location_id)
 
     socket =
       socket
@@ -134,8 +135,7 @@ defmodule MainWeb.Live.ConversationsView do
       user
       |> Conversations.get(conversation_id)
       |> fetch_member()
-
-
+    Main.LiveUpdates.subscribe_live_view(conversation_id)
     messages =
       user
       |> ConversationMessages.all(conversation_id)
@@ -159,6 +159,8 @@ defmodule MainWeb.Live.ConversationsView do
 
     location = socket.assigns.location
     user = socket.assigns.user
+    convo_id = socket.assigns.conversation_id
+    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :agent_typing_stop})
     socket= %{socket |
       assigns: Map.delete(Map.delete(Map.delete(socket.assigns,:conversation_id),:conversation),:new),changed: Map.put_new(socket.changed, :key, true)}
     conversations =
@@ -172,7 +174,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:location, location)
       |> assign(:conversations, conversations)
       |> assign(:my_conversations, my_conversations)
-      
+
     {:noreply, socket}
   end
 
@@ -199,6 +201,7 @@ defmodule MainWeb.Live.ConversationsView do
       socket
       |> assign(:conversation, conversation)
       |> assign(:messages, messages)
+      |> assign(:child_id, length(messages))
       |> assign(:changeset, ConversationMessages.get_changeset())
     {:noreply, socket}
   end
@@ -208,9 +211,15 @@ defmodule MainWeb.Live.ConversationsView do
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
     |> case do
-         {:ok, _message} ->
+         {:ok, message_} ->
            message = %{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
            @chatbot.send(message)
+           IO.inspect("###################")
+           IO.inspect(1234)
+           IO.inspect("###################")
+
+           Main.LiveUpdates.notify_live_view(conversation.id , {__MODULE__, {:new_msg, message_}})
+
          {:error, _changeset} ->
            nil
        end
@@ -258,6 +267,16 @@ defmodule MainWeb.Live.ConversationsView do
     params["conversation_message"]
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
+    |> case do
+         {:ok, message_} ->
+           IO.inspect("###################")
+           IO.inspect(123)
+           IO.inspect("###################")
+
+           Main.LiveUpdates.notify_live_view(conversation.id , {__MODULE__, {:new_msg, message_}})
+         _ -> nil
+       end
+
   end
 
   def handle_event("assign", %{"foo" => params}, socket)do
@@ -332,7 +351,7 @@ defmodule MainWeb.Live.ConversationsView do
         |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
         |> Stream.map(&({&1.disposition_name, &1.id}))
         |> Enum.to_list()
-      Main.LiveUpdates.notify_live_view({__MODULE__, :updated_open})
+      Main.LiveUpdates.notify_live_view(location.id,{__MODULE__, :updated_open})
 
       socket =
         socket
@@ -341,9 +360,9 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:my_conversations, my_conversations)
         |> assign(:dispositions, dispositions)
         |> assign(:user, user)
-        
+
       {:noreply,socket}
-      else
+    else
       {:noreply,socket}
 
     end
@@ -381,7 +400,7 @@ defmodule MainWeb.Live.ConversationsView do
         |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
         |> Stream.map(&({&1.disposition_name, &1.id}))
         |> Enum.to_list()
-      Main.LiveUpdates.notify_live_view({__MODULE__, :updated_open})
+      Main.LiveUpdates.notify_live_view(location.id,{__MODULE__, :updated_open})
 
       socket =
         socket
@@ -392,7 +411,7 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:user, user)
 
       {:noreply,socket}
-      else
+    else
       {:noreply,socket}
     end
   end
@@ -434,7 +453,7 @@ defmodule MainWeb.Live.ConversationsView do
         user
         |> ConversationMessages.all(id)
       saved_replies = SavedReply.get_by_location_id(location.id)
-      Main.LiveUpdates.notify_live_view({__MODULE__, :updated_open})
+      Main.LiveUpdates.notify_live_view(location.id,{__MODULE__, :updated_open})
       socket =
         socket
         |> assign(:conversation_id, id)
@@ -455,8 +474,8 @@ defmodule MainWeb.Live.ConversationsView do
 
   def handle_event("new",_,socket)do
     socket = socket
-    |> assign(:new, "new")
-    |> assign( changeset: Conversations.get_changeset(),)
+             |> assign(:new, "new")
+             |> assign( changeset: Conversations.get_changeset(),)
 
     {:noreply, socket}
   end
@@ -487,9 +506,43 @@ defmodule MainWeb.Live.ConversationsView do
     count = open_convos(socket.assigns.location.id)
     {:noreply, assign(socket, %{count: count})}
   end
+  def handle_info({_requesting_module, :online}, socket) do
+    {:noreply, assign(socket, %{online: true})}
+  end
+  def handle_info({_requesting_module, :offline}, socket) do
+    {:noreply, assign(socket, %{online: false})}
+  end
+  def handle_info({_requesting_module, :user_typing_start}, socket) do
+    {:noreply, assign(socket, %{typing: true})}
+  end
+  def handle_info({_requesting_module, :user_typing_stop}, socket) do
+    {:noreply, assign(socket, %{typing: false})}
+  end
+
+  def handle_event("focused",_,socket)do
+    convo_id = socket.assigns.conversation_id
+    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :agent_typing_start})
+    {:noreply, socket}
+
+  end
+  def handle_event("blured",_,socket)do
+    convo_id = socket.assigns.conversation_id
+    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :agent_typing_stop})
+    {:noreply, socket}
+  end
   defp open_convos(location_id) do
     %{role: "admin"}
     |> Conversations.all(location_id)
     |> Enum.count(&(&1.status in ["open", "pending"]))
+  end
+  def terminate(reason, socket) do
+    if(socket.assigns[:conversation_id]) do
+      convo_id = socket.assigns.conversation_id
+      Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :agent_typing_stop})
+    end
+
+  end
+  def handle_info(_, socket) do
+    {:noreply, socket}
   end
 end

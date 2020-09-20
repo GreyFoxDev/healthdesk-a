@@ -17,7 +17,7 @@ defmodule MainWeb.Live.OpenConverationsView do
 
   def mount(_params, %{"location_id" => location_id} = session, socket) do
     timer = Enum.random(1000..10_000)
-    Main.LiveUpdates.subscribe_live_view()
+    Main.LiveUpdates.subscribe_live_view(location_id)
     socket =
       socket
       |> assign(:count, open_convos(location_id))

@@ -101,7 +101,6 @@ defmodule MainWeb.AdminController do
   def index(conn, _params) do
     current_user = current_user(conn)
     teams = teams(conn)
-
     team_members = TeamMember.all()
     team_admin_count =
       team_members
@@ -118,7 +117,13 @@ defmodule MainWeb.AdminController do
       dispositions = Disposition.count_all()
       [dispositions_per_day] = Disposition.average_per_day()
       locations = Location.all()
+      IO.inspect("###################")
+      IO.inspect(length(locations))
+      IO.inspect("###################")
 
+      response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id).median_response_time||0 end)
+      middle_index = response_times |> length() |> div(2)
+      response_time = response_times |> Enum.sort |> Enum.at(middle_index)
       campaigns = locations
       |> Enum.map(fn(location) ->
         Campaign.get_by_location_id(location.id)
@@ -130,7 +135,7 @@ defmodule MainWeb.AdminController do
         campaigns: campaigns,
         dispositions: dispositions,
         dispositions_per_day: dispositions_per_day,
-        response_time: nil,
+        response_time: response_time,
         web_totals: totals_by_channel("WEB"),
         sms_totals: totals_by_channel("SMS"),
         app_totals: totals_by_channel("APP"),

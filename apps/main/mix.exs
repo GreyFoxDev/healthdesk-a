@@ -63,7 +63,8 @@ defmodule Main.Mixfile do
       {:elixir_uuid, "~> 1.2"},
       {:nimble_csv, "~> 0.5.0"},
       {:jason, "~> 1.0"},
-      {:tesla, "~> 1.3.0"}
+      {:tesla, "~> 1.3.0"},
+      {:quantum, "~> 3.0"}
     ]
   end
 end
