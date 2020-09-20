@@ -11,7 +11,7 @@ defmodule MainWeb.ConversationController do
     TimezoneOffset}
   alias MainWeb.Helper.Formatters
   alias MainWeb.AssignTeamMemberController
-
+  alias Main.Scheduler
   require Logger
 
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
@@ -106,7 +106,7 @@ defmodule MainWeb.ConversationController do
 
         pending_message_count = (ConCache.get(:session_cache, id) || 0)
         :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
-        LiveUpdates.notify_live_view({__MODULE__, :updated_open})
+        LiveUpdates.notify_live_view(location_id,{__MODULE__, :updated_open})
         redirect(
           conn,
           to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id)
@@ -164,7 +164,7 @@ defmodule MainWeb.ConversationController do
 
       with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
            {:ok, _} <- ConversationMessages.create(message) do
-        Main.LiveUpdates.notify_live_view({__MODULE__, :updated_open})
+        Main.LiveUpdates.notify_live_view(location_id,{__MODULE__, :updated_open})
         redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
       else
         {:error, _changeset} ->
@@ -188,7 +188,7 @@ defmodule MainWeb.ConversationController do
       |> Location.get(location_id)
     case create_convo(params,location,current_user) do
       {:ok, _} ->
-        Main.LiveUpdates.notify_live_view({__MODULE__, :updated_open})
+        Main.LiveUpdates.notify_live_view(location_id,{__MODULE__, :updated_open})
         redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location.id))
       {:error,:error} ->
 
@@ -208,9 +208,9 @@ defmodule MainWeb.ConversationController do
 
   end
 
-  def create_convo(%{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name} = params},location,current_user) when campaign_name != "" do
+  def create_convo(%{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name, "csv_data" => csv_data} = params},location,current_user) when campaign_name != "" do
     send_at_utc = if params["scheduled"] && params["send_at"] do
-      offest =
+      offset =
         location.timezone
         |> TimezoneOffset.calculate()
         |> abs()
@@ -218,7 +218,48 @@ defmodule MainWeb.ConversationController do
       params["send_at"]
       |> Kernel.<>(":00")
       |> NaiveDateTime.from_iso8601!()
-      |> NaiveDateTime.add(offest, :second)
+      |> NaiveDateTime.add(offset, :second)
+      |> DateTime.from_naive!("Etc/UTC")
+    else
+      DateTime.utc_now
+    end
+
+    scheduled = if params["scheduled"], do: true, else: false
+
+    with %{"send_at" => ^send_at_utc} = params <- Map.put(params, "send_at", send_at_utc),
+         %{} = params <- Map.merge(params, %{"location_id" => location.id, "scheduled" => scheduled}),
+         {:ok, campaign} <- Campaign.create(params) do
+
+      params["csv_data"]
+      |> MyParser.parse_string
+      |> Enum.map(
+           fn [first_name, last_name, phone_number] ->
+             %{
+               "recipient_name" => "#{first_name} #{last_name}",
+               "phone_number" => phone_number,
+               "campaign_id" => campaign.id
+             }
+           end
+         )
+      |> Enum.map(fn (row) -> CampaignRecipient.create(row) end)
+      |> Enum.count()
+      Scheduler.schedule_campaign(campaign.id)
+      {:ok, %{}}
+    else
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+  def create_convo(%{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name} = params},location,current_user) when campaign_name != "" do
+    send_at_utc = if params["scheduled"] && params["send_at"] do
+      offset =
+        location.timezone
+        |> TimezoneOffset.calculate()
+        |> abs()
+
+      params["send_at"]
+      |> Kernel.<>(":00")
+      |> NaiveDateTime.from_iso8601!()
+      |> NaiveDateTime.add(offset, :second)
       |> DateTime.from_naive!("Etc/UTC")
     else
       DateTime.utc_now
@@ -244,6 +285,8 @@ defmodule MainWeb.ConversationController do
          )
       |> Stream.map(fn (row) -> CampaignRecipient.create(row) end)
       |> Enum.count()
+
+      Scheduler.schedule_campaign(campaign.id)
       {:ok, %{}}
     else
       {:error, changeset} -> {:error, changeset}

@@ -28,12 +28,13 @@
             </ul><!-- /.nav-tabs -->
         </div>
         <div class="card-body">
-            <%= f = form_for @changeset, "#", [ phx_submit: :new_msg, multipart: true] %>
+            <%= f = form_for @changeset, "#", [ phx_submit: :new_msg, multipart: true, novalidate: :novalidate] %>
             <fieldset>
                 <div class="form-group form_csv">
                     <label for="tf3">CSV Upload</label>
                     <div class="custom-file">
-                        <%= file_input f, :csv, accept: "text/csv, .csv", class: "custom-file-input", placeholder: "Choose file" %>
+                        <%= file_input f, :csv, [accept: "text/csv, .csv", class: "custom-file-input", placeholder: "Choose file", phx_hook: "CsvUpload"] %>
+                        <%= hidden_input f, :csv_data, [phx_update: "ignore", id: "csv_data"] %>
                         <label class="custom-file-label" for="tf3">Choose file</label>
                         <small id="tf1Help" class="form-text text-muted">Please upload a csv file with Firstname, Lastname and Mobile Number. <a href="#">Click here</a> to download a sample csv.</small>
                     </div>
@@ -103,6 +104,12 @@
                 <% else %>
                 Message from <strong><%= format_phone(@conversation.original_number) %></strong>
                 <% end %>
+                <%= if assigns[:online] do %>
+                <span class="indicator online"></span>
+                <% else %>
+                <span class="indicator offline"></span>
+                <% end %>
+
             </h4>
             <%= if @conversation.team_member_id do %>
             <p class="list-group-item-text">
@@ -317,7 +324,20 @@
                     <% end %>
 
                 <% end %>
-                <%= live_render(@socket, MainWeb.Live.ConversationMessageUpdatesView, session: %{"user" => @user, "conversation" => @conversation.id } ,id: "update"<>@conversation.id) %>
+                <%= live_render(@socket, MainWeb.Live.ConversationMessageUpdatesView, session: %{"user" => @user, "conversation" => @conversation.id } ,id: "update"<>@conversation.id<>to_string(assigns[:child_id])) %>
+                <%= if assigns[:typing] do %>
+                <li class="conversation-inbound">
+                    <div class="conversation-meta">
+                        <p class="ticontainer"> <span>User is typing </span>
+                            <span class="tiblock">
+                            <span class="tidot"></span>
+                            <span class="tidot"></span>
+                            <span class="tidot"></span>
+                        </span>
+                        </p>
+                    </div>
+                </li>
+                <% end %>
             </ul>
         </section>
     </div>
@@ -328,7 +348,7 @@
     <%= f = form_for @changeset, "#", [ phx_submit: :save] %>
     <div class="media mb-1">
         <div class="media-body">
-            <%= text_input f, :message, id: "reply_matches", class: "form-control border-0 shadow-none", place_holder: "Type a message" %>
+            <%= text_input f, :message, id: "reply_matches", class: "form-control border-0 shadow-none", place_holder: "Type a message",phx_focus: :focused,phx_blur: :blured  %>
         </div>
         <div>
             <button type="submit" class="btn btn-light btn-icon">
@@ -505,7 +525,7 @@
                         <% team_member = (c.team_member || default_user()) %>
                         <td>
         <span class="user-avatar-wrapper">
-            <a href="#" class="user-avatar user-avatar-md"><img src="<%= team_member.user.avatar %>" alt=""></a>
+            <a href="#" class="user-avatar user-avatar-md"><img src="<%= if team_member.user.avatar != "", do: team_member.user.avatar , else: "/images/unknown-profile.jpg" %>" alt=""></a>
             <span>
                 <b>
                     <a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>">
@@ -597,7 +617,7 @@
                         <% team_member = (c.team_member || default_user()) %>
                         <td>
         <span class="user-avatar-wrapper">
-            <a href="#" class="user-avatar user-avatar-md"><img src="<%= team_member.user.avatar %>" alt=""></a>
+            <a href="#" class="user-avatar user-avatar-md"><img src="<%= if team_member.user.avatar != "", do: team_member.user.avatar , else: "/images/unknown-profile.jpg" %>" alt=""></a>
             <span>
                 <b>
                     <a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>">
@@ -689,7 +709,8 @@
                         <% team_member = (c.team_member || default_user()) %>
                         <td>
         <span class="user-avatar-wrapper">
-            <a href="#" class="user-avatar user-avatar-md"><img src="<%= team_member.user.avatar %>" alt=""></a>
+
+            <a href="#" class="user-avatar user-avatar-md"><img src="<%= if team_member.user.avatar != "", do: team_member.user.avatar , else: "/images/unknown-profile.jpg" %>" alt=""></a>
             <span>
                 <b>
                     <a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>">
@@ -705,7 +726,6 @@
         </span>
                         </td>
                         <td>
-
                             <%= if c.member && c.member.first_name do %>
                             <b><a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>"><%= Enum.join([c.member.first_name, c.member.last_name], " ") %></a></b>
                             <% else %>
@@ -798,17 +818,22 @@
     $(document).on('DOMSubtreeModified', 'body', function () {
         if($('.modal-backdrop').is(":visible")){
         $('.modal-backdrop').remove();}
-        if($('#conversation_scheduled').is(':checked') )
+        if($('#conversation_scheduled').is(':checked')&&$('.form_date').is(":hidden") )
         {
+            flatpickr("#conversation_send_at");
             $( ".form_date" ).show(500);
             $(".form_btn").html("Schedule");
         }
         $( "#conversation_original_number" ).prop('required',true);
         $( "#conversation_message" ).prop('required',true);
-        $( ".form_name" ).hide();
-        $( ".form_csv" ).hide();
-        $( ".form_date" ).hide();
-        $(".form_schedule").hide();
+        if($(".nav-link.show.active").length) {
+            if($(".nav-link.show.active").html()=="Personal") {
+                $(".form_name").hide();
+                $(".form_csv").hide();
+                $(".form_date").hide();
+                $(".form_schedule").hide();
+            }
+        }
     })
     $('body').on('DOMSubtreeModified', '#scroll-message', function () {
         var div = document.getElementById("scroll-message");
@@ -845,38 +870,41 @@
     });
 
     $(document).on('click','#rd2',function (e) {
-        $( ".form_to" ).hide(500);
-        $( ".form_name" ).show(500);
-        $( ".form_name" ).show(500);
-        $(".form_schedule").show(500);
+
         $( "#rd2" ).addClass( "show active" );
         $( "#rd1" ).removeClass( "show active" );
         $( "#conversation_csv" ).prop('required',true);
         $( "#conversation_campaign_name" ).prop('required',true);
         $("#conversation_original_number").removeAttr('required');
         $( "#conversation_original_number" ).val('');
-        $( ".form_csv" ).show(500);
         if($('#conversation_scheduled').is(':checked') )
         {
             $( ".form_date" ).show(500);
             $(".form_btn").html("Schedule");
         }
+        $( ".form_csv" ).show(500);
+        $( ".form_to" ).hide(500);
+        $( ".form_name" ).show(500);
+        $( ".form_name" ).show(500);
+        $(".form_schedule").show(500);
     });
     $(document).on('click','#rd1',function (e) {
-        $( ".form_to" ).show(500);
         $( "#rd1" ).addClass( "show active" );
         $( "#rd2" ).removeClass( "show active" );
-        $( ".form_name" ).hide(500);
-        $(".form_schedule").hide(500);
         $("#conversation_csv").removeAttr('required');
         $("#conversation_campaign_name").removeAttr('required');
         $( "#conversation_original_number" ).prop('required',true);
         $( "#conversation_campaign_name" ).val('');
         $( ".form_csv" ).hide(500);
         $( ".form_date" ).hide(500);
+        $( ".form_name" ).hide(500);
+        $(".form_schedule").hide(500);
+        $( ".form_to" ).show(500);
+
     });
     $(document).on('click','#conversation_scheduled',function (e) {
         if(conversation_scheduled.checked) {
+            flatpickr("#conversation_send_at");
             $( ".form_date" ).show(500);
             $(".form_btn").html("Schedule");
         } else {

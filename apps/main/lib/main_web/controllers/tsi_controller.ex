@@ -163,13 +163,14 @@ defmodule MainWeb.TsiController do
     location = conn.assigns.location
 
     with %Schema{} = convo <- C.get(convo_id) do
+      message= params["message"]||params["foo"]["message"]
       <<"APP:+1", phone_number :: binary>> = convo.original_number
 
-      CM.create(
+      res=CM.create(
         %{
           "conversation_id" => convo.id,
           "phone_number" => convo.original_number,
-          "message" => params["message"],
+          "message" => message,
           "sent_at" => DateTime.utc_now()
         }
       )
@@ -181,18 +182,18 @@ defmodule MainWeb.TsiController do
         MainWeb.Endpoint.broadcast(
           "convo:#{convo_id}",
           "broadcast",
-          %{message: params["message"], name: name, phone_number: phone_number}
+          %{message: message, name: name, phone_number: phone_number}
         )
       else
         MainWeb.Endpoint.broadcast(
           "convo:#{convo_id}",
           "broadcast",
-          %{message: params["message"], phone_number: phone_number}
+          %{message: message, phone_number: phone_number}
         )
       end
 
       if convo.status == "closed" do
-        params["message"]
+        message
         |> ask_wit_ai(location)
         |> case do
              {:ok, response} ->
@@ -221,7 +222,7 @@ defmodule MainWeb.TsiController do
                :ok =
                  Notify.send_to_admin(
                    convo.id,
-                   "Message From: #{convo.original_number}\n#{params["message"]}",
+                   "Message From: #{convo.original_number}\n#{message}",
                    location.phone_number
                  )
            end
