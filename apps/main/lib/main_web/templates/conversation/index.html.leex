@@ -28,12 +28,13 @@
             </ul><!-- /.nav-tabs -->
         </div>
         <div class="card-body">
-            <%= f = form_for @changeset, "#", [ phx_submit: :new_msg, multipart: true] %>
+            <%= f = form_for @changeset, "#", [ phx_submit: :new_msg, multipart: true, novalidate: :novalidate] %>
             <fieldset>
                 <div class="form-group form_csv">
                     <label for="tf3">CSV Upload</label>
                     <div class="custom-file">
-                        <%= file_input f, :csv, accept: "text/csv, .csv", class: "custom-file-input", placeholder: "Choose file" %>
+                        <%= file_input f, :csv, [accept: "text/csv, .csv", class: "custom-file-input", placeholder: "Choose file", phx_hook: "CsvUpload"] %>
+                        <%= hidden_input f, :csv_data, [phx_update: "ignore", id: "csv_data"] %>
                         <label class="custom-file-label" for="tf3">Choose file</label>
                         <small id="tf1Help" class="form-text text-muted">Please upload a csv file with Firstname, Lastname and Mobile Number. <a href="#">Click here</a> to download a sample csv.</small>
                     </div>
