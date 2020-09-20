@@ -5,7 +5,7 @@ defmodule Main.Scheduler do
   alias Quantum.Job
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
-  def schedule_campaign(id \\ "5183e86a-393d-40a9-8bcc-7aa4e9fb768e") do
+  def schedule_campaign(id) do
     campaign = Campaign.get(id)
     time= campaign.send_at
     cron_expr = %Crontab.CronExpression{
