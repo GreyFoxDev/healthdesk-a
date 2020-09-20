@@ -215,14 +215,15 @@ defmodule MainWeb.ConversationController do
         |> TimezoneOffset.calculate()
         |> abs()
 
-      params["send_at"]
-      |> Kernel.<>(":00")
-      |> NaiveDateTime.from_iso8601!()
-      |> NaiveDateTime.add(offset, :second)
-      |> DateTime.from_naive!("Etc/UTC")
+        params["send_at"]
+        |> Kernel.<>(":00")
+        |> NaiveDateTime.from_iso8601!()
+        |> NaiveDateTime.add(offset, :second)
+        |> DateTime.from_naive!("Etc/UTC")
     else
       DateTime.utc_now
     end
+
 
     scheduled = if params["scheduled"], do: true, else: false
 
@@ -243,7 +244,13 @@ defmodule MainWeb.ConversationController do
          )
       |> Enum.map(fn (row) -> CampaignRecipient.create(row) end)
       |> Enum.count()
-      Scheduler.schedule_campaign(campaign.id)
+
+      if !scheduled do
+
+        Task.start(fn ->Scheduler.send_campaign(campaign.id) end)
+      else
+        Scheduler.schedule_campaign(campaign.id)
+      end
       {:ok, %{}}
     else
       {:error, changeset} -> {:error, changeset}
