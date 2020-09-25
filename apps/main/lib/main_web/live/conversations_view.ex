@@ -11,7 +11,7 @@ defmodule MainWeb.Live.ConversationsView do
 
   def render(assigns), do: MainWeb.ConversationView.render("index.html", assigns)
 
-  def mount(_params, %{"location_id" => location_id,"conversation_id" => conversation_id, "user" => user}, socket) do
+  def mount(_params, %{"location_id" => location_id, "conversation_id" => conversation_id, "user" => user}, socket) do
     location = user
                |> Location.get(location_id)
     Main.LiveUpdates.subscribe_live_view(location_id)
@@ -30,11 +30,12 @@ defmodule MainWeb.Live.ConversationsView do
       |> Stream.map(&({&1.disposition_name, &1.id}))
       |> Enum.to_list()
 
-    teams= user |> Data.Team.all()
+    teams = user
+            |> Data.Team.all()
     team_members =
       user
       |> TeamMember.all(location_id)
-    team_members_all= Enum.map(team_members, fn x -> {x.user.first_name<>" "<>x.user.last_name, x.id} end)
+    team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
     conversation =
       user
       |> Conversations.get(conversation_id)
@@ -63,15 +64,17 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:user, user)
       |> assign(:count, count)
       |> assign(:tab, "open")
+      |> assign(:search_string, "")
 
 
     {:ok, socket}
   end
   def mount(_params, %{"location_id" => location_id, "user" => user}, socket) do
-    if connected?(socket), do: send( self(), {:fetch, %{user: user, location_id: location_id}} )
+    if connected?(socket), do: send(self(), {:fetch, %{user: user, location_id: location_id}})
     location = user
                |> Location.get(location_id)
-    teams= user |> Data.Team.all()
+    teams = user
+            |> Data.Team.all()
     Main.LiveUpdates.subscribe_live_view(location_id)
 
     socket =
@@ -84,11 +87,12 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:user, user)
       |> assign(:count, 0)
       |> assign(:tab, "me")
+      |> assign(:search_string, "")
 
     {:ok, socket}
   end
 
-  def handle_info( {:fetch, %{user: user, location_id: location_id}}, socket ) do
+  def handle_info({:fetch, %{user: user, location_id: location_id}}, socket) do
     location = user
                |> Location.get(location_id)
     conversations =
@@ -118,19 +122,19 @@ defmodule MainWeb.Live.ConversationsView do
 
     {:noreply, socket}
   end
-  def fetch_member(%{original_number: << "CH", _rest :: binary >> = channel} = conversation) do
+  def fetch_member(%{original_number: <<"CH", _rest :: binary>> = channel} = conversation) do
     with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
       Map.put(conversation, :member, channel.member)
     end
   end
   def fetch_member(conversation), do: conversation
 
-  def handle_event("openconvo", %{ "cid" => conversation_id,"lid"=>location_id,"tid" => team_id}=params, socket) do
-    user= socket.assigns.user
+  def handle_event("openconvo", %{"cid" => conversation_id, "lid" => location_id, "tid" => team_id} = params, socket) do
+    user = socket.assigns.user
     team_members =
       user
       |> TeamMember.all(location_id)
-    team_members_all= Enum.map(team_members, fn x -> {x.user.first_name<>" "<>x.user.last_name, x.id} end)
+    team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
     conversation =
       user
       |> Conversations.get(conversation_id)
@@ -160,9 +164,12 @@ defmodule MainWeb.Live.ConversationsView do
     location = socket.assigns.location
     user = socket.assigns.user
     convo_id = socket.assigns.conversation_id
-    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :agent_typing_stop})
-    socket= %{socket |
-      assigns: Map.delete(Map.delete(Map.delete(socket.assigns,:conversation_id),:conversation),:new),changed: Map.put_new(socket.changed, :key, true)}
+    Main.LiveUpdates.notify_live_view(convo_id, {__MODULE__, :agent_typing_stop})
+    socket = %{
+      socket |
+      assigns: Map.delete(Map.delete(Map.delete(socket.assigns, :conversation_id), :conversation), :new),
+      changed: Map.put_new(socket.changed, :key, true)
+    }
     conversations =
       user
       |> Conversations.all(location.id)
@@ -178,17 +185,22 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
 
-  def handle_event("tab", %{ "tab" => tab}, socket) do
+  def handle_event("tab", %{"tab" => tab}, socket) do
 
-    {:noreply, socket |> assign(:tab, tab)}
+    {
+      :noreply,
+      socket
+      |> assign(:tab, tab)
+      |> assign(:search_string, "")
+    }
   end
 
-  def handle_event("save", %{"conversation_message" => c_params}=params, socket) do
+  def handle_event("save", %{"conversation_message" => c_params} = params, socket) do
     location = socket.assigns.location
     user = socket.assigns.user
     conversation = socket.assigns.conversation
 
-    send_message(conversation, params, location,user)
+    send_message(conversation, params, location, user)
     conversation =
       user
       |> Conversations.get(conversation.id)
@@ -205,67 +217,96 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:changeset, ConversationMessages.get_changeset())
     {:noreply, socket}
   end
-  defp send_message(%{original_number: << "+1", _ :: binary >>} = conversation, params, location,user) do
+  defp send_message(%{original_number: <<"+1", _ :: binary>>} = conversation, params, location, user) do
 
     params["conversation_message"]
-    |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
+    |> Map.merge(
+         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
+       )
     |> ConversationMessages.create()
     |> case do
          {:ok, message_} ->
-           message = %{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
+           message = %{
+             provider: :twilio,
+             from: location.phone_number,
+             to: conversation.original_number,
+             body: params["conversation_message"]["message"]
+           }
            @chatbot.send(message)
            IO.inspect("###################")
            IO.inspect(1234)
            IO.inspect("###################")
 
-           Main.LiveUpdates.notify_live_view(conversation.id , {__MODULE__, {:new_msg, message_}})
+           Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message_}})
 
          {:error, _changeset} ->
            nil
        end
   end
-  defp send_message(%{original_number: << "messenger:", _ :: binary>>} = conversation, params, location,user) do
+  defp send_message(%{original_number: <<"messenger:", _ :: binary>>} = conversation, params, location, user) do
 
     params["conversation_message"]
-    |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
+    |> Map.merge(
+         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
+       )
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-           message = %Chatbot.Params{provider: :twilio, from: "messenger:#{location.messenger_id}", to: conversation.original_number, body: params["conversation_message"]["message"]}
+           message = %Chatbot.Params{
+             provider: :twilio,
+             from: "messenger:#{location.messenger_id}",
+             to: conversation.original_number,
+             body: params["conversation_message"]["message"]
+           }
            Chatbot.Client.Twilio.call(message)
          {:error, _changeset} ->
            nil
        end
   end
-  defp send_message(%{original_number: << "CH", _ :: binary >>} = conversation, params, location,user) do
+  defp send_message(%{original_number: <<"CH", _ :: binary>>} = conversation, params, location, user) do
 
 
     from_name = if conversation.team_member do
-      Enum.join([conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."], " ")
+      Enum.join(
+        [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
+        " "
+      )
     else
       location.location_name
     end
 
     params["conversation_message"]
-    |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
+    |> Map.merge(
+         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
+       )
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-           message = %Chatbot.Params{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
+           message = %Chatbot.Params{
+             provider: :twilio,
+             from: location.phone_number,
+             to: conversation.original_number,
+             body: params["conversation_message"]["message"]
+           }
            Chatbot.Client.Twilio.channel(message)
          {:error, _changeset} -> nil
        end
   end
-  defp send_message(%{original_number: << "APP", _ :: binary >>} = conversation, params, location,user) do
+  defp send_message(%{original_number: <<"APP", _ :: binary>>} = conversation, params, location, user) do
 
     from = if conversation.team_member do
-      Enum.join([conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."], " ")
+      Enum.join(
+        [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
+        " "
+      )
     else
       location.location_name
     end
 
     params["conversation_message"]
-    |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
+    |> Map.merge(
+         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
+       )
     |> ConversationMessages.create()
     |> case do
          {:ok, message_} ->
@@ -273,7 +314,7 @@ defmodule MainWeb.Live.ConversationsView do
            IO.inspect(123)
            IO.inspect("###################")
 
-           Main.LiveUpdates.notify_live_view(conversation.id , {__MODULE__, {:new_msg, message_}})
+           Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message_}})
          _ -> nil
        end
 
@@ -284,7 +325,9 @@ defmodule MainWeb.Live.ConversationsView do
     user = socket.assigns.user
     conversation = socket.assigns.conversation
     if params["team_member_id"] != "" do
-      case MainWeb.AssignTeamMemberController.assign(Map.merge(params,%{"id" => conversation.id, "location_id" => location.id})) do
+      case MainWeb.AssignTeamMemberController.assign(
+             Map.merge(params, %{"id" => conversation.id, "location_id" => location.id})
+           ) do
         {:ok, _} ->
           conversation =
             user
@@ -299,21 +342,21 @@ defmodule MainWeb.Live.ConversationsView do
             |> assign(:conversation, conversation)
             |> assign(:messages, messages)
             |> assign(:changeset, ConversationMessages.get_changeset())
-          {:noreply,socket}
+          {:noreply, socket}
         _ ->
-          {:noreply,socket}
+          {:noreply, socket}
       end
 
     end
 
   end
 
-  def handle_event("close", %{"did" => disposition_id}=params, socket)do
+  def handle_event("close", %{"did" => disposition_id} = params, socket)do
 
     location = socket.assigns.location
     user = socket.assigns.user
     conversation = case socket.assigns[:conversation] do
-      nil ->  conversation = Conversations.get(params["cid"])
+      nil -> conversation = Conversations.get(params["cid"])
       c -> c
     end
 
@@ -326,7 +369,7 @@ defmodule MainWeb.Live.ConversationsView do
         user
         |> Data.Disposition.get(disposition_id)
 
-      message=   %{
+      message = %{
         "conversation_id" => conversation.id,
         "phone_number" => user.phone_number,
         "message" => "CLOSED: Closed by #{user_info} with disposition #{disposition.disposition_name}",
@@ -335,8 +378,11 @@ defmodule MainWeb.Live.ConversationsView do
 
       Conversations.update(%{"id" => conversation.id, "status" => "closed", "team_member_id" => nil})
       ConversationMessages.create(message)
-      socket= %{socket |
-        assigns: Map.delete(socket.assigns,:conversation_id),changed: Map.put_new(socket.changed, :key, true)}
+      socket = %{
+        socket |
+        assigns: Map.delete(socket.assigns, :conversation_id),
+        changed: Map.put_new(socket.changed, :key, true)
+      }
 
       conversations =
         user
@@ -351,7 +397,7 @@ defmodule MainWeb.Live.ConversationsView do
         |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
         |> Stream.map(&({&1.disposition_name, &1.id}))
         |> Enum.to_list()
-      Main.LiveUpdates.notify_live_view(location.id,{__MODULE__, :updated_open})
+      Main.LiveUpdates.notify_live_view(location.id, {__MODULE__, :updated_open})
 
       socket =
         socket
@@ -361,9 +407,9 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, dispositions)
         |> assign(:user, user)
 
-      {:noreply,socket}
+      {:noreply, socket}
     else
-      {:noreply,socket}
+      {:noreply, socket}
 
     end
   end
@@ -375,7 +421,7 @@ defmodule MainWeb.Live.ConversationsView do
     if conversation.status != "closed" do
       user_info = Formatters.format_team_member(user)
       _ = ConCache.delete(:session_cache, conversation_id)
-      message=   %{
+      message = %{
         "conversation_id" => conversation_id,
         "phone_number" => user.phone_number,
         "message" => "CLOSED: Closed by #{user_info}",
@@ -384,8 +430,11 @@ defmodule MainWeb.Live.ConversationsView do
 
       Conversations.update(%{"id" => conversation.id, "status" => "closed", "team_member_id" => nil})
       ConversationMessages.create(message)
-      socket= %{socket |
-        assigns: Map.delete(socket.assigns,:conversation_id),changed: Map.put_new(socket.changed, :key, true)}
+      socket = %{
+        socket |
+        assigns: Map.delete(socket.assigns, :conversation_id),
+        changed: Map.put_new(socket.changed, :key, true)
+      }
 
       conversations =
         user
@@ -400,7 +449,7 @@ defmodule MainWeb.Live.ConversationsView do
         |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
         |> Stream.map(&({&1.disposition_name, &1.id}))
         |> Enum.to_list()
-      Main.LiveUpdates.notify_live_view(location.id,{__MODULE__, :updated_open})
+      Main.LiveUpdates.notify_live_view(location.id, {__MODULE__, :updated_open})
 
       socket =
         socket
@@ -410,9 +459,9 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, dispositions)
         |> assign(:user, user)
 
-      {:noreply,socket}
+      {:noreply, socket}
     else
-      {:noreply,socket}
+      {:noreply, socket}
     end
   end
   def handle_event("open", %{"cid" => id}, socket)do
@@ -442,7 +491,7 @@ defmodule MainWeb.Live.ConversationsView do
       team_members =
         user
         |> TeamMember.all(location.id)
-      team_members_all= Enum.map(team_members, fn x -> {x.user.first_name<>" "<>x.user.last_name, x.id} end)
+      team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
       conversation =
         user
         |> Conversations.get(id)
@@ -453,7 +502,7 @@ defmodule MainWeb.Live.ConversationsView do
         user
         |> ConversationMessages.all(id)
       saved_replies = SavedReply.get_by_location_id(location.id)
-      Main.LiveUpdates.notify_live_view(location.id,{__MODULE__, :updated_open})
+      Main.LiveUpdates.notify_live_view(location.id, {__MODULE__, :updated_open})
       socket =
         socket
         |> assign(:conversation_id, id)
@@ -467,25 +516,28 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:changeset, ConversationMessages.get_changeset())
       {:noreply, socket}
     else
-      {:noreply,socket}
+      {:noreply, socket}
     end
 
   end
 
-  def handle_event("new",_,socket)do
+  def handle_event("new", _, socket)do
     socket = socket
              |> assign(:new, "new")
-             |> assign( changeset: Conversations.get_changeset(),)
+             |> assign(changeset: Conversations.get_changeset(), )
 
     {:noreply, socket}
   end
-  def handle_event("new_msg",params,socket)do
+  def handle_event("new_msg", params, socket)do
 
     location = socket.assigns.location
     user = socket.assigns.user
-    MainWeb.ConversationController.create_convo(Map.merge(params,%{"location_id" => location.id}),location,user)
-    socket= %{socket |
-      assigns: Map.delete(Map.delete(Map.delete(socket.assigns,:conversation_id),:conversation),:new),changed: Map.put_new(socket.changed, :key, true)}
+    MainWeb.ConversationController.create_convo(Map.merge(params, %{"location_id" => location.id}), location, user)
+    socket = %{
+      socket |
+      assigns: Map.delete(Map.delete(Map.delete(socket.assigns, :conversation_id), :conversation), :new),
+      changed: Map.put_new(socket.changed, :key, true)
+    }
     conversations =
       user
       |> Conversations.all(location.id)
@@ -519,17 +571,79 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, assign(socket, %{typing: false})}
   end
 
-  def handle_event("focused",_,socket)do
+  def handle_event("focused", _, socket)do
     convo_id = socket.assigns.conversation_id
-    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :agent_typing_start})
+    Main.LiveUpdates.notify_live_view(convo_id, {__MODULE__, :agent_typing_start})
     {:noreply, socket}
 
   end
-  def handle_event("blured",_,socket)do
+  def handle_event("blured", _, socket)do
     convo_id = socket.assigns.conversation_id
-    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :agent_typing_stop})
+    Main.LiveUpdates.notify_live_view(convo_id, {__MODULE__, :agent_typing_stop})
     {:noreply, socket}
   end
+
+  def handle_event("filter_convo", query, socket) do
+    IO.inspect(query)
+    search_string = query["value"]
+    conversations = socket.assigns[:o_conversations] || socket.assigns.conversations
+    my_conversations = socket.assigns[:o_my_conversations] || socket.assigns.my_conversations
+    tab = socket.assigns.tab
+    socket = case tab do
+      "me" ->
+        socket
+        |> assign(:my_conversations, filter_conversations(my_conversations, search_string))
+        |> assign(:o_my_conversations, my_conversations)
+      _ ->
+        socket
+        |> assign(:conversations, filter_conversations(conversations, search_string))
+        |> assign(:o_conversations, conversations)
+
+    end
+    {:noreply, socket}
+
+  end
+  defp filter_conversations(conversations, search_string) when is_list(conversations) do
+    IO.inspect("###################")
+    IO.inspect(conversations)
+    IO.inspect("###################")
+
+    case search_string do
+      "" -> conversations
+      search_string ->
+        Enum.filter(conversations, fn c -> filter_conversations(c, search_string) end)
+    end
+  end
+  defp filter_conversations(c, search_string) when is_map(c) do
+    if filter_conversations(c.original_number, search_string) do
+      true
+    else
+      if filter_conversations(c.channel_type, search_string) do
+        true
+      else
+        if c.team_member != nil do
+          filter_conversations(
+            (c.team_member.user.first_name <> " " <> c.team_member.user.last_name),
+            search_string
+          ) || filter_conversations(c.team_member.user.phone_number, search_string)
+        else
+          if c.member != nil do
+            if c.member.first_name != nil do
+              filter_conversations((c.member.first_name <> " " <> c.member.last_name), search_string)
+            else
+              filter_conversations(c.member.phone_number, search_string)
+            end
+          else
+            false
+          end
+        end
+      end
+    end
+  end
+  defp filter_conversations(c, s) when is_binary(c) do
+    String.downcase(c) =~ String.downcase(s)
+  end
+
   defp open_convos(location_id) do
     %{role: "admin"}
     |> Conversations.all(location_id)
@@ -538,7 +652,7 @@ defmodule MainWeb.Live.ConversationsView do
   def terminate(reason, socket) do
     if(socket.assigns[:conversation_id]) do
       convo_id = socket.assigns.conversation_id
-      Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :agent_typing_stop})
+      Main.LiveUpdates.notify_live_view(convo_id, {__MODULE__, :agent_typing_stop})
     end
 
   end
