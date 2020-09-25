@@ -494,7 +494,8 @@
 
 <header class="page-title-bar">
     <div class="d-flex justify-content-between">
-        &nbsp;
+        &nbsp;<div class="pr-2" style="width: 100%">
+            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo"%> </div>
         <%= if @user.role in ["admin", "team-admin", "location-admin"] do %>
 
         <a href="#" phx-click="new"
