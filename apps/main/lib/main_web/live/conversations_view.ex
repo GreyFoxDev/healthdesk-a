@@ -570,6 +570,11 @@ defmodule MainWeb.Live.ConversationsView do
   def handle_info({_requesting_module, :user_typing_stop}, socket) do
     {:noreply, assign(socket, %{typing: false})}
   end
+  def handle_info({_requesting_module, %Data.Schema.ConversationMessage{}=msg}, socket) do
+
+    msgs_=merge(socket.assigns.messages,[msg])|>Enum.sort_by( &(&1.sent_at), {:asc, DateTime})
+    {:noreply,assign(socket,:messages,msgs_)}
+  end
 
   def handle_event("focused", _, socket)do
     convo_id = socket.assigns.conversation_id
@@ -604,9 +609,6 @@ defmodule MainWeb.Live.ConversationsView do
 
   end
   defp filter_conversations(conversations, search_string) when is_list(conversations) do
-    IO.inspect("###################")
-    IO.inspect(conversations)
-    IO.inspect("###################")
 
     case search_string do
       "" -> conversations
@@ -659,4 +661,15 @@ defmodule MainWeb.Live.ConversationsView do
   def handle_info(_, socket) do
     {:noreply, socket}
   end
+
+  defp merge(left, right),
+      do: Map.merge(to_map(left), to_map(right), &resolve_conflict/3) |> Map.values
+
+  defp to_map(list), do: for item <- list, into: %{}, do: {item.id, item}
+
+
+
+  defp resolve_conflict(_key, %{read: read1} = map1, %{read: read2}),
+       do: %{map1 | read: read1||read2}
+
 end

@@ -283,7 +283,19 @@
                                                     <% end %>
                             ·
                             <%= format_date(message.sent_at) %>
+                            <%= if message.read && @conversation.channel_type=="APP" do %>
+                            <i class="fa fa-check" style="color: green"></i>
+                            <i class="fa fa-check" style="color: green"></i>
+                            <% end %>
                         </div>
+                        <% else %>
+                        <%= if message.read && @conversation.channel_type=="APP" do %>
+                        <div class="conversation-meta">
+
+                            <i class="fa fa-check" style="color: green"></i>
+                            <i class="fa fa-check" style="color: green"></i>
+                        </div>
+                        <% end %>
                         <% end %>
                     </div>
                 </li>
@@ -303,6 +315,11 @@
                                                     <% end %>
                             ·
                             <%= format_date(message.sent_at) %>
+                            <%= if message.read && @conversation.channel_type=="APP" do %>
+                            <i class="fa fa-check"  style="color: green"></i>
+                            <i class="fa fa-check" style="color: green"></i>
+                            <% end %>
+
                         </div>
                         <% else %>
                         <div class="conversation-meta">
@@ -314,6 +331,10 @@
                                                     <% end %>
                             ·
                             <%= format_date(message.sent_at) %>
+                            <%= if message.read && @conversation.channel_type=="APP" do %>
+                            <i class="fa fa-check" style="color: green"></i>
+                            <i class="fa fa-check" style="color: green"></i>
+                            <% end %>
                         </div>
                         <% end %>
                     </div>
@@ -362,7 +383,7 @@
 <div style="display: none" id="availableTags">
 
     <%= for saved_reply <- @saved_replies do %>
-            <p><span><%= saved_reply.draft %></span><span><%= saved_reply.title %></span></p>
+    <p><span><%= saved_reply.draft %></span><span><%= saved_reply.title %></span></p>
     <% end %>
 </div>
 
@@ -495,7 +516,7 @@
 <header class="page-title-bar">
     <div class="d-flex justify-content-between">
         &nbsp;<div class="pr-2" style="width: 100%">
-            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo"%> </div>
+        <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo"%> </div>
         <%= if @user.role in ["admin", "team-admin", "location-admin"] do %>
 
         <a href="#" phx-click="new"
@@ -818,7 +839,7 @@
     });
     $(document).on('DOMSubtreeModified', 'body', function () {
         if($('.modal-backdrop').is(":visible")){
-        $('.modal-backdrop').remove();}
+            $('.modal-backdrop').remove();}
         if($('#conversation_scheduled').is(':checked')&&$('.form_date').is(":hidden") )
         {
             flatpickr("#conversation_send_at");
@@ -839,7 +860,7 @@
     $('body').on('DOMSubtreeModified', '#scroll-message', function () {
         var div = document.getElementById("scroll-message");
         div.scrollTop = div.scrollHeight;
-         $("#availableTags p").each(function(i,elem)
+        $("#availableTags p").each(function(i,elem)
         {
             span = $(elem).find('span');
             if (span.length)

@@ -2,6 +2,7 @@ defmodule MainWeb.Live.WebMessagesView do
   use Phoenix.LiveView
 
   alias Data.Schema.{Location, Conversation}
+  alias Data.{ConversationMessages}
 
   require Logger
 
@@ -13,7 +14,7 @@ defmodule MainWeb.Live.WebMessagesView do
          conversation <- Data.Conversations.get(convo_id) do
 
       messages = Data.ConversationMessages.get_by_conversation_id(convo_id)
-
+      Task.start(fn -> Enum.each(messages, fn(msg) -> mark_read(convo_id,msg)end) end)
       if connected?(socket), do: :timer.send_interval(3000, self(), {:update, convo_id})
 
       socket =
@@ -61,6 +62,7 @@ defmodule MainWeb.Live.WebMessagesView do
     {:noreply, assign(socket, %{typing: false})}
   end
   def handle_info({_requesting_module, {:new_msg,msg}}, socket) do
+     socket.assigns.convo_id |>mark_read(msg)
 
     messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
     messages = messages ++ [msg]
@@ -71,6 +73,11 @@ defmodule MainWeb.Live.WebMessagesView do
   end
   def handle_info(_, socket) do
     {:noreply, socket}
+  end
+  defp mark_read(convo_id,msg) do
+    {:ok, msg}= ConversationMessages.mark_read(msg)
+    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, msg})
+
   end
 
 end

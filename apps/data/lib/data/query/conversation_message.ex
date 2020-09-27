@@ -15,7 +15,8 @@ defmodule Data.Query.ConversationMessage do
   """
   @spec get(id :: binary(), repo :: Ecto.Repo.t()) :: ConversationMessage.t() | nil
   def get(id, repo \\ Read) do
-    from(t in ConversationMessage,
+    from(
+      t in ConversationMessage,
       where: t.id == ^id
     )
     |> repo.one()
@@ -47,10 +48,11 @@ defmodule Data.Query.ConversationMessage do
   Return a list of conversation messages for a conversation
   """
   @spec get_by_conversation_id(conversation_id :: binary(), repo :: Ecto.Repo.t()) :: [
-          ConversationMessage.t()
-        ]
+                                                                                        ConversationMessage.t()
+                                                                                      ]
   def get_by_conversation_id(conversation_id, repo \\ Read) do
-    from(c in ConversationMessage,
+    from(
+      c in ConversationMessage,
       where: c.conversation_id == ^conversation_id,
       distinct: [c.sent_at],
       order_by: c.sent_at,
@@ -68,16 +70,39 @@ defmodule Data.Query.ConversationMessage do
     %ConversationMessage{}
     |> ConversationMessage.changeset(params)
     |> case do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        repo.insert(changeset)
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.insert(changeset)
 
-      changeset ->
-        {:error, changeset}
-    end
+         changeset ->
+           {:error, changeset}
+       end
+  end
+
+  @doc """
+  mark a message as read
+  """
+  @spec get_by_conversation_id(msg :: ConversationMessage.t(), repo :: Ecto.Repo.t()) :: [
+                                                                                           ConversationMessage.t()
+                                                                                         ]
+  def mark_read(msg, repo \\ Write)
+  def mark_read(%{read: false} = msg, repo) do
+    cs = msg
+    |> ConversationMessage.changeset(%{read: true})
+    cs
+    |> case do
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.update(changeset)
+         changeset ->
+           {:error, changeset}
+       end
+  end
+  def mark_read(%{read: true} = msg, repo ) do
+    {:ok,msg}
   end
 
   defp build_results(results) do
     cols = Enum.map(results.columns, &String.to_existing_atom/1)
-    Enum.map(results.rows, fn row -> Map.new(Enum.zip(cols, row)) end) |> List.first
+    Enum.map(results.rows, fn row -> Map.new(Enum.zip(cols, row)) end)
+    |> List.first
   end
 end
