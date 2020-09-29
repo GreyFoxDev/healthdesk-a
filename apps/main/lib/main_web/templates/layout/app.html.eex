@@ -55,7 +55,9 @@
 
 
                     <div class="top-bar-item top-bar-item-right px-0 d-none d-sm-flex">
-                        <%= if current_user = assigns[:current_user] do %> 
+                        <%= live_render(@conn, MainWeb.Live.NotificationAlertsView, session: %{"current_user" => @current_user}) %>
+                        <%= if current_user = assigns[:current_user] do %>
+
                             <div class="dropdown">
                                 <button class="btn-account d-none d-md-flex" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span class="user-avatar user-avatar-md">

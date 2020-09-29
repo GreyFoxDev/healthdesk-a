@@ -2,11 +2,7 @@
 // @import "looper/scss/theme.scss";
 
 $white: #ffffff;
-$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
-@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
-@import "~@fortawesome/fontawesome-free/scss/solid.scss";
-@import "~@fortawesome/fontawesome-free/scss/brands.scss";
-@import "~@fortawesome/fontawesome-free/scss/regular.scss";
+
 body {
   background-color: $white;
 }
@@ -199,4 +195,62 @@ list::-webkit-calendar-picker-indicator {
 }
 .tidot:nth-child(3){
   -webkit-animation-delay:400ms;
+}
+
+
+
+.notes-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.notes{
+  flex: 1;
+  align-items: stretch;
+  overflow: scroll;
+  position: relative;
+  height: 58vh;
+
+}
+.notes .user{
+  color: #2d1861;
+  font-weight: bold;
+  margin-bottom: 0px;
+}
+.new-note {
+  flex: 2;
+  position: relative;
+  bottom: 0;
+  left: 0;
+  padding: 20px;
+  width: 100%;
+}
+.new-note textarea {
+  min-height: 100px;
+  width: 100%;
+}
+.new-note button {
+  width: 100%;
+}
+
+span.read:before
+{
+  content: ' \25CF';
+  font-size: 10px;
+  color: red;
+}
+
+.notif.nread {
+  background-color: #0000ff14;
+  font-style: italic;
+}
+.notif {
+  background-color: white;
+  border-bottom: 1px solid lightgray;
+  padding: 10px;
+}
+
+span.user-tag {
+  text-decoration: underline;
+  color: green;
 }

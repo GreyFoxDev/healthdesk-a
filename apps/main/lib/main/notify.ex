@@ -6,11 +6,76 @@ defmodule MainWeb.Notify do
   require Logger
 
   alias Data.{Location, Conversations, TeamMember, TimezoneOffset}
+  alias Data.Schema.Notification
 
   @url "[url]/admin/teams/[team_id]/locations/[location_id]/conversations/[conversation_id]/conversation-messages"
   @super_admin Application.get_env(:main, :super_admin)
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
   @endpoint Application.get_env(:main, :endpoint)
+
+  def send_to_teammate(conversation_id, message, location, team_member,user) do
+
+    %{data: link} =
+      @url
+      |> String.replace("[url]", @endpoint)
+      |> String.replace("[team_id]", location.team_id)
+      |> String.replace("[location_id]", location.id)
+      |> String.replace("[conversation_id]", conversation_id)
+      |> Bitly.Link.shorten()
+
+    body = Enum.join([user.first_name,user.last_name ,message, link[:url]], " ")
+    IO.inspect("#######body########")
+    IO.inspect(body)
+    IO.inspect("###################")
+
+    timezone_offset = TimezoneOffset.calculate(location.timezone)
+    current_time_string =
+      Time.utc_now()
+      |> Time.add(timezone_offset)
+      |> to_string()
+
+    available=
+      location
+      |> TeamMember.get_available_by_location(current_time_string)
+      |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
+      |> List.first
+
+    IO.inspect(team_member.user, label: "SEND TO TEAMMATE")
+
+    if team_member.user.use_email do
+      conversation = Conversations.get(conversation_id)
+      member = conversation.member
+      subject = if member do
+        member = [
+                   member.first_name,
+                   member.last_name,
+                   conversation.original_number
+                 ] |> Enum.join(" ")
+
+        "New message from #{member}"
+      else
+        "New message from #{conversation.original_number}"
+      end
+
+      team_member.user.email
+      |> Main.Email.generate_email(body, subject)
+      |> Main.Mailer.deliver_now()
+    end
+
+    if available && available.use_sms do
+      message = %{
+        provider: :twilio,
+        from: location.phone_number,
+        to: available.phone_number,
+        body: body
+      }
+
+      @chatbot.send(message)
+    end
+
+    :ok
+  end
+
 
   def send_to_teammate(conversation_id, message, location, team_member) do
     location = Location.get_by_phone(location)

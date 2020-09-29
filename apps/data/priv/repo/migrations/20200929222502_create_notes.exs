@@ -1,0 +1,13 @@
+defmodule Data.ReadOnly.Repo.Migrations.CreateNotes do
+  use Ecto.Migration
+
+  def change do
+    create table(:notes) do
+      add(:text, :string)
+      add(:conversation_id, references(:conversations))
+      add(:user_id, references(:users))
+
+      timestamps()
+    end
+  end
+end

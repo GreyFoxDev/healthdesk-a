@@ -25,24 +25,31 @@ defmodule Data.Conversations do
   Get changesets for conversations.
   """
   def get_changeset(),
-    do: Data.Schema.Conversation.changeset(%Data.Schema.Conversation{})
+      do: Data.Schema.Conversation.changeset(%Data.Schema.Conversation{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
       |> Query.get()
       |> Schema.changeset()
-
     {:ok, changeset}
   end
 
-  def all(%{role: role}, location_id) when role in @roles,
-    do: Query.get_by_location_id(location_id)
+  def all(%{role: role}, location_id) when role in @roles do
+    Query.get_by_location_id(location_id)
 
+  end
   def all(_, _), do: {:error, :invalid_permissions}
 
+  def all_open(%{role: role}, location_id, limit , offset ) when role in @roles do
+       Query.get_open_by_location_id(location_id, limit, offset)
+  end
+  def all_closed(%{role: role}, location_id, limit , offset ) when role in @roles do
+       Query.get_closed_by_location_id(location_id, limit, offset)
+  end
+
   def get(%{role: role}, id) when role in @roles,
-    do: Query.get(id)
+      do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
