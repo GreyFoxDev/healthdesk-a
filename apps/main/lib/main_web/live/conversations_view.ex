@@ -1,14 +1,15 @@
 defmodule MainWeb.Live.ConversationsView do
   use Phoenix.LiveView
 
-  alias Data.{Location, Conversations, TeamMember, ConversationMessages, SavedReply, MemberChannel}
+  alias Data.{Location, Conversations, TeamMember, ConversationMessages, SavedReply, MemberChannel, Notes, Notifications}
   alias Data.Schema.MemberChannel, as: Channel
   alias MainWeb.Helper.Formatters
 
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
   require Logger
-
+  @limit 25
+  @offset 0
   def render(assigns), do: MainWeb.ConversationView.render("index.html", assigns)
 
   def mount(_params, %{"location_id" => location_id, "conversation_id" => conversation_id, "user" => user}, socket) do
@@ -45,6 +46,8 @@ defmodule MainWeb.Live.ConversationsView do
       user
       |> ConversationMessages.all(conversation_id)
     saved_replies = SavedReply.get_by_location_id(location_id)
+    notes= Notes.get_by_conversation(conversation_id)
+
 
     socket =
       socket
@@ -54,6 +57,8 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:team_members, team_members)
       |> assign(:team_members_all, team_members_all)
       |> assign(:messages, messages)
+      |> assign(:notes, notes)
+      |> assign(:tab1, "notes")
       |> assign(:has_sidebar, True)
       |> assign(:changeset, ConversationMessages.get_changeset())
       |> assign(:location, location)
@@ -89,15 +94,26 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:tab, "me")
       |> assign(:search_string, "")
 
+
     {:ok, socket}
   end
 
   def handle_info({:fetch, %{user: user, location_id: location_id}}, socket) do
     location = user
                |> Location.get(location_id)
-    conversations =
-      user
-      |> Conversations.all(location_id)
+#    open_conversations =
+#      user
+#      |> Conversations.all_open(location_id, @limit, @offset)
+#    close_conversations =
+#      user
+#      |> Conversations.all_closed(location_id, @limit, @offset)
+#    conversations = open_conversations++close_conversations
+    conversations = user
+          |> Conversations.all(location_id)
+    IO.inspect("###################")
+    IO.inspect(@limit)
+    IO.inspect(length conversations)
+    IO.inspect("###################")
 
     my_conversations =
       Enum.filter(conversations, fn (c) -> c.team_member && c.team_member.user_id == user.id end)
@@ -145,6 +161,8 @@ defmodule MainWeb.Live.ConversationsView do
       |> ConversationMessages.all(conversation_id)
     saved_replies = SavedReply.get_by_location_id(location_id)
 
+    notes= Notes.get_by_conversation(conversation_id)
+
     socket =
       socket
       |> assign(:conversation_id, conversation_id)
@@ -154,6 +172,8 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:team_members_all, team_members_all)
       |> assign(:messages, messages)
       |> assign(:has_sidebar, True)
+      |> assign(:notes, notes)
+      |> assign(:tab1, "notes")
       |> assign(:changeset, ConversationMessages.get_changeset())
 
     {:noreply, socket}
@@ -192,6 +212,14 @@ defmodule MainWeb.Live.ConversationsView do
       socket
       |> assign(:tab, tab)
       |> assign(:search_string, "")
+    }
+  end
+  def handle_event("tab1", %{"tab" => tab}, socket) do
+
+    {
+      :noreply,
+      socket
+      |> assign(:tab1, tab)
     }
   end
 
@@ -233,9 +261,6 @@ defmodule MainWeb.Live.ConversationsView do
              body: params["conversation_message"]["message"]
            }
            @chatbot.send(message)
-           IO.inspect("###################")
-           IO.inspect(1234)
-           IO.inspect("###################")
 
            Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message_}})
 
@@ -310,9 +335,6 @@ defmodule MainWeb.Live.ConversationsView do
     |> ConversationMessages.create()
     |> case do
          {:ok, message_} ->
-           IO.inspect("###################")
-           IO.inspect(123)
-           IO.inspect("###################")
 
            Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message_}})
          _ -> nil
@@ -502,6 +524,7 @@ defmodule MainWeb.Live.ConversationsView do
         user
         |> ConversationMessages.all(id)
       saved_replies = SavedReply.get_by_location_id(location.id)
+
       Main.LiveUpdates.notify_live_view(location.id, {__MODULE__, :updated_open})
       socket =
         socket
@@ -570,9 +593,66 @@ defmodule MainWeb.Live.ConversationsView do
   def handle_info({_requesting_module, :user_typing_stop}, socket) do
     {:noreply, assign(socket, %{typing: false})}
   end
+  def handle_info({_requesting_module, %Data.Schema.ConversationMessage{}=msg}, socket) do
+
+    msgs_=merge(socket.assigns.messages,[msg])|>Enum.sort_by( &(&1.sent_at), {:asc, DateTime})
+    {:noreply,assign(socket,:messages,msgs_)}
+  end
+
+  def handle_event("new_note",%{"foo" => params},socket)do
+    conversation_id = socket.assigns.conversation_id
+    team_members = socket.assigns.team_members
+    location = socket.assigns.location
+    user = socket.assigns.user
+    text= params["text"]
+    IO.inspect("###################")
+    IO.inspect(text)
+    IO.inspect(text|>String.contains?("@"))
+    IO.inspect("###################")
+    {text_,notifications} = if text|>String.contains?("@") do
+      Enum.reduce(team_members,
+        {text,[]}, fn m, {t,n} ->
+        if String.contains?(t,"@" <> m.user.first_name <> " " <> m.user.last_name) do
+          {
+            String.replace(
+              t,
+              "@" <> m.user.first_name <> " " <> m.user.last_name,
+              "<span class='user-tag'>" <> m.user.first_name <> " " <> m.user.last_name <> "</span>"
+            ),
+            n++[m]
+          }
+        else
+          {t,n}
+        end
+
+      end)
+    else
+      text
+    end
+
+    IO.inspect("###################")
+    IO.inspect(text_)
+    IO.inspect(notifications)
+    IO.inspect("###################")
+
+    Enum.each(notifications,fn n ->
+      notify(%{user_id: n.user.id, from: user.id, conversation_id: conversation_id, text: " has mention you in a conversation"},n,location,user)
+    end)
+
+    params = %{"conversation_id" => conversation_id,"user_id" => user.id,"text" => text_}
+    case Notes.create(params) do
+      {:ok, _ } ->
+        notes= Notes.get_by_conversation(conversation_id)
+        {:noreply,assign(socket,:notes,notes)}
+      {:error, _ } ->
+        {:noreply,socket}
+
+    end
+  end
 
   def handle_event("focused", _, socket)do
     convo_id = socket.assigns.conversation_id
+    team_members = socket.assigns.team_members
     Main.LiveUpdates.notify_live_view(convo_id, {__MODULE__, :agent_typing_start})
     {:noreply, socket}
 
@@ -604,9 +684,6 @@ defmodule MainWeb.Live.ConversationsView do
 
   end
   defp filter_conversations(conversations, search_string) when is_list(conversations) do
-    IO.inspect("###################")
-    IO.inspect(conversations)
-    IO.inspect("###################")
 
     case search_string do
       "" -> conversations
@@ -659,4 +736,26 @@ defmodule MainWeb.Live.ConversationsView do
   def handle_info(_, socket) do
     {:noreply, socket}
   end
+  def handle_event(_,params, socket) do
+    IO.inspect("########qqq###########")
+    IO.inspect(params)
+    IO.inspect("###################")
+
+    {:noreply, socket}
+  end
+  defp notify(params,team_member, location,user)do
+    case Notifications.create(params) do
+      {:ok, notif} ->
+        Main.LiveUpdates.notify_live_view(params.user_id,{__MODULE__, :new_notif})
+        MainWeb.Notify.send_to_teammate(params.conversation_id, params.text, location, team_member,user)
+      _ -> nil
+    end
+
+  end
+
+  defp merge(left, right), do: Map.merge(to_map(left), to_map(right), &resolve_conflict/3) |> Map.values
+  defp to_map(list), do: for item <- list, into: %{}, do: {item.id, item}
+  defp resolve_conflict(_key, %{read: read1} = map1, %{read: read2}),
+       do: %{map1 | read: read1||read2}
+
 end
