@@ -78,12 +78,14 @@ defmodule MainWeb.Live.ConversationsView do
     case connected?(socket) do
       true -> connected_mount(params, session, socket)
       false ->
+        teams = user
+                |> Data.Team.all()
         socket =
           socket
           |> assign(:location, nil)
           |> assign(:conversations, [])
           |> assign(:my_conversations, [])
-          |> assign(:teams, [])
+          |> assign(:teams, teams)
           |> assign(:dispositions, [])
           |> assign(:user, user)
           |> assign(:count, 0)
@@ -96,10 +98,6 @@ defmodule MainWeb.Live.ConversationsView do
   end
 
   def connected_mount(_params, %{"location_id" => location_id, "user" => user}, socket) do
-    IO.inspect("###################")
-    IO.inspect(connected?(socket))
-    IO.inspect("###################")
-
     location = user
                |> Location.get(location_id)
 
