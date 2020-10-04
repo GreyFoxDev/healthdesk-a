@@ -74,10 +74,40 @@ defmodule MainWeb.Live.ConversationsView do
 
     {:ok, socket}
   end
-  def mount(_params, %{"location_id" => location_id, "user" => user}, socket) do
-    if connected?(socket), do: send(self(), {:fetch, %{user: user, location_id: location_id}})
+  def mount(params, %{"location_id" => location_id, "user" => user}=session, socket) do
+    case connected?(socket) do
+      true -> connected_mount(params, session, socket)
+      false ->
+        socket =
+          socket
+          |> assign(:location, nil)
+          |> assign(:conversations, [])
+          |> assign(:my_conversations, [])
+          |> assign(:teams, [])
+          |> assign(:dispositions, [])
+          |> assign(:user, user)
+          |> assign(:count, 0)
+          |> assign(:loading, true)
+          |> assign(:tab, "me")
+          |> assign(:search_string, "")
+
+        {:ok, socket}
+    end
+  end
+
+  def connected_mount(_params, %{"location_id" => location_id, "user" => user}, socket) do
+    IO.inspect("###################")
+    IO.inspect(connected?(socket))
+    IO.inspect("###################")
+
     location = user
                |> Location.get(location_id)
+
+
+     send(self(), {:fetch_c, %{user: user, location: location}})
+     send(self(), {:fetch_d, %{user: user, location: location}})
+
+
     teams = user
             |> Data.Team.all()
     Main.LiveUpdates.subscribe_live_view(location_id)
@@ -91,53 +121,43 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:dispositions, [])
       |> assign(:user, user)
       |> assign(:count, 0)
+      |> assign(:loading, false)
       |> assign(:tab, "me")
       |> assign(:search_string, "")
-
 
     {:ok, socket}
   end
 
-  def handle_info({:fetch, %{user: user, location_id: location_id}}, socket) do
-    location = user
-               |> Location.get(location_id)
-#    open_conversations =
-#      user
-#      |> Conversations.all_open(location_id, @limit, @offset)
-#    close_conversations =
-#      user
-#      |> Conversations.all_closed(location_id, @limit, @offset)
-#    conversations = open_conversations++close_conversations
-    conversations = user
-          |> Conversations.all(location_id)
-    IO.inspect("###################")
-    IO.inspect(@limit)
-    IO.inspect(length conversations)
-    IO.inspect("###################")
+  def handle_info({:fetch_c, %{user: user, location: location}}, socket) do
 
+    conversations = user
+          |> Conversations.all(location.id)
     my_conversations =
       Enum.filter(conversations, fn (c) -> c.team_member && c.team_member.user_id == user.id end)
-    count = open_convos(location_id)
+    count = open_convos(location.id)
+
+    socket =
+      socket
+      |> assign(:conversations, conversations)
+      |> assign(:my_conversations, my_conversations)
+      |> assign(:count, count)
+
+    {:noreply, socket}
+  end
+  def handle_info({:fetch_d, %{user: user, location: location}}, socket) do
     dispositions =
       user
       |> Data.Disposition.get_by_team_id(location.team_id)
       |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
       |> Stream.map(&({&1.disposition_name, &1.id}))
       |> Enum.to_list()
-
-
     socket =
       socket
-      |> assign(:location, location)
-      |> assign(:conversations, conversations)
-      |> assign(:my_conversations, my_conversations)
       |> assign(:dispositions, dispositions)
-      |> assign(:user, user)
-      |> assign(:count, count)
-
 
     {:noreply, socket}
   end
+
   def fetch_member(%{original_number: <<"CH", _rest :: binary>> = channel} = conversation) do
     with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
       Map.put(conversation, :member, channel.member)

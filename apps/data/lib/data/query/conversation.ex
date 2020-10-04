@@ -45,42 +45,6 @@ defmodule Data.Query.Conversation do
     )
     |> repo.all()
   end
-  @spec get_open_by_location_id(location_id :: binary(), limit :: integer(), offset :: integer(), repo :: Ecto.Repo.t()) :: [Conversation.t()]
-  def get_open_by_location_id(location_id,limit , offset , repo \\ Read) do
-    comment_order_query = from(c in Comment, order_by: c.inserted_at, preload: [:user])
-
-    from(c in Conversation,
-      join:  m in ConversationMessage,
-      on: m.conversation_id == c.id,
-      left_join: member in Member,
-      on: c.original_number == member.phone_number,
-      where: c.location_id == ^location_id,
-      where: c.status in ["open","pending"],
-      preload: [conversation_messages: m, team_member: [:user]],
-      order_by: [desc: m.sent_at,],
-      select: %{c | member: member},
-      limit: ^limit,
-      offset: ^offset
-    )
-    |> repo.all() |> repo.preload([:conversation_messages, team_member: [:user]])
-
-  end
-  @spec get_closed_by_location_id(location_id :: binary(), limit :: integer(), offset :: integer(), repo :: Ecto.Repo.t()) :: [Conversation.t()]
-  def get_closed_by_location_id(location_id,limit , offset , repo \\ Read) do
-    from(c in Conversation,
-      inner_join:  m in ConversationMessage,
-      on: m.conversation_id == c.id,
-      left_join: member in Member,
-      on: c.original_number == member.phone_number,
-      where: c.location_id == ^location_id,
-      where: c.status in ["closed"],
-      order_by: [desc: m.sent_at,],
-      select: %{c | member: member},
-      limit: ^limit,
-      offset: ^offset
-    )
-    |> repo.all() |> repo.preload([:conversation_messages, team_member: [:user]])
-  end
 
   @doc """
   Return a single conversation by a unique phone number and location id
