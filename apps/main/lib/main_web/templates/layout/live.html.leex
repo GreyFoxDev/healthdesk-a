@@ -15,14 +15,14 @@
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
-    <script src="<%= static_path(@conn, "/js/stacked-menu/stacked-menu.min.js") %>"></script>
-    <script src="<%= static_path(@conn, "/js/perfect-scrollbar/perfect-scrollbar.min.js") %>"></script>
-    <script src="<%= static_path(@conn, "/js/theme.js") %>"></script>
+    <script src="<%= static_path(@socket, "/js/stacked-menu/stacked-menu.min.js") %>"></script>
+    <script src="<%= static_path(@socket, "/js/perfect-scrollbar/perfect-scrollbar.min.js") %>"></script>
+    <script src="<%= static_path(@socket, "/js/theme.js") %>"></script>
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>" />
-    <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+    <link rel="stylesheet" href="<%= static_path(@socket, "/css/app.css") %>" />
+    <script src="<%= static_path(@socket, "/js/app.js") %>"></script>
 
 
 </head>
@@ -35,7 +35,7 @@
                 <%= if @current_user.role != "teammate" do %>
                 <a href="/admin"><img src="/images/healthdesk-logo.png"/></a>
                 <% else %>
-                <a href="<%=  team_location_live_path(@conn, MainWeb.Live.ConversationsView, @current_user.team_member.team_id, @current_user.team_member.location_id)%>">
+                <a href="<%=  team_location_live_path(@socket, MainWeb.Live.ConversationsView, @current_user.team_member.team_id, @current_user.team_member.location_id)%>">
                     <img src="/images/healthdesk-logo.png"/>
                 </a>
                 <% end %>
@@ -49,7 +49,7 @@
                     </button>
                 </div>
                 <div>
-                    <%= live_render(@conn, MainWeb.Live.ConversationAlertsView, session: %{"current_user" => @current_user}) %>
+                    <%= live_render(@socket, MainWeb.Live.ConversationAlertsView, session: %{"current_user" => @current_user}, id: "convoalerts") %>
                 </div>
             </div>
 
@@ -60,7 +60,7 @@
                         <i class="fa fa-lg fa-chart-line" aria-hidden="true"></i>
                     </button>
                 </a>
-                <%= live_render(@conn, MainWeb.Live.NotificationAlertsView, session: %{"current_user" => @current_user}) %>
+                <%= live_render(@socket, MainWeb.Live.NotificationAlertsView, session: %{"current_user" => @current_user},id: "notialert") %>
                 <%= if current_user = assigns[:current_user] do %>
 
                 <div class="dropdown">
@@ -84,14 +84,14 @@
                             <%= current_user.first_name %>&nbsp
                             <%= current_user.last_name %>
                         </h6>
-                        <%= link "Profile", to: user_path(@conn, :edit, current_user), class: "dropdown-item" %>
-                        <%= link "Logout", to: session_path(@conn, :delete, current_user), method: "delete", class: "dropdown-item" %>
+                        <%= link "Profile", to: user_path(@socket, :edit, current_user), class: "dropdown-item" %>
+                        <%= link "Logout", to: session_path(@socket, :delete, current_user), method: "delete", class: "dropdown-item" %>
                         <hr />
                         <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
-                        <%= link "Analytics", to: admin_path(@conn, :index), class: "dropdown-item" %>
+                        <%= link "Analytics", to: admin_path(@socket, :index), class: "dropdown-item" %>
                                     <% end %>
                         <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
-                        <%= link "Settings", to: settings_url(@conn, current_user), class: "dropdown-item" %>
+                        <%= link "Settings", to: settings_url(@socket, current_user), class: "dropdown-item" %>
                                     <% end %>
                         <%= link "Get support", to: "mailto:support@healthdesk.ai", method: "delete", class: "dropdown-item" %>
                         <%= link "Terms of use", to: "https://healthdesk.ai/terms", target: "_blank", class: "dropdown-item" %>
@@ -109,7 +109,7 @@
                     <ul class="menu">
                         <%= if @current_user.role == "admin" do %>
                         <li class="menu-item has-active">
-                            <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>Teams</span>"}, to: team_path(@conn, :index), class: "menu-link" %>
+                            <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>Teams</span>"}, to: team_path(@socket, :index), class: "menu-link" %>
                         </li>
                         <% end %>
 
@@ -117,7 +117,7 @@
                         <%= if @current_user.role in ["location-admin", "team-admin"] do %>
                         <li class="menu-item has-active">
                             <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>My Team</span>"},
-                                                     to: team_location_path(@conn, :index, team.id), class: "menu-link" %>
+                                                     to: team_location_path(@socket, :index, team.id), class: "menu-link" %>
                         </li>
                         <% end %>
 
@@ -133,10 +133,10 @@
                                 <li class="menu-subhead"><%= team.team_name %></li>
                                 <%= for location <- Enum.filter(team.locations, &(&1.deleted_at == nil)) do %>
                                 <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                    <a href="<%= team_location_live_path(@conn, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
+                                    <a href="<%= team_location_live_path(@socket, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
                                         <%= location.location_name %>
                                         <span class="badge badge-subtle">
-                                                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id}) %>
+                                                                <%= live_render(@socket, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id},id: "openconvos") %>
                                                             </span>
                                     </a>
                                 </li>
@@ -155,12 +155,12 @@
                             </a> <!-- child menu -->
                             <ul class="menu">
                                 <li class="menu-subhead"><%= team.team_name %></li>
-                                <%= for location <- teammate_locations(@conn) do %>
+                                <%= for location <- teammate_locations(@socket) do %>
                                 <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                    <a href="<%= team_location_live_path(@conn, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
+                                    <a href="<%= team_location_live_path(@socket, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
                                         <%= location.location_name %>
                                         <span class="badge badge-subtle">
-                                                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id}) %>
+                                                                <%= live_render(@socket, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id},id: "openconvos") %>
                                                             </span>
                                     </a>
                                 </li>
@@ -179,12 +179,12 @@
                             </a> <!-- child menu -->
                             <ul class="menu">
                                 <li class="menu-subhead"><%= team.team_name %></li>
-                                <%= for location <- teammate_locations(@conn) do %>
+                                <%= for location <- teammate_locations(@socket) do %>
                                 <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                    <a href="<%= team_location_live_path(@conn, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
+                                    <a href="<%= team_location_live_path(@socket, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
                                         <%= location.location_name %>
                                         <span class="badge badge-subtle">
-                                                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id}) %>
+                                                                <%= live_render(@socket, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id}) %>
                                                             </span>
                                     </a>
                                 </li>
@@ -203,7 +203,7 @@
         <div class="wrapper">
             <div class="page has-sidebar has-sidebar-expand-xl">
                 <div class="page-inner">
-                    <%= render @view_module, @view_template, assigns %>
+                    <%= @inner_content %>
                 </div>
             </div>
         </div>
