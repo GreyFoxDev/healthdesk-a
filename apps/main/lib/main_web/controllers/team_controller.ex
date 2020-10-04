@@ -1,7 +1,7 @@
 defmodule MainWeb.TeamController do
   use MainWeb.SecuredContoller
 
-  alias Data.Team
+  alias Data.{Disposition, Team}
 
   def index(conn, _params) do
     render conn, "index.html", teams: teams(conn), location: nil
@@ -39,7 +39,10 @@ defmodule MainWeb.TeamController do
 
   def create(conn, %{"team" => team}) do
     case Team.create(team) do
-      {:ok, _team} ->
+      {:ok, team} ->
+        %{"disposition_name" => "Automated"} |> Map.put("team_id", team.id)|> Disposition.create()
+        %{"disposition_name" => "Call Hang Up"} |> Map.put("team_id", team.id)|> Disposition.create()
+        %{"disposition_name" => "Call Deflected"} |> Map.put("team_id", team.id)|> Disposition.create()
         conn
         |> put_flash(:success, "Team created successfully.")
         |> redirect(to: team_path(conn, :index))

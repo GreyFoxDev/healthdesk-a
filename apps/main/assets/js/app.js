@@ -23,7 +23,6 @@ let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken},hooks: Hooks });
 liveSocket.connect()
 if(Notification.permission != "denied" && Notification.permission != "granted") {
-    console.log("123")
     Notification.requestPermission()
 }
 // Import local files
