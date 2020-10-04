@@ -8,6 +8,7 @@ defmodule MainWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+
   end
 
   pipeline :api,
@@ -43,7 +44,8 @@ defmodule MainWeb.Router do
       resources "/team-members", TeamMemberController
       resources "/locations", LocationController do
         resources "/class-schedule", ClassScheduleController, only: [:new, :create]
-        resources "/conversations", ConversationController do
+        live "/conversations" , Live.ConversationsView, only: [:index]
+        resources "/conversations", ConversationController, except: [:index] do
           resources "/conversation-messages", ConversationMessageController
           put "/close", ConversationController, :close
           put "/open", ConversationController, :open

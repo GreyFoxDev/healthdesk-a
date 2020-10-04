@@ -1,5 +1,6 @@
 defmodule MainWeb.Live.ConversationsView do
-  use Phoenix.LiveView
+  use Phoenix.LiveView, layout: {MainWeb.LayoutView, "live.html"}
+
 
   alias Data.{Location, Conversations, TeamMember, ConversationMessages, SavedReply, MemberChannel, Notes, Notifications}
   alias Data.Schema.MemberChannel, as: Channel
@@ -70,34 +71,14 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:count, count)
       |> assign(:tab, "open")
       |> assign(:search_string, "")
+      |> assign(:current_user, user)
 
 
     {:ok, socket}
   end
-  def mount(params, %{"location_id" => location_id, "user" => user}=session, socket) do
-    case connected?(socket) do
-      true -> connected_mount(params, session, socket)
-      false ->
-        teams = user
-                |> Data.Team.all()
-        socket =
-          socket
-          |> assign(:location, nil)
-          |> assign(:conversations, [])
-          |> assign(:my_conversations, [])
-          |> assign(:teams, teams)
-          |> assign(:dispositions, [])
-          |> assign(:user, user)
-          |> assign(:count, 0)
-          |> assign(:loading, true)
-          |> assign(:tab, "me")
-          |> assign(:search_string, "")
+  def mount( %{"location_id" => location_id, "team_id" => team_id},session, socket) do
+    {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
 
-        {:ok, socket}
-    end
-  end
-
-  def connected_mount(_params, %{"location_id" => location_id, "user" => user}, socket) do
     location = user
                |> Location.get(location_id)
 
@@ -118,6 +99,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:teams, teams)
       |> assign(:dispositions, [])
       |> assign(:user, user)
+      |> assign(:current_user, user)
       |> assign(:count, 0)
       |> assign(:loading, false)
       |> assign(:tab, "me")
@@ -755,10 +737,6 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
   def handle_event(_,params, socket) do
-    IO.inspect("########qqq###########")
-    IO.inspect(params)
-    IO.inspect("###################")
-
     {:noreply, socket}
   end
   defp notify(params,team_member, location,user)do
