@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/images/healthdesk.jpg" />
+    <title>Healthdesk.ai - Admin Portal</title>
+    <%= csrf_meta_tag() %>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <script src="<%= static_path(@conn, "/js/stacked-menu/stacked-menu.min.js") %>"></script>
+    <script src="<%= static_path(@conn, "/js/perfect-scrollbar/perfect-scrollbar.min.js") %>"></script>
+    <script src="<%= static_path(@conn, "/js/theme.js") %>"></script>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>" />
+    <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+
+
+</head>
+
+<body>
+<div class="app">
+    <%= @inner_content %>
+</div> <!-- /container -->
+</body>
+</html>
