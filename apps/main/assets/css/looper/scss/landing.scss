@@ -3,9 +3,6 @@
 // Required
 
 @import "default/variable-bs-overrides";
-@import "node_modules/bootstrap/scss/functions";
-@import "node_modules/bootstrap/scss/variables";
-@import "node_modules/bootstrap/scss/mixins";
 @import "default/variables";
 // your own variables
 @import "variable-custom";
@@ -14,7 +11,6 @@
 // Bootstrap and its default variables
 // ==================================================
 
-@import "node_modules/bootstrap/scss/bootstrap";
 
 
 // Bootstrap components overrides
