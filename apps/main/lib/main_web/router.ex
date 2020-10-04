@@ -8,7 +8,7 @@ defmodule MainWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-
+    plug :put_root_layout, {MainWeb.LayoutView, :root}
   end
 
   pipeline :api,
