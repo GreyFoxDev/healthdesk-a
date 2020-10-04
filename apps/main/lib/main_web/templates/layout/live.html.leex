@@ -155,7 +155,7 @@
                             </a> <!-- child menu -->
                             <ul class="menu">
                                 <li class="menu-subhead"><%= team.team_name %></li>
-                                <%= for location <- teammate_locations(@socket) do %>
+                                <%= for location <- teammate_locations(@current_user) do %>
                                 <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
                                     <a href="<%= team_location_live_path(@socket, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
                                         <%= location.location_name %>
@@ -179,7 +179,7 @@
                             </a> <!-- child menu -->
                             <ul class="menu">
                                 <li class="menu-subhead"><%= team.team_name %></li>
-                                <%= for location <- teammate_locations(@socket) do %>
+                                <%= for location <- teammate_locations(@current_user) do %>
                                 <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
                                     <a href="<%= team_location_live_path(@socket, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
                                         <%= location.location_name %>
