@@ -154,7 +154,7 @@
                                     <a href="<%= team_location_live_path(@socket, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
                                         <%= location.location_name %>
                                         <span class="badge badge-subtle">
-                                                                <%= live_render(@socket, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id}) %>
+                                            <%= live_render(@socket, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id}, id: "openconvo_counter") %>
                                                             </span>
                                     </a>
                                 </li>
