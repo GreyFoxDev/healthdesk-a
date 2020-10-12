@@ -32,7 +32,7 @@ defmodule MainWeb.SessionController do
         "team-admin" ->
           redirect_to(conn, user, "/admin/")
         _ ->
-          path = team_location_conversation_path(conn, :index, user.team_member.team_id, user.team_member.location_id)
+          path = team_location_live_path(conn, MainWeb.Live.ConversationsView, user.team_member.team_id, user.team_member.location_id)
           redirect_to(conn, user, path)
       end
     else
