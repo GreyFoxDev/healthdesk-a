@@ -1,22 +1,12 @@
-<div class="dropdown">
-    <button class="btn-account d-none d-md-flex" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fa fa-lg fa-bell" aria-hidden="true"></i>
-        <span class="ml-2 <%= if @read == true, do: "read",else: "uread"  %>"></span>
-    </button>
-    <div class="dropdown-arrow dropdown-arrow-left"></div>
-    <div class="dropdown-menu pl-2 pr-2" x-placement="bottom-start" style="position: absolute; top: 56px; left: 0px; will-change: top, left; width: 250px;">
-        <h6 class="dropdown-header d-none d-md-block d-lg-none">
-            Notifications
-        </h6>
-        <%= for n <- @notifications do %>
-        <div class="notif <%= if n.read == true, do: "read",else: "nread"  %>">
-            <a phx-click="conversation" phx-value-cid="<%= n.conversation.id %>" phx-value-nid="<%= n.id %>">
-            <%= n.sender.first_name %> <%= n.sender.last_name %> <%= n.text %>
-            </a>
-        </div>
-
-        <% end %>
+<%= for n <- @notifications do %>
+<a href="#" class="dropdown-item unread" phx-click="conversation" phx-value-cid="<%= n.conversation.id %>"
+   phx-value-nid="<%= n.id %>">
+    <div class="user-avatar">
+        <img src="<%= if @current_user.avatar != "", do: @current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt="">
     </div>
-
-
-</div>
+    <div class="dropdown-item-body">
+        <p class="text">  <%= n.sender.first_name %> <%= n.sender.last_name %> <%= n.text %> </p><span
+            class="date"><%= format_date(n.inserted_at) %></span>
+    </div>
+</a>
+<% end %>

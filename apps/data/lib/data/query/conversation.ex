@@ -15,14 +15,11 @@ defmodule Data.Query.Conversation do
   def get(id, repo \\ Read) do
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
-      left_join: t in assoc(c, :team_member),
-      left_join: u in assoc(t, :user),
       left_join: member in Member,
       on: c.original_number == member.phone_number,
       where: c.id == ^id,
-      order_by: m.sent_at,
-      limit: 1,
-      preload: [:location, conversation_messages: m, team_member: {t, user: u}],
+      order_by: [desc: m.sent_at],
+      preload: [:location, conversation_messages: m, team_member: [ :user]],
       select: %{c | member: member}
     )
     |> repo.one()
@@ -31,6 +28,35 @@ defmodule Data.Query.Conversation do
   @doc """
   Return a list of conversations for a location
   """
+  @spec get_by_status(location_id :: [binary()],status :: [binary()], repo :: Ecto.Repo.t()) :: [Conversation.t()]
+  def get_by_status(location_id, status, repo \\ Read) when is_list(status) do
+    from(c in Conversation,
+      join: m in assoc(c, :conversation_messages),
+      left_join: member in Member,
+      on: c.original_number == member.phone_number,
+      where: c.location_id in ^location_id,
+      where: c.status in ^status,
+      # most recent first
+      order_by: [desc: m.sent_at],
+      preload: [conversation_messages: m, team_member: [:user], location: []],
+      select: %{c | member: member}
+    )
+    |> repo.all()
+  end
+  @spec get_by_location_ids(location_id :: [binary()], repo :: Ecto.Repo.t()) :: [Conversation.t()]
+  def get_by_location_ids(location_id, repo \\ Read) do
+    from(c in Conversation,
+      join: m in assoc(c, :conversation_messages),
+      left_join: member in Member,
+      on: c.original_number == member.phone_number,
+      where: c.location_id in ^location_id,
+      # most recent first
+      order_by: [desc: m.sent_at],
+      preload: [conversation_messages: m, team_member: [:user]],
+      select: %{c | member: member}
+    )
+    |> repo.all()
+  end
   @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [Conversation.t()]
   def get_by_location_id(location_id, repo \\ Read) do
     from(c in Conversation,

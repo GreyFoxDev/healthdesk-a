@@ -35,10 +35,16 @@ defmodule Data.Conversations do
     {:ok, changeset}
   end
 
+  def all(%{role: role}, location_id) when role in @roles and is_list(location_id) do
+    Query.get_by_location_ids(location_id)
+  end
   def all(%{role: role}, location_id) when role in @roles do
     Query.get_by_location_id(location_id)
-
   end
+  def all(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do
+    Query.get_by_status(location_id,status)
+  end
+
   def all(_, _), do: {:error, :invalid_permissions}
 
   def all_open(%{role: role}, location_id, limit , offset ) when role in @roles do

@@ -117,9 +117,6 @@ defmodule MainWeb.AdminController do
       dispositions = Disposition.count_all()
       [dispositions_per_day] = Disposition.average_per_day()
       locations = Location.all()
-      IO.inspect("###################")
-      IO.inspect(length(locations))
-      IO.inspect("###################")
 
       response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id).median_response_time||0 end)
       middle_index = response_times |> length() |> div(2)

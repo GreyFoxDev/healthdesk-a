@@ -8,17 +8,24 @@ defmodule MainWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug :put_root_layout, {MainWeb.LayoutView, :root}
   end
 
-  pipeline :api,
-    do: plug :accepts, ["json"]
+  pipeline :api do
+    plug :accepts, ["json"]
+  end
+
+  pipeline :live_root do
+    plug :put_root_layout, {MainWeb.LayoutView, "root_live.html"}
+  end
+  pipeline :not_live do
+    plug :put_root_layout, {MainWeb.LayoutView, :root}
+  end
 
   pipeline :auth,
     do: plug MainWeb.Auth.AuthAccessPipeline
 
   scope "/", MainWeb do
-    pipe_through :browser # Use the default browser stack
+    pipe_through [:browser, :not_live]
 
     get "/", PageController, :index
     get "/login", SessionController, :new
@@ -30,7 +37,13 @@ defmodule MainWeb.Router do
   end
 
   scope "/admin", MainWeb do
-    pipe_through [:browser, :auth]
+    pipe_through [:browser, :auth, :live_root]
+
+    live "/conversations/:id" , Live.ConversationsView, only: [:index]
+
+  end
+  scope "/admin", MainWeb do
+    pipe_through [:browser, :auth, :not_live]
 
     get "/", AdminController, :index
     get "/export/campaign-recipients/:campaign_id", CampaignController, :export

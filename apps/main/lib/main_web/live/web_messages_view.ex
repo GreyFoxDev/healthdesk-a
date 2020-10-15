@@ -35,23 +35,23 @@ defmodule MainWeb.Live.WebMessagesView do
   end
 
   def handle_info({:update, convo_id}, socket) do
-    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :online})
+    Main.LiveUpdates.notify_live_view(convo_id,{convo_id, :online})
     {:noreply, socket}
   end
   def terminate(reason, socket) do
     convo_id = socket.assigns.convo_id
-    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :offline})
+    Main.LiveUpdates.notify_live_view(convo_id,{convo_id, :offline})
 
   end
   def handle_event("focused",_,socket)do
     convo_id = socket.assigns.convo_id
-    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :user_typing_start})
+    Main.LiveUpdates.notify_live_view(convo_id,{convo_id, :user_typing_start})
     {:noreply, socket}
 
   end
   def handle_event("blured",_,socket)do
     convo_id = socket.assigns.convo_id
-    Main.LiveUpdates.notify_live_view(convo_id,{__MODULE__, :user_typing_stop})
+    Main.LiveUpdates.notify_live_view(convo_id,{convo_id, :user_typing_stop})
     {:noreply, socket}
   end
 

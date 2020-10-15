@@ -1,0 +1,44 @@
+/* put your own styles to customize and override the theme */
+.countdown li {
+    list-style-type: none;
+    display: inline-block;
+  }
+  
+  .countdown {
+    font-family:monospace;
+    font-size: 12px;
+  }
+
+  .top-bar-brand a img {
+    width: 160px !important;
+    max-width: 160px !important
+}
+
+* {
+    font-family: Nunito, serif;
+}
+
+
+.pace {
+    -webkit-pointer-events: none;
+    pointer-events: none;
+  
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+  }
+  
+  .pace-inactive {
+    display: none;
+  }
+  
+  .pace .pace-progress {
+    background: #1cc88a;
+    position: fixed;
+    z-index: 2000;
+    right: 100%;
+    width: 100%;
+    height: 3px;
+  }
+
+  

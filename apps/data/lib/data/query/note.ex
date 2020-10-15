@@ -27,9 +27,6 @@ defmodule Data.Query.Note do
   @spec create(params :: map(), repo :: Ecto.Repo.t()) ::
           {:ok, Note.t()} | {:error, Ecto.Changeset.t()}
   def create(params, repo \\ Write) do
-    IO.inspect("###################")
-    IO.inspect(params)
-    IO.inspect("###################")
 
     %Note{}
     |> Note.changeset(params)

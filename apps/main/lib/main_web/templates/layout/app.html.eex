@@ -30,7 +30,18 @@
                         <i class="fa fa-lg fa-chart-line" aria-hidden="true"></i>
                     </button>
                 </a>
+                <div class="dropdown">
+                    <button class="btn-account d-none d-md-flex" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-lg fa-bell" aria-hidden="true"></i>
+                        <span class="ml-2 "></span>
+                    </button>
+                    <div class="dropdown-arrow dropdown-arrow-left"></div>
+                    <div class="dropdown-menu pl-2 pr-2" x-placement="bottom-start" style="position: absolute; top: 56px; left: 0px; will-change: top, left; width: 250px;">
+                        <h6 class="dropdown-header d-none d-md-block d-lg-none">
+                            Notifications
+                        </h6>
                 <%= live_render(@conn, MainWeb.Live.NotificationAlertsView, session: %{"current_user" => @current_user}) %>
+                    </div></div>
                 <%= if current_user = assigns[:current_user] do %>
 
                 <div class="dropdown">
@@ -92,78 +103,29 @@
                         </li>
                         <% end %>
 
-                        <%= if @current_user.role in ["team-admin", "admin"] do %>
-                        <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
-                            <a href="http://google.com" class="menu-link">
-                                <span class="menu-icon oi oi-browser"></span>
-                                <span class="menu-text">
-                                                    <%= team.team_name %>
-                                                </span>
-                            </a> <!-- child menu -->
-                            <ul class="menu">
-                                <li class="menu-subhead"><%= team.team_name %></li>
-                                <%= for location <- Enum.filter(team.locations, &(&1.deleted_at == nil)) do %>
-                                <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                    <a href="<%= team_location_live_path(@conn, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
-                                        <%= location.location_name %>
-                                        <span class="badge badge-subtle">
-                                                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id}) %>
-                                                            </span>
-                                    </a>
-                                </li>
-                                <% end %>
-                            </ul>
-                        </li>
-                        <% end %>
 
-                        <%= if @current_user.role == "location-admin" && @current_user.team_member.team_id == team.id do %>
-                        <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
-                            <a href="http://google.com" class="menu-link">
-                                <span class="menu-icon oi oi-browser"></span>
-                                <span class="menu-text">
-                                                    <%= team.team_name %>
-                                                </span>
-                            </a> <!-- child menu -->
-                            <ul class="menu">
-                                <li class="menu-subhead"><%= team.team_name %></li>
-                                <%= for location <- teammate_locations(@conn) do %>
-                                <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                    <a href="<%= team_location_live_path(@conn, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
-                                        <%= location.location_name %>
-                                        <span class="badge badge-subtle">
-                                                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id}) %>
-                                                            </span>
-                                    </a>
-                                </li>
-                                <% end %>
-                            </ul>
-                        </li>
-                        <% end %>
 
-                        <%= if @current_user.role == "teammate" && @current_user.team_member.team_id == team.id do %>
-                        <li class="menu-item has-child <%= if @location && @location.id in Enum.map(team.locations, fn(l) -> l.id end), do: "has-open", else: "" %>">
-                            <a href="http://google.com" class="menu-link">
+                        <li class="menu-item has-child">
+                            <a href="#" class="menu-link">
                                 <span class="menu-icon oi oi-browser"></span>
                                 <span class="menu-text">
-                                                    <%= team.team_name %>
+                                                    Conversations
                                                 </span>
                             </a> <!-- child menu -->
                             <ul class="menu">
-                                <li class="menu-subhead"><%= team.team_name %></li>
-                                <%= for location <- teammate_locations(@conn) do %>
-                                <li class="menu-item<%= if @location && @location.id === location.id, do: " active"%>">
-                                    <a href="<%= team_location_live_path(@conn, MainWeb.Live.ConversationsView, team.id, location.id) %>" class="menu-link">
-                                        <%= location.location_name %>
-                                        <span class="badge badge-subtle">
-                                                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"location_id" => location.id}) %>
-                                                            </span>
-                                    </a>
+                                <li class="menu-subhead">Active</li>
+                                <li class="menu-item">
+                                    <a href="/admin/conversations/active" class="menu-link">Active</a>
                                 </li>
-                                <% end %>
+                                <li class="menu-item">
+                                    <a href="/admin/conversations/assigned" class="menu-link">Assigned</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="/admin/conversations/closed" class="menu-link">Closed</a>
+                                </li>
                             </ul>
                         </li>
                         <% end %>
-                                <% end %>
                     </ul>
                 </nav>
             </section>

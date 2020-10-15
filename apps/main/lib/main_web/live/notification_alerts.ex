@@ -37,9 +37,6 @@ defmodule MainWeb.Live.NotificationAlertsView do
     conversation =
       socket.assigns.current_user
       |> Conversations.get(params["cid"])
-    IO.inspect("###################")
-    IO.inspect(conversation)
-    IO.inspect("###################")
     Task.start(fn ->
       Notifications.update(%{"id" => params["nid"], "read" => true})
     end)

@@ -1,1035 +1,663 @@
-<link rel="stylesheet" href="https://uselooper.com/assets/vendor/flatpickr/flatpickr.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.3/flatpickr.min.js" integrity="sha256-/irFIZmSo2CKXJ4rxHWfrI+yGJuI16Z005X/bENdpTY=" crossorigin="anonymous"></script>
-
-<%= if assigns[:new]  do %>
-
-<header class="page-title-bar">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active">
-                <a href="#" phx-click="back"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Conversations</a>
-            </li>
-        </ol>
-    </nav>
-    <h1 class="page-title">New Conversation</h1>
-</header>
-
-<div class="panel-body">
-    <section id="base-style" class="card">
-        <div class="card-header nav-scroller">
-            <!-- .nav-tabs -->
-            <ul class="nav nav-tabs card-header-tabs">
-                <li class="nav-item">
-                    <a class="nav-link show active" id="rd1" href="#">Personal</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="rd2" href="#">Campaign</a>
-                </li>
-            </ul><!-- /.nav-tabs -->
-        </div>
-        <div class="card-body">
-            <%= f = form_for @changeset, "#", [ phx_submit: :new_msg, multipart: true, novalidate: :novalidate] %>
-            <fieldset>
-                <div class="form-group form_csv">
-                    <label for="tf3">CSV Upload</label>
-                    <div class="custom-file">
-                        <%= file_input f, :csv, [accept: "text/csv, .csv", class: "custom-file-input", placeholder: "Choose file", phx_hook: "CsvUpload"] %>
-                        <%= hidden_input f, :csv_data, [phx_update: "ignore", id: "csv_data"] %>
-                        <label class="custom-file-label" for="tf3">Choose file</label>
-                        <small id="tf1Help" class="form-text text-muted">Please upload a csv file with Firstname, Lastname and Mobile Number. <a href="#">Click here</a> to download a sample csv.</small>
-                    </div>
-                </div>
-                <div class="form-group form_to">
-                    <label>To</label>
-                    <%= text_input f, :original_number, class: "form-control" %>
-                </div>
-                <div class="form-group form_name">
-                    <label>Campaign Name</label>
-                    <%= text_input f, :campaign_name, class: "form-control" %>
-                </div>
-                <div class="form-group">
-                    <label>Message</label>
-                    <%= textarea f, :message, class: "form-control", place_holder: "Type a message", rows: 6 %>
-                </div>
-                <div class="form-group form_schedule">
-                    <div class="custom-control custom-checkbox mb-3">
-                        <input type="checkbox" class="custom-control-input" id="conversation_scheduled" name="conversation[scheduled]">
-                        <label class="custom-control-label" for="conversation_scheduled">Schedule Campaign</label>
-                        <div class="invalid-tooltip"> You must agree before submitting. </div>
-                    </div>
-                </div>
-                <div class="form-group form_date">
-                    <label class="control-label" for="flatpickr02">Date and Time</label>
-                    <input id="conversation_send_at"
-                           name="conversation[send_at]"
-                           type="text"
-                           class="form-control flatpickr-input active"
-                           data-toggle="flatpickr"
-                           data-enable-time="true"
-                           data-date-format="Y-m-d H:i"
-                           readonly="readonly">
-                </div>
-                <div class="media mb-1">
-                    <div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="far fa-paper-plane"></i>
-                            <span class="form_btn">Send Now</span>
-                        </button>
-                    </div>
-                </div><!-- /.media -->
-            </fieldset>
-            </form>
-        </div>
-    </section>
-</div>
-
-<div class="aside-backdrop"></div></div> <!-- /container -->
-
-<% else  %>
-<%= if assigns[:conversation_id]  do %>
-<article class="message">
-
-    <header class="message-header">
-        <div class="d-flex">
-            <a class="btn btn-light btn-icon" phx-click="back"><i class="fa fa-flip-horizontal fa-share"></i></a>
+<div class="page has-sidebar has-sidebar-fluid has-sidebar-expand-xl">
+    <!-- Message List -->
+    <div class="page-inner page-inner-fill position-relative">
+        <header class="page-navs bg-white shadow-sm d-flex justify-content-between px-2">
+            <div class="btn btn-light btn-icon ">
+                <i class="fa fa-search"></i>
+            </div>
+            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo"%>
+        </header>
+        <div class="">
+            <button type="button" class="btn btn-primary btn-floated position-absolute" data-toggle="modal"
+                    data-target="#newMsg" title="Add New Message"><i class="fa fa-plus"></i></button>
         </div>
 
-        &nbsp;
-        &nbsp;
-        <div class="team">
-            <h4 class="list-group-item-title">
-                <%= if @conversation.member && @conversation.member.first_name do %>
-                Message from
-                <strong><%= Enum.join([@conversation.member.first_name, @conversation.member.last_name], " ") %></strong>
-                <% else %>
-                Message from <strong><%= format_phone(@conversation.original_number) %></strong>
-                <% end %>
-                <%= if assigns[:online] do %>
-                <span class="indicator online"></span>
-                <% else %>
-                <span class="indicator offline"></span>
-                <% end %>
-
-            </h4>
-            <%= if @conversation.team_member_id do %>
-            <p class="list-group-item-text">
-                Assigned to:
-                <%= @conversation.team_member.user.first_name %>
-                <%= @conversation.team_member.user.last_name %>
-            </p>
-            <% else %>
-            <p class="list-group-item-text">
-                Assigned to: <%= format_assigned(@conversation.original_number) %>
-            </p>
-            <% end %>
-        </div>
-
-        <div class="message-header-actions">
-            <!-- invite members -->
-            <%= if @conversation.status in ["open", "pending", "closed"] do %>
-            <div class="dropdown d-inline-block">
-                <%= if @conversation.status in ["open", "pending"] do  %>
-
-                <button type="button" class="btn btn-light btn-icon" title="Invite members" data-toggle="dropdown"
-                        data-display="static" aria-haspoppup="true" aria-expanded="false"><i
-                        class="fas fa-user-plus"></i></button>
-                <div class="dropdown-arrow"></div><!-- .dropdown-menu -->
-                <div class="dropdown-menu dropdown-menu-right dropdown-menu-rich stop-propagation">
-
-                    <div class="dropdown-header"> Assign Conversation</div>
-                    <div class="form-group px-3 py-2 m-0">
-                        <%= f = form_for :foo, "#", [ phx_submit: :assign] %>
-                        <%= select f, :team_member_id, @team_members_all, selected: @conversation.team_member_id||"",prompt: "Select Team Member", class: "custom-select"  %>
-                        <button type="submit" class="btn btn-primary">
-                            Assign
-                        </button>
-                        </form>
-
+        <div class="board p-0 perfect-scrollbar ps ps--active-y">
+            <!-- .list-group -->
+            <div class="list-group list-group-flush list-group-divider border-top" data-toggle="radiolist">
+                <!-- .list-group-item -->
+                <%= for c <- @conversations do %>
+                <div class="list-group-item <%=  if c.id == @open_conversation.id,do: "active",else: ""  %>" phx-click="openconvo" phx-value-cid="<%= c.id %>">
+                    <div class="list-group-item-figure">
+                        <%=  if c.channel_type == "WEB" do  %>
+                        <a href="#" class="tile tile-circle bg-pink"><i class="fab fa-chrome"></i></a>
+                        <% end %>
+                        <%=  if c.channel_type == "FACEBOOK" do  %>
+                        <a href="#" class="tile tile-circle bg-blue"><i class="fab fa-facebook-f"></i></a>
+                        <% end %>
+                        <%=  if c.channel_type == "SMS" do  %>
+                        <a href="#" class="tile tile-circle bg-purple"><i class="fas fa-sms"></i></a>
+                        <% end %>
+                        <%=  if c.channel_type == "APP" do  %>
+                        <a href="#" class="tile tile-circle bg-yellow"><i class="fas fa-mobile"></i></a>
+                        <% end %>
                     </div>
-                </div><!-- /.dropdown-menu -->
-                <% end %>
-                <div class="dropdown" style="display:inline-block;">
-                    <%= if @conversation.status == "closed" do %>
-                    <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button"
-                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        ...
-                    </button>
-                    <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right"
-                         aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="#" phx-click="open" phx-value-cid="<%= @conversation.id %>">Open</a>
+                    <div class="list-group-item-body">
+                        <h4 class="list-group-item-title font-weight-bold">
+                            <a href="#">
+                                <%= if c.member && c.member.first_name do %>
+                                    <%= Enum.join([c.member.first_name, c.member.last_name], " ") %>
+                                <% else %>
+                                    <%= format_phone(c.original_number) %>
+                                <% end %>
+                            </a>
+                        </h4>
+                        <p class="list-group-item-text"> <%= c.location.location_name %> </p>
                     </div>
-                    <%  end %>
-                    <%= if @conversation.status != "closed" do %>
-                    <%= if @dispositions != [] do %>
-                    <button type="button" class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow"
-                            data-toggle="modal" data-target="#exampleModalScrollable">...
-                    </button>
-                    <% else %>
-                    <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button"
-                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        ...
-                    </button>
-                    <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right"
-                         aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="#" phx-click="close" phx-value-cid="<%= @conversation.id %>">Close</a>
-                    </div>
+                    <%= if !c.team_member || c.status == "closed" do %>
+                        <div class="list-group-item-figure">
+                            <button class="btn btn-sm btn-icon text-white bg-success" phx-click="assign" phx-value-cid="<%= c.id %>"><i class="fas fa-check"></i></button>
+                        </div>
                     <% end %>
-            <% end %>
+
+
                 </div>
-
-            </div><!-- /invite members -->
-            <% end %>
-            <button type="button" class="btn btn-light btn-icon d-xl-none" data-toggle="sidebar"><i
-                    class="fa fa-angle-double-left"></i></button>
-            <!--Need to add this button element for the sidebar responsive icon-->
-        </div>
-    </header>
-</article>
-
-<section class="message-body">
-    <style>
-        .scrollable {
-            height: 70vh; /* or any value */
-            overflow-y: auto;
-        }
-    </style>
-
-    <div id="scroll-message" class="card card-fluid mb-0 scrollable">
-        <section class="conversations" role="log">
-            <ul id="convo" class="conversation-list">
-                <li class="log-divider">
-                    <span>
-                        <i class="far fa-fw fa-comment-alt"></i> Conversation started by <strong><%= format_phone(@conversation.original_number) %></strong> ·
-                        <%= format_date(@conversation.started_at) %>
-                    </span>
-                </li>
-
-                <%= for {message, index} <- Enum.with_index(@messages) do %>
-                    <% previous_message = Enum.at(@messages, index-1) %>
-                    <% next_message = Enum.at(@messages, index+1) %>
-                    <% member_name = if @conversation.member, do: [@conversation.member.first_name, @conversation.member.last_name] |> Enum.join(" "), else: " " %>
-
-                <%= if message.phone_number == @conversation.original_number do %>
-                <%= if previous_message && message.phone_number == previous_message.phone_number do %>
-                <li class="conversation-inbound conversation-faux">
-                    <div class="conversation-message conversation-message-skip-avatar">
-                        <div class="conversation-message-text"><%= text_to_html(message.message) |> raw %></div>
-                        <%= if next_message && next_message.phone_number != message.phone_number do %>
-                        <div class="conversation-meta">
-                            <%= if member_name != " ", do: member_name, else: "#{format_phone(message.phone_number)}" %>
-                            ·
-                            <%= format_date(message.sent_at) %>
-                        </div>
-                        <% end %>
-                    </div>
-                </li>
-                <% else %>
-                <li class="conversation-inbound">
-                    <div class="conversation-avatar">
-                        <a href="#!" class="tile tile-circle bg-muted"><i class="oi oi-person"></i></a>
-                    </div>
-                    <div class="conversation-message">
-                        <div class="conversation-message-text"> <%= text_to_html(message.message) |> raw %></div>
-                        <%= if next_message && next_message.phone_number != message.phone_number do %>
-                        <div class="conversation-meta">
-                            <%= if member_name != " ", do: member_name, else: "#{format_phone(message.phone_number)}" %>
-                            ·
-                            <%= format_date(message.sent_at) %>
-                        </div>
-                        <% end %>
-                    </div>
-                </li>
                 <% end %>
 
+            </div><!-- /.list-group -->
+            <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+                <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+            </div>
+            <div class="ps__rail-y" style="top: 0px; height: 454px; right: 0px;">
+                <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 194px;"></div>
+            </div>
+        </div><!-- /board -->
+    </div>
+    <!-- Conversation Window -->
+
+
+    <div class="page-sidebar bg-light">
+        <div class="row m-0">
+            <!--Message Window-->
+            <%= if assigns[:open_conversation]  do %>
+            <div class="sidebar-section sidebar-section-fill page-inner-fill col-lg-8 p-0">
+                <!-- .message -->
+                <div class="message m-0" style="top:0 !important;">
+                    <!-- message header -->
+                    <div class="message-header p-3 bg-white shadow-sm">
+                        <a href="#" class="btn-account" role="button">
+                            <span class="user-avatar user-avatar-md">
+                                <img src="/images/unknown-profile.jpg">
+                            </span>
+                            <span class="account-summary"><span class="account-name">
+                                 <%= if @open_conversation.member && @open_conversation.member.first_name do %>
+                                <%= Enum.join([@open_conversation.member.first_name, @open_conversation.member.last_name], " ") %>
+                                <% else %>
+                                <%= format_phone(@open_conversation.original_number) %>
+                                <% end %>
+                            </span>
+                                <span class="account-description">Active | 1h 20min
+                                    <%= if @open_conversation.team_member do %>
+                                      | Assigned to <%= @open_conversation.team_member.user.first_name %> <%= @open_conversation.team_member.user.last_name %>
+                                    <% end %>
+                                </span></span></a>
+                        <div class="message-header-actions">
+
+                            <!-- assign conversation -->
+                            <div class="dropdown d-inline-block">
+                                <button type="button" class="btn btn-light btn-icon" title="Invite members"
+                                        data-toggle="dropdown" data-display="static" aria-haspopup="true"
+                                        aria-expanded="false"><span class="oi oi-person"></span></button>
+                                <!-- .dropdown-menu -->
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-rich stop-propagation">
+                                    <%= f = form_for :foo, "#", [ phx_submit: :assign] %>
+                                    <div class="dropdown-arrow"></div>
+                                    <div class="dropdown-header"> Assign to a Teammate</div>
+                                    <div class="form-group px-3 py-2 m-0">
+                                        <%= select f, :team_member_id, @team_members_all, selected: @open_conversation.team_member_id||"",prompt: "Select Team Member", class: "custom-select"  %>
+                                    </div>
+                                    <div id="people" class="tribute-inline stop-propagation"></div>
+                                    <button type="submit">Assign <span class="oi oi-person"></span></button>
+                                    </form>
+                                </div><!-- /.dropdown-menu -->
+                            </div><!-- / assign conversation -->
+                            <!-- close dispositions -->
+                            <div class="dropdown d-inline-block">
+                                <button type="button" class="btn btn-light btn-icon" title="Close Conversation"
+                                        data-toggle="dropdown" data-display="static" aria-haspopup="true"
+                                        aria-expanded="false"><i class="fas fa-archive"></i></button>
+                                <!-- .dropdown-menu -->
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-rich stop-propagation">
+                                    <div class="dropdown-arrow"></div>
+                                    <div class="dropdown-header"> Close Conversation</div>
+
+                                    <div class="form-group px-3 py-2 m-0">
+                                        <label class="control-label" for="select2-single">Please select one to
+                                            continue</label>
+                                        <select id="select2-single"
+                                                class="form-control select2-hidden-accessible"
+                                                data-toggle="select2"
+                                                data-placeholder="Select a Disposition"
+                                                data-allow-clear="true"
+                                                data-select2-id="select2-single" tabindex="-1"
+                                                aria-hidden="true">
+                                            <%= for {key, value} <- @dispositions do %>
+                                            <option value="<%= value %>" data-select2-id="<%= value %>"
+                                                    phx-click="close" phx-value-did="<%= value %>"
+                                                    phx-value-cid="<%= @open_conversation.id %>"><%= key %></option>
+                                            <% end %>
+
+                                        </select>
+                                    </div>
+
+
+                                    <div id="people" class="tribute-inline stop-propagation"></div>
+                                    <a href="#" class="dropdown-footer">Close <span class="oi oi-transfer"></span></a>
+                                </div><!-- /.dropdown-menu -->
+                            </div><!-- / close dispositions -->
+
+
+                            <button type="button" class="btn btn-light btn-icon d-xl-none" data-toggle="sidebar"><i
+                                    class="fa fa-angle-double-left"></i></button>
+                        </div>
+                    </div><!-- /message header -->
+                    <!-- message body -->
+                    <div class="message-body p-0 border-top">
+                        <!-- .card -->
+                        <div class="card card-fluid mb-0 m-3">
+                            <!-- .conversations -->
+                            <div role="log" class="conversations">
+                                <!-- .conversation-list -->
+                                <ul class="conversation-list">
+                                    <!-- .conversation-divider -->
+                                    <li class="log-divider">
+                                        <span>
+                                        <i class="far fa-fw fa-comment-alt"></i> Conversation started by
+                                        <strong>
+                                            <%= if @open_conversation.member && @open_conversation.member.first_name do %>
+                                                 <%= Enum.join([@open_conversation.member.first_name, @open_conversation.member.last_name], " ") %>
+                                            <% else %>
+                                                <%= format_phone(@open_conversation.original_number) %>
+                                            <% end %>
+                                        </strong> ·
+                                            <%= format_date(@open_conversation.started_at) %> </span>
+                                    </li><!-- /.conversation-divider -->
+                                    <%= for {message, index} <- Enum.with_index(@open_conversation.conversation_messages)|>Enum.reverse() do %>
+                                        <% previous_message = Enum.at(@open_conversation.conversation_messages, index-1) %>
+                                        <% next_message = Enum.at(@open_conversation.conversation_messages, index+1) %>
+                                        <% member_name = if @open_conversation.member, do: [@open_conversation.member.first_name, @open_conversation.member.last_name] |> Enum.join(" "), else: " " %>
+
+                                    <%= if message.phone_number == @open_conversation.original_number do %>
+                                    <%= if previous_message && message.phone_number == previous_message.phone_number do %>
+                                    <li class="conversation-inbound conversation-faux">
+                                        <div class="conversation-message ">
+                                            <div class="conversation-message-text"><%= text_to_html(message.message) |> raw %></div>
+                                            <%= if next_message && next_message.phone_number != message.phone_number do %>
+                                            <div class="conversation-meta">
+                                                <%= if member_name != " ", do: member_name, else: "#{format_phone(message.phone_number)}" %>
+                                                ·
+                                                <%= format_date(message.sent_at) %>
+                                            </div>
+                                            <% end %>
+                                        </div>
+                                    </li>
+                                    <% else %>
+                                    <li class="conversation-inbound">
+                                        <div class="conversation-message">
+                                            <div class="conversation-message-text"> <%= text_to_html(message.message) |> raw %></div>
+                                            <%= if next_message && next_message.phone_number != message.phone_number do %>
+                                            <div class="conversation-meta">
+                                                <%= if member_name != " ", do: member_name, else: "#{format_phone(message.phone_number)}" %>
+                                                ·
+                                                <%= format_date(message.sent_at) %>
+                                            </div>
+                                            <% end %>
+                                        </div>
+                                    </li>
+                                    <% end %>
 
                     <% else %>
-                <%= cond do %>
+                                    <%= cond do %>
                             <% String.contains?(message.message, "OPENED") -> %>
-                <li class="log-divider">
+                                    <li class="log-divider">
                                     <span>
                                         <i class="fa fa-fw fa-user-plus"></i>
                                         Conversation <%= String.replace(message.message, "OPENED:", "") %> · <%= format_date(message.sent_at) %>
                                     </span>
-                </li>
-                <% String.contains?(message.message, "CLOSED") -> %>
-                <li class="log-divider">
+                                    </li>
+                                    <% String.contains?(message.message, "CLOSED") -> %>
+                                    <li class="log-divider">
                                     <span>
                                         <i class="fa fa-fw fa-user-plus"></i>
                                         Conversation <%= String.replace(message.message, "CLOSED:", "") %> · <%= format_date(message.sent_at) %>
                                     </span>
-                </li>
-                <% String.contains?(message.message, "ASSIGNED") -> %>
-                <li class="log-divider">
+                                    </li>
+                                    <% String.contains?(message.message, "ASSIGNED") -> %>
+                                    <li class="log-divider">
                                     <span>
                                         <i class="fa fa-fw fa-user-plus"></i>
                                         <%= String.replace(message.message, "ASSIGNED:", "") %> · <%= format_date(message.sent_at) %>
                                     </span>
-                </li>
-                <% true -> %>
-                <%= if previous_message && message.phone_number != previous_message.phone_number do %>
-                <li class="conversation-outbound conversation-faux">
-                    <div class="conversation-message conversation-message-skip-avatar">
-                        <%= if format_phone(@conversation.original_number) == "Unknown Visitor" do %>
-                        <div class="conversation-message-text"><%= message.message |> raw %></div>
-                        <% else %>
-                        <div class="conversation-message-text"><%= text_to_html(message.message) |> raw %></div>
-                        <% end %>
-                        <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
-                        <div class="conversation-meta">
-                            <%= if message.phone_number == @location.phone_number do %>
-                            <%= format_assigned(@conversation.original_number) %>
+                                    </li>
+                                    <% true -> %>
+                                    <%= if previous_message && message.phone_number != previous_message.phone_number do %>
+                                    <li class="conversation-outbound conversation-faux">
+                                        <div class="conversation-message ">
+                                            <%= if format_phone(@open_conversation.original_number) == "Unknown Visitor" do %>
+                                            <div class="conversation-message-text"><%= message.message |> raw %></div>
+                                            <% else %>
+                                            <div class="conversation-message-text"><%= text_to_html(message.message) |> raw %></div>
+                                            <% end %>
+                                            <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
+                                            <div class="conversation-meta">
+                                                <%= if message.phone_number == @open_conversation.location.phone_number do %>
+                                                <%= format_assigned(@open_conversation.original_number) %>
                                                     <% else %>
-                            <%= format_phone(message.phone_number) %>
+                                                <%= format_phone(message.phone_number) %>
                                                     <% end %>
-                            ·
-                            <%= format_date(message.sent_at) %>
-                            <%= if message.read && @conversation.channel_type=="APP" do %>
-                            <i class="fa fa-check" style="color: green"></i>
-                            <i class="fa fa-check" style="color: green"></i>
-                            <% end %>
-                        </div>
-                        <% else %>
-                        <%= if message.read && @conversation.channel_type=="APP" do %>
-                        <div class="conversation-meta">
+                                                ·
+                                                <%= format_date(message.sent_at) %>
+                                                <%= if message.read && @open_conversation.channel_type=="APP" do %>
+                                                <i class="fa fa-check" style="color: green"></i>
+                                                <i class="fa fa-check" style="color: green"></i>
+                                                <% end %>
+                                            </div>
+                                            <% else %>
+                                            <%= if message.read && @open_conversation.channel_type=="APP" do %>
+                                            <div class="conversation-meta">
 
-                            <i class="fa fa-check" style="color: green"></i>
-                            <i class="fa fa-check" style="color: green"></i>
-                        </div>
+                                                <i class="fa fa-check" style="color: green"></i>
+                                                <i class="fa fa-check" style="color: green"></i>
+                                            </div>
+                                            <% end %>
                         <% end %>
-                        <% end %>
-                    </div>
-                </li>
-                <% else %>
-                <li class="conversation-outbound">
-                    <div class="conversation-avatar">
-                        <a href="#!" class="tile tile-circle bg-muted"><i class="oi oi-person"></i></a>
-                    </div>
-                    <div class="conversation-message">
-                        <div class="conversation-message-text"> <%= text_to_html(message.message) |> raw %></div>
-                        <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
-                        <div class="conversation-meta">
-                            <%= if message.phone_number == @location.phone_number do %>
-                            <%= format_assigned(@conversation.original_number) %>
+                                        </div>
+                                    </li>
+                                    <% else %>
+                                    <li class="conversation-outbound">
+                                        <div class="conversation-message">
+                                            <div class="conversation-message-text"> <%= text_to_html(message.message) |> raw %></div>
+                                            <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
+                                            <div class="conversation-meta">
+                                                <%= if message.phone_number == @open_conversation.location.phone_number do %>
+                                                <%= format_assigned(@open_conversation.original_number) %>
                                                     <% else %>
-                            <%= format_phone(message.phone_number) %>
+                                                <%= format_phone(message.phone_number) %>
                                                     <% end %>
-                            ·
-                            <%= format_date(message.sent_at) %>
-                            <%= if message.read && @conversation.channel_type=="APP" do %>
-                            <i class="fa fa-check"  style="color: green"></i>
-                            <i class="fa fa-check" style="color: green"></i>
-                            <% end %>
+                                                ·
+                                                <%= format_date(message.sent_at) %>
+                                                <%= if message.read && @open_conversation.channel_type=="APP" do %>
+                                                <i class="fa fa-check" style="color: green"></i>
+                                                <i class="fa fa-check" style="color: green"></i>
+                                                <% end %>
 
-                        </div>
-                        <% else %>
-                        <div class="conversation-meta">
-                            <% team_member = Enum.find(@team_members, &(&1.user.phone_number == message.phone_number)) %>
-                            <%= if team_member do %>
-                            <%= format_team_member(team_member.user) %>
+                                            </div>
+                                            <% else %>
+                                            <div class="conversation-meta">
+                                                <% team_member = Enum.find(@team_members, &(&1.user.phone_number == message.phone_number)) %>
+                                                <%= if team_member do %>
+                                                <%= format_team_member(team_member.user) %>
                                                     <% else %>
-                            <%= format_phone(message.phone_number) %>
+                                                <%= format_phone(message.phone_number) %>
                                                     <% end %>
-                            ·
-                            <%= format_date(message.sent_at) %>
-                            <%= if message.read && @conversation.channel_type=="APP" do %>
-                            <i class="fa fa-check" style="color: green"></i>
-                            <i class="fa fa-check" style="color: green"></i>
-                            <% end %>
-                        </div>
-                        <% end %>
-                    </div>
-                </li>
-                <% end %>
+                                                ·
+                                                <%= format_date(message.sent_at) %>
+                                                <%= if message.read && @open_conversation.channel_type=="APP" do %>
+                                                <i class="fa fa-check" style="color: green"></i>
+                                                <i class="fa fa-check" style="color: green"></i>
+                                                <% end %>
+                                            </div>
+                                            <% end %>
+                                        </div>
+                                    </li>
+                                    <% end %>
                         <% end %>
 
                     <% end %>
 
                 <% end %>
-                <%= live_render(@socket, MainWeb.Live.ConversationMessageUpdatesView, session: %{"user" => @user, "conversation" => @conversation.id } ,id: "update"<>@conversation.id<>to_string(assigns[:child_id])) %>
-                <%= if assigns[:typing] do %>
-                <li class="conversation-inbound">
-                    <div class="conversation-meta">
-                        <p class="ticontainer"> <span>User is typing </span>
-                            <span class="tiblock">
-                            <span class="tidot"></span>
-                            <span class="tidot"></span>
-                            <span class="tidot"></span>
-                        </span>
-                        </p>
-                    </div>
-                </li>
-                <% end %>
-            </ul>
-        </section>
+                                    <%= live_render(@socket, MainWeb.Live.ConversationMessageUpdatesView, session: %{"user" => @user, "conversation" => @open_conversation.id } ,id: "update"<>@open_conversation.id<>to_string(assigns[:child_id])) %>
+                                    <%= if assigns[:typing] do %>
+                                    <li class="conversation-inbound">
+                                        <div class="conversation-meta">
+                                            <p class="ticontainer"><span>User is typing </span>
+                                                <span class="tiblock">
+                                                <span class="tidot"></span>
+                                                <span class="tidot"></span>
+                                                <span class="tidot"></span>
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </li>
+                                    <% end %>
+                                </ul><!-- /.conversation-list -->
+                            </div><!-- /.conversations -->
+
+                        </div><!-- /.card -->
+                    </div><!-- /message body -->
+                    <!-- message publisher -->
+                    <div class="message-publisher">
+                        <!-- form -->
+                        <%= f = form_for @changeset, "#", [ phx_submit: :save] %>
+                        <!-- .media -->
+                        <div class="media mb-1">
+
+                            <div class="media-body">
+                                <%= text_input f, :message,
+                                     id: "messagetext",
+                                     class: "form-control border-0 shadow-none",
+                                     place_holder: "Type a message",
+                                     phx_focus: :focused,
+                                     data_emojiable: true,
+                                     data_tribute: true,
+                                     phx_blur: :blured  %>
+
+
+                            </div>
+                            <div class="d-flex align-items-center">
+
+
+
+                                <button type="submit" class="btn btn-light btn-icon"><i
+                                        class="far fa-paper-plane"></i></button>
+                            </div>
+                        </div><!-- /.media -->
+                        </form><!-- /form -->
+
+                    </div><!-- /message publisher -->
+                </div><!-- /.message -->
+            </div>
+            <!--Sidebar Window-->
+            <div class="col-lg-4 p-0  bg-white"
+                 style="    border-left: 1px solid rgba(34,34,48,.1);height: calc(100vh - 3.5rem);overflow-y:scroll;">
+                <!-- .sidebar-header -->
+                <header class="sidebar-header d-sm-none">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a class="prevent-default" href="#" onclick="Looper.toggleSidebar()"><i
+                                    class="breadcrumb-icon fa fa-angle-left mr-2"></i>Back</a>
+                        </li>
+                    </ol>
+                </header><!-- /.sidebar-header -->
+                <!-- .nav-tabs -->
+                <ul class="nav nav-tabs nav-fill bg-white shadow-sm border-bottom" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#team-profile" role="tab"
+                           aria-controls="team-profile" aria-selected="true">Details</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#message-files" role="tab"
+                           aria-controls="message-files" aria-selected="false">Notes</a>
+                    </li>
+                </ul><!-- /.nav-tabs -->
+                <!-- .sidebar-section-fill -->
+                <div class="sidebar-section-fill">
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <!-- #team-profile -->
+                        <div id="team-profile" class="tab-pane fade show active" role="tabpanel"
+                             aria-labelledby="team-profile">
+                            <!-- .card -->
+                            <div class="">
+                                <!-- .card-body -->
+                                <div class="card-body text-center">
+                                    <!-- team avatar -->
+                                    <a href="#" class="user-avatar user-avatar-xl my-3"><img
+                                            src="/images/unknown-profile.jpg"></a>
+                                    <!-- /team avatar -->
+                                    <h3 class="card-title text-truncate">
+                                        <%= if @open_conversation.member && @open_conversation.member.first_name, do: @open_conversation.member.first_name<>" "<>@open_conversation.member.last_name, else: "N/A" %>
+                                    </h3>
+                                    <h6 class="card-subtitle text-muted mb-3"> <%= @open_conversation.location.location_name %>
+                                        || <%= if @open_conversation.member, do: format_date(@open_conversation.member.inserted_at), else: "" %></h6>
+                                    <!-- grid row -->
+                                </div><!-- /.card-body -->
+                                <!--  <div class="card-footer">
+                                      <div class="card-footer-item">
+                                          Delinquent
+                                          <div class="text-muted small"> Status</div>
+                                      </div>
+                                      <div class="card-footer-item">
+                                          Basic - Single
+                                          <div class="text-muted small"> Plan</div>
+                                      </div>
+                                  </div>
+
+
+                                <div class="card-footer">
+                                    <div class="card-footer-item card-footer-item-bordered">
+                                        <div class="metric">
+                                            <p class="metric-label mb-1"> Payment Due Date </p>
+                                            <p class="metric-value"><strong> Apr 20, 2020 </strong></p>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer-item card-footer-item-bordered">
+                                        <div class="metric">
+                                            <p class="metric-label mb-1"> Amount Due </p>
+                                            <p class="metric-value"><strong> $57.64 </strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-footer-item card-footer-item-bordered">
+                                        <div class="metric">
+                                            <p class="metric-label mb-1"> Last Check-In </p>
+                                            <p class="metric-value"><strong> Jan 20, 2020 </strong></p>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer-item card-footer-item-bordered">
+                                        <div class="metric">
+                                            <p class="metric-label mb-1"> Check-In Streak </p>
+                                            <p class="metric-value"><strong> 7 </strong></p>
+                                        </div>
+                                    </div>
+                                </div> -->
+                                <div class="card-footer p-3">
+                                    <!-- .form -->
+                                    <form id="member-form" method="PUT" style="width:100%;">
+                                        <%= if @open_conversation.member do %>
+                                        <input name="id" type="hidden" value="<%= @open_conversation.member.id %>">
+                                        <% end %>
+                                        <input name="member[team_id]" type="hidden"
+                                               value="<%= @open_conversation.location.team_id %>">
+                                        <fieldset>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label for="email">Email</label>
+                                                        <input name="member[email]" type="text" class="form-control"
+                                                               value="<%= if @open_conversation.member, do: @open_conversation.member.email, else: "N/A" %>">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="fl1">First Name</label>
+                                                        <input name="member[first_name]" type="text"
+                                                               class="form-control"
+                                                               value="<%= if @open_conversation.member, do: @open_conversation.member.first_name, else: "N/A" %>">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="fl1">Last Name</label>
+                                                        <input name="member[last_name]" type="text" class="form-control"
+                                                               value="<%= if @open_conversation.member, do: @open_conversation.member.last_name, else: "N/A" %>">
+                                                    </div>
+                                                </div>
+
+                                            </div><!-- /.form-group -->
+                                            <div class="row">
+
+
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="fl1">Phone Number</label>
+                                                        <input name="member[phone_number]" type="text"
+                                                               class="form-control"
+                                                               value="<%= if @open_conversation.member, do: format_phone(@open_conversation.member.phone_number), else: "N/A" %>">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="fl1">Location</label>
+                                                        <input type="text" class="form-control"
+                                                               value="<%= @open_conversation.location.location_name %>"
+                                                               readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!-- /.form-group -->
+                                            <div class="form-group">
+                                                <!-- .control-label -->
+                                                <label class="control-label" for="select2-tagging">Status</label>
+                                                <!-- you can put options directly in data attribute -->
+                                                <select id="member-status" name="member[status]" class="form-control">
+                                                    <%= for {key, value} <- member_status() do %>
+                                                    <%= if @open_conversation.member && @open_conversation.member.status == value do %>
+                                                    <option value="<%= value %>" selected><%= key %></option>
+                                                    <% else %>
+                                                    <option value="<%= value %>"><%= key %></option>
+                                                    <% end %>
+                                                    <% end %>
+                                                </select>
+                                            </div>
+
+
+                                        </fieldset>
+                                        <button class="btn btn-primary btn-lg btn-block" id="update_member">Update</button>
+
+                                    </form>
+
+                                    <!-- .fieldset -->
+                                    <!-- /.form-group -->
+                                    <!-- .form-group -->
+
+                                </div><!-- /.card-footer -->
+
+                            </div><!-- /.card -->
+                            <!-- .list-group -->
+
+                        </div><!-- /#team-profile -->
+                        <!-- #message-files -->
+                        <div id="message-files" class="tab-pane fade" role="tabpanel" aria-labelledby="message-files">
+                            <div class="card-body border-top" style="overflow-y:scroll;z-index: 2;max-height: 65vh;">
+                                <ul class="timeline timeline-fluid p-0">
+                                    <%= for n <- @notes do %>
+                                    <!-- .timeline-item -->
+                                    <li class="timeline-item py-2">
+
+                                        <!-- .timeline-body -->
+                                        <div class="timeline-body m-0">
+                                            <!-- .media -->
+                                            <div class="media">
+                                                <!-- .media-body -->
+                                                <div class="media-body">
+                                                    <p class="mb-0">
+                                                        <%= n.user.first_name %> <%= n.user.last_name %>
+                                                        : <%= text_to_html(n.text,[escape: false]) |> safe_to_string |> raw %>
+                                                    </p><span
+                                                        class="timeline-date"><%= format_date(n.inserted_at) %></span>
+                                                </div><!-- /.media-body -->
+                                            </div><!-- /.media -->
+                                        </div><!-- /.timeline-body -->
+                                    </li><!-- /.timeline-item -->
+                                    <% end %>
+
+                                </ul><!-- /.timeline -->
+                            </div>
+                            <div class="card-footer p-3 bg-white"
+                                 style="position: absolute;width:100%;bottom:0;z-index:10000;">
+                                <!-- .form -->
+                                <%= f = form_for :foo, "#", [ phx_submit: :new_note, style: "width:100%;"] %>
+                                <!-- .fieldset -->
+                                <fieldset>
+                                    <div class="form-group">
+                                        <label for="tf6">Private Note</label>
+                                        <%= textarea f, :text, prompt: "Enter Notes", id: "tag_user", rows: "3", class: "form-control"  %>
+                                    </div>
+
+                                </fieldset><!-- /.fieldset -->
+                                <button type="submit" class="btn btn-primary btn-lg btn-block" type="submit">Add
+                                </button>
+                                </form><!-- /.form -->
+
+                            </div><!-- /.card-footer -->
+                        </div><!-- /#message-files -->
+                    </div><!-- /Tab panes -->
+                </div>
+            </div>
+            <% else %>
+                    No conversations to display
+            <% end%>
+
+        </div>
     </div>
-</section>
 
-<%= if @conversation.status in ["open", "pending"] do %>
-<footer class="message-publisher">
-    <%= f = form_for @changeset, "#", [ phx_submit: :save] %>
-    <div class="media mb-1">
-        <div class="media-body">
-            <%= text_input f, :message, id: "reply_matches", class: "form-control border-0 shadow-none", place_holder: "Type a message",phx_focus: :focused,phx_blur: :blured  %>
-        </div>
-        <div>
-            <button type="submit" class="btn btn-light btn-icon">
-                <i class="far fa-paper-plane"></i>
-            </button>
-        </div>
-    </div><!-- /.media -->
-    </form>
-</footer>
+</div>
+<div class="modal fade" id="newMsg" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true" >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Send a Message</h5>
 
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <%= f = form_for @changeset, "#", [ phx_submit: :new_msg,  novalidate: :novalidate] %>
+                <fieldset>
+                        <div class="form-group">
+                            <label for="locationMsg">Location</label>
+                            <select id="locationMsg"
+                                    name="location_id"
+                                    class="form-control select2-hidden-accessible"
+                                    data-placeholder="Select a Location"
+                                    data-toggle="select2"
+                                    data-allow-clear="true"
+                                    data-select2-id="locationMsg" tabindex="-1"
+                                    aria-hidden="true">
+                                <%= for l <- @locations do %>
+                                    <option value="<%= l.id %>"> <%= l.location_name %></option>
+                                <% end %>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="unknown">To</label>
+                            <%= text_input f, :original_number, class: "form-control" %>
+                        </div>
+                        <div class="form-group">
+                            <label for="tf6">Message</label>
+                            <%= textarea f, :message, class: "form-control", place_holder: "Type a message", rows: 5, id: "tf6" %>
+                        </div>
+                    </fieldset>
+
+                <button type="submit" class="btn btn-primary float-right" >Send</button>
+                <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div style="display: none" id="availableTags">
 
     <%= for saved_reply <- @saved_replies do %>
     <p><span><%= saved_reply.draft %></span><span><%= saved_reply.title %></span></p>
     <% end %>
 </div>
-<% end %>
 <div style="display: none" id="availableMembers">
 
     <%= for x <- @team_members do %>
     <p><span><%= x.id %></span><span><%= x.user.first_name <> " " <> x.user.last_name %></span></p>
     <% end %>
 </div>
-<div class="page-sidebar">
-    <header class="sidebar-header d-sm-none"> <!--Need To Add this section. some of the html was missing-->
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item">
-                <a class="prevent-default" href="#" onclick="Looper.toggleSidebar()"><i
-                        class="breadcrumb-icon fa fa-angle-left mr-2"></i>Back</a>
-            </li>
-        </ol>
-    </header>
-    <div class="sidebar-section">
-        <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link <%= if @tab1 == "details", do: " active",else: ""  %>" phx-click="tab1" phx-value-tab="details" data-toggle="tab" href="#tab1" role="tab" aria-controls="tab1" aria-selected="false">Details</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= if @tab1 == "notes", do: " active",else: ""  %>" phx-click="tab1" phx-value-tab="notes" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">Notes</a>
-            </li>
-        </ul>
-        <div class="tab-content p-3">
-            <div class="tab-pane fade <%= if @tab1 == "details", do: " active show",else: ""  %>" id="tab1" role="tabpanel" aria-labelledby="tab1">
-                <fieldset>
-                    <legend>Conversation Details</legend>
-                    <form id="member-form" method="PUT">
-                        <%= if @conversation.member do %>
-                        <input name="id" type="hidden" value="<%= @conversation.member.id %>">
-                        <% end %>
-                        <input name="member[team_id]" type="hidden" value="<%= @location.team_id %>">
-                        <div class="form-group">
-                            <div class="form-label-group">
-                                <input type="text" class="form-control" value="<%= @conversation.location.location_name %>"
-                                       readonly> <label for="fl1"> Location</label>
-                            </div>
-                        </div><!-- /.form-group -->
-                        <div class="form-group">
-                            <div class="form-label-group">
-                                <input name="member[first_name]" type="text" class="form-control"
-                                       value="<%= if @conversation.member, do: @conversation.member.first_name, else: "N/A" %>">
-                                <label for="fl1"> First Name</label>
-                            </div>
-                        </div><!-- /.form-group -->
-                        <div class="form-group">
-                            <div class="form-label-group">
-                                <input name="member[last_name]" type="text" class="form-control"
-                                       value="<%= if @conversation.member, do: @conversation.member.last_name, else: "N/A" %>">
-                                <label for="fl1"> Last Name</label>
-                            </div>
-                        </div><!-- /.form-group -->
-                        <div class="form-group">
-                            <div class="form-label-group">
-                                <input name="member[phone_number]" type="text" class="form-control"
-                                       value="<%= if @conversation.member, do: format_phone(@conversation.member.phone_number), else: "N/A" %>">
-                                <label for="fl1"> Phone Numbers</label>
-                            </div>
-                        </div><!-- /.form-group -->
-                        <div class="form-group">
-                            <div class="form-label-group">
-                                <input name="member[email]" type="text" class="form-control"
-                                       value="<%= if @conversation.member, do: @conversation.member.email, else: "N/A" %>">
-                                <label for="fl1"> Email</label>
-                            </div>
-                        </div><!-- /.form-group -->
-                        <div class="form-group">
-                            <div class="form-label-group">
-                                <label> Status</label>
-                                <select id="member-status" name="member[status]" class="custom-select">
-                                    <%= for {key, value} <- member_status() do %>
-                                    <%= if @conversation.member && @conversation.member.status == value do %>
-                                    <option value="<%= value %>" selected><%= key %></option>
-                                    <% else %>
-                                    <option value="<%= value %>"><%= key %></option>
-                                    <% end %>
-                            <% end %>
-                                </select>
-                            </div>
-                        </div>
+<style>
+    .log-divider > span {
+        z-index: 1 !important;
+    }
 
-                        <div class="form-actions">
-                            <input type="button" value="Update" id="update_member" class="btn btn-primary">
-                        </div>
-
-                    </form>
-                </fieldset>
-            </div>
-            <div class="tab-pane fade <%= if @tab1 == "notes", do: " active show",else: ""  %>" id="tab2" role="tabpanel" aria-labelledby="tab2" class="notes-container">
-                <div class="notes">
-                    <%= for n <- @notes do %>
-                    <p class="user">
-                    <%= n.user.first_name %> <%= n.user.last_name %> (<%= n.inserted_at |> format_date %>) : </p>
-                    <%= text_to_html(n.text,[escape: false]) |> safe_to_string |> raw %>
-                    <% end %>
-                </div>
-                <div class="new-note">
-                    <hr>
-                    Private Notes
-                    <%= f = form_for :foo, "#", [ phx_submit: :new_note] %>
-                    <%= textarea f, :text, prompt: "Enter Notes", id: "tag_user"  %>
-                    <button type="submit" class="btn btn-primary">
-                        ADD
-                    </button>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-
-    <div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog"
-         aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalScrollableTitle">Close Conversation</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <div class="form-label-group">
-                            <%= for {key, value} <- @dispositions do %>
-                            <a class="dropdown-item" href="#" phx-click="close" phx-value-did="<%= value %>"><%= key %></a>
-                            <% end %>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <% else  %>
-    <header id="conversation-tabs" class="section-menu nav-scroller">
-        <!-- .nav-tabs -->
-        <ul class="nav nav-tabs card-header-tabs">
-            <li class="nav-item <%= if @tab == "me", do: " active show",else: ""  %>">
-                <a class="nav-link" data-toggle="tab" href="#project-assigned" phx-click="tab" phx-value-tab="me">Me (<%= Enum.count(@my_conversations, &(&1.status in ["open", "pending"])) %>)</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= if @tab == "open", do: " active show",else: ""  %>" data-toggle="tab"
-                   href="#project-open" phx-click="tab" phx-value-tab="open">Open (<%= @count %>)</a>
-            </li>
-            <li class="nav-item <%= if @tab == "close", do: " active show",else: ""  %>">
-                <a class="nav-link" data-toggle="tab" href="#project-closed" phx-click="tab" phx-value-tab="close">Closed (<%= Enum.count(@conversations, fn(c) -> c.status == "closed" end) %>)</a>
-            </li>
-        </ul>
-        <!-- /.nav-tabs -->
-
-
-    </header>
-
-    <header class="page-title-bar">
-        <div class="d-flex justify-content-between">
-            &nbsp;<div class="pr-2" style="width: 100%">
-            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo"%> </div>
-            <%= if @user.role in ["admin", "team-admin", "location-admin"] do %>
-
-            <a href="#" phx-click="new"
-               class="btn btn-primary">
-                <i class="fas fa-plus">&nbsp;</i>
-                New Message
-            </a>
-            <% end %>
-        </div>
-    </header>
-
-    <div class="page-section">
-        <section class="card card-fluid">
-            <div class="text-muted px-3 mb-2"></div>
-
-            <div class="tab-content">
-
-                <div class="tab-pane fade<%= if @tab == "me", do: " active show",else: "" %>">
-                    <!-- .list-group-item -->
-                    <%= if Enum.count(@my_conversations) == 0 do %>
-                    <div class="alert alert-info mx-3">You have no assigned conversations for this location</div>
-                    <% end %>
-
-                    <table class="table no-first-border">
-                        <tbody>
-                        <%= for c <- @my_conversations do %>
-                        <tr>
-                            <% team_member = (c.team_member || default_user()) %>
-                            <td>
-        <span class="user-avatar-wrapper">
-            <a href="#" class="user-avatar user-avatar-md"><img src="<%= if team_member.user.avatar != "", do: team_member.user.avatar , else: "/images/unknown-profile.jpg" %>" alt=""></a>
-            <span>
-                <b>
-                    <a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>">
-                        <%= if !c.team_member do %>
-                            <%=  format_assigned(c.original_number) %>
-                        <% else %>
-                            <%= team_member.user.first_name %> <%= team_member.user.last_name %>
-                        <% end %>
-                    </a>
-                </b>
-                <span class="list-group-item-text"><%= String.replace(team_member.user.role, "-", " ") |> String.capitalize() %></span>
-            </span>
-        </span>
-                            </td>
-                            <td>
-
-                                <%= if c.member && c.member.first_name do %>
-                                <b><a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>"><%= Enum.join([c.member.first_name, c.member.last_name], " ") %></a></b>
-                                <% else %>
-                                <b><a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>"><%= format_phone(c.original_number) %></a></b>
-                                <% end %>
-                                <p class="list-group-item-text"><%= List.first(c.conversation_messages).message |> String.slice(0..100) %>&hellip;</p>
-                            </td>
-                            <td>
-                                <%= List.first(c.conversation_messages).sent_at |> format_date() %>
-                            </td>
-                            <td>
-                                <div class="dropdown">
-                                    <%= if c.status == "closed" do %>
-                                    <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        ...
-                                    </button>
-                                    <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" phx-click="open" phx-value-cid="<%= c.id %>">Open</a>
-                                    </div>
-                                    <%  end %>
-                                    <%= if c.status != "closed" do %>
-                                    <%= if @dispositions != [] do %>
-                                    <button type="button" class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" data-toggle="modal" data-target="#mmodal<%= c.id %>">...</button>
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="mmodal<%= c.id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalScrollableTitle">Close Conversation</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="form-group">
-                                                        <div class="form-label-group">
-                                                            <%= for {key, value} <- @dispositions do %>
-                                                            <a class="dropdown-item" href="#" phx-click="close" phx-value-did="<%= value %>"  phx-value-cid="<%= c.id %>"><%= key %></a>
-                                                            <% end %>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <% else %>
-                                    <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</button>
-                                    <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" phx-click="close" phx-value-cid="<%= c.id %>">Close</a>
-                                    </div>
-                                    <% end %>
-            <% end %>
-                                </div>
-                            </td>
-                        </tr>
-                        <% end %>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="tab-pane fade <%= if @tab == "open", do: " active show",else: ""  %>">
-                    <%= if Enum.count(@conversations, &(&1.status in ["open", "pending"])) == 0 do %>
-                    <div class="alert alert-info mx-3">There are no open conversations for this location.</div>
-                    <% end %>
-
-                    <table class="table no-first-border">
-                        <tbody>
-                        <%= for c <- Enum.filter(@conversations, &(&1.status in ["open", "pending"])) do %>
-                        <tr>
-                            <% team_member = (c.team_member || default_user()) %>
-                            <td>
-        <span class="user-avatar-wrapper">
-            <a href="#" class="user-avatar user-avatar-md"><img src="<%= if team_member.user.avatar != "", do: team_member.user.avatar , else: "/images/unknown-profile.jpg" %>" alt=""></a>
-            <span>
-                <b>
-                    <a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>">
-                        <%= if !c.team_member do %>
-                            <%=  format_assigned(c.original_number) %>
-                        <% else %>
-                            <%= team_member.user.first_name %> <%= team_member.user.last_name %>
-                        <% end %>
-                    </a>
-                </b>
-                <span class="list-group-item-text"><%= String.replace(team_member.user.role, "-", " ") |> String.capitalize() %></span>
-            </span>
-        </span>
-                            </td>
-                            <td>
-
-                                <%= if c.member && c.member.first_name do %>
-                                <b><a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>"><%= Enum.join([c.member.first_name, c.member.last_name], " ") %></a></b>
-                                <% else %>
-                                <b><a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>"><%= format_phone(c.original_number) %></a></b>
-                                <% end %>
-                                <p class="list-group-item-text"><%= List.first(c.conversation_messages).message |> String.slice(0..100) %>&hellip;</p>
-                            </td>
-                            <td>
-                                <%= List.first(c.conversation_messages).sent_at |> format_date() %>
-                            </td>
-                            <td>
-                                <div class="dropdown">
-                                    <%= if c.status == "closed" do %>
-                                    <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        ...
-                                    </button>
-                                    <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" phx-click="open" phx-value-cid="<%= c.id %>">Open</a>
-                                    </div>
-                                    <%  end %>
-                                    <%= if c.status != "closed" do %>
-                                    <%= if @dispositions != [] do %>
-                                    <button type="button" class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" data-toggle="modal" data-target="#omodal<%= c.id %>">...</button>
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="omodal<%= c.id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalScrollableTitle">Close Conversation</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="form-group">
-                                                        <div class="form-label-group">
-                                                            <%= for {key, value} <- @dispositions do %>
-                                                            <a class="dropdown-item" href="#" phx-click="close" phx-value-did="<%= value %>" phx-value-cid="<%= c.id %>"><%= key %></a>
-                                                            <% end %>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <% else %>
-                                    <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</button>
-                                    <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" phx-click="close" phx-value-cid="<%= c.id %>">Close</a>
-                                    </div>
-                                    <% end %>
-            <% end %>
-                                </div>
-                            </td>
-                        </tr>
-                        <% end %>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="tab-pane fade <%= if @tab == "close", do: " active show",else: ""  %>">
-                    <%= if Enum.count(@conversations, &(&1.status == "closed")) == 0 do %>
-                    <div class="alert alert-info mx-3">There are no closed conversations for this location.</div>
-                    <% end %>
-
-                    <table class="table no-first-border">
-                        <tbody>
-                        <%= for c <- Enum.filter(@conversations, &(&1.status == "closed")) do %>
-                        <tr>
-                            <% team_member = (c.team_member || default_user()) %>
-                            <td>
-        <span class="user-avatar-wrapper">
-
-            <a href="#" class="user-avatar user-avatar-md"><img src="<%= if team_member.user.avatar != "", do: team_member.user.avatar , else: "/images/unknown-profile.jpg" %>" alt=""></a>
-            <span>
-                <b>
-                    <a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>">
-                        <%= if !c.team_member do %>
-                            <%=  format_assigned(c.original_number) %>
-                        <% else %>
-                            <%= team_member.user.first_name %> <%= team_member.user.last_name %>
-                        <% end %>
-                    </a>
-                </b>
-                <span class="list-group-item-text"><%= String.replace(team_member.user.role, "-", " ") |> String.capitalize() %></span>
-            </span>
-        </span>
-                            </td>
-                            <td>
-                                <%= if c.member && c.member.first_name do %>
-                                <b><a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>"><%= Enum.join([c.member.first_name, c.member.last_name], " ") %></a></b>
-                                <% else %>
-                                <b><a href="#" phx-click="openconvo" phx-value-lid="<%= @location.id %>" phx-value-tid="<%= @location.team_id %>" phx-value-cid="<%= c.id %>"><%= format_phone(c.original_number) %></a></b>
-                                <% end %>
-                                <p class="list-group-item-text"><%= List.first(c.conversation_messages).message |> String.slice(0..100) %>&hellip;</p>
-                            </td>
-                            <td>
-                                <%= List.first(c.conversation_messages).sent_at |> format_date() %>
-                            </td>
-                            <td>
-                                <div class="dropdown">
-                                    <%= if c.status == "closed" do %>
-                                    <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        ...
-                                    </button>
-                                    <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" phx-click="open" phx-value-cid="<%= c.id %>">Open</a>
-                                    </div>
-                                    <%  end %>
-                                    <%= if c.status != "closed" do %>
-                                    <%= if @dispositions != [] do %>
-                                    <button type="button" class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" data-toggle="modal" data-target="#omodal<%= c.id %>">...</button>
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="omodal<%= c.id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalScrollableTitle">Close Conversation</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="form-group">
-                                                        <div class="form-label-group">
-                                                            <%= for {key, value} <- @dispositions do %>
-                                                            <a class="dropdown-item" href="#" phx-click="close" phx-value-did="<%= value %>" phx-value-cid="<%= c.id %>"><%= key %></a>
-                                                            <% end %>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <% else %>
-                                    <button class="btn btn-sm btn-secondary btn-icon dropdown-toggle hide-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</button>
-                                    <div id="open-close-conversation" class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" phx-click="close" phx-value-cid="<%= c.id %>">Close</a>
-                                    </div>
-                                    <% end %>
-                            <% end %>
-                                </div>
-                            </td>
-                        </tr>
-                        <% end %>
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-
-        </section>
-    </div>
-    <% end %>
-<% end %>
-    <script>
-        var availableTags = [
-        ];
-        var availableMembers = [
-        ];
-        $(document).on('click','#update_member',function (e) {
-            e.preventDefault(); // prevent default action of link
-
-            $.ajax({
-                url: '/api/update-member',
-                type: 'PUT',
-                data: $("#member-form").serialize(),
-                success: function (data) {
-                    alert("You have successfully updated the member data");
-                    // window.location.reload();
-                },
-                error: function (data) {
-                    var response = data.responseJSON.message;
-                    alert(response);
-                }
-            });
-        });
-        $(document).on('DOMSubtreeModified', 'body', function () {
-            if($('.modal-backdrop').is(":visible")){
-                $('.modal-backdrop').remove();}
-            if($('#conversation_scheduled').is(':checked')&&$('.form_date').is(":hidden") )
-            {
-                flatpickr("#conversation_send_at");
-                $( ".form_date" ).show(500);
-                $(".form_btn").html("Schedule");
-            }
-            $( "#conversation_original_number" ).prop('required',true);
-            $( "#conversation_message" ).prop('required',true);
-            if($(".nav-link.show.active").length) {
-                if($(".nav-link.show.active").html()=="Personal") {
-                    $(".form_name").hide();
-                    $(".form_csv").hide();
-                    $(".form_date").hide();
-                    $(".form_schedule").hide();
-                }
-            }
-        })
-        $('body').on('DOMSubtreeModified', '#scroll-message', function () {
-            var div = document.getElementById("scroll-message");
-            div.scrollTop = div.scrollHeight;
-            availableTags = [];
-            availableMembers = [];
-            $("#availableTags p").each(function(i,elem)
-            {
-                span = $(elem).find('span');
-                if (span.length)
-                {
-                    availableTags.push({value: span[0].innerText, label: span[1].innerText})
-
-                }        });
-            $("#availableMembers p").each(function(i,elem)
-            {
-                span = $(elem).find('span');
-                if (span.length)
-                {
-                    var tag=  "@"+span[1].innerText;
-                    availableMembers.push({value: tag, label: span[1].innerText})
-
-                }        });
-            $("#reply_matches").autocomplete({
-                source: function (request, response) {
-                    var term_ = request.term
-                    if (term_ == "#") {
-                        response(availableTags)
-                    } else {
-                        var term = term_.replace("#", "");
-                        var reg = new RegExp($.ui.autocomplete.escapeRegex(term), "i")
-                        if (term !== "") response($.grep(availableTags, function (tag) {
-                            return tag.label.match(reg)
-                        }))
-                    }
-                },
-                position: {
-                    my: "left bottom",
-                    at: "left top-9",
-                },
-                _resizeMenu: function () {
-                    this.menu.element.outerWidth(250);
-                }
-            });
-            $("#tag_user").bind("keydown", function(event) {
-                // don't navigate away from the field on tab when selecting an item
-                if (event.keyCode === $.ui.keyCode.TAB
-                    && $(this).data("autocomplete").menu.active) {
-                    event.preventDefault();
-                }
-            }).autocomplete({
-                source: function (request, response) {
-                    var term_ = extractLast(request.term)
-                    console.log(term)
-                    if (term_ == "@") {
-                        response(availableMembers)
-                    } else {
-                        var term = term_.replace("@", "");
-                        var reg = new RegExp($.ui.autocomplete.escapeRegex(term), "i")
-                        if (term !== "") response($.grep(availableMembers, function (tag) {
-                            return tag.label.match(reg)
-                        }))
-                    }
-                },
-                position: {
-                    my: "left bottom",
-                    at: "left top-9",
-                },
-                open: function(){
-                    $(this).autocomplete('widget').css('z-index', 99999);
-                    return false;
-                },
-                _resizeMenu: function () {
-                    this.menu.element.outerWidth(250);
-                },
-                focus: function() {
-                    return false; // prevent value inserted on focus
-                },
-                select: function(event, ui) {
-                    var terms = split(this.value.substring(0, this.selectionStart));
-                    terms.pop();  // remove the current input
-                    terms.push(ui.item.value);        // add the selected item
-                    this.value =
-                        $.trim(terms.join(" ") + this.value.substring(this.selectionStart)) + " ";
-                    return false;
-                }
-            });
-        });
-
-        $(document).on('click','#rd2',function (e) {
-
-            $( "#rd2" ).addClass( "show active" );
-            $( "#rd1" ).removeClass( "show active" );
-            $( "#conversation_csv" ).prop('required',true);
-            $( "#conversation_campaign_name" ).prop('required',true);
-            $("#conversation_original_number").removeAttr('required');
-            $( "#conversation_original_number" ).val('');
-            if($('#conversation_scheduled').is(':checked') )
-            {
-                $( ".form_date" ).show(500);
-                $(".form_btn").html("Schedule");
-            }
-            $( ".form_csv" ).show(500);
-            $( ".form_to" ).hide(500);
-            $( ".form_name" ).show(500);
-            $( ".form_name" ).show(500);
-            $(".form_schedule").show(500);
-        });
-        $(document).on('click','#rd1',function (e) {
-            $( "#rd1" ).addClass( "show active" );
-            $( "#rd2" ).removeClass( "show active" );
-            $("#conversation_csv").removeAttr('required');
-            $("#conversation_campaign_name").removeAttr('required');
-            $( "#conversation_original_number" ).prop('required',true);
-            $( "#conversation_campaign_name" ).val('');
-            $( ".form_csv" ).hide(500);
-            $( ".form_date" ).hide(500);
-            $( ".form_name" ).hide(500);
-            $(".form_schedule").hide(500);
-            $( ".form_to" ).show(500);
-
-        });
-        $(document).on('click','#conversation_scheduled',function (e) {
-            if(conversation_scheduled.checked) {
-                flatpickr("#conversation_send_at");
-                $( ".form_date" ).show(500);
-                $(".form_btn").html("Schedule");
-            } else {
-                $( ".form_date" ).hide(500);
-                $(".form_btn").html("Send Now");
-            }
-        });
-        function split(val) {
-            return val.split(/ \s*/);
+    @media (min-width: 1200px) {
+        .has-compact-menu .has-sidebar-expand-xl.has-sidebar-fluid .page-inner {
+            margin-right: calc(100vw - 24.5rem) !important;
         }
 
-        function extractLast(term) {
-            return split(term).pop();
+        .has-compact-menu .has-sidebar-expand-xl.has-sidebar-fluid .page-sidebar {
+            width: calc(100vw - 24.5rem) !important;
+            max-width: calc(100vw - 24.5rem) !important;
         }
-    </script>
+
+    }
+</style>
