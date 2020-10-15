@@ -99,7 +99,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:user, user)
       |> assign(:current_user, user)
       |> assign(:count, 0)
-      |> assign(:loading, false)
+      |> assign(:loading, true)
       |> assign(:tab, "active")
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
@@ -133,7 +133,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:user, user)
       |> assign(:current_user, user)
       |> assign(:count, 0)
-      |> assign(:loading, false)
+      |> assign(:loading, true)
       |> assign(:tab, "assigned")
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
@@ -167,7 +167,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:user, user)
       |> assign(:current_user, user)
       |> assign(:count, 0)
-      |> assign(:loading, false)
+      |> assign(:loading, true)
       |> assign(:tab, "closed")
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
@@ -195,6 +195,8 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, [])
         |> assign(:conversations, conversations)
         |> assign(:open_conversation, nil)
+        |> assign(:loading, false)
+
       open_conversation ->
         dispositions =
           user
@@ -216,6 +218,8 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, dispositions)
         |> assign(:conversations, conversations)
         |> assign(:open_conversation, open_conversation)
+        |> assign(:loading, false)
+
     end
 
     {:noreply, socket}
@@ -236,6 +240,7 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, [])
         |> assign(:conversations, conversations)
         |> assign(:open_conversation, nil)
+        |> assign(:loading, false)
       open_conversation ->
         dispositions =
           user
@@ -257,6 +262,8 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, dispositions)
         |> assign(:conversations, conversations)
         |> assign(:open_conversation, open_conversation)
+        |> assign(:loading, false)
+
     end
 
     {:noreply, socket}
@@ -277,6 +284,8 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, [])
         |> assign(:conversations, conversations)
         |> assign(:open_conversation, nil)
+        |> assign(:loading, false)
+
       open_conversation ->
         dispositions =
           user
@@ -298,6 +307,8 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, dispositions)
         |> assign(:conversations, conversations)
         |> assign(:open_conversation, open_conversation)
+        |> assign(:loading, false)
+
     end
 
     {:noreply, socket}
@@ -327,6 +338,8 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, [])
         |> assign(:open_conversation, nil)
         |> assign(:changeset, Conversations.get_changeset())
+        |> assign(:loading, false)
+
       open_conversation ->
         dispositions =
           user
@@ -348,6 +361,8 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:dispositions, dispositions)
         |> assign(:open_conversation, open_conversation)
         |> assign(:changeset, Conversations.get_changeset())
+        |> assign(:loading, false)
+
     end
 
     {:noreply, socket}
