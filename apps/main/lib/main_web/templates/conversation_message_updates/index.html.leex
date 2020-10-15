@@ -1,8 +1,5 @@
 <%= for message <- Enum.reverse(@messages) do %>
   <li class="conversation-inbound">
-    <div class="conversation-avatar">
-      <a href="#!" class="tile tile-circle bg-muted"><i class="oi oi-person"></i></a>
-    </div>
     <div class="conversation-message">
     <div class="conversation-message-text"> <%= message.message %></div>
     <div class="conversation-meta">

@@ -24,9 +24,6 @@ defmodule MainWeb.Notify do
       |> Bitly.Link.shorten()
 
     body = Enum.join([user.first_name,user.last_name ,message, link[:url]], " ")
-    IO.inspect("#######body########")
-    IO.inspect(body)
-    IO.inspect("###################")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =

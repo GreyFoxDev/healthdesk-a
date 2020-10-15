@@ -1,34 +1,37 @@
 defmodule MainWeb.Live.OpenConverationsView do
   use Phoenix.HTML
   use Phoenix.LiveView
-
+  import MainWeb.Helper.LocationHelper
   alias Data.Conversations, as: C
 
-  def mount(_params, %{"location_id" => location_id, "header" => true} = session, socket) do
-    MainWeb.Endpoint.subscribe("alert:#{location_id}")
+
+  def mount(_params, %{ "current_user" => current_user} = session, socket) do
+
+    location_ids = teammate_locations(current_user,true)
+
+    Enum.each(location_ids, fn location_id ->
+      Main.LiveUpdates.subscribe_live_view(location_id)
+    end)
     socket =
       socket
-      |> assign(:count, open_convos(location_id))
-      |> assign(:location_id, location_id)
-      |> assign(:header, true)
-
-    {:ok, socket}
-  end
-
-  def mount(_params, %{"location_id" => location_id} = session, socket) do
-    timer = Enum.random(1000..10_000)
-    Main.LiveUpdates.subscribe_live_view(location_id)
-    socket =
-      socket
-      |> assign(:count, open_convos(location_id))
-      |> assign(:location_id, location_id)
+      |> assign(:count, open_convos(location_ids))
+      |> assign(:current_user, current_user)
+      |> assign(:session, session)
+      |> assign(:location_ids, location_ids)
       |> assign(:header, false)
 
     {:ok, socket}
   end
+  def mount(_params, %{ "location_id" => location_id} = _session, socket) do
 
-  def render(%{count: count, header: true} = assigns) do
-    ~L[Open (<%= count %>)]
+    Main.LiveUpdates.subscribe_live_view(location_id)
+    socket =
+      socket
+      |> assign(:count, open_convos(location_id))
+      |> assign(:location_ids, location_id)
+      |> assign(:header, false)
+
+    {:ok, socket}
   end
 
   def render(%{count: count, header: false} = assigns) do
@@ -38,7 +41,7 @@ defmodule MainWeb.Live.OpenConverationsView do
   def handle_info(broadcast = %{topic: << "alert:", location_id :: binary >>}, socket) do
     count =
       try do
-        open_convos(socket.assigns.location_id)
+        open_convos(socket.assigns.location_ids)
       rescue
         _ ->
           socket.assigns.count

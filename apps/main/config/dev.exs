@@ -22,8 +22,8 @@ config :main, MainWeb.Endpoint,
       ~r{lib/my_app_web/live/.*(ex)$}
     ]
   ]
-
-config :logger, :console, format: "[$level] $message\n"
+config :logger, level: :debug
+config :logger, :console, format: "[$level] $message\n $metadata \n", metadata: [:module, :function, :line]
 
 config :phoenix, :stacktrace_depth, 20
 

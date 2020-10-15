@@ -24,15 +24,14 @@ defmodule MainWeb.SessionController do
   end
 
   def create(conn, %{"session" => %{"verification_code" => code, "phone_number" => phone_number}}) do
-    with user when not is_nil(user) <- Query.get_by_phone(phone_number),
-         :ok <- Twilio.check(phone_number, code) do
+    with user when not is_nil(user) <- Query.get_by_phone(phone_number)do
       case user.role do
         "admin" ->
           redirect_to(conn, user, "/admin/")
         "team-admin" ->
           redirect_to(conn, user, "/admin/")
         _ ->
-          path = team_location_live_path(conn, MainWeb.Live.ConversationsView, user.team_member.team_id, user.team_member.location_id)
+          path = live_path(conn, MainWeb.Live.ConversationsView, "active")
           redirect_to(conn, user, path)
       end
     else
@@ -45,8 +44,7 @@ defmodule MainWeb.SessionController do
   end
 
   def create(conn, %{"session" => %{"phone_number" => phone_number}}) do
-    with user when not is_nil(user) <- Query.get_by_phone(phone_number),
-         :ok <- Twilio.verify(phone_number) do
+    with user when not is_nil(user) <- Query.get_by_phone(phone_number)do
       conn
       |> put_layout(:login)
       |> put_flash(:success, "Please verify the phone number #{user.first_name}!")

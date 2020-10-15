@@ -21,6 +21,7 @@ defmodule Main.LiveUpdates do
     Phoenix.PubSub.broadcast(Main.PubSub, topic(user_id), message)
   end
 
+
   defp topic, do: @topic
   defp topic(user_id), do: topic() <> to_string(user_id)
 end
