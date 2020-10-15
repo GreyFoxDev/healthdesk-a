@@ -882,10 +882,13 @@ defmodule MainWeb.Live.ConversationsView do
     filter_conversations(c.original_number, search_string) ||
       filter_conversations(c.channel_type, search_string) ||
       filter_conversations(c.location.location_name, search_string) ||
-      ( c.team_member != nil && filter_conversations((c.team_member.user.first_name <> " " <> c.team_member.user.last_name), search_string) )||
+      ( c.team_member != nil && filter_conversations(((c.team_member.user.first_name||"") <> " " <> (c.team_member.user.last_name||"")), search_string) )||
       ( c.team_member != nil &&   filter_conversations(c.team_member.user.phone_number, search_string)) ||
-      ( c.member != nil && (c.member.first_name != nil && filter_conversations((c.member.first_name <> " " <> c.member.last_name), search_string))) ||
+      ( c.member != nil && (c.member.first_name != nil && filter_conversations((c.member.first_name <> " " <> (c.member.last_name||"")), search_string))) ||
       ( c.member != nil && (c.member.phone_number != nil &&  filter_conversations(c.member.phone_number, search_string)))
+  end
+  defp filter_conversations(nil, s) do
+    false
   end
   defp filter_conversations(c, s) when is_binary(c) do
     String.downcase(c) =~ String.downcase(s)
