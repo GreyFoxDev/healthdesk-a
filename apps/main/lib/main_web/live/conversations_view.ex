@@ -79,7 +79,7 @@ defmodule MainWeb.Live.ConversationsView do
     {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
     location_ids = user |> teammate_locations(true)
     locations = user |> teammate_locations()
-
+    Main.LiveUpdates.subscribe_live_view()
     send(self(), {:fetch_c, %{user: user, locations: location_ids, type: "active"}})
 
     teams = user
@@ -103,6 +103,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:tab, "active")
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
+      |> assign(:mchangeset, ConversationMessages.get_changeset())
 
     {:ok, socket}
   end
@@ -111,7 +112,7 @@ defmodule MainWeb.Live.ConversationsView do
     {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
     location_ids = user |> teammate_locations(true)
     locations = user |> teammate_locations()
-
+    Main.LiveUpdates.subscribe_live_view()
     send(self(), {:fetch_c, %{user: user, locations: location_ids, type: "assigned"}})
 
     teams = user
@@ -136,6 +137,8 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:tab, "assigned")
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
+      |> assign(:mchangeset, ConversationMessages.get_changeset())
+
 
     {:ok, socket}
   end
@@ -144,7 +147,7 @@ defmodule MainWeb.Live.ConversationsView do
     {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
     location_ids = user |> teammate_locations(true)
     locations = user |> teammate_locations()
-
+    Main.LiveUpdates.subscribe_live_view()
     send(self(), {:fetch_c, %{user: user, locations: location_ids, type: "closed"}})
 
     teams = user
@@ -168,6 +171,8 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:tab, "closed")
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
+      |> assign(:mchangeset, ConversationMessages.get_changeset())
+
 
     {:ok, socket}
   end
@@ -362,7 +367,7 @@ defmodule MainWeb.Live.ConversationsView do
 
     messages =
       user
-      |> ConversationMessages.all(conversation.id)
+      |> ConversationMessages.all(conversation.id) |>Enum.reverse()
     socket =
       socket
       |> assign(:open_conversation, Map.merge(conversation,%{conversation_messages: messages}))
@@ -752,6 +757,10 @@ defmodule MainWeb.Live.ConversationsView do
     end
   end
   def handle_info({convo_id, :user_typing_start}, socket) do
+    IO.inspect("###################")
+    IO.inspect(123)
+    IO.inspect("###################")
+
     if  convo_id == socket.assigns.open_conversation.id do
       {:noreply, assign(socket, %{typing: true})}
     else
@@ -765,10 +774,13 @@ defmodule MainWeb.Live.ConversationsView do
       {:noreply, socket}
     end
   end
-  def handle_info({_requesting_module, %Data.Schema.ConversationMessage{}=msg}, socket) do
-
+  def handle_info({convo_id, %Data.Schema.ConversationMessage{}=msg}, socket) do
+    if  convo_id == socket.assigns.open_conversation.id do
     msgs_=merge(socket.assigns.messages,[msg])|>Enum.sort_by( &(&1.sent_at), {:asc, DateTime})
     {:noreply,assign(socket,:messages,msgs_)}
+    else
+    {:noreply,socket}
+    end
   end
   def handle_event("new_note",%{"foo" => params},socket)do
     user = socket.assigns.user
@@ -800,10 +812,7 @@ defmodule MainWeb.Live.ConversationsView do
     else
       text
     end
-    IO.inspect("###################")
-    IO.inspect(params["text"])
-    IO.inspect(text)
-    IO.inspect("###################")
+
 
 
     Enum.each(notifications,fn n ->

@@ -4,7 +4,9 @@ config :main, MainWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
-  check_origin: false
+  check_origin: false,
+  watchers: [node: ["node_modules/brunch/bin/brunch", "watch", "--stdin",
+                    cd: Path.expand("../assets", __DIR__)]]
 
 config :main, Main.Mailer,
   adapter: Bamboo.LocalAdapter
@@ -20,8 +22,8 @@ config :main, MainWeb.Endpoint,
       ~r{lib/my_app_web/live/.*(ex)$}
     ]
   ]
-
-config :logger, :console, format: "[$level] $message\n"
+config :logger, level: :debug
+config :logger, :console, format: "[$level] $message\n $metadata \n", metadata: [:module, :function, :line]
 
 config :phoenix, :stacktrace_depth, 20
 

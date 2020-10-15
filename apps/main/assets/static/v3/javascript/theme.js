@@ -214,7 +214,7 @@ var Theme = /*#__PURE__*/function () {
     key: "tooltips",
     value: function tooltips() {
       // Turn off the transform placement on Popper
-      Popper.Defaults.modifiers.computeStyle.gpuAcceleration = false;
+      // Popper.Defaults.modifiers.computeStyle.gpuAcceleration = false;
       $('[data-toggle="tooltip"]').tooltip();
     }
     /**

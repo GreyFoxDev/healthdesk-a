@@ -86,11 +86,15 @@
                                 <%= format_phone(@open_conversation.original_number) %>
                                 <% end %>
                             </span>
-                                <span class="account-description">Active | 1h 20min
+                                <span class="account-description"><%= if assigns[:online] do %>
+                <span class="indicator online"></span>
+                <% else %>
+                <span class="indicator offline"></span>
+                <% end %><span>
                                     <%= if @open_conversation.team_member do %>
                                       | Assigned to <%= @open_conversation.team_member.user.first_name %> <%= @open_conversation.team_member.user.last_name %>
                                     <% end %>
-                                </span></span></a>
+                                </span></span></span></a>
                         <div class="message-header-actions">
 
                             <!-- assign conversation -->
@@ -328,7 +332,7 @@
                     <!-- message publisher -->
                     <div class="message-publisher">
                         <!-- form -->
-                        <%= f = form_for @changeset, "#", [ phx_submit: :save] %>
+                        <%= f = form_for @mchangeset, "#", [ phx_submit: :save] %>
                         <!-- .media -->
                         <div class="media mb-1">
 
