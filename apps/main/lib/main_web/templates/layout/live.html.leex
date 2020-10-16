@@ -112,7 +112,7 @@
                         </a>
 
                     </li>
-                    <li class="menu-item has-child">
+                    <li class="menu-item has-child has-open">
                         <a class="menu-link" href="#">
                             <span class="menu-icon oi oi-chat"></span>
                             <span class="menu-text">Conversations</span>
@@ -121,13 +121,14 @@
                             </span>
                         </a>
                         <ul class="menu">
-                            <li class="menu-item">
+
+                            <li class="menu-item <%= if assigns[:tab] == "active",do: "has-open",else: "" %>">
                                 <a href="/admin/conversations/active" class="menu-link">Active</a>
                             </li>
-                            <li class="menu-item">
+                            <li class="menu-item <%= if assigns[:tab] == "assigned",do: "has-open",else: "" %>">
                                 <a href="/admin/conversations/assigned" class="menu-link">Assigned</a>
                             </li>
-                            <li class="menu-item">
+                            <li class="menu-item <%= if assigns[:tab] == "closed",do: "has-open",else: "" %>">
                                 <a href="/admin/conversations/closed" class="menu-link">Closed</a>
                             </li>
                         </ul>

@@ -58,7 +58,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:team_members_all, team_members_all)
       |> assign(:messages, messages)
       |> assign(:notes, notes)
-      |> assign(:tab1, "notes")
+      |> assign(:tab1, "details")
       |> assign(:has_sidebar, True)
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:location, location)
@@ -101,6 +101,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:count, 0)
       |> assign(:loading, true)
       |> assign(:tab, "active")
+      |> assign(:tab1, "details")
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
@@ -135,6 +136,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:count, 0)
       |> assign(:loading, true)
       |> assign(:tab, "assigned")
+      |> assign(:tab1, "details")
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
@@ -169,6 +171,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:count, 0)
       |> assign(:loading, true)
       |> assign(:tab, "closed")
+      |> assign(:tab1, "details")
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
@@ -590,7 +593,7 @@ defmodule MainWeb.Live.ConversationsView do
       Conversations.update(%{"id" => conversation.id, "status" => "closed", "team_member_id" => nil})
       ConversationMessages.create(message)
       conversations = user
-                       |> Conversations.all(socket.assigns.locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
+                      |> Conversations.all(socket.assigns.locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
       convo= conversations |> List.first()
       socket = case convo do
         nil ->
@@ -744,6 +747,14 @@ defmodule MainWeb.Live.ConversationsView do
     end
 
   end
+  def handle_event("tab1", %{"tab" => tab}, socket)do
+
+    socket =
+      socket
+      |> assign(:tab1, tab)
+    {:noreply, socket}
+
+  end
   def handle_event("new", _, socket)do
     socket = socket
              |> assign(:new, "new")
@@ -803,10 +814,10 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def handle_info({convo_id, %Data.Schema.ConversationMessage{}=msg}, socket) do
     if  convo_id == socket.assigns.open_conversation.id do
-    msgs_=merge(socket.assigns.messages,[msg])|>Enum.sort_by( &(&1.sent_at), {:asc, DateTime})
-    {:noreply,assign(socket,:messages,msgs_)}
+      msgs_=merge(socket.assigns.messages,[msg])|>Enum.sort_by( &(&1.sent_at), {:asc, DateTime})
+      {:noreply,assign(socket,:messages,msgs_)}
     else
-    {:noreply,socket}
+      {:noreply,socket}
     end
   end
   def handle_event("new_note",%{"foo" => params},socket)do

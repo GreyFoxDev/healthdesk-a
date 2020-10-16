@@ -382,11 +382,11 @@
                 <!-- .nav-tabs -->
                 <ul class="nav nav-tabs nav-fill bg-white shadow-sm border-bottom" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#team-profile" role="tab"
+                        <a class="nav-link <%= if @tab1 == "details", do: " active",else: ""  %>" phx-click="tab1" phx-value-tab="details" data-toggle="tab" href="#team-profile" role="tab"
                            aria-controls="team-profile" aria-selected="true">Details</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#message-files" role="tab"
+                        <a class="nav-link <%= if @tab1 == "notes", do: " active",else: ""  %>" phx-click="tab1" phx-value-tab="notes" data-toggle="tab" href="#message-files" role="tab"
                            aria-controls="message-files" aria-selected="false">Notes</a>
                     </li>
                 </ul><!-- /.nav-tabs -->
@@ -395,7 +395,7 @@
                     <!-- Tab panes -->
                     <div class="tab-content">
                         <!-- #team-profile -->
-                        <div id="team-profile" class="tab-pane fade show active" role="tabpanel"
+                        <div id="team-profile" class="tab-pane fade <%= if @tab1 == "details", do: " active show",else: ""  %>" role="tabpanel"
                              aria-labelledby="team-profile">
                             <!-- .card -->
                             <div class="">
@@ -406,7 +406,7 @@
                                             src="/images/unknown-profile.jpg"></a>
                                     <!-- /team avatar -->
                                     <h3 class="card-title text-truncate">
-                                        <%= if @open_conversation.member && @open_conversation.member.first_name, do: @open_conversation.member.first_name<>" "<>@open_conversation.member.last_name, else: "N/A" %>
+                                        <%= if @open_conversation.member && @open_conversation.member.first_name, do: @open_conversation.member.first_name<>" "<>(@open_conversation.member.last_name||""), else: "N/A" %>
                                     </h3>
                                     <h6 class="card-subtitle text-muted mb-3"> <%= @open_conversation.location.location_name %>
                                         || <%= if @open_conversation.member, do: format_date(@open_conversation.member.inserted_at), else: "" %></h6>
@@ -484,7 +484,7 @@
                                                     <div class="form-group">
                                                         <label for="fl1">Last Name</label>
                                                         <input name="member[last_name]" type="text" class="form-control"
-                                                               value="<%= if @open_conversation.member, do: @open_conversation.member.last_name, else: "N/A" %>">
+                                                               value="<%= if @open_conversation.member, do: @open_conversation.member.last_name||"", else: "N/A" %>">
                                                     </div>
                                                 </div>
 
@@ -541,7 +541,7 @@
 
                         </div><!-- /#team-profile -->
                         <!-- #message-files -->
-                        <div id="message-files" class="tab-pane fade" role="tabpanel" aria-labelledby="message-files">
+                        <div id="message-files" class="tab-pane fade <%= if @tab1 == "notes", do: " active show",else: ""  %>" role="tabpanel" aria-labelledby="message-files">
                             <div class="card-body border-top" style="overflow-y:scroll;z-index: 2;max-height: 65vh;">
                                 <ul class="timeline timeline-fluid p-0">
                                     <%= for n <- @notes do %>
