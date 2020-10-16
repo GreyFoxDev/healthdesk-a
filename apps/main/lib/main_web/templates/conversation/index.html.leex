@@ -128,11 +128,12 @@
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-rich stop-propagation">
                                     <div class="dropdown-arrow"></div>
                                     <div class="dropdown-header"> Close Conversation</div>
-
+                                    <%= f = form_for :foo, "#", [ phx_submit: :close] %>
                                     <div class="form-group px-3 py-2 m-0">
                                         <label class="control-label" for="select2-single">Please select one to
                                             continue</label>
-                                        <select id="select2-single"
+                                        <select name="did"
+                                                id="select2-single"
                                                 class="form-control select2-hidden-accessible"
                                                 data-toggle="select2"
                                                 data-placeholder="Select a Disposition"
@@ -150,7 +151,8 @@
 
 
                                     <div id="people" class="tribute-inline stop-propagation"></div>
-                                    <a href="#" class="dropdown-footer">Close <span class="oi oi-transfer"></span></a>
+                                    <button type="submit">Close</button>
+                                    </form>
                                 </div><!-- /.dropdown-menu -->
                             </div><!-- / close dispositions -->
 

@@ -563,13 +563,13 @@ defmodule MainWeb.Live.ConversationsView do
 
   end
   def handle_event("close", %{"did" => disposition_id} = params, socket)do
+    IO.inspect("###################")
+    IO.inspect("testing")
+    IO.inspect("###################")
 
-    location = socket.assigns.location
     user = socket.assigns.user
-    conversation = case socket.assigns[:conversation] do
-      nil -> conversation = Conversations.get(params["cid"])
-      c -> c
-    end
+    conversation = socket.assigns.open_conversation
+    location = socket.assigns.location_ids
 
     if conversation.status != "closed" do
       user_info = Formatters.format_team_member(user)
@@ -589,34 +589,46 @@ defmodule MainWeb.Live.ConversationsView do
 
       Conversations.update(%{"id" => conversation.id, "status" => "closed", "team_member_id" => nil})
       ConversationMessages.create(message)
-      socket = %{
-        socket |
-        assigns: Map.delete(socket.assigns, :conversation_id),
-        changed: Map.put_new(socket.changed, :key, true)
-      }
+      conversations = user
+                       |> Conversations.all(socket.assigns.locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
+      convo= conversations |> List.first()
+      socket = case convo do
+        nil ->
+          socket
+          |> assign(:team_members, [])
+          |> assign(:team_members_all, [])
+          |> assign(:notes, [])
+          |> assign(:saved_replies, [])
+          |> assign(:dispositions, [])
+          |> assign(:conversations, conversations)
+          |> assign(:open_conversation, nil)
+          |> assign(:loading, false)
 
-      conversations =
-        user
-        |> Conversations.all(location.id)
+        open_conversation ->
+          dispositions =
+            user
+            |> Data.Disposition.get_by_team_id(open_conversation.location.team_id)
+            |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
+            |> Stream.map(&({&1.disposition_name, &1.id}))
+            |> Enum.to_list()
+          team_members =
+            user
+            |> TeamMember.all(open_conversation.location.id)
+          team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
+          notes= Notes.get_by_conversation(open_conversation.id)
+          saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
+          socket
+          |> assign(:team_members, team_members)
+          |> assign(:team_members_all, team_members_all)
+          |> assign(:notes, notes)
+          |> assign(:saved_replies, saved_replies)
+          |> assign(:dispositions, dispositions)
+          |> assign(:conversations, conversations)
+          |> assign(:open_conversation, open_conversation)
+          |> assign(:loading, false)
 
-      my_conversations =
-        Enum.filter(conversations, fn (c) -> c.team_member && c.team_member.user_id == user.id end)
+      end
 
-      dispositions =
-        user
-        |> Data.Disposition.get_by_team_id(location.team_id)
-        |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
-        |> Stream.map(&({&1.disposition_name, &1.id}))
-        |> Enum.to_list()
-      Main.LiveUpdates.notify_live_view(location.id, {__MODULE__, :updated_open})
-
-      socket =
-        socket
-        |> assign(:location, location)
-        |> assign(:conversations, conversations)
-        |> assign(:my_conversations, my_conversations)
-        |> assign(:dispositions, dispositions)
-        |> assign(:user, user)
 
       {:noreply, socket}
     else
