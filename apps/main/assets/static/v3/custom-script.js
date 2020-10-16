@@ -36,9 +36,14 @@ $(document).ready(function() {
         }); });
     var availableTags = [];
     var availableMembers = [];
-    $('body').on('DOMSubtreeModified', 'main', function () {
-        Looper.init();
-    })
+
+    $("body").on('DOMNodeRemoved','main', function(e) {
+       if (e.target.isSameNode($('#loading')[0])){
+           Looper.init();
+
+       }
+    });
+
     var tribute = new Tribute({
         trigger: '#',
         selectTemplate: function (item) {
@@ -56,7 +61,6 @@ $(document).ready(function() {
     $('body').on('DOMSubtreeModified', '.message-body', function () {
         var div = document.getElementsByClassName("message-body")[0]
         div.scrollTop = div.scrollHeight;
-        Looper.init();
     })
     $('body').on('DOMSubtreeModified', '.timeline', function () {
         var div = ($(".timeline").parent())[0]
