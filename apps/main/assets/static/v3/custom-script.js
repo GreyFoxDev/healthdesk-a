@@ -61,6 +61,7 @@ $(document).ready(function() {
     $('body').on('DOMSubtreeModified', '.message-body', function () {
         var div = document.getElementsByClassName("message-body")[0]
         div.scrollTop = div.scrollHeight;
+        Looper.init();
     })
     $('body').on('DOMSubtreeModified', '.timeline', function () {
         var div = ($(".timeline").parent())[0]

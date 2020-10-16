@@ -537,7 +537,7 @@ defmodule MainWeb.Live.ConversationsView do
            %{"id" => conversation.id, "location_id" => location.id, "team_member_id" => user.team_member.id}
          ) do
       {:ok, _} ->
-        if socket.assign.tab == "active" do
+        if socket.assigns.tab == "active" do
           conversation =
             user
             |> Conversations.get(conversation.id)

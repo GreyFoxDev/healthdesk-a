@@ -37,7 +37,7 @@ defmodule MainWeb.AssignTeamMemberController do
       "sent_at" => DateTime.utc_now()}
 
 
-    with {:ok, _pi} <- Conversations.update(%{"id" => id, "team_member_id" => team_member_id}),
+    with {:ok, _pi} <- Conversations.update(%{"id" => id, "team_member_id" => team_member_id, "status" => "open"}),
          {:ok, _} <- ConversationMessages.create(message) do
       if original_message != nil do
         message =

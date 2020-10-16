@@ -89,21 +89,6 @@
             <section class="aside-menu overflow-hidden ps">
                 <nav id="stacked-menu" class="stacked-menu stacked-menu-has-collapsible">
                     <ul class="menu">
-                        <%= if @current_user.role == "admin" do %>
-                        <li class="menu-item has-active">
-                            <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>Teams</span>"}, to: team_path(@conn, :index), class: "menu-link" %>
-                        </li>
-                        <% end %>
-
-                        <%= for team <- @teams do %>
-                        <%= if @current_user.role in ["location-admin", "team-admin"] do %>
-                        <li class="menu-item has-active">
-                            <%= link {:safe, "<span class='menu-icon fa fa-home'></span> <span class='menu-text'>My Team</span>"},
-                                                     to: team_location_path(@conn, :index, team.id), class: "menu-link" %>
-                        </li>
-                        <% end %>
-
-
 
                         <li class="menu-item has-child">
                             <a href="#" class="menu-link">
@@ -125,7 +110,6 @@
                                 </li>
                             </ul>
                         </li>
-                        <% end %>
                     </ul>
                 </nav>
             </section>

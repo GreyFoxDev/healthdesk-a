@@ -9,10 +9,7 @@
     <!-- Message List -->
     <div class="page-inner page-inner-fill position-relative">
         <header class="page-navs bg-white shadow-sm d-flex justify-content-between px-2">
-            <div class="btn btn-light btn-icon ">
-                <i class="fa fa-search"></i>
-            </div>
-            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo"%>
+            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..."%>
         </header>
         <div class="">
             <button type="button" class="btn btn-primary btn-floated position-absolute" data-toggle="modal"
