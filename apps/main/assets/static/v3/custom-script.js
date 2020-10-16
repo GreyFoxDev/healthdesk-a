@@ -36,7 +36,9 @@ $(document).ready(function() {
         }); });
     var availableTags = [];
     var availableMembers = [];
-    Looper.init();
+    $('body').on('DOMSubtreeModified', 'main', function () {
+        Looper.init();
+    })
     var tribute = new Tribute({
         trigger: '#',
         selectTemplate: function (item) {
