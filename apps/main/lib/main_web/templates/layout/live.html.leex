@@ -1,12 +1,14 @@
 <header class="app-header bg-white">
     <div class="top-bar">
         <div class="top-bar-brand">
-            <button class="hamburger hamburger-squeeze mr-2" type="button" data-toggle="aside-menu" aria-label="toggle aside menu"><span class="hamburger-box"><span class="hamburger-inner"></span></span></button>
+            <!--    <button class="hamburger hamburger-squeeze mr-2" type="button" data-toggle="aside-menu" aria-label="toggle aside menu">
+                   <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+               </button> -->
             <a href="/admin"><img src="/v3/images/logo.png"/></a>
         </div>
         <div class="top-bar-list">
             <div class="top-bar-item px-2 d-md-none d-lg-none d-xl-none">
-                <button class="hamburger hamburger-squeeze" type="button" data-toggle="aside" aria-label="toggle menu">
+               <button class="hamburger hamburger-squeeze" type="button" data-toggle="aside" aria-label="toggle menu">
                     <span class="hamburger-box">
                         <span class="hamburger-inner"></span>
                     </span>
@@ -122,19 +124,19 @@
                         </a>
                         <ul class="menu">
 
-                            <li class="menu-item <%= if assigns[:tab] == "active",do: "has-open",else: "" %>">
+                            <li class="menu-item <%= if assigns[:tab] == "active",do: "has-active",else: "" %>">
                                 <a href="/admin/conversations/active" class="menu-link">Active</a>
                             </li>
-                            <li class="menu-item <%= if assigns[:tab] == "assigned",do: "has-open",else: "" %>">
+                            <li class="menu-item <%= if assigns[:tab] == "assigned",do: "has-active",else: "" %>">
                                 <a href="/admin/conversations/assigned" class="menu-link">Assigned</a>
                             </li>
-                            <li class="menu-item <%= if assigns[:tab] == "closed",do: "has-open",else: "" %>">
+                            <li class="menu-item <%= if assigns[:tab] == "closed",do: "has-active",else: "" %>">
                                 <a href="/admin/conversations/closed" class="menu-link">Closed</a>
                             </li>
                         </ul>
                     </li>
-                    <li class="menu-item">
-                        <a class="menu-link" href="#">
+                    <li class="menu-item <%= if assigns[:tab] == "campaign",do: "has-active",else: "" %>">
+                        <a class="menu-link" href="/admin/campaigns">
                             <span class="menu-icon oi oi-phone"></span>
                             <span class="menu-text">Campaigns</span>
                         </a>
@@ -160,6 +162,3 @@
      <%= @inner_content %>
     </div>
 </main>
-<footer class="app-footer">
-    <div class="copyright"> Copyright © 2020 Healthdesk Inc. All right reserved. </div>
-</footer>

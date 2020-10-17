@@ -256,7 +256,7 @@
                                         </a>
                                     </td>
                                     <td class="align-middle">
-                                        <%= link "Download", to: campaign_path(@conn, :export, campaign.id), class: "nav-link" %>
+
                                     </td>
                                     <td class="align-middle">
                                         <%= if !campaign.completed do %>

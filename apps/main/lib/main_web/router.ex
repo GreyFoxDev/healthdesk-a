@@ -40,6 +40,7 @@ defmodule MainWeb.Router do
     pipe_through [:browser, :auth, :live_root]
 
     live "/conversations/:id" , Live.ConversationsView, only: [:index]
+    live "/campaigns" , Live.CampaignsView
 
   end
   scope "/admin", MainWeb do

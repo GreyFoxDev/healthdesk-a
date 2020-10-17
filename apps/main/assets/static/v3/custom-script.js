@@ -15,6 +15,20 @@ $(document).ready(function() {
                 .addClass("has-active");
         }
     });
+    $('body').on("click","#conversation_scheduled", function () {
+        if (conversation_scheduled.checked) {
+            $(".form_date").show(500);
+            $(".form_btn").html("Schedule");
+            flatpickr("#conversation_send_at", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i"
+            });
+
+        } else {
+            $(".form_date").hide(500);
+            $(".form_btn").html("Send Now");
+        }
+    });
     $('body').on('submit', '.modal.fade.show form',() =>
         $('#newMsg').modal('hide')
     )
@@ -36,68 +50,92 @@ $(document).ready(function() {
         }); });
     var availableTags = [];
     var availableMembers = [];
+    let cpdata = null;
+    let test = false;
 
-    $("body").on('DOMNodeRemoved','main', function(e) {
-       if (e.target.isSameNode($('#loading')[0])){
-           Looper.init();
+    // $("body").on('DOMNodeInserted','#campaignData1', function(e) {
+    //     if (e.target.matches('tr.last')){
+    //         Looper.init();
+    //         if( cpdata != e.target.id)
+    //         {
+    //             cpdata=e.target.id;
+    //             test = true;
+    //             tb= $('#campaignData1').DataTable();
+    //             tb.destroy()
+    //             $('#campaignData1').DataTable( {
+    //                 "scrollCollapse": true,
+    //                 "responsive": true,
+    //                 "info":     false,
+    //                 "destroy":     true,
+    //                 "searching": true,
+    //                 "ordering": false,
+    //                 "retrieve": true
+    //             });
+    //         }
+    //     }
+    // });
 
-       }
-    });
-
-    var tribute = new Tribute({
-        trigger: '#',
-        selectTemplate: function (item) {
-            return item.original.value;
-        },
-        values: []
-    });
-    var tribute2 = new Tribute({
-        trigger: '@',
-        selectTemplate: function (item) {
-            return item.original.value;
-        },
-        values: []
-    });
-    $('body').on('DOMSubtreeModified', '.message-body', function () {
-        var div = document.getElementsByClassName("message-body")[0]
-        div.scrollTop = div.scrollHeight;
+$("body").on('DOMNodeRemoved','main', function(e) {
+    if (e.target.isSameNode($('#loading')[0])){
         Looper.init();
-    })
-    $('body').on('DOMSubtreeModified', '.timeline', function () {
-        var div = ($(".timeline").parent())[0]
-        div.scrollTop = div.scrollHeight;
 
-    })
-    $('body').on('DOMSubtreeModified', '#availableTags', function () {
-        availableTags = [];
-        $("#availableTags p").each(function (i, elem) {
-            span = $(elem).find('span');
-            if (span.length) {
-                availableTags.push({value: span[0].innerText, key: span[1].innerText})
+    }
+});
 
-            }
-        });
-        tribute.collection[0].values=availableTags
-        tribute.detach(document.getElementById("messagetext"));
-        tribute.attach(document.getElementById('messagetext'));
+var tribute = new Tribute({
+    trigger: '#',
+    selectTemplate: function (item) {
+        return item.original.value;
+    },
+    values: []
+});
+var tribute2 = new Tribute({
+    trigger: '@',
+    selectTemplate: function (item) {
+        return item.original.value;
+    },
+    values: []
+});
+$('body').on('DOMSubtreeModified', '.message-body', function () {
+    var div = document.getElementsByClassName("message-body")[0]
+    div.scrollTop = div.scrollHeight;
+    Looper.init();
+})
+$('body').on('DOMSubtreeModified', '#message-files', function () {
+    var div = $("#message-files .card-body")[0]
+    div.scrollTop = div.scrollHeight;
 
-    })
-    $('body').on('DOMSubtreeModified', '#availableMembers', function () {
-        availableMembers = [];
+})
+$('body').on('DOMSubtreeModified', '#availableTags', function () {
+    availableTags = [];
+    $("#availableTags p").each(function (i, elem) {
+        span = $(elem).find('span');
+        if (span.length) {
+            availableTags.push({value: span[0].innerText, key: span[1].innerText})
 
-        $("#availableMembers p").each(function (i, elem) {
-            span = $(elem).find('span');
-            if (span.length) {
-                var tag = "@" + span[1].innerText;
-                availableMembers.push({value: tag, key: span[1].innerText})
+        }
+    });
+    tribute.collection[0].values=availableTags
+    tribute.detach(document.getElementById("messagetext"));
+    tribute.attach(document.getElementById('messagetext'));
 
-            }
-        });
-        tribute2.collection[0].values=availableMembers
-        tribute2.detach(document.getElementById("tag_user"));
-        tribute2.attach(document.getElementById('tag_user'));
+})
+$('body').on('DOMSubtreeModified', '#availableMembers', function () {
+    availableMembers = [];
 
-    })
+    $("#availableMembers p").each(function (i, elem) {
+        span = $(elem).find('span');
+        if (span.length) {
+            var tag = "@" + span[1].innerText;
+            availableMembers.push({value: tag, key: span[1].innerText})
+
+        }
+    });
+    tribute2.collection[0].values=availableMembers
+    tribute2.detach(document.getElementById("tag_user"));
+    tribute2.attach(document.getElementById('tag_user'));
+
+})
 
 } );
 
@@ -437,17 +475,6 @@ $(document).ready(function() {
     });
 } );
 
-$(document).ready(function() {
-    $('#campaignData1').DataTable( {
-        "order": [[ 2, "asc" ]],
-        "columnDefs": [
-            { "orderable": false, "targets": "no-sort" }
-        ],
-        "scrollCollapse": true,
-        "responsive": true,
-        "info":     false
-    });
-} );
 
 $(document).ready(function() {
     $('#callData').DataTable( {

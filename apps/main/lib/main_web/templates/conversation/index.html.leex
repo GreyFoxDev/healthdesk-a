@@ -7,6 +7,8 @@
 
 <div class="page has-sidebar has-sidebar-fluid has-sidebar-expand-xl">
     <!-- Message List -->
+    <%= if assigns[:open_conversation]  do %>
+
     <div class="page-inner page-inner-fill position-relative">
         <header class="page-navs bg-white shadow-sm d-flex justify-content-between px-2">
             <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..."%>
@@ -73,7 +75,6 @@
     <div class="page-sidebar bg-light">
         <div class="row m-0">
             <!--Message Window-->
-            <%= if assigns[:open_conversation]  do %>
             <div class="sidebar-section sidebar-section-fill page-inner-fill col-lg-8 p-0">
                 <!-- .message -->
                 <div class="message m-0" style="top:0 !important;">
@@ -112,10 +113,12 @@
                                     <div class="dropdown-arrow"></div>
                                     <div class="dropdown-header"> Assign to a Teammate</div>
                                     <div class="form-group px-3 py-2 m-0">
-                                        <%= select f, :team_member_id, @team_members_all, selected: @open_conversation.team_member_id||"",prompt: "Select Team Member", class: "custom-select"  %>
+                                        <%= select f, :team_member_id, @team_members_all, selected: @open_conversation.team_member_id||"",prompt: "Select Teammate ", class: "custom-select"  %>
                                     </div>
-                                    <div id="people" class="tribute-inline stop-propagation"></div>
-                                    <button type="submit">Assign <span class="oi oi-person"></span></button>
+                                    <div  class="tribute-inline stop-propagation"></div>
+                                    <div class="form-group px-3 py-2 m-0">
+                                        <button id="people" type="submit">Assign <span class="oi oi-person"></span></button>
+                                    </div>
                                     </form>
                                 </div><!-- /.dropdown-menu -->
                             </div><!-- / assign conversation -->
@@ -150,8 +153,10 @@
                                     </div>
 
 
-                                    <div id="people" class="tribute-inline stop-propagation"></div>
-                                    <button type="submit">Close</button>
+                                    <div class="tribute-inline stop-propagation"></div>
+                                    <div class="form-group px-3 py-2 m-0">
+                                        <button id="close" type="submit">Close</button>
+                                    </div>
                                     </form>
                                 </div><!-- /.dropdown-menu -->
                             </div><!-- / close dispositions -->
@@ -588,12 +593,18 @@
                     </div><!-- /Tab panes -->
                 </div>
             </div>
-            <% else %>
-                    No conversations to display
-            <% end%>
+
 
         </div>
     </div>
+    <% else %>
+    <div class="empty-inbox">
+        <div>
+            <h3>Inbox Zero</h3>
+            <span>Ahhh... that feels good.</span>
+        </div>
+    </div>
+    <% end%>
 
 </div>
 <div class="modal fade" id="newMsg" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"

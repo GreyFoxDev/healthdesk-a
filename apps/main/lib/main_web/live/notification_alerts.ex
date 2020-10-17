@@ -43,7 +43,7 @@ defmodule MainWeb.Live.NotificationAlertsView do
 
         {:noreply,
       socket
-      |> redirect(to: "/admin/teams/#{conversation.location.team_id}/locations/#{conversation.location.id}/conversations/#{conversation.id}/conversation-messages" )
+      |> redirect(to: "/admin/conversations/#{conversation.id}" )
     }
   end
 
