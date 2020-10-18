@@ -1,5 +1,7 @@
 $(document).ready(function() {
     var url = window.location;
+
+
     // Will only work if string in href matches with location
     $('.menu li a[href="'+ url +'"]').parent().addClass('has-active');
 
@@ -48,96 +50,8 @@ $(document).ready(function() {
                 alert(response);
             }
         }); });
-    var availableTags = [];
-    var availableMembers = [];
-    let cpdata = null;
-    let test = false;
 
-    // $("body").on('DOMNodeInserted','#campaignData1', function(e) {
-    //     if (e.target.matches('tr.last')){
-    //         Looper.init();
-    //         if( cpdata != e.target.id)
-    //         {
-    //             cpdata=e.target.id;
-    //             test = true;
-    //             tb= $('#campaignData1').DataTable();
-    //             tb.destroy()
-    //             $('#campaignData1').DataTable( {
-    //                 "scrollCollapse": true,
-    //                 "responsive": true,
-    //                 "info":     false,
-    //                 "destroy":     true,
-    //                 "searching": true,
-    //                 "ordering": false,
-    //                 "retrieve": true
-    //             });
-    //         }
-    //     }
-    // });
-
-$("body").on('DOMNodeRemoved','main', function(e) {
-    if (e.target.isSameNode($('#loading')[0])){
-        Looper.init();
-
-    }
 });
-
-var tribute = new Tribute({
-    trigger: '#',
-    selectTemplate: function (item) {
-        return item.original.value;
-    },
-    values: []
-});
-var tribute2 = new Tribute({
-    trigger: '@',
-    selectTemplate: function (item) {
-        return item.original.value;
-    },
-    values: []
-});
-$('body').on('DOMSubtreeModified', '.message-body', function () {
-    var div = document.getElementsByClassName("message-body")[0]
-    div.scrollTop = div.scrollHeight;
-    Looper.init();
-})
-$('body').on('DOMSubtreeModified', '#message-files', function () {
-    var div = $("#message-files .card-body")[0]
-    div.scrollTop = div.scrollHeight;
-
-})
-$('body').on('DOMSubtreeModified', '#availableTags', function () {
-    availableTags = [];
-    $("#availableTags p").each(function (i, elem) {
-        span = $(elem).find('span');
-        if (span.length) {
-            availableTags.push({value: span[0].innerText, key: span[1].innerText})
-
-        }
-    });
-    tribute.collection[0].values=availableTags
-    tribute.detach(document.getElementById("messagetext"));
-    tribute.attach(document.getElementById('messagetext'));
-
-})
-$('body').on('DOMSubtreeModified', '#availableMembers', function () {
-    availableMembers = [];
-
-    $("#availableMembers p").each(function (i, elem) {
-        span = $(elem).find('span');
-        if (span.length) {
-            var tag = "@" + span[1].innerText;
-            availableMembers.push({value: tag, key: span[1].innerText})
-
-        }
-    });
-    tribute2.collection[0].values=availableMembers
-    tribute2.detach(document.getElementById("tag_user"));
-    tribute2.attach(document.getElementById('tag_user'));
-
-})
-
-} );
 
 var globalContainer;
 

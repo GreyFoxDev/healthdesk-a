@@ -7,9 +7,6 @@ defmodule MainWeb.Helper.LocationHelper do
   end
 
   def teammate_locations(%Data.Schema.User{role: "admin"}=current_user) do
-    IO.inspect("###################")
-    IO.inspect(123)
-    IO.inspect("###################")
 
     Location.all()
     |> Stream.filter(&(&1.deleted_at == nil))

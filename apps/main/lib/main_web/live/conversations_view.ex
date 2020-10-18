@@ -168,41 +168,24 @@ defmodule MainWeb.Live.ConversationsView do
                     |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
     convo= conversations |> List.first()
 
+    socket = socket
+             |> assign(:team_members, [])
+             |> assign(:team_members_all, [])
+             |> assign(:notes, [])
+             |> assign(:saved_replies, [])
+             |> assign(:dispositions, [])
+             |> assign(:loading, false)
+             |> assign(:conversations, conversations)
 
     socket = case convo do
       nil ->
         socket
-        |> assign(:team_members, [])
-        |> assign(:team_members_all, [])
-        |> assign(:notes, [])
-        |> assign(:saved_replies, [])
-        |> assign(:dispositions, [])
-        |> assign(:conversations, conversations)
         |> assign(:open_conversation, nil)
-        |> assign(:loading, false)
 
       open_conversation ->
-        dispositions =
-          user
-          |> Data.Disposition.get_by_team_id(open_conversation.location.team_id)
-          |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
-          |> Stream.map(&({&1.disposition_name, &1.id}))
-          |> Enum.to_list()
-        team_members =
-          user
-          |> TeamMember.all(open_conversation.location.id)
-        team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
-        notes= Notes.get_by_conversation(open_conversation.id)
-        saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
+        send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
         socket
-        |> assign(:team_members, team_members)
-        |> assign(:team_members_all, team_members_all)
-        |> assign(:notes, notes)
-        |> assign(:saved_replies, saved_replies)
-        |> assign(:dispositions, dispositions)
-        |> assign(:conversations, conversations)
         |> assign(:open_conversation, open_conversation)
-        |> assign(:loading, false)
 
     end
 
@@ -213,40 +196,24 @@ defmodule MainWeb.Live.ConversationsView do
     conversations = user
                     |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) ->(c.team_member && c.team_member.user_id != user.id) end)
     convo= (conversations |> List.first())
+    socket = socket
+             |> assign(:team_members, [])
+             |> assign(:team_members_all, [])
+             |> assign(:notes, [])
+             |> assign(:saved_replies, [])
+             |> assign(:dispositions, [])
+             |> assign(:loading, false)
+             |> assign(:conversations, conversations)
 
     socket = case convo do
       nil ->
         socket
-        |> assign(:team_members, [])
-        |> assign(:team_members_all, [])
-        |> assign(:notes, [])
-        |> assign(:saved_replies, [])
-        |> assign(:dispositions, [])
-        |> assign(:conversations, conversations)
         |> assign(:open_conversation, nil)
-        |> assign(:loading, false)
+
       open_conversation ->
-        dispositions =
-          user
-          |> Data.Disposition.get_by_team_id(open_conversation.location.team_id)
-          |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
-          |> Stream.map(&({&1.disposition_name, &1.id}))
-          |> Enum.to_list()
-        team_members =
-          user
-          |> TeamMember.all(open_conversation.location.id)
-        team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
-        notes= Notes.get_by_conversation(open_conversation.id)
-        saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
+        send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
         socket
-        |> assign(:team_members, team_members)
-        |> assign(:team_members_all, team_members_all)
-        |> assign(:notes, notes)
-        |> assign(:saved_replies, saved_replies)
-        |> assign(:dispositions, dispositions)
-        |> assign(:conversations, conversations)
         |> assign(:open_conversation, open_conversation)
-        |> assign(:loading, false)
 
     end
 
@@ -257,41 +224,24 @@ defmodule MainWeb.Live.ConversationsView do
     conversations = user
                     |> Conversations.all(locations,["closed"])
     convo= (conversations |> List.first())
+    socket = socket
+             |> assign(:team_members, [])
+             |> assign(:team_members_all, [])
+             |> assign(:notes, [])
+             |> assign(:saved_replies, [])
+             |> assign(:dispositions, [])
+             |> assign(:loading, false)
+             |> assign(:conversations, conversations)
 
     socket = case convo do
       nil ->
         socket
-        |> assign(:team_members, [])
-        |> assign(:team_members_all, [])
-        |> assign(:notes, [])
-        |> assign(:saved_replies, [])
-        |> assign(:dispositions, [])
-        |> assign(:conversations, conversations)
         |> assign(:open_conversation, nil)
-        |> assign(:loading, false)
 
       open_conversation ->
-        dispositions =
-          user
-          |> Data.Disposition.get_by_team_id(open_conversation.location.team_id)
-          |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
-          |> Stream.map(&({&1.disposition_name, &1.id}))
-          |> Enum.to_list()
-        team_members =
-          user
-          |> TeamMember.all(open_conversation.location.id)
-        team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
-        notes= Notes.get_by_conversation(open_conversation.id)
-        saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
+        send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
         socket
-        |> assign(:team_members, team_members)
-        |> assign(:team_members_all, team_members_all)
-        |> assign(:notes, notes)
-        |> assign(:saved_replies, saved_replies)
-        |> assign(:dispositions, dispositions)
-        |> assign(:conversations, conversations)
         |> assign(:open_conversation, open_conversation)
-        |> assign(:loading, false)
 
     end
 
@@ -304,8 +254,8 @@ defmodule MainWeb.Live.ConversationsView do
                   |> Conversations.all(locations,["closed"])
       _ ->
         if open_conversation.team_member == nil || open_conversation.team_member.user_id == user.id do
-            user
-                          |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
+          user
+          |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
         else
           conversations = user
                           |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) ->(c.team_member && c.team_member.user_id != user.id) end)
@@ -315,9 +265,9 @@ defmodule MainWeb.Live.ConversationsView do
       "closed" -> "closed"
       _ ->
         if open_conversation.team_member == nil || open_conversation.team_member.user_id == user.id do
-            "active"
+          "active"
         else
-        "assigned"
+          "assigned"
         end
     end
 
@@ -335,21 +285,44 @@ defmodule MainWeb.Live.ConversationsView do
     notes= Notes.get_by_conversation(open_conversation.id)
     saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
     socket=socket
-    |> assign(:team_members, team_members)
-    |> assign(:team_members_all, team_members_all)
-    |> assign(:notes, notes)
-    |> assign(:tab, tab)
-    |> assign(:tab1, "notes")
-    |> assign(:saved_replies, saved_replies)
-    |> assign(:dispositions, dispositions)
-    |> assign(:conversations, conversations)
-    |> assign(:open_conversation, open_conversation)
-    |> assign(:loading, false)
+           |> assign(:team_members, team_members)
+           |> assign(:team_members_all, team_members_all)
+           |> assign(:notes, notes)
+           |> assign(:tab, tab)
+           |> assign(:tab1, "notes")
+           |> assign(:saved_replies, saved_replies)
+           |> assign(:dispositions, dispositions)
+           |> assign(:conversations, conversations)
+           |> assign(:open_conversation, open_conversation)
+           |> assign(:loading, false)
 
 
     {:noreply, socket}
   end
+  def handle_info({:fetch_d, %{user: user, locations: locations, convo: open_conversation}},socket)do
+    dispositions =
+      user
+      |> Data.Disposition.get_by_team_id(open_conversation.location.team_id)
+      |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
+      |> Stream.map(&({&1.disposition_name, &1.id}))
+      |> Enum.to_list()
+    team_members =
+      user
+      |> TeamMember.all(open_conversation.location.id)
+    team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
+    notes= Notes.get_by_conversation(open_conversation.id)
+    saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
+    socket = socket
+    |> assign(:team_members, team_members)
+    |> assign(:team_members_all, team_members_all)
+    |> assign(:notes, notes)
+    |> assign(:saved_replies, saved_replies)
+    |> assign(:dispositions, dispositions)
+    |> assign(:loading, false)
+    if connected?(socket), do: Process.send_after(self(), :reload_convo, 1000)
 
+    {:noreply, socket}
+  end
   def fetch_member(%{original_number: <<"CH", _rest :: binary>> = channel} = conversation) do
     with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
       Map.put(conversation, :member, channel.member)
@@ -364,44 +337,39 @@ defmodule MainWeb.Live.ConversationsView do
       |> Conversations.get(conversation_id)
       |> fetch_member()
 
+    socket = socket
+             |> assign(:team_members, [])
+             |> assign(:team_members_all, [])
+             |> assign(:notes, [])
+             |> assign(:saved_replies, [])
+             |> assign(:dispositions, [])
+             |> assign(:loading, false)
+
     socket = case convo do
       nil ->
         socket
-        |> assign(:team_members, [])
-        |> assign(:team_members_all, [])
-        |> assign(:notes, [])
-        |> assign(:saved_replies, [])
-        |> assign(:dispositions, [])
         |> assign(:open_conversation, nil)
-        |> assign(:changeset, Conversations.get_changeset())
-        |> assign(:loading, false)
 
       open_conversation ->
-        dispositions =
-          user
-          |> Data.Disposition.get_by_team_id(open_conversation.location.team_id)
-          |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
-          |> Stream.map(&({&1.disposition_name, &1.id}))
-          |> Enum.to_list()
-        team_members =
-          user
-          |> TeamMember.all(open_conversation.location.id)
-        team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
-        notes= Notes.get_by_conversation(open_conversation.id)
-        saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
+        send(self(), {:fetch_d, %{user: user, locations: socket.assigns.location_ids, convo: open_conversation}})
         socket
-        |> assign(:team_members, team_members)
-        |> assign(:team_members_all, team_members_all)
-        |> assign(:notes, notes)
-        |> assign(:saved_replies, saved_replies)
-        |> assign(:dispositions, dispositions)
         |> assign(:open_conversation, open_conversation)
-        |> assign(:changeset, Conversations.get_changeset())
-        |> assign(:loading, false)
 
     end
 
+    if connected?(socket), do: Process.send_after(self(), :reload_convo, 1000)
     {:noreply, socket}
+  end
+  def handle_info(:reload_convo, socket) do
+    IO.inspect("###################")
+    IO.inspect("reload_convo")
+    IO.inspect("###################")
+
+    {:noreply, push_event(socket, "reload_convo", %{})}
+
+  end
+  def handle_info(:reload_table, socket) do
+    {:noreply, push_event(socket, "reload", %{})}
 
   end
 
@@ -578,7 +546,7 @@ defmodule MainWeb.Live.ConversationsView do
             user
             |> Conversations.get(conversation.id)
             |> fetch_member()
-          locations = socket.assigns.locations
+          locations = socket.assigns.location_ids
           conversations = user
                           |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
 

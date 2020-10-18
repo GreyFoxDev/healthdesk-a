@@ -89,18 +89,10 @@ defmodule MainWeb.Live.CampaignsView do
     {:noreply, socket}
   end
   def handle_info(:init_table, socket) do
-    IO.inspect("###################")
-    IO.inspect("init_table")
-    IO.inspect("###################")
-
     {:noreply, push_event(socket, "init", %{})}
 
   end
   def handle_info(:reload_table, socket) do
-    IO.inspect("###################")
-    IO.inspect("reload")
-    IO.inspect("###################")
-
     {:noreply, push_event(socket, "reload", %{})}
 
   end
