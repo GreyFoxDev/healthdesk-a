@@ -38,7 +38,7 @@ const init_convo = function (){
 
 }
 const reload_convo = function (){
-    menu_fix()
+    Looper.init()
     var div = document.getElementsByClassName("message-body")[0]
     div.scrollTop = div.scrollHeight;
     var div = $("#message-files .card-body")[0]
