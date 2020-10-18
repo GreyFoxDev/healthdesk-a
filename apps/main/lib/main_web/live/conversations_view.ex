@@ -172,9 +172,6 @@ defmodule MainWeb.Live.ConversationsView do
                     |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
     open_conversation = conversations |> List.first()
 
-    IO.inspect("###################")
-    IO.inspect(open_conversation)
-    IO.inspect("###################")
 
     socket = socket
              |> assign(:team_members, [])
@@ -277,15 +274,9 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
   def handle_info({:fetch_d, %{user: user, locations: locations, convo: nil}},socket)do
-    IO.inspect("###################")
-    IO.inspect("we should not be here")
-    IO.inspect("###################")
     {:noreply, socket}
   end
   def handle_info({:fetch_d, %{user: user, locations: locations, convo: open_conversation}},socket)do
-    IO.inspect("###################")
-    IO.inspect("we are here")
-    IO.inspect("###################")
 
     dispositions =
       user
@@ -338,9 +329,6 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
   def handle_info(:reload_convo, socket) do
-    IO.inspect("###################")
-    IO.inspect("reload_convo")
-    IO.inspect("###################")
 
     {:noreply, push_event(socket, "reload_convo", %{})}
 
