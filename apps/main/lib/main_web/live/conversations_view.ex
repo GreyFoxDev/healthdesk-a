@@ -48,6 +48,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
 
+
     {:ok, socket}
   end
   def mount(%{"id" => "assigned"},session, socket) do
@@ -84,6 +85,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:mchangeset, ConversationMessages.get_changeset())
 
 
+
     {:ok, socket}
   end
   def mount(%{"id" => "closed"},session, socket) do
@@ -117,6 +119,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
+
 
 
     {:ok, socket}
@@ -160,13 +163,18 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
 
+
     {:ok, socket}
   end
   def handle_info({:fetch_c, %{user: user, locations: locations, type: "active"}}, socket) do
 
     conversations = user
                     |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
-    convo= conversations |> List.first()
+    open_conversation = conversations |> List.first()
+
+    IO.inspect("###################")
+    IO.inspect(open_conversation)
+    IO.inspect("###################")
 
     socket = socket
              |> assign(:team_members, [])
@@ -176,26 +184,20 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:dispositions, [])
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
+             |> assign(:open_conversation, open_conversation)
+    if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
+    send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
 
-    socket = case convo do
-      nil ->
-        socket
-        |> assign(:open_conversation, nil)
-
-      open_conversation ->
-        send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
-        socket
-        |> assign(:open_conversation, open_conversation)
-
-    end
-
+    socket
+    |> assign(:open_conversation, open_conversation)
     {:noreply, socket}
   end
   def handle_info({:fetch_c, %{user: user, locations: locations, type: "assigned"}}, socket) do
 
     conversations = user
                     |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) ->(c.team_member && c.team_member.user_id != user.id) end)
-    convo= (conversations |> List.first())
+    open_conversation = conversations |> List.first()
+
     socket = socket
              |> assign(:team_members, [])
              |> assign(:team_members_all, [])
@@ -204,26 +206,20 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:dispositions, [])
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
+             |> assign(:open_conversation, open_conversation)
+    if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
+    send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
 
-    socket = case convo do
-      nil ->
-        socket
-        |> assign(:open_conversation, nil)
-
-      open_conversation ->
-        send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
-        socket
-        |> assign(:open_conversation, open_conversation)
-
-    end
-
+    socket
+    |> assign(:open_conversation, open_conversation)
     {:noreply, socket}
   end
   def handle_info({:fetch_c, %{user: user, locations: locations, type: "closed"}}, socket) do
 
     conversations = user
                     |> Conversations.all(locations,["closed"])
-    convo= (conversations |> List.first())
+    open_conversation= conversations |> List.first()
+
     socket = socket
              |> assign(:team_members, [])
              |> assign(:team_members_all, [])
@@ -232,19 +228,12 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:dispositions, [])
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
+             |> assign(:open_conversation, open_conversation)
+    if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
+    send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
 
-    socket = case convo do
-      nil ->
-        socket
-        |> assign(:open_conversation, nil)
-
-      open_conversation ->
-        send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
-        socket
-        |> assign(:open_conversation, open_conversation)
-
-    end
-
+    socket
+    |> assign(:open_conversation, open_conversation)
     {:noreply, socket}
   end
   def handle_info({:fetch_c, %{user: user, locations: locations, convo: open_conversation}}, socket) do
@@ -270,36 +259,34 @@ defmodule MainWeb.Live.ConversationsView do
           "assigned"
         end
     end
+    socket = socket
+             |> assign(:team_members, [])
+             |> assign(:tab, tab)
+             |> assign(:team_members_all, [])
+             |> assign(:notes, [])
+             |> assign(:saved_replies, [])
+             |> assign(:dispositions, [])
+             |> assign(:loading, false)
+             |> assign(:conversations, conversations)
+             |> assign(:open_conversation, open_conversation)
+    if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
+    send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
 
-
-    dispositions =
-      user
-      |> Data.Disposition.get_by_team_id(open_conversation.location.team_id)
-      |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
-      |> Stream.map(&({&1.disposition_name, &1.id}))
-      |> Enum.to_list()
-    team_members =
-      user
-      |> TeamMember.all(open_conversation.location.id)
-    team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
-    notes= Notes.get_by_conversation(open_conversation.id)
-    saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
-    socket=socket
-           |> assign(:team_members, team_members)
-           |> assign(:team_members_all, team_members_all)
-           |> assign(:notes, notes)
-           |> assign(:tab, tab)
-           |> assign(:tab1, "notes")
-           |> assign(:saved_replies, saved_replies)
-           |> assign(:dispositions, dispositions)
-           |> assign(:conversations, conversations)
-           |> assign(:open_conversation, open_conversation)
-           |> assign(:loading, false)
-
-
+    socket
+    |> assign(:open_conversation, open_conversation)
+    {:noreply, socket}
+  end
+  def handle_info({:fetch_d, %{user: user, locations: locations, convo: nil}},socket)do
+    IO.inspect("###################")
+    IO.inspect("we should not be here")
+    IO.inspect("###################")
     {:noreply, socket}
   end
   def handle_info({:fetch_d, %{user: user, locations: locations, convo: open_conversation}},socket)do
+    IO.inspect("###################")
+    IO.inspect("we are here")
+    IO.inspect("###################")
+
     dispositions =
       user
       |> Data.Disposition.get_by_team_id(open_conversation.location.team_id)
@@ -313,12 +300,12 @@ defmodule MainWeb.Live.ConversationsView do
     notes= Notes.get_by_conversation(open_conversation.id)
     saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
     socket = socket
-    |> assign(:team_members, team_members)
-    |> assign(:team_members_all, team_members_all)
-    |> assign(:notes, notes)
-    |> assign(:saved_replies, saved_replies)
-    |> assign(:dispositions, dispositions)
-    |> assign(:loading, false)
+             |> assign(:team_members, team_members)
+             |> assign(:team_members_all, team_members_all)
+             |> assign(:notes, notes)
+             |> assign(:saved_replies, saved_replies)
+             |> assign(:dispositions, dispositions)
+             |> assign(:loading, false)
     if connected?(socket), do: Process.send_after(self(), :reload_convo, 1000)
 
     {:noreply, socket}
@@ -344,20 +331,10 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:saved_replies, [])
              |> assign(:dispositions, [])
              |> assign(:loading, false)
+             |> assign(:open_conversation, convo)
 
-    socket = case convo do
-      nil ->
-        socket
-        |> assign(:open_conversation, nil)
+    send(self(), {:fetch_d, %{user: user, locations: socket.assigns.location_ids, convo: convo}})
 
-      open_conversation ->
-        send(self(), {:fetch_d, %{user: user, locations: socket.assigns.location_ids, convo: open_conversation}})
-        socket
-        |> assign(:open_conversation, open_conversation)
-
-    end
-
-    if connected?(socket), do: Process.send_after(self(), :reload_convo, 1000)
     {:noreply, socket}
   end
   def handle_info(:reload_convo, socket) do
@@ -368,8 +345,8 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, push_event(socket, "reload_convo", %{})}
 
   end
-  def handle_info(:reload_table, socket) do
-    {:noreply, push_event(socket, "reload", %{})}
+  def handle_info(:init_convo, socket) do
+    {:noreply, push_event(socket, "init_convo", %{})}
 
   end
 

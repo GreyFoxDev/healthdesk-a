@@ -34,6 +34,7 @@ const reload = function (){
     });
 }
 const init_convo = function (){
+    menu_fix();
 
 }
 const reload_convo = function (){
