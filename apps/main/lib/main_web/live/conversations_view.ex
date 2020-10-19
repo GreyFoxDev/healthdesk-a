@@ -840,6 +840,7 @@ defmodule MainWeb.Live.ConversationsView do
     socket =  socket
               |> assign(:conversations, filter_conversations(conversations, search_string))
               |> assign(:o_conversations, conversations)
+    if connected?(socket), do: Process.send_after(self(), :reload_convo, 1000)
 
     {:noreply, socket}
 
