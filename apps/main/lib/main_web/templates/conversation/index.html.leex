@@ -137,11 +137,9 @@
                                             continue</label>
                                         <select name="did"
                                                 id="select2-single"
-                                                class="form-control select2-hidden-accessible"
-                                                data-toggle="select2"
+                                                class="form-control "
                                                 data-placeholder="Select a Disposition"
                                                 data-allow-clear="true"
-                                                data-select2-id="select2-single" tabindex="-1"
                                                 aria-hidden="true">
                                             <%= for {key, value} <- @dispositions do %>
                                             <option value="<%= value %>" data-select2-id="<%= value %>"
@@ -626,11 +624,9 @@
                             <label for="locationMsg">Location</label>
                             <select id="locationMsg"
                                     name="location_id"
-                                    class="form-control select2-hidden-accessible"
+                                    class="form-control"
                                     data-placeholder="Select a Location"
-                                    data-toggle="select2"
                                     data-allow-clear="true"
-                                    data-select2-id="locationMsg" tabindex="-1"
                                     aria-hidden="true">
                                 <%= for l <- @locations do %>
                                     <option value="<%= l.id %>"> <%= l.location_name %></option>

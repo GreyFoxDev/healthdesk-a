@@ -335,7 +335,9 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def handle_info(:init_convo, socket) do
     {:noreply, push_event(socket, "init_convo", %{})}
-
+  end
+  def handle_info(:menu_fix, socket) do
+    {:noreply, push_event(socket, "menu_fix", %{})}
   end
 
   def handle_event("save", %{"conversation_message" => c_params} = params, socket) do
