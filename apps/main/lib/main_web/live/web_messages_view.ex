@@ -62,7 +62,7 @@ defmodule MainWeb.Live.WebMessagesView do
     {:noreply, assign(socket, %{typing: false})}
   end
   def handle_info({_requesting_module, {:new_msg,msg}}, socket) do
-     socket.assigns.convo_id |>mark_read(msg)
+     socket.assigns.convo_id |> mark_read(msg)
 
     messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
     messages = messages ++ [msg]

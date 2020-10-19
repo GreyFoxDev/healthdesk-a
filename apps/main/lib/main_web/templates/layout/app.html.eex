@@ -25,11 +25,6 @@
 
 
             <div class="top-bar-item top-bar-item-right px-0 d-none d-sm-flex">
-                <a href="/admin">
-                    <button class="btn-account d-none d-md-flex" type="button">
-                        <i class="fa fa-lg fa-chart-line" aria-hidden="true"></i>
-                    </button>
-                </a>
                 <div class="dropdown">
                     <button class="btn-account d-none d-md-flex" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="oi oi-envelope-open"></span>

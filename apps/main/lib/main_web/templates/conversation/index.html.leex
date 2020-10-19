@@ -123,6 +123,7 @@
                                 </div><!-- /.dropdown-menu -->
                             </div><!-- / assign conversation -->
                             <!-- close dispositions -->
+                            <%= if @open_conversation.status != "closed" do %>
                             <div class="dropdown d-inline-block">
                                 <button type="button" class="btn btn-light btn-icon" title="Close Conversation"
                                         data-toggle="dropdown" data-display="static" aria-haspopup="true"
@@ -157,7 +158,7 @@
                                     </form>
                                 </div><!-- /.dropdown-menu -->
                             </div><!-- / close dispositions -->
-
+                            <% end %>
 
                             <button type="button" class="btn btn-light btn-icon d-xl-none" data-toggle="sidebar"><i
                                     class="fa fa-angle-double-left"></i></button>
@@ -476,15 +477,16 @@
 
                                             </div>
                                             <div class="row">
-                                                <div class="col-lg-6">
+                                                <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="fl1">First Name</label>
                                                         <input name="member[first_name]" type="text"
                                                                class="form-control"
                                                                value="<%= if @open_conversation.member, do: @open_conversation.member.first_name, else: "N/A" %>">
                                                     </div>
-                                                </div>
-                                                <div class="col-lg-6">
+                                                </div></div>
+                                                <div class="row">
+                                                    <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="fl1">Last Name</label>
                                                         <input name="member[last_name]" type="text" class="form-control"
@@ -494,9 +496,7 @@
 
                                             </div><!-- /.form-group -->
                                             <div class="row">
-
-
-                                                <div class="col-lg-6">
+                                                <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="fl1">Phone Number</label>
                                                         <input name="member[phone_number]" type="text"
@@ -504,7 +504,9 @@
                                                                value="<%= if @open_conversation.member, do: format_phone(@open_conversation.member.phone_number), else: "N/A" %>">
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-6">
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="fl1">Location</label>
                                                         <input type="text" class="form-control"

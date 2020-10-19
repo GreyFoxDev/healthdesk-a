@@ -176,27 +176,31 @@ defmodule MainWeb.TsiController do
       )
 
       member = Member.get_by_phone_number(@role, convo.original_number)
-
-      if member do
-        name = Enum.join([member.first_name, member.last_name], " ")
-        MainWeb.Endpoint.broadcast(
-          "convo:#{convo_id}",
-          "broadcast",
-          %{message: message, name: name, phone_number: phone_number}
-        )
-      else
-        MainWeb.Endpoint.broadcast(
-          "convo:#{convo_id}",
-          "broadcast",
-          %{message: message, phone_number: phone_number}
-        )
-      end
+#
+#      if member do
+#        name = Enum.join([member.first_name, member.last_name], " ")
+#        MainWeb.Endpoint.broadcast(
+#          "convo:#{convo_id}",
+#          "broadcast",
+#          %{message: message, name: name, phone_number: phone_number}
+#        )
+#      else
+#        MainWeb.Endpoint.broadcast(
+#          "convo:#{convo_id}",
+#          "broadcast",
+#          %{message: message, phone_number: phone_number}
+#        )
+#      end
 
       if convo.status == "closed" do
         message
         |> ask_wit_ai(location)
         |> case do
              {:ok, response} ->
+               IO.inspect("############1#######")
+               IO.inspect(response)
+               IO.inspect("###################")
+
                CM.create(
                  %{
                    "conversation_id" => convo.id,
@@ -208,6 +212,10 @@ defmodule MainWeb.TsiController do
 
                close_conversation(convo_id, location)
              {:unknown, response} ->
+               IO.inspect("#############2######")
+               IO.inspect(response)
+               IO.inspect("###################")
+
                CM.create(
                  %{
                    "conversation_id" => convo.id,

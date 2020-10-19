@@ -6,6 +6,7 @@ const ReloadTable = {
         this.handleEvent("reload_convo", ({}) => reload_convo())
         this.handleEvent("init_convo", ({}) => init_convo())
         this.handleEvent("menu_fix", ({}) => menu_fix())
+        this.handleEvent("scroll_chat", ({}) => scroll_chat())
     }
 }
 const init = function (){
@@ -90,6 +91,11 @@ const reload_convo = function (){
 
 const menu_fix = function (){
     Looper.stackedMenu.init()
+
+}
+const scroll_chat = function (){
+    var div = document.getElementsByClassName("message-body")[0]
+    div.scrollTop = div.scrollHeight;
 
 }
 export default ReloadTable;

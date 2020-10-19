@@ -8,7 +8,7 @@ defmodule MainWeb.Notify do
   alias Data.{Location, Conversations, TeamMember, TimezoneOffset}
   alias Data.Schema.Notification
 
-  @url "[url]/admin/teams/[team_id]/locations/[location_id]/conversations/[conversation_id]/conversation-messages"
+  @url "[url]/admin/conversations/[conversation_id]/"
   @super_admin Application.get_env(:main, :super_admin)
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
   @endpoint Application.get_env(:main, :endpoint)
@@ -18,8 +18,6 @@ defmodule MainWeb.Notify do
     %{data: link} =
       @url
       |> String.replace("[url]", @endpoint)
-      |> String.replace("[team_id]", location.team_id)
-      |> String.replace("[location_id]", location.id)
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
@@ -80,8 +78,6 @@ defmodule MainWeb.Notify do
     %{data: link} =
       @url
       |> String.replace("[url]", @endpoint)
-      |> String.replace("[team_id]", location.team_id)
-      |> String.replace("[location_id]", location.id)
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
@@ -144,8 +140,6 @@ defmodule MainWeb.Notify do
     %{data: link} =
       @url
       |> String.replace("[url]", @endpoint)
-      |> String.replace("[team_id]", location.team_id)
-      |> String.replace("[location_id]", location.id)
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 

@@ -24,8 +24,12 @@ defmodule MainWeb.Live.ConversationMessageUpdatesView do
     case conversation.channel_type do
       "APP" -> {:noreply,socket}
       _ ->  messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
+            if connected?(socket), do: Process.send_after(self(), :scroll_chat, 500)
             {:noreply, assign(socket, :messages, [broadcast.payload|messages])}
     end
 
+  end
+  def handle_info(:scroll_chat, socket) do
+    {:noreply, push_event(socket, "scroll_chat", %{})}
   end
 end

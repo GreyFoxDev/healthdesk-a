@@ -339,6 +339,9 @@ defmodule MainWeb.Live.ConversationsView do
   def handle_info(:menu_fix, socket) do
     {:noreply, push_event(socket, "menu_fix", %{})}
   end
+  def handle_info(:scroll_chat, socket) do
+    {:noreply, push_event(socket, "scroll_chat", %{})}
+  end
 
   def handle_event("save", %{"conversation_message" => c_params} = params, socket) do
     location = socket.assigns.open_conversation.location
@@ -358,6 +361,7 @@ defmodule MainWeb.Live.ConversationsView do
       socket
       |> assign(:open_conversation, Map.merge(conversation,%{conversation_messages: messages}))
       |> assign(:changeset, Conversations.get_changeset())
+    if connected?(socket), do: Process.send_after(self(), :scroll_chat, 500)
     {:noreply, socket}
   end
   defp send_message(%{original_number: <<"+1", _ :: binary>>} = conversation, params, location, user) do
@@ -522,6 +526,7 @@ defmodule MainWeb.Live.ConversationsView do
             |> assign(:open_conversation, conversation)
             |> assign(:conversations, conversations)
             |> assign(:changeset, Conversations.get_changeset())
+          if connected?(socket), do: Process.send_after(self(), :reload_convo, 1000)
 
           {:noreply, socket}
         else
