@@ -76,7 +76,7 @@
  }
 
  .dropdown-item.active, .dropdown-item:active {
-     background-color: #FF745C;
+     background-color: #FD1734;
  }
 
  *,
@@ -118,7 +118,7 @@
  h1 {
      margin: 0 0 1.5rem 0;
      font-size: 1.5rem;
-     color: #FF745C;
+     color: #FD1734;
      text-align: center;
  }
 
@@ -157,7 +157,7 @@
  .submit {
      padding: 15px 30px;
      color: #FFF;
-     background-color: #FF745C;
+     background-color: #FD1734;
      font-size: 18px;
      letter-spacing: 0.07em;
      text-align: center;
@@ -165,7 +165,7 @@
      border-radius: 5px;
      margin: 10px 0;
      width: 100%;
-     border: 1px solid #FF745C;
+     border: 1px solid #FD1734;
      border-width: 1px;
  }
 

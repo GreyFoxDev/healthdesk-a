@@ -387,6 +387,7 @@ defmodule MainWeb.TsiController do
     case conn.assigns.location.location_name do
       <<"ATC - ", _rest :: binary>> -> :around_the_clock_fitness_conversation
       <<"PB - ", _rest :: binary>> -> :palm_beach_sports_club_conversation
+      <<"TW - ", _rest :: binary>> -> :total_woman_conversation
       _ -> :tsi_conversation
     end
   end

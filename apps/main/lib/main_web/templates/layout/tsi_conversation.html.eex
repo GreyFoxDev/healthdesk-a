@@ -18,14 +18,14 @@
     box-sizing: border-box;
 }
      .bg-p {
-         background-color: #FF745C;
+         background-color: #FD1734;
      }
      
      .chat-div {
 
      }
      .fa {
-         color: #FF745C;
+         color: #FD1734;
      }
      .bg-s {
          background-color: #e2e2e2;
@@ -112,7 +112,7 @@
         <!-- Just an image -->
         <nav class="navbar navbar-light bg-light sticky-top shadow-sm">
             <a class="navbar-brand" href="#">
-                <img src="https://i.ibb.co/M5YdtLy/logo.png" width="150px" border="0"/>
+                <img src="/images/your-fittness.png" width="150px" border="0"/>
                 <a href="<%= tsi_path(@conn, :new, @api_key) %>?phone-number=<%= @phone_number %>&ticket=new">
                     <button type="button" class="btn btn-outline-primary btn-sm">Submit New Request</button>
                 </a>
