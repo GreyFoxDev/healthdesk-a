@@ -62,6 +62,9 @@ defmodule MainWeb.Api.ConversationController do
         "message" => message,
         "sent_at" => DateTime.utc_now()})
     end
+    IO.inspect("###################")
+    IO.inspect(params)
+    IO.inspect("###################")
 
     if params["disposition"] do
       convo = C.get(id)
@@ -103,6 +106,7 @@ defmodule MainWeb.Api.ConversationController do
             "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
             "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
           |> CM.create()
+          C.close(id)
         end
 
     end
