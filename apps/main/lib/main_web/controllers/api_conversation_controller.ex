@@ -18,6 +18,7 @@ defmodule MainWeb.Api.ConversationController do
 
   def create(conn, %{"location" => location, "member" => member}) do
     with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
+      Task.start(fn ->  close_convo(convo.id) end)
       conn
       |> put_status(200)
       |> put_resp_content_type("application/json")
@@ -27,10 +28,10 @@ defmodule MainWeb.Api.ConversationController do
 
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message}) do
     CM.create(%{
-          "conversation_id" => id,
-          "phone_number" => from,
-          "message" => message,
-          "sent_at" => DateTime.utc_now()})
+      "conversation_id" => id,
+      "phone_number" => from,
+      "message" => message,
+      "sent_at" => DateTime.utc_now()})
 
     conn
     |> put_status(200)
@@ -48,18 +49,18 @@ defmodule MainWeb.Api.ConversationController do
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message} = params) do
     if message == "Sent to Slack" do
       CM.create(%{
-            "conversation_id" => id,
-            "phone_number" => from,
-            "message" => params["slack_message"],
-            "sent_at" => DateTime.utc_now()})
+        "conversation_id" => id,
+        "phone_number" => from,
+        "message" => params["slack_message"],
+        "sent_at" => DateTime.utc_now()})
 
       :ok = MainWeb.Notify.send_to_admin(id, params["slack_message"], from)
     else
       CM.create(%{
-            "conversation_id" => id,
-            "phone_number" => from,
-            "message" => message,
-            "sent_at" => DateTime.utc_now()})
+        "conversation_id" => id,
+        "phone_number" => from,
+        "message" => message,
+        "sent_at" => DateTime.utc_now()})
     end
 
     if params["disposition"] do
@@ -83,4 +84,28 @@ defmodule MainWeb.Api.ConversationController do
     |> put_resp_content_type("application/json")
     |> json(%{conversation_id: id})
   end
+  def close_convo(id)do
+    :timer.sleep(60000);
+    conversation = C.get(id)
+    case conversation do
+      nil -> nil
+      convo ->
+        if convo.status != "closed" do
+
+          location = Location.get(convo.location_id)
+          dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
+          disposition = Enum.find(dispositions, &(&1.disposition_name == "Call Hang Up"))
+
+          Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
+
+          %{"conversation_id" => id,
+            "phone_number" => location.phone_number,
+            "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+            "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
+          |> CM.create()
+        end
+
+    end
+  end
+
 end

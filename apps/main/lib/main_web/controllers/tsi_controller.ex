@@ -285,6 +285,7 @@ defmodule MainWeb.TsiController do
         case location.location_name do
           <<"ATC - ", _rest :: binary>> -> "around_the_clock_fitness_new.html"
           <<"PB - ", _rest :: binary>> -> "palm_beach_sports_club_new.html"
+          <<"TW - ", _rest :: binary>> -> "total_woman_new.html"
           _ -> "new.html"
         end
 

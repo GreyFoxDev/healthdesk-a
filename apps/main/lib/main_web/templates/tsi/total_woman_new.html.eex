@@ -1,4 +1,4 @@
-<img src="/images/your-fittness.png" id="logo"/>
+<img src="/images/total-woman-logo.png" id="logo"/>
 <h1>Greetings! Please select one option below:</h1>
 
 <%= form_for @conn, tsi_path(@conn, :create, @api_key), fn f -> %>
@@ -100,7 +100,7 @@
 
  form {
      margin: 3rem auto;
-     padding: 10px 20px;
+     padding: 10px 20px
      border-radius: 8px;
  }
 
