@@ -51,7 +51,7 @@
         h1 {
         margin: 0 0 1.5rem 0;
         font-size: 2rem;
-        color: #FF745C;
+        color: #FD1734;
         text-align: center;
         }
 
@@ -90,14 +90,14 @@
         .submit {
         padding: 19px 39px 18px 39px;
         color: #FFF;
-        background-color: #FF745C;
+        background-color: #FD1734;
         font-size: 18px;
         letter-spacing: 0.07em;
         text-align: center;
         font-style: normal;
         border-radius: 5px;
         width: 100%;
-        border: 1px solid #FF745C;
+        border: 1px solid #FD1734;
         border-width: 1px;
         }
 
@@ -127,7 +127,7 @@
         }
 
         .number {
-        background-color: #FF745C;
+        background-color: #FD1734;
         color: #fff;
         height: 30px;
         width: 30px;
