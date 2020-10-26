@@ -348,6 +348,7 @@ defmodule MainWeb.Live.ConversationsView do
     user = socket.assigns.user
     conversation = socket.assigns.open_conversation
 
+
     send_message(conversation, params, location, user)
     conversation =
       user
@@ -427,9 +428,11 @@ defmodule MainWeb.Live.ConversationsView do
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-           message = %Chatbot.Params{
+         from = if conversation.team_member && conversation.team_member.user.first_name, do: conversation.team_member.user.first_name, else: location.location_name
+
+         message = %Chatbot.Params{
              provider: :twilio,
-             from: location.phone_number,
+             from: from,
              to: conversation.original_number,
              body: params["conversation_message"]["message"]
            }
