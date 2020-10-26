@@ -1,47 +1,48 @@
 <div class="chat-div">
     <div id="scroll-message" class="bg-white scrollable">
-<%= for message <- assigns[:messages] do %>
-    <%= if message.phone_number == @original_number do %>
-      <div class="media my-3 w-75 ml-auto">
-        <div class="media-body">
-          <div class="bg-p rounded py-3 px-3 mb-0" phx-click="test">
-            <p class="text-small mb-0 text-receive text-white"><%= message.message %></p>
-          </div>
-          <p class="small mb-0 text-muted">You<span> - </span><%= MainWeb.Helper.Formatters.format_date(message.sent_at) %></p>
-        </div>
-      </div>
-    <% else %>
-      <%= if !String.starts_with?(message.message, "CLOSED") do %>
-        <div class="media my-3 w-75">
-          <div class="media-body">
-            <div class="bg-s rounded py-3 px-3">
-              <p class="text-small mb-0 text-receive"><%= message.message %></p>
+        <%= for message <- assigns[:messages] do %>
+        <%= if message.phone_number == @original_number do %>
+        <div class="media my-3 w-75 ml-auto">
+            <div class="media-body">
+                <div class="bg-p rounded py-3 px-3 mb-0" phx-click="test">
+                    <p class="text-small mb-0 text-receive text-white"><%= message.message %></p>
+                </div>
+                <p class="small mb-0 text-muted">You<span> - </span><%= MainWeb.Helper.Formatters.format_date(message.sent_at) %></p>
             </div>
-            <p class="small mb-0 text-muted"><%= MainWeb.Helper.Formatters.format_phone(message.phone_number) %>
-              <span> - </span><%= MainWeb.Helper.Formatters.format_date(message.sent_at) %>
-            </p>
-          </div>
         </div>
-      <% end %>
+        <% else %>
+        <%= if !String.starts_with?(message.message, "CLOSED") do %>
+        <div class="media my-3 w-75">
+            <div class="media-body">
+                <div class="bg-s rounded py-3 px-3">
+                    <p class="text-small mb-0 text-receive"><%= message.message %></p>
+                </div>
+                <p class="small mb-0 text-muted">
+                    <%= if @member && @member.user.first_name, do: @member.user.first_name, else: @location.location_name %>
+                    <span> - </span><%= MainWeb.Helper.Formatters.format_date(message.sent_at) %>
+                </p>
+            </div>
+        </div>
+        <% end %>
     <% end %>
 <% end %>
 
-<%= if assigns[:typing] do %>
-<div class="media my-3 w-75 ml-auto">
-  <div class="media-body">
-    <p class="small mb-0 text-muted ticontainer">
-      <span>Agent is typing </span>
-      <span class="tiblock">
+        <%= if assigns[:typing] do %>
+        <div class="media my-3 w-75 ml-auto">
+            <div class="media-body">
+                <p class="small mb-0 text-muted ticontainer">
+                    <span>Agent is typing </span>
+                    <span class="tiblock">
                             <span class="tidot"></span>
                             <span class="tidot"></span>
                             <span class="tidot"></span>
                         </span>
-    </p>
-  </div>
-</div>
+                </p>
+            </div>
+        </div>
 
-<% end %>
-</div>
+        <% end %>
+    </div>
 </div>
 <!-- Typing area -->
 

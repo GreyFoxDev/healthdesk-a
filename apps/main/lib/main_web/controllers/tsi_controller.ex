@@ -197,9 +197,7 @@ defmodule MainWeb.TsiController do
         |> ask_wit_ai(location)
         |> case do
              {:ok, response} ->
-               IO.inspect("############1#######")
-               IO.inspect(response)
-               IO.inspect("###################")
+
 
                CM.create(
                  %{
@@ -212,9 +210,7 @@ defmodule MainWeb.TsiController do
 
                close_conversation(convo_id, location)
              {:unknown, response} ->
-               IO.inspect("#############2######")
-               IO.inspect(response)
-               IO.inspect("###################")
+
 
                CM.create(
                  %{
@@ -226,7 +222,7 @@ defmodule MainWeb.TsiController do
                )
 
                C.pending(convo_id)
-
+               Main.LiveUpdates.notify_live_view({location.id, :updated_open})
                :ok =
                  Notify.send_to_admin(
                    convo.id,

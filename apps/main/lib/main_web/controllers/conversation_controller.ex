@@ -106,7 +106,7 @@ defmodule MainWeb.ConversationController do
 
         pending_message_count = (ConCache.get(:session_cache, id) || 0)
         :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
-        LiveUpdates.notify_live_view(location_id,{__MODULE__, :updated_open})
+        LiveUpdates.notify_live_view({location_id, :updated_open})
         redirect(
           conn,
           to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, id)
@@ -164,7 +164,7 @@ defmodule MainWeb.ConversationController do
 
       with {:ok, _pi} <- Conversations.update(%{"id" => id, "status" => "closed", "team_member_id" => nil}),
            {:ok, _} <- ConversationMessages.create(message) do
-        Main.LiveUpdates.notify_live_view(location_id,{__MODULE__, :updated_open})
+        Main.LiveUpdates.notify_live_view({location_id, :updated_open})
         redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location_id))
       else
         {:error, _changeset} ->
@@ -188,7 +188,7 @@ defmodule MainWeb.ConversationController do
       |> Location.get(location_id)
     case create_convo(params,location,current_user) do
       {:ok, _} ->
-        Main.LiveUpdates.notify_live_view(location_id,{__MODULE__, :updated_open})
+        Main.LiveUpdates.notify_live_view({location_id, :updated_open})
         redirect(conn, to: team_location_conversation_path(conn, :index, location.team_id, location.id))
       {:error,:error} ->
 

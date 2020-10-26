@@ -3,6 +3,8 @@ defmodule MainWeb.Live.WebMessagesView do
 
   alias Data.Schema.{Location, Conversation}
   alias Data.{ConversationMessages}
+  alias Data.Schema.MemberChannel, as: Channel
+  alias Data.Schema.MemberChannel
 
   require Logger
 
@@ -14,7 +16,8 @@ defmodule MainWeb.Live.WebMessagesView do
          conversation <- Data.Conversations.get(convo_id) do
 
       messages = Data.ConversationMessages.get_by_conversation_id(convo_id)
-      Task.start(fn -> Enum.each(messages, fn(msg) -> mark_read(convo_id,msg)end) end)
+
+      Task.start(fn -> Enum.each(messages, fn(msg) -> if msg.read == false, do: mark_read(convo_id,msg),else: nil end) end)
       if connected?(socket), do: :timer.send_interval(3000, self(), {:update, convo_id})
 
       socket =
@@ -23,6 +26,8 @@ defmodule MainWeb.Live.WebMessagesView do
         |> assign(:convo_id, convo_id)
         |> assign(:api_key, api_key)
         |> assign(:messages, messages)
+        |> assign(:location, location)
+        |> assign(:member, conversation.team_member)
       Main.LiveUpdates.subscribe_live_view(convo_id)
       MainWeb.Endpoint.subscribe("convo:#{convo_id}")
       Main.LiveUpdates.notify_live_view({convo_id, :user_typing_stop})
@@ -74,6 +79,12 @@ defmodule MainWeb.Live.WebMessagesView do
   def handle_info(_, socket) do
     {:noreply, socket}
   end
+  def fetch_member(%{original_number: <<"CH", _rest :: binary>> = channel} = conversation) do
+    with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
+      Map.put(conversation, :member, channel.member)
+    end
+  end
+  def fetch_member(conversation), do: conversation
   defp mark_read(convo_id,msg) do
     {:ok, msg}= ConversationMessages.mark_read(msg)
     Main.LiveUpdates.notify_live_view({convo_id, msg})

@@ -131,8 +131,14 @@
                     </li>
                     <li class="menu-item <%= if assigns[:tab] == "campaign",do: "has-active",else: "" %>">
                         <a class="menu-link" href="/admin/campaigns">
-                            <span class="menu-icon oi oi-phone"></span>
+                            <span class="menu-icon oi oi-laptop"></span>
                             <span class="menu-text">Campaigns</span>
+                        </a>
+                    </li>
+                    <li class="menu-item <%= if assigns[:tab] == "ticket",do: "has-active",else: "" %>">
+                        <a class="menu-link" href="/admin/tickets">
+                            <span class="menu-icon oi oi-phone"></span>
+                            <span class="menu-text">Tickets</span>
                         </a>
                     </li>
                     <li class="menu-item ">

@@ -62,7 +62,7 @@ defmodule MainWeb.Api.ConversationController do
         "message" => message,
         "sent_at" => DateTime.utc_now()})
     end
-    IO.inspect("###################")
+    IO.inspect("########api###########")
     IO.inspect(params)
     IO.inspect("###################")
 

@@ -35,5 +35,16 @@ defmodule MainWeb.LayoutView do
     |> Kernel.++([current_user.team_member.location])
     |> Enum.dedup_by(&(&1.id))
   end
+  def title(conn, assigns) do
 
+       case assigns[:tab]  do
+      "ticket"    -> "Healthdesk.ai - Tickets"
+      "campaign"    -> "Healthdesk.ai - Campaigns"
+      "active"    -> "Healthdesk.ai - Active Conversations"
+      "assigned"    -> "Healthdesk.ai -  Assigned Conversations"
+      "closed"    -> "Healthdesk.ai -  Closed Conversations"
+
+      _ -> "Healthdesk.ai - Analytics"
+    end
+  end
 end
