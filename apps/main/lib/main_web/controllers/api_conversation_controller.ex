@@ -9,6 +9,7 @@ defmodule MainWeb.Api.ConversationController do
     location = Location.get_by_messenger_id(location)
 
     with {:ok, convo} <- C.find_or_start_conversation({member, location.phone_number}) do
+      Main.LiveUpdates.notify_live_view({convo.location_id, :updated_open})
       conn
       |> put_status(200)
       |> put_resp_content_type("application/json")
@@ -18,7 +19,8 @@ defmodule MainWeb.Api.ConversationController do
 
   def create(conn, %{"location" => location, "member" => member}) do
     with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
-      Task.start(fn ->  close_convo(convo.id) end)
+      Main.LiveUpdates.notify_live_view({convo.location_id, :updated_open})
+      Task.start(fn ->  close_convo(convo) end)
       conn
       |> put_status(200)
       |> put_resp_content_type("application/json")
@@ -87,9 +89,9 @@ defmodule MainWeb.Api.ConversationController do
     |> put_resp_content_type("application/json")
     |> json(%{conversation_id: id})
   end
-  def close_convo(id)do
+  def close_convo(%{original_number: <<"+1", _ :: binary>>} = convo_)do
     :timer.sleep(60000);
-    conversation = C.get(id)
+    conversation = C.get(convo_.id)
     case conversation do
       nil -> nil
       convo ->
@@ -99,17 +101,19 @@ defmodule MainWeb.Api.ConversationController do
           dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
           disposition = Enum.find(dispositions, &(&1.disposition_name == "Call Hang Up"))
 
-          Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
+          Data.ConversationDisposition.create(%{"conversation_id" => convo.id, "disposition_id" => disposition.id})
 
-          %{"conversation_id" => id,
+          %{"conversation_id" => convo.id,
             "phone_number" => location.phone_number,
             "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
             "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
           |> CM.create()
-          C.close(id)
+          C.close(convo.id)
+          Main.LiveUpdates.notify_live_view({location.id, :updated_open})
         end
 
     end
   end
+  def close_convo(_) do  end
 
 end

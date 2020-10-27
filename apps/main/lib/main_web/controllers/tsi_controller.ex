@@ -65,6 +65,7 @@ defmodule MainWeb.TsiController do
 
   def new(conn, %{"phone-number" => phone_number, "api_key" => api_key} = params) do
 
+
     location = conn.assigns.location
     phone = "APP:#{format_phone(phone_number)}"
 
@@ -160,6 +161,10 @@ defmodule MainWeb.TsiController do
   end
 
   def update(conn, %{"id" => convo_id, "api_key" => api_key} = params) do
+    IO.inspect("###################")
+    IO.inspect(123)
+    IO.inspect("###################")
+
     location = conn.assigns.location
 
     with %Schema{} = convo <- C.get(convo_id) do
@@ -198,6 +203,9 @@ defmodule MainWeb.TsiController do
         |> case do
              {:ok, response} ->
 
+               IO.inspect("###################")
+               IO.inspect(321)
+               IO.inspect("###################")
 
                CM.create(
                  %{
@@ -211,6 +219,9 @@ defmodule MainWeb.TsiController do
                close_conversation(convo_id, location)
              {:unknown, response} ->
 
+               IO.inspect("###################")
+               IO.inspect(323)
+               IO.inspect("###################")
 
                CM.create(
                  %{

@@ -2,7 +2,7 @@ defmodule MainWeb.Helper.Formatters  do
   alias Calendar.Strftime
   require Logger
 
-  alias Data.MemberChannel
+  alias Data.{MemberChannel,User}
   alias Data.Schema.MemberChannel, as: Channel
 
   def format_role("admin") do
@@ -14,6 +14,13 @@ defmodule MainWeb.Helper.Formatters  do
     |> String.split("-")
     |> Enum.map(&String.capitalize/1)
     |> Enum.join(" ")
+  end
+
+  def format_user(number)do
+    case User.get_by_phone number do
+      user -> Enum.join([user.first_name, user.last_name], " ")
+      _ -> format_phone(number)
+    end
   end
 
   def format_phone(<<"1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do

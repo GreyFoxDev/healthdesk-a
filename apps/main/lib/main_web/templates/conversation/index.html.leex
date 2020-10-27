@@ -256,7 +256,7 @@
                                                 <%= if message.phone_number == @open_conversation.location.phone_number do %>
                                                 <%= format_assigned(@open_conversation.original_number) %>
                                                     <% else %>
-                                                <%= format_phone(message.phone_number) %>
+                                                <%= format_user(message.phone_number) %>
                                                     <% end %>
                                                 ·
                                                 <%= format_date(message.sent_at) %>
@@ -298,8 +298,8 @@
                                             <% else %>
                                             <div class="conversation-meta">
                                                 <% team_member = Enum.find(@team_members, &(&1.user.phone_number == message.phone_number)) %>
-                                                <%= if team_member do %>
-                                                <%= format_team_member(team_member.user) %>
+                                                <%= if @open_conversation.team_member do %>
+                                                <%= format_team_member(@open_conversation.team_member.user) %>
                                                     <% else %>
                                                 <%= format_phone(message.phone_number) %>
                                                     <% end %>

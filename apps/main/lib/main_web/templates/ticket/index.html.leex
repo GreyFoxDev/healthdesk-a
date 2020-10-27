@@ -1,0 +1,517 @@
+<%= if @loading == true do %>
+<div id="loading">
+    <div class="lds-facebook"><div></div><div></div><div></div></div>
+</div>
+<% end %>
+<div class="page">
+    <div class="page-inner">
+        <header class="page-title-bar">
+            <div class="d-flex flex-column flex-md-row">
+                <h1 class="page-title"> Tickets </h1>
+
+                <div class="ml-auto d-flex">
+                    <!-- .dropdown -->
+                    <div class="dropdown mx-2">
+                        <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false"><span>Location: All</span> <i class="fa fa-fw fa-caret-down"></i>
+                        </button> <!-- .dropdown-menu -->
+                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-auto stop-propagation">
+                            <div class="dropdown-arrow"></div><!-- .custom-control -->
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="dpToday" name="dpFilter"
+                                       data-start="2019/03/27" data-end="2019/03/27"> <label
+                                    class="custom-control-label d-flex justify-content-between" for="dpToday"><span>Downtown</span></label>
+                            </div><!-- /.custom-control -->
+                            <!-- .custom-control -->
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="dpYesterday" name="dpFilter"
+                                       data-start="2019/03/26" data-end="2019/03/26"> <label
+                                    class="custom-control-label d-flex justify-content-between" for="dpYesterday"><span>Pasadenas</span></label>
+                            </div><!-- /.custom-control -->
+                            <!-- .custom-control -->
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="dpWeek" name="dpFilter"
+                                       data-start="2019/03/21" data-end="2019/03/27" checked=""> <label
+                                    class="custom-control-label d-flex justify-content-between" for="dpWeek"><span>Los Angeles</span></label>
+                            </div><!-- /.custom-control -->
+                        </div><!-- /.dropdown-menu -->
+                    </div><!-- /.dropdown -->
+                    <div class="dropdown mx-2">
+                        <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false"><span>This Week</span> <i class="fa fa-fw fa-caret-down"></i>
+                        </button> <!-- .dropdown-menu -->
+                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-md stop-propagation">
+                            <div class="dropdown-arrow"></div><!-- .custom-control -->
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="dpToday" name="dpFilter"
+                                       data-start="2019/03/27" data-end="2019/03/27"> <label
+                                    class="custom-control-label d-flex justify-content-between" for="dpToday"><span>Today</span>
+                                <span class="text-muted">Mar 27</span></label>
+                            </div><!-- /.custom-control -->
+                            <!-- .custom-control -->
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="dpYesterday" name="dpFilter"
+                                       data-start="2019/03/26" data-end="2019/03/26"> <label
+                                    class="custom-control-label d-flex justify-content-between" for="dpYesterday"><span>Yesterday</span>
+                                <span class="text-muted">Mar 26</span></label>
+                            </div><!-- /.custom-control -->
+                            <!-- .custom-control -->
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="dpWeek" name="dpFilter"
+                                       data-start="2019/03/21" data-end="2019/03/27" checked=""> <label
+                                    class="custom-control-label d-flex justify-content-between" for="dpWeek"><span>This Week</span>
+                                <span class="text-muted">Mar 21-27</span></label>
+                            </div><!-- /.custom-control -->
+                            <!-- .custom-control -->
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="dpMonth" name="dpFilter"
+                                       data-start="2019/03/01" data-end="2019/03/27"> <label
+                                    class="custom-control-label d-flex justify-content-between" for="dpMonth"><span>This Month</span>
+                                <span class="text-muted">Mar 1-31</span></label>
+                            </div><!-- /.custom-control -->
+                            <!-- .custom-control -->
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="dpYear" name="dpFilter"
+                                       data-start="2019/01/01" data-end="2019/12/31"> <label
+                                    class="custom-control-label d-flex justify-content-between" for="dpYear"><span>This Year</span>
+                                <span class="text-muted">2019</span></label>
+                            </div><!-- /.custom-control -->
+                            <!-- .custom-control -->
+                        </div><!-- /.custom-control -->
+                    </div><!-- /.dropdown-menu -->
+                    <button class="btn btn-primary ml-2" data-toggle="modal" data-target="#newTicket">New Ticket
+                    </button>
+
+                </div><!-- /.dropdown -->
+            </div><!-- /.dropdown -->
+
+        </header>
+        <div class="row">
+            <!-- grid column -->
+            <div class="col-md-12 d-flex">
+                <div class="card card-fluid flex-fill">
+                    <div class="card-body">
+                        <!-- .form-group -->
+                        <div class="form-group">
+                            <label class="control-label" for="bss1">Filter by Status</label> <select id="bss1"
+                                                                                                     data-toggle="selectpicker"
+                                                                                                     data-width="100%">
+                            <option> New</option>
+                            <option> Open</option>
+                            <option> Pending</option>
+                            <option> Closed</option>
+                        </select>
+                        </div><!-- /.form-group -->
+                        <!-- .table-responsive -->
+                        <div class="table-responsive">
+                            <table id="Tickets2" class="table  table-hover">
+
+                                <thead class="bg-light">
+                                <tr>
+                                    <td>#</td>
+                                    <th>Date</th>
+                                    <th>Assigned</th>
+                                    <th>Description</th>
+                                    <th>Attachment</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Time</th>
+                                    <th>Created By</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
+                                    </td>
+                                    <td class="align-middle">May 12, 2020</td>
+                                    <td class="align-middle">Nick Barone</td>
+                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
+                                    </td>
+                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
+                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">New</span>
+                                    </td>
+
+                                    <td class="align-middle">P3</td>
+
+                                    <td class="align-middle">20m</td>
+                                    <td class="align-middle">Johnny Winn</td>
+                                </tr>
+                                <tr>
+                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
+                                    </td>
+                                    <td class="align-middle">May 12, 2020</td>
+
+                                    <td class="align-middle">Nick Barone</td>
+                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
+                                    </td>
+                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
+                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Open</span>
+                                    </td>
+
+                                    <td class="align-middle">P3</td>
+
+                                    <td class="align-middle">20m</td>
+                                    <td class="align-middle">Johnny Winn</td>
+                                </tr>
+                                <tr>
+                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
+                                    </td>
+                                    <td class="align-middle">May 12, 2020</td>
+
+                                    <td class="align-middle">Nick Barone</td>
+                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
+                                    </td>
+                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
+                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Pending</span>
+                                    </td>
+                                    <td class="align-middle">P3</td>
+                                    <td class="align-middle">20m</td>
+                                    <td class="align-middle">Johnny Winn</td>
+                                </tr>
+                                <tr>
+                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
+                                    </td>
+                                    <td class="align-middle">May 12, 2020</td>
+
+                                    <td class="align-middle">Nick Barone</td>
+                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
+                                    </td>
+                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
+                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Pending</span>
+                                    </td>
+
+                                    <td class="align-middle">P3</td>
+
+                                    <td class="align-middle">20m</td>
+                                    <td class="align-middle">Johnny Winn</td>
+                                </tr>
+                                <tr>
+                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
+                                    </td>
+                                    <td class="align-middle">May 12, 2020</td>
+
+                                    <td class="align-middle">Nick Barone</td>
+                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
+                                    </td>
+                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
+                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Pending</span>
+                                    </td>
+
+                                    <td class="align-middle">P3</td>
+
+                                    <td class="align-middle">20m</td>
+                                    <td class="align-middle">Johnny Winn</td>
+                                </tr>
+                                <tr>
+                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
+                                    </td>
+                                    <td class="align-middle">May 12, 2020</td>
+
+                                    <td class="align-middle">Nick Barone</td>
+                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
+                                    </td>
+                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
+                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Closed</span>
+                                    </td>
+
+                                    <td class="align-middle">P3</td>
+
+                                    <td class="align-middle">20m</td>
+                                    <td class="align-middle">Johnny Winn</td>
+                                </tr>
+                                </tbody>
+
+                            </table>
+                        </div><!-- /.table-responsive -->
+                    </div>
+                </div><!-- /grid column -->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- New Ticket Modal-->
+<div class="modal fade" id="newTicket" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Create a new Ticket</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="unknown">Location</label>
+                            <select id="location" class="form-control select2-hidden-accessible" data-toggle="select2"
+                                    data-maximum-selection-length="4" multiple="" data-select2-id="location"
+                                    tabindex="-1" aria-hidden="true">
+                                <option value="sales"> Downtown</option>
+                                <option value="frontdesk"> Arcadia</option>
+                                <option value="retention"> Los Angeles</option>
+                                <option value="sales"> Hollywood</option>
+                                <option value="frontdesk"> Long Beach</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="unknown">Assign to a teammate</label>
+                            <select id="unknown" class="form-control select2-hidden-accessible" data-toggle="select2"
+                                    data-maximum-selection-length="4" multiple="" data-select2-id="unknown"
+                                    tabindex="-1" aria-hidden="true">
+                                <option value="sales"> Jay Kuntal</option>
+                                <option value="frontdesk"> Nick Barone</option>
+                                <option value="retention"> Johnny Winn</option>
+                                <option value="sales"> Jay Kuntal</option>
+                                <option value="frontdesk"> Nick Barone</option>
+                                <option value="retention"> Johnny Winn</option>
+                                <option value="sales"> Jay Kuntal</option>
+                                <option value="frontdesk"> Nick Barone</option>
+                                <option value="retention"> Johnny Winn</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="priority">Priority</label> <select id="priority"
+                                                                           class="form-control select2-hidden-accessible"
+                                                                           data-toggle="select2"
+                                                                           data-placeholder="Select a Disposition"
+                                                                           data-allow-clear="true"
+                                                                           data-select2-id="priority" tabindex="-1"
+                                                                           aria-hidden="true">
+
+                            <option value="sales"> P0 - Blocker</option>
+                            <option value="sales"> P1 - Critical</option>
+                            <option value="sales"> P2 - Major</option>
+                            <option value="sales"> P3 - Minor</option>
+                            <option value="sales"> RFE - Request for Enhancement</option>
+
+                        </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label" for="tfInvalid">Attachment</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="tfInvalid"> <label
+                                    class="custom-file-label" for="tfInvalid">Choose file</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tf6">Description</label>
+                            <textarea class="form-control" id="tf6" rows="5"></textarea>
+                        </div>
+
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- .modal -->
+<div class="modal modal-drawer fade" id="editTicket" tabindex="-1" role="dialog" aria-labelledby="modalViewTaskLabel"
+     aria-hidden="true">
+    <!-- .modal-dialog -->
+    <div class="modal-dialog modal-lg modal-drawer-right" role="document">
+        <!-- .modal-content -->
+        <div class="modal-content">
+            <!-- .modal-body -->
+            <div class="modal-body p-3 p-lg-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active">
+                        <a href="#" data-dismiss="modal"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>In
+                            Progress</a>
+                    </li>
+                </ol>
+                <h5 id="modalViewTaskLabel" class="modal-title"> #123 </h5>
+                <hr>
+                <p class="text-muted"> Created on May 12th, 2020 by <a href="#" class="link-text ml-1"
+                                                                       data-toggle="tooltip"><span
+                        class="user-avatar user-avatar-xs"><img src="assets/images/avatars/uifaces6.jpg" alt=""></span>
+                    jay Kuntal</a>
+                </p>
+                <hr>
+                <div class="task-description">
+                    <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus perferendis magnam fugit
+                        veritatis numquam perspiciatis. Mollitia optio vero eum velit, recusandae! Amet in consectetur
+                        expedita repellat, obcaecati non deserunt molestias. </p>
+                </div><!-- grid row -->
+                <div class="row my-3">
+                    <!-- grid column -->
+                    <div class="col-6 mb-3">
+                        <!-- .time-tracking -->
+                        <div class="time-tracking">
+                            <h6> Status </h6>
+                            <button type="button" class="btn btn-warning">In Progress</button>
+                        </div><!-- /.time-tracking -->
+                    </div><!-- /grid column -->
+                    <!-- grid column -->
+                    <div class="col-6 mb-3">
+                        <h6> Time </h6>
+                        <p>20 Minutes</p>
+                    </div><!-- /grid column -->
+                    <!-- grid column -->
+                    <div class="col-6 mb-3">
+                        <h6> Labels </h6>
+                        <div class="form-group"><select id="priority" class="form-control select2-hidden-accessible"
+                                                        data-toggle="select2" data-placeholder="Select a Disposition"
+                                                        data-allow-clear="true" data-select2-id="priority" tabindex="-1"
+                                                        aria-hidden="true">
+
+                            <option value="sales"> P0 - Blocker</option>
+                            <option value="sales"> P1 - Critical</option>
+                            <option value="sales"> P2 - Major</option>
+                            <option value="sales"> P3 - Minor</option>
+                            <option value="sales"> RFE - Request for Enhancement</option>
+
+                        </select>
+                        </div>
+                    </div><!-- /grid column -->
+                    <!-- grid column -->
+                    <div class="col-6 mb-3">
+                        <!-- .assignee -->
+                        <div class="assignee">
+                            <h6> Assigned To </h6>
+                            <div class="avatar-group">
+                                <a href="#" class="user-avatar" data-toggle="tooltip" title="You"><img
+                                        src="assets/images/avatars/uifaces2.jpg" alt="You"></a>
+                                <div class="dropdown d-inline-block">
+                                    <a href="#" class="tile tile-circle" data-toggle="dropdown" aria-haspopup="true"
+                                       aria-expanded="false"><i class="fa fa-plus"></i></a> <!-- .dropdown-menu -->
+                                    <div class="dropdown-menu dropdown-menu-md overflow-auto stop-propagation"
+                                         aria-labelledby="dropdownAssignee2" style="max-height: 30rem;">
+                                        <h6 id="dropdownAssignee2" class="dropdown-header"> Add assignee </h6>
+                                        <div class="dropdown-divider"></div>
+                                        <div class="form-group px-3 py-2 mb-0">
+                                            <input type="text" class="form-control" placeholder="Search members"
+                                                   data-autofocus="true">
+                                        </div>
+                                        <label class="custom-control custom-checkbox"><input type="checkbox"
+                                                                                             class="custom-control-input task-unassignees"
+                                                                                             name="taskAssignees[]"
+                                                                                             value="0"
+                                                                                             data-label="Unassigned">
+                                            <span class="custom-control-label">Unassigned</span></label>
+                                        <div class="dropdown-divider"></div>
+                                        <h6 class="dropdown-header"> Assignee(s) </h6><label
+                                            class="custom-control custom-checkbox filterable" data-sort="Beni Arisandi"><input
+                                            type="checkbox" class="custom-control-input task-assignees"
+                                            name="taskAssignees[]" value="4" data-label="Beni Arisandi" checked> <span
+                                            class="custom-control-label custom-control-label-media"><span class="media"><span
+                                            class="mr-2"><span class="user-avatar"><img
+                                            src="assets/images/avatars/uifaces2.jpg" alt=""></span></span> <span
+                                            class="media-body">Beni Arisandi<br>
+                            <span class="text-muted">@benz</span></span></span></span></label> <label
+                                            class="custom-control custom-checkbox filterable"
+                                            data-sort="Melissa Day"><input type="checkbox"
+                                                                           class="custom-control-input task-assignees"
+                                                                           name="taskAssignees[]" value="2"
+                                                                           data-label="Melissa Day" checked> <span
+                                            class="custom-control-label custom-control-label-media"><span class="media"><span
+                                            class="mr-2"><span class="user-avatar"><img
+                                            src="assets/images/avatars/uifaces4.jpg" alt=""></span></span> <span
+                                            class="media-body">Melissa Day<br>
+                            <span class="text-muted">@melday</span></span></span></span></label>
+                                        <div id="dntmDivider" class="dropdown-divider"></div>
+                                        <label class="custom-control custom-checkbox filterable"
+                                               data-sort="Adam Medina"><input type="checkbox"
+                                                                              class="custom-control-input task-assignees"
+                                                                              name="taskAssignees[]" value="3"
+                                                                              data-label="Adam Medina"> <span
+                                                class="custom-control-label custom-control-label-media"><span
+                                                class="media"><span class="mr-2"><span class="user-avatar"><img
+                                                src="assets/images/avatars/uifaces15.jpg" alt=""></span></span> <span
+                                                class="media-body">Adam Medina<br>
+                            <span class="text-muted">@amed</span></span></span></span></label> <label
+                                            class="custom-control custom-checkbox filterable"
+                                            data-sort="Diana Miller"><input type="checkbox"
+                                                                            class="custom-control-input task-assignees"
+                                                                            name="taskAssignees[]" value="1"
+                                                                            data-label="Diana Miller"> <span
+                                            class="custom-control-label custom-control-label-media"><span class="media"><span
+                                            class="mr-2"><span class="user-avatar"><img
+                                            src="assets/images/avatars/uifaces9.jpg" alt=""></span></span> <span
+                                            class="media-body">Diana Miller<br>
+                            <span class="text-muted">@dmiller</span></span></span></span></label> <label
+                                            class="custom-control custom-checkbox filterable" data-sort="Douglas Lucas"><input
+                                            type="checkbox" class="custom-control-input task-assignees"
+                                            name="taskAssignees[]" value="5" data-label="Douglas Lucas"> <span
+                                            class="custom-control-label custom-control-label-media"><span class="media"><span
+                                            class="mr-2"><span class="user-avatar"><img
+                                            src="assets/images/avatars/uifaces5.jpg" alt=""></span></span> <span
+                                            class="media-body">Douglas Lucas<br>
+                            <span class="text-muted">@lucaldoug</span></span></span></span></label>
+                                    </div><!-- /.dropdown-menu -->
+                                </div>
+                            </div>
+                        </div><!-- /.assignee -->
+                    </div><!-- /grid column -->
+                </div><!-- /grid row -->
+                <!-- .form-group -->
+                <div class="form-group">
+                    <h6> Notes </h6>
+                    <!-- save task todos to this input hidden -->
+                    <input type="hidden" name="vtTodos"> <!-- .todo-list -->
+                    <div id="vtTodos" class="todo-list">
+                        <!-- .todo -->
+                        <div class="p-1">
+                            <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus perferendis magnam
+                                fugit veritatis numquam perspiciatis. Mollitia optio vero eum velit, recusandae! Amet in
+                                consectetur expedita repellat, obcaecati non deserunt molestias. </p>
+                        </div><!-- /.todo --><!-- .todo -->
+                        <div class="p-1">
+                            <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus perferendis magnam
+                                fugit veritatis numquam perspiciatis. Mollitia optio vero eum velit, recusandae! Amet in
+                                consectetur expedita repellat, obcaecati non deserunt molestias. </p>
+                        </div><!-- /.todo -->
+                        <!-- .todo -->
+                        <div class="p-1">
+                            <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus perferendis magnam
+                                fugit veritatis numquam perspiciatis. Mollitia optio vero eum velit, recusandae! Amet in
+                                consectetur expedita repellat, obcaecati non deserunt molestias. </p>
+                        </div><!-- /.todo -->
+
+                    </div><!-- /.todo-list -->
+
+                </div><!-- /.form-group -->
+                <hr>
+                <!-- .media -->
+                <div class="media">
+                    <div class="media-body">
+                        <!-- .publisher -->
+                        <div class="publisher keep-focus focus"><!-- .publisher-input -->
+                            <div class="publisher-input">
+                                <textarea id="publisherInput7" class="form-control"
+                                          placeholder="Add a comment"></textarea>
+                            </div><!-- /.publisher-input -->
+                            <!-- .publisher-actions -->
+                            <div class="publisher-actions">
+                                <!-- .publisher-tools -->
+                                <div class="publisher-tools mr-auto">
+                                    <div class="btn btn-light btn-icon fileinput-button">
+                                    </div>
+                                </div><!-- /.publisher-tools -->
+                                <button type="submit" class="btn btn-primary">Publish</button>
+                            </div><!-- /.publisher-actions -->
+                        </div><!-- /.publisher -->
+                    </div><!-- /.media-body -->
+                </div><!-- /.media -->
+            </div><!-- /.modal-body -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

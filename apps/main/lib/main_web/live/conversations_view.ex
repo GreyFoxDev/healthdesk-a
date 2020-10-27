@@ -615,57 +615,6 @@ defmodule MainWeb.Live.ConversationsView do
 
     end
   end
-  def handle_event("close", %{"cid" => conversation_id}, socket)do
-    location = socket.assigns.location
-    user = socket.assigns.user
-    conversation = Conversations.get(conversation_id)
-
-    if conversation.status != "closed" do
-      user_info = Formatters.format_team_member(user)
-      _ = ConCache.delete(:session_cache, conversation_id)
-      message = %{
-        "conversation_id" => conversation_id,
-        "phone_number" => user.phone_number,
-        "message" => "CLOSED: Closed by #{user_info}",
-        "sent_at" => DateTime.utc_now()
-      }
-
-      Conversations.update(%{"id" => conversation.id, "status" => "closed", "team_member_id" => nil})
-      ConversationMessages.create(message)
-      socket = %{
-        socket |
-        assigns: Map.delete(socket.assigns, :conversation_id),
-        changed: Map.put_new(socket.changed, :key, true)
-      }
-
-      conversations =
-        user
-        |> Conversations.all(location.id)
-
-      my_conversations =
-        Enum.filter(conversations, fn (c) -> c.team_member && c.team_member.user_id == user.id end)
-
-      dispositions =
-        user
-        |> Data.Disposition.get_by_team_id(location.team_id)
-        |> Stream.reject(&(&1.disposition_name in ["Automated", "Call deflected"]))
-        |> Stream.map(&({&1.disposition_name, &1.id}))
-        |> Enum.to_list()
-      Main.LiveUpdates.notify_live_view( {location.id, :updated_open})
-
-      socket =
-        socket
-        |> assign(:location, location)
-        |> assign(:conversations, conversations)
-        |> assign(:my_conversations, my_conversations)
-        |> assign(:dispositions, dispositions)
-        |> assign(:user, user)
-
-      {:noreply, socket}
-    else
-      {:noreply, socket}
-    end
-  end
   def handle_event("open", %{"cid" => id}, socket)do
 
     conversation = Conversations.get(id)
@@ -779,6 +728,9 @@ defmodule MainWeb.Live.ConversationsView do
     end
   end
   def handle_info({convo_id, %Data.Schema.ConversationMessage{}=msg}, socket) do
+    IO.inspect("###################")
+    IO.inspect("lets see")
+    IO.inspect("###################")
 
 
     if  socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
@@ -786,7 +738,7 @@ defmodule MainWeb.Live.ConversationsView do
       conversation = socket.assigns.open_conversation
       messages =
         user
-        |> ConversationMessages.all(conversation.id) |>Enum.reverse()
+        |> ConversationMessages.all(conversation.id) |> Enum.reverse()
       socket =
         socket
         |> assign(:open_conversation, Map.merge(conversation,%{conversation_messages: messages}))
@@ -799,10 +751,7 @@ defmodule MainWeb.Live.ConversationsView do
     end
   end
   def handle_info({location_id, :updated_open}, socket) do
-    IO.inspect("###################")
-    IO.inspect("broadcast")
-    IO.inspect(location_id)
-    IO.inspect("###################")
+
     if socket.assigns.tab == "active" && Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
       send(self(), {:fetch_c, %{user: socket.assigns.user, locations: socket.assigns.location_ids, type: "active"}})
     end

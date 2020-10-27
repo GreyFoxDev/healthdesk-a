@@ -26,6 +26,8 @@ defmodule MainWeb.Live.ConversationMessageUpdatesView do
       _ ->  messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
             if connected?(socket), do: Process.send_after(self(), :scroll_chat, 500)
             {:noreply, assign(socket, :messages, [broadcast.payload|messages])}
+            Main.LiveUpdates.notify_live_view({id, struct( %Data.Schema.ConversationMessage{},broadcast.payload)})
+            {:noreply,socket}
     end
 
   end
