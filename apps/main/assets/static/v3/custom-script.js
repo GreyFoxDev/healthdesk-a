@@ -34,7 +34,7 @@ $(document).ready(function() {
     $('body').on('submit', '.modal.fade.show form',() =>
         $('#newMsg').modal('hide')
     )
-    $('body').on('click', '#update_member',function (){
+    $('body').on('click', '#update_member',function (e){
         e.preventDefault(); // prevent default action of link
 
         $.ajax({

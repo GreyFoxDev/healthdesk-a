@@ -4,6 +4,7 @@ defmodule MainWeb.Api.ConversationController do
   alias Data.Conversations, as: C
   alias Data.ConversationMessages, as: CM
   alias Data.Location
+  alias Data.Member
 
   def create(conn, %{"location" => << "messenger:", location :: binary>>, "member" => << "messenger:", _ :: binary>> = member}) do
     location = Location.get_by_messenger_id(location)
@@ -17,10 +18,28 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
 
+  def create(conn, %{"location" => location, "member" => member, "type" => "call"}) do
+    with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
+      Task.start(fn ->  notify_open(convo.location_id) end)
+      Task.start(fn ->  close_convo(convo) end)
+      conn
+      |> put_status(200)
+      |> put_resp_content_type("application/json")
+      |> json(%{conversation_id: convo.id})
+    end
+  end
+  def create(conn, %{"location" => location, "member" => member, "preEngagementData" => %{"memberName" => name, "phoneNumber" => number}}) do
+    with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
+      Task.start(fn ->  notify_open(convo.location_id) end)
+      conn
+      |> put_status(200)
+      |> put_resp_content_type("application/json")
+      |> json(%{conversation_id: convo.id})
+    end
+  end
   def create(conn, %{"location" => location, "member" => member}) do
     with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
-      Main.LiveUpdates.notify_live_view({convo.location_id, :updated_open})
-      Task.start(fn ->  close_convo(convo) end)
+      Task.start(fn ->  notify_open(convo.location_id) end)
       conn
       |> put_status(200)
       |> put_resp_content_type("application/json")
@@ -89,6 +108,11 @@ defmodule MainWeb.Api.ConversationController do
     |> put_resp_content_type("application/json")
     |> json(%{conversation_id: id})
   end
+
+  def notify_open(location_id)do
+    :timer.sleep(5000);
+    Main.LiveUpdates.notify_live_view({location_id, :updated_open})
+  end
   def close_convo(%{original_number: <<"+1", _ :: binary>>} = convo_)do
     :timer.sleep(60000);
     conversation = C.get(convo_.id)
@@ -114,6 +138,6 @@ defmodule MainWeb.Api.ConversationController do
 
     end
   end
-  def close_convo(_) do  end
+  def close_convo(_), do: nil
 
 end

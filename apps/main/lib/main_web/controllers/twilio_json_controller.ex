@@ -33,7 +33,13 @@ defmodule MainWeb.TwilioJsonController do
 
   def inbound(%Plug.Conn{assigns: %{status: "pending", convo: id}} = conn, _params) do
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
+    location = conn.assigns.location
+    case location do
+      nil -> nil
+      loc when is_binary(loc) -> nil
+      location ->       notify_open(location.id)
 
+    end
     conn
     |> put_resp_content_type("application/json")
     |> put_status(200)
@@ -44,7 +50,7 @@ defmodule MainWeb.TwilioJsonController do
   Handle a successful communication with a member
   """
   def inbound(%Plug.Conn{assigns: %{response: response}} = conn, _params)
-  when is_binary(response) do
+      when is_binary(response) do
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
@@ -59,5 +65,10 @@ defmodule MainWeb.TwilioJsonController do
     |> put_resp_content_type("application/json")
     |> put_status(500)
     |> json(%{message: "Service Error"})
+  end
+
+  def notify_open(location_id)do
+    :timer.sleep(5000);
+    Main.LiveUpdates.notify_live_view({location_id, :updated_open})
   end
 end

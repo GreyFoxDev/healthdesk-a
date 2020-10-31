@@ -258,7 +258,6 @@
                                                     <% else %>
                                                 <%= format_user(message.phone_number) %>
                                                     <% end %>
-                                                ·
                                                 <%= format_date(message.sent_at) %>
                                                 <%= if message.read && @open_conversation.channel_type=="APP" do %>
                                                 <i class="fa fa-check" style="color: green"></i>
@@ -283,9 +282,9 @@
                                             <%= if is_nil(next_message) || next_message.phone_number != message.phone_number do %>
                                             <div class="conversation-meta">
                                                 <%= if message.phone_number == @open_conversation.location.phone_number do %>
-                                                <%= format_assigned(@open_conversation.original_number) %>
+                                                <%= @open_conversation.location.location_name %>
                                                     <% else %>
-                                                <%= format_phone(message.phone_number) %>
+                                                <%= format_user(message.phone_number) %>
                                                     <% end %>
                                                 ·
                                                 <%= format_date(message.sent_at) %>
@@ -301,7 +300,7 @@
                                                 <%= if @open_conversation.team_member do %>
                                                 <%= format_team_member(@open_conversation.team_member.user) %>
                                                     <% else %>
-                                                <%= format_phone(message.phone_number) %>
+                                                <%= format_user(message.phone_number) %>
                                                     <% end %>
                                                 ·
                                                 <%= format_date(message.sent_at) %>
@@ -532,7 +531,7 @@
 
 
                                         </fieldset>
-                                        <button class="btn btn-primary btn-lg btn-block" id="update_member">Update</button>
+                                        <button type="button" class="btn btn-primary btn-lg btn-block" id="update_member">Update</button>
 
                                     </form>
 
@@ -681,3 +680,4 @@
 
     }
 </style>
+

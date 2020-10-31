@@ -573,6 +573,7 @@ defmodule MainWeb.Live.ConversationsView do
       convo= conversations |> List.first()
       socket = case convo do
         nil ->
+          if connected?(socket), do: Process.send_after(self(), :menu_fix, 1000)
           socket
           |> assign(:team_members, [])
           |> assign(:team_members_all, [])
@@ -596,6 +597,7 @@ defmodule MainWeb.Live.ConversationsView do
           team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
           notes= Notes.get_by_conversation(open_conversation.id)
           saved_replies = SavedReply.get_by_location_id(open_conversation.location.id)
+          if connected?(socket), do: Process.send_after(self(), :menu_fix, 1000)
           socket
           |> assign(:team_members, team_members)
           |> assign(:team_members_all, team_members_all)
@@ -878,7 +880,5 @@ defmodule MainWeb.Live.ConversationsView do
   defp merge(left, right), do: Map.merge(to_map(left), to_map(right), &resolve_conflict/3) |> Map.values
   defp to_map(list), do: (for item <- list, into: %{}, do: {item.id, item})
   defp resolve_conflict(_key, %{read: read1} = map1, %{read: read2}), do: %{map1 | read: read1||read2}
-
-
 
 end

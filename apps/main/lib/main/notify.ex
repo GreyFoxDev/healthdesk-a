@@ -5,8 +5,9 @@ defmodule MainWeb.Notify do
 
   require Logger
 
-  alias Data.{Location, Conversations, TeamMember, TimezoneOffset}
+  alias Data.{Location, Conversations, TeamMember, TimezoneOffset, MemberChannel}
   alias Data.Schema.Notification
+  alias Data.Schema.MemberChannel, as: Channel
 
   @url "[url]/admin/conversations/[conversation_id]/"
   @super_admin Application.get_env(:main, :super_admin)
@@ -38,7 +39,7 @@ defmodule MainWeb.Notify do
     IO.inspect(team_member.user, label: "SEND TO TEAMMATE")
 
     if team_member.user.use_email do
-      conversation = Conversations.get(conversation_id)
+      conversation = Conversations.get(conversation_id) |> fetch_member()
       member = conversation.member
       subject = if member do
         member = [
@@ -98,7 +99,7 @@ defmodule MainWeb.Notify do
     IO.inspect(team_member.user, label: "SEND TO TEAMMATE")
 
     if team_member.user.use_email do
-      conversation = Conversations.get(conversation_id)
+      conversation=  Conversations.get(conversation_id) |> fetch_member()
       member = conversation.member
       subject = if member do
         member = [
@@ -168,7 +169,7 @@ defmodule MainWeb.Notify do
       |> Enum.filter(&(&1.user.role == "location-admin"))
       |> IO.inspect(label: "ALL ADMINS")
 
-    conversation = Conversations.get(conversation_id)
+    conversation = Conversations.get(conversation_id) |> fetch_member()
 
     _ = Enum.each(all_admins, fn(admin) ->
       if admin.user.use_email do
@@ -218,5 +219,11 @@ defmodule MainWeb.Notify do
 
     :ok
   end
+  def fetch_member(%{original_number: << "CH", _rest :: binary >> = channel} = conversation) do
+    with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
+      Map.put(conversation, :member, channel.member)
+    end
+  end
+  def fetch_member(conversation), do: conversation
 
 end
