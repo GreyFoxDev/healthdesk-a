@@ -79,6 +79,9 @@ defmodule MainWeb.Live.WebMessagesView do
   def handle_info(_, socket) do
     {:noreply, socket}
   end
+  def handle_event(_,params, socket) do
+    {:noreply, socket}
+  end
   def fetch_member(%{original_number: <<"CH", _rest :: binary>> = channel} = conversation) do
     with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
       Map.put(conversation, :member, channel.member)
