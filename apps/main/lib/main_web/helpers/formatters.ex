@@ -18,6 +18,7 @@ defmodule MainWeb.Helper.Formatters  do
 
   def format_user(number)do
     case User.get_by_phone number do
+      nil -> format_phone(number)
       user -> Enum.join([user.first_name, user.last_name, ""], " ")
       _ -> format_phone(number)
     end
