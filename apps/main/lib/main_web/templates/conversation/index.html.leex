@@ -186,7 +186,7 @@
                                             <% else %>
                                                 <%= format_phone(@open_conversation.original_number) %>
                                             <% end %>
-                                        </strong> ·
+                                        </strong> ·&nbsp;
                                             <%= format_date(@open_conversation.started_at) %> </span>
                                     </li><!-- /.conversation-divider -->
                                     <%= for {message, index} <- Enum.with_index(@open_conversation.conversation_messages)|>Enum.reverse() do %>
@@ -202,7 +202,7 @@
                                             <%= if next_message && next_message.phone_number != message.phone_number do %>
                                             <div class="conversation-meta">
                                                 <%= if member_name != " ", do: member_name, else: "#{format_phone(message.phone_number)}" %>
-                                                ·
+                                                ·&nbsp;
                                                 <%= format_date(message.sent_at) %>
                                             </div>
                                             <% end %>
@@ -215,7 +215,7 @@
                                             <%= if next_message && next_message.phone_number != message.phone_number do %>
                                             <div class="conversation-meta">
                                                 <%= if member_name != " ", do: member_name, else: "#{format_phone(message.phone_number)}" %>
-                                                ·
+                                                ·&nbsp;
                                                 <%= format_date(message.sent_at) %>
                                             </div>
                                             <% end %>
@@ -261,7 +261,7 @@
                                                 <%= format_assigned(@open_conversation.original_number) %>
                                                     <% else %>
                                                 <%= format_user(message.phone_number) %>
-                                                    <% end %>
+                                                    <% end %>&nbsp;
                                                 <%= format_date(message.sent_at) %>
                                                 <%= if message.read && @open_conversation.channel_type=="APP" do %>
                                                 <i class="fa fa-check" style="color: green"></i>
@@ -290,7 +290,7 @@
                                                     <% else %>
                                                 <%= format_user(message.phone_number) %>
                                                     <% end %>
-                                                ·
+                                                ·&nbsp;
                                                 <%= format_date(message.sent_at) %>
                                                 <%= if message.read && @open_conversation.channel_type=="APP" do %>
                                                 <i class="fa fa-check" style="color: green"></i>
@@ -305,7 +305,7 @@
                                                 <%= format_team_member(@open_conversation.team_member.user) %>
                                                     <% else %>
                                                 <%= format_user(message.phone_number) %>
-                                                    <% end %>
+                                                    <% end %>&nbsp;
                                                 ·
                                                 <%= format_date(message.sent_at) %>
                                                 <%= if message.read && @open_conversation.channel_type=="APP" do %>
