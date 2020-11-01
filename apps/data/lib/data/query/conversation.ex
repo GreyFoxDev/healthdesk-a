@@ -30,12 +30,16 @@ defmodule Data.Query.Conversation do
   """
   @spec get_by_status(location_id :: [binary()],status :: [binary()], repo :: Ecto.Repo.t()) :: [Conversation.t()]
   def get_by_status(location_id, status, repo \\ Read) when is_list(status) do
+    time = DateTime.add(DateTime.utc_now(), -1296000, :seconds)
+
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
       left_join: member in Member,
       on: c.original_number == member.phone_number,
       where: c.location_id in ^location_id,
       where: c.status in ^status,
+      where: m.sent_at >=  ^time ,
+
       # most recent first
       order_by: [desc: m.sent_at],
       preload: [conversation_messages: m, team_member: [:user], location: []],

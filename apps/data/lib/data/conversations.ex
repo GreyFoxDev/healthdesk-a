@@ -36,13 +36,13 @@ defmodule Data.Conversations do
   end
 
   def all(%{role: role}, location_id) when role in @roles and is_list(location_id) do
-    Query.get_by_location_ids(location_id)
+    Query.get_by_location_ids(location_id) |> Enum.take(200)
   end
   def all(%{role: role}, location_id) when role in @roles do
     Query.get_by_location_id(location_id)
   end
   def all(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do
-    Query.get_by_status(location_id,status)
+    Query.get_by_status(location_id,status) |> Enum.take(200)
   end
 
   def all(_, _), do: {:error, :invalid_permissions}

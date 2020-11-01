@@ -8,6 +8,7 @@ defmodule Data.Schema.Notification do
                id: binary(),
                user_id: binary(),
                conversation_id: binary() | nil,
+               ticket_id: binary() | nil,
                from: binary() | nil,
                text: String.t(),
                read: :boolean | false
@@ -21,6 +22,7 @@ defmodule Data.Schema.Notification do
   user_id
   from
   conversation_id
+  ticket_id
   read
   |a
 
@@ -33,6 +35,7 @@ defmodule Data.Schema.Notification do
     belongs_to(:user, Data.Schema.User)
     belongs_to(:sender, Data.Schema.User,[foreign_key: :from])
     belongs_to(:conversation, Data.Schema.Conversation)
+    belongs_to(:ticket, Data.Schema.Ticket)
 
     timestamps()
   end

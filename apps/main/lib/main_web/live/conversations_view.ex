@@ -2,7 +2,7 @@ defmodule MainWeb.Live.ConversationsView do
   use Phoenix.LiveView, layout: {MainWeb.LayoutView, "live.html"}
 
 
-  alias Data.{Location, Conversations, TeamMember, ConversationMessages, SavedReply, MemberChannel, Notes, Notifications}
+  alias Data.{Location, Conversations,Ticket, TeamMember, ConversationMessages, SavedReply, MemberChannel, Notes, Notifications}
   alias Data.Schema.MemberChannel, as: Channel
   alias MainWeb.Helper.Formatters
   import MainWeb.Helper.LocationHelper
@@ -47,6 +47,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
+      |> assign(:tchangeset, Ticket.get_changeset())
 
 
     {:ok, socket}
@@ -323,6 +324,9 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:dispositions, [])
              |> assign(:loading, false)
              |> assign(:open_conversation, convo)
+             |> assign(:online, false)
+             |> assign(:typing, false)
+
 
     send(self(), {:fetch_d, %{user: user, locations: socket.assigns.location_ids, convo: convo}})
 
@@ -699,7 +703,14 @@ defmodule MainWeb.Live.ConversationsView do
 
     {:noreply, socket}
   end
-
+  def handle_event("new_ticket",%{"ticket" => params}, socket)do
+    Ticket.create(params)
+    Process.send_after(self(), :close_new, 10)
+    {:noreply, socket}
+  end
+  def handle_info(:close_new, socket) do
+    {:noreply, push_event(socket, "close_new", %{})}
+  end
   def handle_info({convo_id, :online}, socket) do
     if socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
       {:noreply, assign(socket, %{online: true})}
@@ -753,6 +764,9 @@ defmodule MainWeb.Live.ConversationsView do
     end
   end
   def handle_info({location_id, :updated_open}, socket) do
+    IO.inspect("###################")
+    IO.inspect(123)
+    IO.inspect("###################")
 
     if socket.assigns.tab == "active" && Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
       send(self(), {:fetch_c, %{user: socket.assigns.user, locations: socket.assigns.location_ids, type: "active"}})

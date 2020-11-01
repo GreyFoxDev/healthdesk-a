@@ -8,6 +8,7 @@ defmodule Data.Schema.Ticket do
                id: binary(),
                user_id: binary(),
                team_member_id: binary() | nil,
+               location_id: binary() | nil,
                description: String.t(),
                status: String.t(),
                priority: String.t(),
@@ -22,17 +23,19 @@ defmodule Data.Schema.Ticket do
   team_member_id
   status
   priority
+  location_id
   |a
 
   @all_fields @required_fields ++ @optional_fields
 
   schema "tickets" do
     field(:description, :string)
-    field(:status, :string)
+    field(:status, :string , default: "new")
     field(:priority, :string)
     belongs_to(:user, Data.Schema.User)
-    belongs_to(:team_member_id, Data.Schema.TeamMember)
-    has_many(:notes, Data.Schema.TicketNotes)
+    belongs_to(:location, Data.Schema.Location)
+    belongs_to(:team_member, Data.Schema.TeamMember)
+    has_many(:notes, Data.Schema.TicketNote)
 
     timestamps()
   end

@@ -1,6 +1,11 @@
 <%= for n <- @notifications do %>
+<%= if n.conversation do %>
 <a href="#" class="dropdown-item unread" phx-click="conversation" phx-value-cid="<%= n.conversation.id %>"
    phx-value-nid="<%= n.id %>">
+    <% else %>
+    <a href="#" class="dropdown-item unread" phx-click="conversation" phx-value-tid="<%= n.ticket.id %>"
+       phx-value-nid="<%= n.id %>">
+    <% end %>
     <div class="user-avatar">
         <img src="<%= if @current_user.avatar != "", do: @current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt="">
     </div>

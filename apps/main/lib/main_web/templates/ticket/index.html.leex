@@ -3,7 +3,7 @@
     <div class="lds-facebook"><div></div><div></div><div></div></div>
 </div>
 <% end %>
-<div class="page">
+<div class="page" phx-hook ="ReloadTable">
     <div class="page-inner">
         <header class="page-title-bar">
             <div class="d-flex flex-column flex-md-row">
@@ -11,74 +11,6 @@
 
                 <div class="ml-auto d-flex">
                     <!-- .dropdown -->
-                    <div class="dropdown mx-2">
-                        <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false"><span>Location: All</span> <i class="fa fa-fw fa-caret-down"></i>
-                        </button> <!-- .dropdown-menu -->
-                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-auto stop-propagation">
-                            <div class="dropdown-arrow"></div><!-- .custom-control -->
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="dpToday" name="dpFilter"
-                                       data-start="2019/03/27" data-end="2019/03/27"> <label
-                                    class="custom-control-label d-flex justify-content-between" for="dpToday"><span>Downtown</span></label>
-                            </div><!-- /.custom-control -->
-                            <!-- .custom-control -->
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="dpYesterday" name="dpFilter"
-                                       data-start="2019/03/26" data-end="2019/03/26"> <label
-                                    class="custom-control-label d-flex justify-content-between" for="dpYesterday"><span>Pasadenas</span></label>
-                            </div><!-- /.custom-control -->
-                            <!-- .custom-control -->
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="dpWeek" name="dpFilter"
-                                       data-start="2019/03/21" data-end="2019/03/27" checked=""> <label
-                                    class="custom-control-label d-flex justify-content-between" for="dpWeek"><span>Los Angeles</span></label>
-                            </div><!-- /.custom-control -->
-                        </div><!-- /.dropdown-menu -->
-                    </div><!-- /.dropdown -->
-                    <div class="dropdown mx-2">
-                        <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false"><span>This Week</span> <i class="fa fa-fw fa-caret-down"></i>
-                        </button> <!-- .dropdown-menu -->
-                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-md stop-propagation">
-                            <div class="dropdown-arrow"></div><!-- .custom-control -->
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="dpToday" name="dpFilter"
-                                       data-start="2019/03/27" data-end="2019/03/27"> <label
-                                    class="custom-control-label d-flex justify-content-between" for="dpToday"><span>Today</span>
-                                <span class="text-muted">Mar 27</span></label>
-                            </div><!-- /.custom-control -->
-                            <!-- .custom-control -->
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="dpYesterday" name="dpFilter"
-                                       data-start="2019/03/26" data-end="2019/03/26"> <label
-                                    class="custom-control-label d-flex justify-content-between" for="dpYesterday"><span>Yesterday</span>
-                                <span class="text-muted">Mar 26</span></label>
-                            </div><!-- /.custom-control -->
-                            <!-- .custom-control -->
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="dpWeek" name="dpFilter"
-                                       data-start="2019/03/21" data-end="2019/03/27" checked=""> <label
-                                    class="custom-control-label d-flex justify-content-between" for="dpWeek"><span>This Week</span>
-                                <span class="text-muted">Mar 21-27</span></label>
-                            </div><!-- /.custom-control -->
-                            <!-- .custom-control -->
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="dpMonth" name="dpFilter"
-                                       data-start="2019/03/01" data-end="2019/03/27"> <label
-                                    class="custom-control-label d-flex justify-content-between" for="dpMonth"><span>This Month</span>
-                                <span class="text-muted">Mar 1-31</span></label>
-                            </div><!-- /.custom-control -->
-                            <!-- .custom-control -->
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="dpYear" name="dpFilter"
-                                       data-start="2019/01/01" data-end="2019/12/31"> <label
-                                    class="custom-control-label d-flex justify-content-between" for="dpYear"><span>This Year</span>
-                                <span class="text-muted">2019</span></label>
-                            </div><!-- /.custom-control -->
-                            <!-- .custom-control -->
-                        </div><!-- /.custom-control -->
-                    </div><!-- /.dropdown-menu -->
                     <button class="btn btn-primary ml-2" data-toggle="modal" data-target="#newTicket">New Ticket
                     </button>
 
@@ -92,139 +24,39 @@
                 <div class="card card-fluid flex-fill">
                     <div class="card-body">
                         <!-- .form-group -->
-                        <div class="form-group">
-                            <label class="control-label" for="bss1">Filter by Status</label> <select id="bss1"
-                                                                                                     data-toggle="selectpicker"
-                                                                                                     data-width="100%">
-                            <option> New</option>
-                            <option> Open</option>
-                            <option> Pending</option>
-                            <option> Closed</option>
-                        </select>
-                        </div><!-- /.form-group -->
+                        <!-- /.form-group -->
                         <!-- .table-responsive -->
                         <div class="table-responsive">
-                            <table id="Tickets2" class="table  table-hover">
+                            <table id="Tickets2<%= @table_id %>" class=" Tickets2 table  table-hover">
 
                                 <thead class="bg-light">
                                 <tr>
-                                    <td>#</td>
-                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
                                     <th>Assigned</th>
                                     <th>Description</th>
-                                    <th>Attachment</th>
-                                    <th>Status</th>
                                     <th>Priority</th>
-                                    <th>Time</th>
+                                    <th>Location</th>
+                                    <th>Last Action</th>
                                     <th>Created By</th>
+                                    <td></td>
                                 </tr>
                                 </thead>
                                 <tbody>
+
+                                <%= for t <- @tickets do %>
                                 <tr>
-                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
-                                    </td>
-                                    <td class="align-middle">May 12, 2020</td>
-                                    <td class="align-middle">Nick Barone</td>
-                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
-                                    </td>
-                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
-                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">New</span>
-                                    </td>
-
-                                    <td class="align-middle">P3</td>
-
-                                    <td class="align-middle">20m</td>
-                                    <td class="align-middle">Johnny Winn</td>
+                                    <td class="align-middle"><span class="badge badge-subtle badge-alert"><%= t.status %></span></td>
+                                    <td class="align-middle"><%= format_date t.inserted_at %></td>
+                                    <td class="align-middle"><%= t.team_member.user.first_name %> <%= t.team_member.user.last_name %></td>
+                                    <td class="align-middle"><%= t.description %></td>
+                                    <td class="align-middle"><%= t.priority %></td>
+                                    <td class="align-middle"><%= t.location.location_name %></td>
+                                    <td class="align-middle"><%= format_date t.updated_at %></td>
+                                    <td class="align-middle"><%= t.user.first_name %> <%= t.user.last_name %></td>
+                                    <td class="align-middle"><a href="#" phx-click="edit_ticket" phx-value-id="<%= t.id %>" ><i class="far fa-eye"></i></a></td>
                                 </tr>
-                                <tr>
-                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
-                                    </td>
-                                    <td class="align-middle">May 12, 2020</td>
-
-                                    <td class="align-middle">Nick Barone</td>
-                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
-                                    </td>
-                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
-                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Open</span>
-                                    </td>
-
-                                    <td class="align-middle">P3</td>
-
-                                    <td class="align-middle">20m</td>
-                                    <td class="align-middle">Johnny Winn</td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
-                                    </td>
-                                    <td class="align-middle">May 12, 2020</td>
-
-                                    <td class="align-middle">Nick Barone</td>
-                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
-                                    </td>
-                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
-                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Pending</span>
-                                    </td>
-                                    <td class="align-middle">P3</td>
-                                    <td class="align-middle">20m</td>
-                                    <td class="align-middle">Johnny Winn</td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
-                                    </td>
-                                    <td class="align-middle">May 12, 2020</td>
-
-                                    <td class="align-middle">Nick Barone</td>
-                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
-                                    </td>
-                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
-                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Pending</span>
-                                    </td>
-
-                                    <td class="align-middle">P3</td>
-
-                                    <td class="align-middle">20m</td>
-                                    <td class="align-middle">Johnny Winn</td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
-                                    </td>
-                                    <td class="align-middle">May 12, 2020</td>
-
-                                    <td class="align-middle">Nick Barone</td>
-                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
-                                    </td>
-                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
-                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Pending</span>
-                                    </td>
-
-                                    <td class="align-middle">P3</td>
-
-                                    <td class="align-middle">20m</td>
-                                    <td class="align-middle">Johnny Winn</td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle"><a href="#" data-target="#editTicket" data-toggle="modal">#123</a>
-                                    </td>
-                                    <td class="align-middle">May 12, 2020</td>
-
-                                    <td class="align-middle">Nick Barone</td>
-                                    <td class="align-middle">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                        Sit ab molestias inventore corporis, eveniet quasi ipsam repellat ipsa cum qui.
-                                    </td>
-                                    <td class="align-middle"><a href="#">Upload.pdf</a></td>
-                                    <td class="align-middle"><span class="badge badge-subtle badge-alert">Closed</span>
-                                    </td>
-
-                                    <td class="align-middle">P3</td>
-
-                                    <td class="align-middle">20m</td>
-                                    <td class="align-middle">Johnny Winn</td>
-                                </tr>
+                                <% end %>
                                 </tbody>
 
                             </table>
@@ -251,72 +83,39 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form>
-                    <fieldset>
-                        <div class="form-group">
-                            <label for="unknown">Location</label>
-                            <select id="location" class="form-control select2-hidden-accessible" data-toggle="select2"
-                                    data-maximum-selection-length="4" multiple="" data-select2-id="location"
-                                    tabindex="-1" aria-hidden="true">
-                                <option value="sales"> Downtown</option>
-                                <option value="frontdesk"> Arcadia</option>
-                                <option value="retention"> Los Angeles</option>
-                                <option value="sales"> Hollywood</option>
-                                <option value="frontdesk"> Long Beach</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="unknown">Assign to a teammate</label>
-                            <select id="unknown" class="form-control select2-hidden-accessible" data-toggle="select2"
-                                    data-maximum-selection-length="4" multiple="" data-select2-id="unknown"
-                                    tabindex="-1" aria-hidden="true">
-                                <option value="sales"> Jay Kuntal</option>
-                                <option value="frontdesk"> Nick Barone</option>
-                                <option value="retention"> Johnny Winn</option>
-                                <option value="sales"> Jay Kuntal</option>
-                                <option value="frontdesk"> Nick Barone</option>
-                                <option value="retention"> Johnny Winn</option>
-                                <option value="sales"> Jay Kuntal</option>
-                                <option value="frontdesk"> Nick Barone</option>
-                                <option value="retention"> Johnny Winn</option>
-                            </select>
-                        </div>
+                <%= f = form_for @changeset, "#", [ phx_submit: :new_ticket] %>
+                <%= hidden_input f, :user_id, value: @user.id %>
+                <fieldset>
+                    <div class="form-group">
+                        <label for="unknown">Location</label>
+                        <%= select f, :location_id, Enum.map(@locations, &{&1.location_name, &1.id}),prompt: "Select a Location",required: true, class: "custom-select"  %>
 
-                        <div class="form-group">
-                            <label for="priority">Priority</label> <select id="priority"
-                                                                           class="form-control select2-hidden-accessible"
-                                                                           data-toggle="select2"
-                                                                           data-placeholder="Select a Disposition"
-                                                                           data-allow-clear="true"
-                                                                           data-select2-id="priority" tabindex="-1"
-                                                                           aria-hidden="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="unknown">Assign to a teammate</label>
+                        <%= select f, :team_member_id, @team_members_all,prompt: "Select Teammate ",required: true, class: "custom-select"  %>
+                    </div>
 
-                            <option value="sales"> P0 - Blocker</option>
-                            <option value="sales"> P1 - Critical</option>
-                            <option value="sales"> P2 - Major</option>
-                            <option value="sales"> P3 - Minor</option>
-                            <option value="sales"> RFE - Request for Enhancement</option>
+                    <div class="form-group">
+                        <label for="priority">Priority</label>
+                        <%= select f, :priority,
+                        [{"P0 - Blocker", "P0"},{"P1 - Critical","P1"},{"P2 - Critical","P2"},{"P3 - Major","P3"},{"RFE - Request for Enhancement","RFE"}],
+                        prompt: "Select Priority ",required: true, class: "custom-select"  %>
+                    </div>
+                    <div class="form-group">
+                        <label for="tf6">Description</label>
+                        <%= textarea f, :description, prompt: "Enter description",required: true,  rows: "5", class: "form-control"  %>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
 
-                        </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-control-label" for="tfInvalid">Attachment</label>
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="tfInvalid"> <label
-                                    class="custom-file-label" for="tfInvalid">Choose file</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="tf6">Description</label>
-                            <textarea class="form-control" id="tf6" rows="5"></textarea>
-                        </div>
-
-                    </fieldset>
+                </fieldset>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Save</button>
+
             </div>
         </div>
     </div>
@@ -334,22 +133,24 @@
             <div class="modal-body p-3 p-lg-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item active">
-                        <a href="#" data-dismiss="modal"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>In
-                            Progress</a>
+                        <a href="#" phx-click="close_edit"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Back</a>
                     </li>
                 </ol>
-                <h5 id="modalViewTaskLabel" class="modal-title"> #123 </h5>
+                <h5 id="modalViewTaskLabel" class="modal-title"> <%= @open_ticket.status %> </h5>
                 <hr>
-                <p class="text-muted"> Created on May 12th, 2020 by <a href="#" class="link-text ml-1"
-                                                                       data-toggle="tooltip"><span
-                        class="user-avatar user-avatar-xs"><img src="assets/images/avatars/uifaces6.jpg" alt=""></span>
-                    jay Kuntal</a>
+                <p class="text-muted"> Created on <%= format_date_time_split(@open_ticket.inserted_at) %> by <a href="#" class="link-text ml-1"
+                                                                                                                data-toggle="tooltip"><span
+                        class="user-avatar user-avatar-xs">
+                                        <%= if Ecto.assoc_loaded?(@open_ticket.user) do %>
+                    <img src="<%= if @open_ticket.user.avatar != "", do: @open_ticket.user.avatar, else: "/images/unknown-profile.jpg" %>" alt=""></span>
+                    <%= Enum.join([@open_ticket.user.first_name||"", @open_ticket.user.last_name||""], " ") %>
+                                <% else %>
+                    <img src="/images/unknown-profile.jpg" alt=""></span>"Unknown user"
+                    <% end %> </a>
                 </p>
                 <hr>
                 <div class="task-description">
-                    <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus perferendis magnam fugit
-                        veritatis numquam perspiciatis. Mollitia optio vero eum velit, recusandae! Amet in consectetur
-                        expedita repellat, obcaecati non deserunt molestias. </p>
+                    <p> <%= @open_ticket.description %> </p>
                 </div><!-- grid row -->
                 <div class="row my-3">
                     <!-- grid column -->
@@ -357,29 +158,30 @@
                         <!-- .time-tracking -->
                         <div class="time-tracking">
                             <h6> Status </h6>
-                            <button type="button" class="btn btn-warning">In Progress</button>
+                            <%= f = form_for @changeset, "#", [phx_change: :update_ticket] %>
+                            <%= hidden_input f, :id, value: @open_ticket.id, id: "ticket_id0" %>
+                            <%= select f, :status,
+                        [{"New","new"},{"Open","open"},{"Pending","pending"},{"Resolved","resolved"},{"Closed","closed"}],
+                        prompt: "Select Priority ",required: true,id: "priority_select", class: "custom-select", value: @open_ticket.status  %>
+                            <form/>
                         </div><!-- /.time-tracking -->
                     </div><!-- /grid column -->
                     <!-- grid column -->
                     <div class="col-6 mb-3">
-                        <h6> Time </h6>
-                        <p>20 Minutes</p>
+                        <h6> Last Action </h6>
+                        <p><%= format_date @open_ticket.updated_at %></p>
                     </div><!-- /grid column -->
                     <!-- grid column -->
                     <div class="col-6 mb-3">
                         <h6> Labels </h6>
-                        <div class="form-group"><select id="priority" class="form-control select2-hidden-accessible"
-                                                        data-toggle="select2" data-placeholder="Select a Disposition"
-                                                        data-allow-clear="true" data-select2-id="priority" tabindex="-1"
-                                                        aria-hidden="true">
-
-                            <option value="sales"> P0 - Blocker</option>
-                            <option value="sales"> P1 - Critical</option>
-                            <option value="sales"> P2 - Major</option>
-                            <option value="sales"> P3 - Minor</option>
-                            <option value="sales"> RFE - Request for Enhancement</option>
-
-                        </select>
+                        <div class="form-group">
+                            <%= f = form_for @changeset, "#", [phx_change: :update_ticket] %>
+                            <%= hidden_input f, :id, value: @open_ticket.id, id: "ticket_id1" %>
+                            <%= select f, :priority,
+                        [{"P0 - Blocker", "P0"},{"P1 - Critical","P1"},{"P2 - Critical","P2"},{"P3 - Major","P3"},{"RFE - Request for Enhancement","RFE"}],
+                        prompt: "Select Priority ",required: true, class: "custom-select", value: @open_ticket.priority  %>
+                            <form/>
+                            </select>
                         </div>
                     </div><!-- /grid column -->
                     <!-- grid column -->
@@ -388,76 +190,11 @@
                         <div class="assignee">
                             <h6> Assigned To </h6>
                             <div class="avatar-group">
-                                <a href="#" class="user-avatar" data-toggle="tooltip" title="You"><img
-                                        src="assets/images/avatars/uifaces2.jpg" alt="You"></a>
-                                <div class="dropdown d-inline-block">
-                                    <a href="#" class="tile tile-circle" data-toggle="dropdown" aria-haspopup="true"
-                                       aria-expanded="false"><i class="fa fa-plus"></i></a> <!-- .dropdown-menu -->
-                                    <div class="dropdown-menu dropdown-menu-md overflow-auto stop-propagation"
-                                         aria-labelledby="dropdownAssignee2" style="max-height: 30rem;">
-                                        <h6 id="dropdownAssignee2" class="dropdown-header"> Add assignee </h6>
-                                        <div class="dropdown-divider"></div>
-                                        <div class="form-group px-3 py-2 mb-0">
-                                            <input type="text" class="form-control" placeholder="Search members"
-                                                   data-autofocus="true">
-                                        </div>
-                                        <label class="custom-control custom-checkbox"><input type="checkbox"
-                                                                                             class="custom-control-input task-unassignees"
-                                                                                             name="taskAssignees[]"
-                                                                                             value="0"
-                                                                                             data-label="Unassigned">
-                                            <span class="custom-control-label">Unassigned</span></label>
-                                        <div class="dropdown-divider"></div>
-                                        <h6 class="dropdown-header"> Assignee(s) </h6><label
-                                            class="custom-control custom-checkbox filterable" data-sort="Beni Arisandi"><input
-                                            type="checkbox" class="custom-control-input task-assignees"
-                                            name="taskAssignees[]" value="4" data-label="Beni Arisandi" checked> <span
-                                            class="custom-control-label custom-control-label-media"><span class="media"><span
-                                            class="mr-2"><span class="user-avatar"><img
-                                            src="assets/images/avatars/uifaces2.jpg" alt=""></span></span> <span
-                                            class="media-body">Beni Arisandi<br>
-                            <span class="text-muted">@benz</span></span></span></span></label> <label
-                                            class="custom-control custom-checkbox filterable"
-                                            data-sort="Melissa Day"><input type="checkbox"
-                                                                           class="custom-control-input task-assignees"
-                                                                           name="taskAssignees[]" value="2"
-                                                                           data-label="Melissa Day" checked> <span
-                                            class="custom-control-label custom-control-label-media"><span class="media"><span
-                                            class="mr-2"><span class="user-avatar"><img
-                                            src="assets/images/avatars/uifaces4.jpg" alt=""></span></span> <span
-                                            class="media-body">Melissa Day<br>
-                            <span class="text-muted">@melday</span></span></span></span></label>
-                                        <div id="dntmDivider" class="dropdown-divider"></div>
-                                        <label class="custom-control custom-checkbox filterable"
-                                               data-sort="Adam Medina"><input type="checkbox"
-                                                                              class="custom-control-input task-assignees"
-                                                                              name="taskAssignees[]" value="3"
-                                                                              data-label="Adam Medina"> <span
-                                                class="custom-control-label custom-control-label-media"><span
-                                                class="media"><span class="mr-2"><span class="user-avatar"><img
-                                                src="assets/images/avatars/uifaces15.jpg" alt=""></span></span> <span
-                                                class="media-body">Adam Medina<br>
-                            <span class="text-muted">@amed</span></span></span></span></label> <label
-                                            class="custom-control custom-checkbox filterable"
-                                            data-sort="Diana Miller"><input type="checkbox"
-                                                                            class="custom-control-input task-assignees"
-                                                                            name="taskAssignees[]" value="1"
-                                                                            data-label="Diana Miller"> <span
-                                            class="custom-control-label custom-control-label-media"><span class="media"><span
-                                            class="mr-2"><span class="user-avatar"><img
-                                            src="assets/images/avatars/uifaces9.jpg" alt=""></span></span> <span
-                                            class="media-body">Diana Miller<br>
-                            <span class="text-muted">@dmiller</span></span></span></span></label> <label
-                                            class="custom-control custom-checkbox filterable" data-sort="Douglas Lucas"><input
-                                            type="checkbox" class="custom-control-input task-assignees"
-                                            name="taskAssignees[]" value="5" data-label="Douglas Lucas"> <span
-                                            class="custom-control-label custom-control-label-media"><span class="media"><span
-                                            class="mr-2"><span class="user-avatar"><img
-                                            src="assets/images/avatars/uifaces5.jpg" alt=""></span></span> <span
-                                            class="media-body">Douglas Lucas<br>
-                            <span class="text-muted">@lucaldoug</span></span></span></span></label>
-                                    </div><!-- /.dropdown-menu -->
-                                </div>
+                                <%= f = form_for @changeset, "#", [phx_change: :update_ticket] %>
+                                <%= hidden_input f, :id, value: @open_ticket.id, id: "ticket_id2" %>
+                                <%= select f, :team_member_id, @team_members_all,id: "edit_team_member",prompt: "Select Teammate ",required: true, class: "custom-select", value: @open_ticket.team_member_id  %>
+                                <form/>
+
                             </div>
                         </div><!-- /.assignee -->
                     </div><!-- /grid column -->
@@ -468,36 +205,28 @@
                     <!-- save task todos to this input hidden -->
                     <input type="hidden" name="vtTodos"> <!-- .todo-list -->
                     <div id="vtTodos" class="todo-list">
-                        <!-- .todo -->
+                        <%= for n <- @open_ticket.notes do %>
                         <div class="p-1">
-                            <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus perferendis magnam
-                                fugit veritatis numquam perspiciatis. Mollitia optio vero eum velit, recusandae! Amet in
-                                consectetur expedita repellat, obcaecati non deserunt molestias. </p>
-                        </div><!-- /.todo --><!-- .todo -->
-                        <div class="p-1">
-                            <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus perferendis magnam
-                                fugit veritatis numquam perspiciatis. Mollitia optio vero eum velit, recusandae! Amet in
-                                consectetur expedita repellat, obcaecati non deserunt molestias. </p>
-                        </div><!-- /.todo -->
-                        <!-- .todo -->
-                        <div class="p-1">
-                            <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus perferendis magnam
-                                fugit veritatis numquam perspiciatis. Mollitia optio vero eum velit, recusandae! Amet in
-                                consectetur expedita repellat, obcaecati non deserunt molestias. </p>
-                        </div><!-- /.todo -->
-
-                    </div><!-- /.todo-list -->
+                            <p><%= n.note %>
+                                <span class="meta">( <%= n.user.first_name %> <%= format_date n.inserted_at %> )</span>
+                            </p>
+                        </div>
+                        <% end %>
+                    </div>
 
                 </div><!-- /.form-group -->
                 <hr>
+                <form></form>
                 <!-- .media -->
                 <div class="media">
                     <div class="media-body">
                         <!-- .publisher -->
                         <div class="publisher keep-focus focus"><!-- .publisher-input -->
+                            <%= f = form_for @nchangeset, "#", [ phx_submit: :save_note] %>
                             <div class="publisher-input">
-                                <textarea id="publisherInput7" class="form-control"
-                                          placeholder="Add a comment"></textarea>
+                                <%= hidden_input f, :user_id, value: @user.id,id: "ticket_id3" %>
+                                <%= hidden_input f, :ticket_id, value: @open_ticket.id, id: "ticket_id3" %>
+                                <%= textarea f, :note, prompt: "Enter note",required: true, id: "note_input",  rows: "3", class: "form-control"  %>
                             </div><!-- /.publisher-input -->
                             <!-- .publisher-actions -->
                             <div class="publisher-actions">
@@ -508,6 +237,7 @@
                                 </div><!-- /.publisher-tools -->
                                 <button type="submit" class="btn btn-primary">Publish</button>
                             </div><!-- /.publisher-actions -->
+                            </form>
                         </div><!-- /.publisher -->
                     </div><!-- /.media-body -->
                 </div><!-- /.media -->
@@ -515,3 +245,9 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<div style="display: none" id="availableMembers">
+
+    <%= for x <- @team_members do %>
+    <p><span><%= x.id %></span><span><%= x.user.first_name <> " " <> x.user.last_name %></span></p>
+    <% end %>
+</div>

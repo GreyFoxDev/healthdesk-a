@@ -7,6 +7,10 @@ const ReloadTable = {
         this.handleEvent("init_convo", ({}) => init_convo())
         this.handleEvent("menu_fix", ({}) => menu_fix())
         this.handleEvent("scroll_chat", ({}) => scroll_chat())
+        this.handleEvent("init_ticket", ({}) => init_ticket())
+        this.handleEvent("close_new", ({}) => close_new())
+        this.handleEvent("open_edit", ({}) => open_edit())
+        this.handleEvent("close_edit", ({}) => close_edit())
     }
 }
 const init = function (){
@@ -93,9 +97,49 @@ const menu_fix = function (){
     Looper.stackedMenu.init()
 
 }
+const init_ticket = function (){
+    let tb= $('.Tickets2').DataTable();
+    $('.Tickets2').DataTable( {
+        "scrollCollapse": true,
+        "responsive": true,
+        "info":     false,
+        "destroy":     true,
+        "searching": true,
+        "ordering": false,
+        "retrieve": true
+    });
+    var availableMembers = [];
+    $("#availableMembers p").each(function (i, elem) {
+        let span = $(elem).find('span');
+        if (span.length) {
+            var tag = "@" + span[1].innerText;
+            availableMembers.push({value: tag, key: span[1].innerText})
+
+        }
+    });
+    var tribute2 = new Tribute({
+        trigger: '@',
+        selectTemplate: function (item) {
+            return item.original.value;
+        },
+        values: []
+    });
+    tribute2.collection[0].values=availableMembers
+    tribute2.attach($('[id^="note_input"]')[0]);
+    menu_fix();
+}
 const scroll_chat = function (){
     var div = document.getElementsByClassName("message-body")[0]
     div.scrollTop = div.scrollHeight;
 
+}
+const close_new = function (){
+    $("#newTicket").modal('hide')
+}
+const close_edit = function (){
+    $("#editTicket").modal('hide')
+}
+const open_edit = function (){
+    $("#editTicket").modal('show')
 }
 export default ReloadTable;

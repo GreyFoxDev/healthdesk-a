@@ -23,7 +23,7 @@ defmodule Data.Query.Notification do
     from(n in Notification,
       where: n.user_id == ^user_id,
       order_by: [desc: n.inserted_at],
-      preload: [:user, :sender, :conversation],
+      preload: [:user, :sender, :conversation, :ticket],
     )
     |> repo.all()
   end

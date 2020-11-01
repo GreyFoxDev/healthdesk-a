@@ -114,26 +114,34 @@ defmodule MainWeb.Api.ConversationController do
     Main.LiveUpdates.notify_live_view({location_id, :updated_open})
   end
   def close_convo(%{original_number: <<"+1", _ :: binary>>} = convo_)do
-    :timer.sleep(60000);
+    :timer.sleep(100000);
     conversation = C.get(convo_.id)
     case conversation do
       nil -> nil
       convo ->
         if convo.status != "closed" do
+          is_call = if convo.conversation_messages  do
+            convo.conversation_messages |> List.first |> String.match?(~r/calling/)
+          else
+            false
+          end
+          if is_call do
 
-          location = Location.get(convo.location_id)
-          dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
-          disposition = Enum.find(dispositions, &(&1.disposition_name == "Call Hang Up"))
+            location = Location.get(convo.location_id)
+            dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
+            disposition = Enum.find(dispositions, &(&1.disposition_name == "Call Hang Up"))
 
-          Data.ConversationDisposition.create(%{"conversation_id" => convo.id, "disposition_id" => disposition.id})
+            Data.ConversationDisposition.create(%{"conversation_id" => convo.id, "disposition_id" => disposition.id})
 
-          %{"conversation_id" => convo.id,
-            "phone_number" => location.phone_number,
-            "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
-            "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
-          |> CM.create()
-          C.close(convo.id)
-          Main.LiveUpdates.notify_live_view({location.id, :updated_open})
+            %{"conversation_id" => convo.id,
+              "phone_number" => location.phone_number,
+              "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+              "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
+            |> CM.create()
+            C.close(convo.id)
+            Main.LiveUpdates.notify_live_view({location.id, :updated_open})
+          end
+
         end
 
     end
