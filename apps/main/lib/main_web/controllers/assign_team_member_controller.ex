@@ -46,6 +46,8 @@ defmodule MainWeb.AssignTeamMemberController do
           |> String.replace("[message]", original_message.message)
 
         Notify.send_to_teammate(id, message, location.phone_number, team_member)
+        Main.LiveUpdates.notify_live_view(id, {__MODULE__, {:new_msg, message}})
+
       end
 
       {:ok,%{}}
