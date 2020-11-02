@@ -721,6 +721,7 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def handle_info({convo_id, :online}, socket) do
     if socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
+      if connected?(socket), do: Process.send_after(self(), :menu_fix, 1000)
       {:noreply, assign(socket, %{online: true})}
     else
       {:noreply, socket}
@@ -728,6 +729,8 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def handle_info({convo_id, :offline}, socket) do
     if socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
+      if connected?(socket), do: Process.send_after(self(), :menu_fix, 1000)
+
       {:noreply, assign(socket, %{online: false})}
     else
       {:noreply, socket}
@@ -736,6 +739,8 @@ defmodule MainWeb.Live.ConversationsView do
   def handle_info({convo_id, :user_typing_start}, socket) do
 
     if  socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
+      if connected?(socket), do: Process.send_after(self(), :menu_fix, 1000)
+
       {:noreply, assign(socket, %{typing: true})}
     else
       {:noreply, socket}
@@ -743,6 +748,8 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def handle_info({convo_id, :user_typing_stop}, socket) do
     if  socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
+      if connected?(socket), do: Process.send_after(self(), :menu_fix, 1000)
+
       {:noreply, assign(socket, %{typing: false})}
     else
       {:noreply, socket}
@@ -773,7 +780,7 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def handle_info({location_id, :updated_open}, socket) do
     IO.inspect("###################")
-    IO.inspect(123)
+    IO.inspect(:updated_open)
     IO.inspect("###################")
 
     if socket.assigns.tab == "active" && Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
