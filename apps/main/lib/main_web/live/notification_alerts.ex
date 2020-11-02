@@ -34,17 +34,30 @@ defmodule MainWeb.Live.NotificationAlertsView do
   end
 
   def handle_event("conversation", params, socket) do
-    conversation =
-      socket.assigns.current_user
-      |> Conversations.get(params["cid"])
-    Task.start(fn ->
-      Notifications.update(%{"id" => params["nid"], "read" => true})
-    end)
+    if params["cid"] do
+      conversation =
+        socket.assigns.current_user
+        |> Conversations.get(params["cid"])
+      Task.start(fn ->
+        Notifications.update(%{"id" => params["nid"], "read" => true})
+      end)
 
-        {:noreply,
-      socket
-      |> redirect(to: "/admin/conversations/#{conversation.id}" )
-    }
+      {:noreply,
+        socket
+        |> redirect(to: "/admin/conversations/#{conversation.id}" )
+      }
+    end
+    if params["tid"] do
+      Task.start(fn ->
+        Notifications.update(%{"id" => params["nid"], "read" => true})
+      end)
+
+      {:noreply,
+        socket
+        |> redirect(to: "/admin/tickets/#{params["tid"]}" )
+      }
+    end
+
   end
 
 end

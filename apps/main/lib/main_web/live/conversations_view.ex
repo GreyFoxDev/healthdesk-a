@@ -82,6 +82,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:tab, "assigned")
       |> assign(:tab1, "details")
       |> assign(:search_string, "")
+      |> assign(:tchangeset, Ticket.get_changeset())
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
 
@@ -120,6 +121,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
+      |> assign(:tchangeset, Ticket.get_changeset())
 
 
 
@@ -163,6 +165,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
+      |> assign(:tchangeset, Ticket.get_changeset())
 
 
     {:ok, socket}

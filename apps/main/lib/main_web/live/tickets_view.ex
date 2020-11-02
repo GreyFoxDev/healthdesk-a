@@ -5,6 +5,33 @@ defmodule MainWeb.Live.TicketsView do
 
   def render(assigns), do: MainWeb.TicketView.render("index.html", assigns)
 
+  def mount(%{"id" => id}, session, socket) do
+    IO.inspect("###########id########")
+    IO.inspect(id)
+    IO.inspect("###################")
+
+    {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
+
+    location_ids = user |> teammate_locations(true)
+    locations = user |> teammate_locations()
+    socket = socket
+             |> assign(:locations, locations)
+             |> assign(:location_ids, location_ids)
+             |> assign(:tab, "ticket")
+             |> assign(:loading, true)
+             |> assign(:user, user)
+             |> assign(:current_user, user)
+             |> assign(:team_members, [])
+             |> assign(:tickets, [])
+             |> assign(:table_id, gen_reference())
+             |> assign(:team_members_all, [])
+             |> assign(:changeset, Ticket.get_changeset())
+             |> assign(:nchangeset, TicketNote.get_changeset())
+             |> assign(:open_ticket, %Data.Schema.Ticket{user_id: "", description: "", team_member_id: "", status: "", priority: "", location_id: "",inserted_at: DateTime.utc_now(),updated_at: DateTime.utc_now(), notes: []})
+
+    send(self(), {:fetch_c, %{user: user, locations: location_ids}})
+    send(self(), {:fetch_s, %{id: id}})
+  end
   def mount(_params, session, socket) do
     {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
 
@@ -43,8 +70,14 @@ defmodule MainWeb.Live.TicketsView do
              |> assign(:team_members, team_members)
              |> assign(:team_members_all, team_members_all)
              |> assign(:tickets, tickets)
-             |> assign(:open_ticket, tickets |> List.first)
              |> assign(:table_id, gen_reference())
+    socket = if ((tickets |> List.first) !=nil)  do
+      socket
+      |> assign(:open_ticket, tickets |> List.first)
+    else
+      socket
+
+    end
 
 
     if connected?(socket), do: Process.send_after(self(), :init_ticket, 3000)
@@ -107,14 +140,14 @@ defmodule MainWeb.Live.TicketsView do
       notify(%{user_id: n.user.id, from: user.id, ticket_id: params["ticket_id"], text: " has mention you in a ticket"},n,user)
     end)
     {:ok, res} = TicketNote.create(params)
-#    note =
-      TicketNote.get(res.id)
-#    open_ticket=socket.assigns.open_ticket
-#    notes=open_ticket.notes
-#    notes_ = [note|notes]
-#    open_ticket = %{open_ticket | notes: notes_}
-#
-#    socket = socket |> assign(:open_ticket, open_ticket)
+    #    note =
+    TicketNote.get(res.id)
+    #    open_ticket=socket.assigns.open_ticket
+    #    notes=open_ticket.notes
+    #    notes_ = [note|notes]
+    #    open_ticket = %{open_ticket | notes: notes_}
+    #
+    #    socket = socket |> assign(:open_ticket, open_ticket)
     Process.send_after(self(), :close_edit, 10)
     {:noreply, socket}
   end
@@ -155,7 +188,7 @@ defmodule MainWeb.Live.TicketsView do
     case Notifications.create(params) do
       {:ok, notif} ->
         Main.LiveUpdates.notify_live_view(params.user_id,{__MODULE__, :new_notif})
-#        MainWeb.Notify.send_to_teammate(params.conversation_id, params.text, team_member,user)
+      #        MainWeb.Notify.send_to_teammate(params.conversation_id, params.text, team_member,user)
       _ -> nil
     end
 
