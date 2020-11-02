@@ -137,7 +137,7 @@ defmodule MainWeb.Live.TicketsView do
 
       end)
     else
-      note
+      {note,[]}
     end
 
     Enum.each(notifications,fn n ->

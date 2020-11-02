@@ -810,7 +810,7 @@ defmodule MainWeb.Live.ConversationsView do
 
       end)
     else
-      text
+      {text,[]}
     end
 
     Enum.each(notifications,fn n ->
@@ -889,6 +889,14 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def handle_event(_,params, socket) do
     {:noreply, socket}
+  end
+  defp notify(params)do
+    case Notifications.create(params) do
+      {:ok, notif} ->
+        Main.LiveUpdates.notify_live_view(params.user_id,{__MODULE__, :new_notif})
+      _ -> nil
+    end
+
   end
   defp notify(params,team_member, location,user)do
     case Notifications.create(params) do

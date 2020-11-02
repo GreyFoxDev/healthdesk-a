@@ -45,7 +45,7 @@
                                 <tbody>
 
                                 <%= for t <- @tickets do %>
-                                <tr>
+                                <tr phx-click="edit_ticket" phx-value-id="<%= t.id %>" >
                                     <td class="align-middle"><span class="badge badge-subtle badge-alert"><%= t.status %></span></td>
                                     <td class="align-middle"><%= format_date t.inserted_at %></td>
                                     <td class="align-middle"><%= t.team_member.user.first_name %> <%= t.team_member.user.last_name %></td>
