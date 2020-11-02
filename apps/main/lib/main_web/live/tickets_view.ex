@@ -6,9 +6,6 @@ defmodule MainWeb.Live.TicketsView do
   def render(assigns), do: MainWeb.TicketView.render("index.html", assigns)
 
   def mount(%{"id" => id}, session, socket) do
-    IO.inspect("###########id########")
-    IO.inspect(id)
-    IO.inspect("###################")
 
     {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
 
@@ -31,6 +28,8 @@ defmodule MainWeb.Live.TicketsView do
 
     send(self(), {:fetch_c, %{user: user, locations: location_ids}})
     send(self(), {:fetch_s, %{id: id}})
+    {:ok, socket}
+
   end
   def mount(_params, session, socket) do
     {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
