@@ -42,6 +42,7 @@ defmodule MainWeb.Router do
     live "/conversations/:id" , Live.ConversationsView, only: [:index]
     live "/campaigns" , Live.CampaignsView
     live "/tickets" , Live.TicketsView
+    live "/tickets/:id" , Live.TicketsView
 
   end
   scope "/admin", MainWeb do

@@ -707,7 +707,12 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
   def handle_event("new_ticket",%{"ticket" => params}, socket)do
-    Ticket.create(params)
+    {:ok, res}=Ticket.create(params)
+    IO.inspect("###################")
+    IO.inspect(res)
+    IO.inspect("###################")
+    tm = TeamMember.get(%{role: "admin"}, res.team_member_id)
+    notify(%{user_id: tm.user.id, from: res.user_id, ticket_id: res.id, text: " has assigned you a ticket"})
     Process.send_after(self(), :close_new, 10)
     {:noreply, socket}
   end

@@ -96,7 +96,12 @@ defmodule MainWeb.Live.TicketsView do
     {:noreply, socket}
   end
   def handle_event("new_ticket",%{"ticket" => params}, socket)do
-    Ticket.create(params)
+    {:ok, res}=Ticket.create(params)
+    IO.inspect("###################")
+    IO.inspect(res)
+    IO.inspect("###################")
+    tm = TeamMember.get(%{role: "admin"}, res.team_member_id)
+    notify(%{user_id: tm.user.id, from: res.user_id, ticket_id: res.id, text: " has assigned you a ticket"})
     Process.send_after(self(), :close_new, 10)
     send(self(), {:fetch_c, %{user: socket.assigns.user, locations: socket.assigns.location_ids}})
     {:noreply, assign(socket,loading: true)}
@@ -183,7 +188,7 @@ defmodule MainWeb.Live.TicketsView do
     |> Kernel.+(min)
     |> Integer.to_string(36)
   end
-  defp notify(params,team_member,user)do
+  defp notify(params,team_member \\nil,user \\nil)do
     case Notifications.create(params) do
       {:ok, notif} ->
         Main.LiveUpdates.notify_live_view(params.user_id,{__MODULE__, :new_notif})
