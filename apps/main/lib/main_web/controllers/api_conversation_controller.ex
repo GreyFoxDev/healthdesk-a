@@ -121,7 +121,7 @@ defmodule MainWeb.Api.ConversationController do
       convo ->
         if convo.status != "closed" do
           is_call = if convo.conversation_messages  do
-            convo.conversation_messages |> List.first |> String.match?(~r/calling/)
+            (convo.conversation_messages |> List.first).message |> String.match?(~r/calling/)
           else
             false
           end

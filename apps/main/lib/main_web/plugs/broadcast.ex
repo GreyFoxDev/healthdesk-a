@@ -30,11 +30,11 @@ defmodule MainWeb.Plug.Broadcast do
       nil -> nil
       location ->
         alert_info = Map.merge(assigns, %{location: location, member: member})
+        Main.LiveUpdates.notify_live_view({location.id, :updated_open})
         MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)
         MainWeb.Endpoint.broadcast("alert:#{location.phone_number}", "broadcast", alert_info)
 
     end
-    Main.LiveUpdates.notify_live_view({convo.location_id, :updated_open})
     conn
   end
 
