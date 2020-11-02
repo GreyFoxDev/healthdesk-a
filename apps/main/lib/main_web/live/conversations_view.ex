@@ -485,12 +485,12 @@ defmodule MainWeb.Live.ConversationsView do
              Map.merge(params, %{"id" => conversation.id, "location_id" => location.id})
            ) do
         {:ok, _} ->
-          if socket.assign.tab == "active" do
+          if socket.assigns.tab == "active" do
             conversation =
               user
               |> Conversations.get(conversation.id)
               |> fetch_member()
-            locations = socket.assigns.locations
+            locations = socket.assigns.location_ids
             conversations = user
                             |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
 

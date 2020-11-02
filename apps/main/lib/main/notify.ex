@@ -6,7 +6,6 @@ defmodule MainWeb.Notify do
   require Logger
 
   alias Data.{Location, Conversations, TeamMember, TimezoneOffset, MemberChannel}
-  alias Data.Schema.TeamMember
   alias Data.Schema.MemberChannel, as: Channel
 
   @url "[url]/admin/conversations/[conversation_id]/"
