@@ -42,11 +42,6 @@ defmodule Data.Conversations do
     Query.get_by_location_id(location_id)
   end
   def all(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do
-    IO.inspect("###########lets see########")
-    IO.inspect(location_id)
-    IO.inspect(Process.info(self(), :current_stacktrace), label: "STACKTRACE")
-
-    IO.inspect("###################")
 
     Query.get_by_status(location_id,status) |> Enum.take(200)
   end

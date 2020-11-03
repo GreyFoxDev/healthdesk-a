@@ -37,6 +37,9 @@ defmodule MainWeb.Plug.CloseConversation do
   If the intent isn't found then set the conversation status to pending while
   an admin addresses the member.
   """
+  def call(%{assigns: %{convo: id, intent: nil}} = conn, _opts) do
+    conn
+  end
   def call(%{assigns: %{convo: id, intent: {:unknown, []}}} = conn, _opts) do
     C.pending(id)
     conn

@@ -22,6 +22,10 @@ defmodule MainWeb.Plug.OpenConversation do
   def call(%{assigns: %{member: member, location: location}} = conn, _opts)
   when is_binary(member) and is_binary(location) do
     with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({member, location}) do
+      IO.inspect("###################")
+      IO.inspect(convo)
+      IO.inspect("###################")
+
       CM.create(%{
             "conversation_id" => convo.id,
             "phone_number" => member,
@@ -31,6 +35,7 @@ defmodule MainWeb.Plug.OpenConversation do
       conn
       |> assign(:convo, convo.id)
       |> assign(:status, convo.status)
+      |> assign(:team_member_id, convo.team_member_id)
     else
       {:error, message} ->
         Logger.error("MEMBER: #{member}\nLOCATION: #{location}\n - Error finding or starting a conversation")

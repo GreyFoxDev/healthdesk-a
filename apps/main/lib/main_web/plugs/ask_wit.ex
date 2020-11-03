@@ -4,7 +4,7 @@ defmodule MainWeb.Plug.AskWit do
   """
 
   require Logger
-
+  alias Data.Conversations
   import Plug.Conn
 
   @spec init(list()) :: list()
@@ -16,10 +16,11 @@ defmodule MainWeb.Plug.AskWit do
   @doc """
   Only once the member has opted in will the question be sent to Wit
   """
-  def call(%{assigns: %{convo: id, opt_in: true, status: "open", message: message}} = conn, _opts) do
-    pending_message_count = (ConCache.get(:session_cache, id) || 0)
+  def call(%{assigns: %{convo: id,  status: "open", message: message}} = conn, _opts) do
 
-    if pending_message_count == 0 && conn.assigns[:status] == "closed"  do
+
+    pending_message_count = (ConCache.get(:session_cache, id) || 0)
+    if pending_message_count == 0 && conn.assigns[:team_member_id] == nil  do
       assign(conn, :intent, ask_wit_ai(message))
     else
       assign(conn, :intent, {:unknown, []})

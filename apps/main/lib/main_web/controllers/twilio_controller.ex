@@ -10,7 +10,6 @@ defmodule MainWeb.TwilioController do
 
   plug P.AssignParams
   plug P.OpenConversation
-  plug P.OptIn
   plug P.CacheQuestion
   plug P.AskWit
   plug P.BuildAnswer
