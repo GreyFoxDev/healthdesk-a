@@ -61,6 +61,7 @@ defmodule Data.Query.Ticket do
   def get_by_location_ids(location_id, repo \\ Read) do
     from(t in Ticket,
       where: t.location_id in ^location_id,
+      where: t.status != "archive",
       order_by: [desc: t.updated_at],
       preload: [:user,:location, team_member: [:user],notes: [:user]],
       limit: 100

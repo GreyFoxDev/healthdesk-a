@@ -21,7 +21,7 @@ defmodule MainWeb.Plug.CacheQuestion do
   @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t() | no_return()
   def call(conn, _opts), do: conn
 
-  def call(%{assigns: %{opt_in: true, member: member, message: message}} = conn, _opts) do
+  def call(%{assigns: %{ member: member, message: message}} = conn, _opts) do
     downcased = String.downcase(message)
     cond do
       downcased in ["no", "stop"] ->

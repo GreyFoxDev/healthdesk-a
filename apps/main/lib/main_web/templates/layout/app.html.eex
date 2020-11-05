@@ -1,122 +1,164 @@
-
-    <header class="app-header app-header-dark">
-        <div class="top-bar">
-            <div class="top-bar-brand">
-                <%= if @current_user.role != "teammate" do %>
-                <a href="/admin"><img src="/images/healthdesk-logo.png"/></a>
-                <% else %>
-                <a href="<%=  team_location_live_path(@conn, MainWeb.Live.ConversationsView, @current_user.team_member.team_id, @current_user.team_member.location_id)%>">
-                    <img src="/images/healthdesk-logo.png"/>
-                </a>
-                <% end %>
+<header class="app-header bg-white">
+    <div class="top-bar">
+        <div class="top-bar-brand">
+            <!--    <button class="hamburger hamburger-squeeze mr-2" type="button" data-toggle="aside-menu" aria-label="toggle aside menu">
+                   <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+               </button> -->
+            <a href="/admin"><img src="/v3/images/logo.png"/></a>
+        </div>
+        <div class="top-bar-list">
+            <div class="top-bar-item px-2 d-md-none d-lg-none d-xl-none">
+                <button class="hamburger hamburger-squeeze" type="button" data-toggle="aside" aria-label="toggle menu">
+                    <span class="hamburger-box">
+                        <span class="hamburger-inner"></span>
+                    </span>
+                </button>
             </div>
-            <div class="top-bar-list">
-                <div class="top-bar-item px-2 d-md-none d-lg-none d-xl-none">
-                    <button class="hamburger hamburger-squeeze" type="button" data-toggle="aside" aria-label="toggle menu">
-                                <span class="hamburger-box">
-                                    <span class="hamburger-inner"></span>
-                                </span>
-                    </button>
-                </div>
-                <div>
-                    <%= live_render(@conn, MainWeb.Live.ConversationAlertsView, session: %{"current_user" => @current_user}) %>
-                </div>
+            <div>
+                <%= live_render(@conn, MainWeb.Live.ConversationAlertsView, session: %{"current_user" => @current_user}, id: "convoalerts") %>
             </div>
+        </div>
 
 
-            <div class="top-bar-item top-bar-item-right px-0 d-none d-sm-flex">
-                <div class="dropdown">
-                    <button class="btn-account d-none d-md-flex" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="oi oi-envelope-open"></span>
-                        <span class="ml-2 "></span>
-                    </button>
-                    <div class="dropdown-arrow dropdown-arrow-left"></div>
-                    <div class="dropdown-menu pl-2 pr-2" x-placement="bottom-start" style="position: absolute; top: 56px; left: 0px; will-change: top, left; width: 250px;">
-                        <h6 class="dropdown-header d-none d-md-block d-lg-none">
-                            Notifications
-                        </h6>
-                <%= live_render(@conn, MainWeb.Live.NotificationAlertsView, session: %{"current_user" => @current_user}) %>
-                    </div></div>
-                <%= if current_user = assigns[:current_user] do %>
 
-                <div class="dropdown">
-                    <button class="btn-account d-none d-md-flex" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="user-avatar user-avatar-md">
-                                        <img src="<%= if current_user.avatar != "", do: current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt=""></span>
-                        <span class="account-summary pr-lg-4 d-none d-lg-block">
-                                            <span class="account-name">
-                                                <%= current_user.first_name %>
-                                                <%= current_user.last_name %>
-                                            </span>
-                                            <span class="account-description">
-                                                <%= MainWeb.Helper.Formatters.format_role(current_user.role) %>
-                                            </span>
-                                        </span>
-                    </button>
+        <div class="top-bar-item top-bar-item-right px-0 d-none d-sm-flex">
+            <ul class="header-nav nav">
+                <!-- .nav-item -->
 
-                    <div class="dropdown-arrow dropdown-arrow-left"></div><!-- .dropdown-menu -->
-                    <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; top: 56px; left: 0px; will-change: top, left;">
-                        <h6 class="dropdown-header d-none d-md-block d-lg-none">
-                            <%= current_user.first_name %>&nbsp
-                            <%= current_user.last_name %>
-                        </h6>
-                        <%= link "Profile", to: user_path(@conn, :edit, current_user), class: "dropdown-item" %>
-                        <%= link "Logout", to: session_path(@conn, :delete, current_user), method: "delete", class: "dropdown-item" %>
-                        <hr />
-                        <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
-                        <%= link "Analytics", to: admin_path(@conn, :index), class: "dropdown-item" %>
-                                    <% end %>
-                        <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
-                        <%= link "Settings", to: settings_url(@conn, current_user), class: "dropdown-item" %>
-                                    <% end %>
-                        <%= link "Get support", to: "mailto:support@healthdesk.ai", method: "delete", class: "dropdown-item" %>
-                        <%= link "Terms of use", to: "https://healthdesk.ai/terms", target: "_blank", class: "dropdown-item" %>
-                        <%= link "Privacy policy", to: "https://healthdesk.ai/privacy", target: "_blank", class: "dropdown-item" %>
-                    </div><!-- /.dropdown-menu -->
-                </div>
-                <% end %>
+                <li class="nav-item dropdown header-nav-dropdown has-notified">
+                    <a class="nav-link" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="oi oi-envelope-open"></span></a> <!-- .dropdown-menu -->
+                    <div class="dropdown-menu dropdown-menu-rich dropdown-menu-right">
+                        <div class="dropdown-arrow"></div>
+                        <h6 class="dropdown-header stop-propagation">
+                            <span>Notifications <span class="badge"></span></span>
+                        </h6><!-- .dropdown-scroll -->
+                        <div class="dropdown-scroll perfect-scrollbar">
+                            <%= live_render(@conn, MainWeb.Live.NotificationAlertsView, session: %{"current_user" => @current_user},id: "notialert") %>
+                        </div>
+                    </div>
+                </li><!-- /.nav-item -->
 
-            </div>
+            </ul>
 
-    </header>
-    <aside class="app-aside app-aside-expand-md app-aside-light">
-        <div class="aside-content">
-            <section class="aside-menu overflow-hidden ps">
-                <nav id="stacked-menu" class="stacked-menu stacked-menu-has-collapsible">
-                    <ul class="menu">
 
-                        <li class="menu-item has-child">
-                            <a href="#" class="menu-link">
-                                <span class="menu-icon oi oi-browser"></span>
-                                <span class="menu-text">
-                                                    Conversations
-                                                </span>
-                            </a> <!-- child menu -->
-                            <ul class="menu">
-                                <li class="menu-subhead">Active</li>
-                                <li class="menu-item">
-                                    <a href="/admin/conversations/active" class="menu-link">Active</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="/admin/conversations/assigned" class="menu-link">Assigned</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="/admin/conversations/closed" class="menu-link">Closed</a>
-                                </li>
-                            </ul>
-                        </li>
+            <div class="dropdown d-none d-md-flex">
+                <button class="btn-account" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="user-avatar user-avatar-md">
+                <img src="<%= if @current_user.avatar != "", do: @current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt=""><span class="avatar-badge online"></span>
+              </span>
+                    <span class="account-summary pr-lg-4 d-none d-lg-block">
+                <span class="account-name"> <%= @current_user.first_name %>  <%= @current_user.last_name %></span>
+                  <span class="account-description d-flex justify-content-around">
+                    <p class="mb-0 mr-2">Online</p><span>|</span>
+                    <ul class="countdown pl-2 m-0">
+                      <li>
+                        <span class="hours time">00</span>
+                      </li>
+                      <li class="seperator">:</li>
+                      <li>
+                        <span class="minutes time">00</span>
+                      </li>
+                      <li class="seperator">:</li>
+                      <li>
+                        <span class="seconds time">00</span>
+                      </li>
                     </ul>
-                </nav>
-            </section>
-        </div>
-    </aside>
+                  </span>
+                </span>
+                    </span>
+                </button>
+                <div class="dropdown-arrow dropdown-arrow-left"></div><!-- .dropdown-menu -->
+                <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: top, left; top: 56px; left: 0px;">
+                    <h6 class="dropdown-header d-none d-md-block d-lg-none"><%= @current_user.first_name %>&nbsp<%= @current_user.last_name %></h6>
+                    <a  class="dropdown-item" href="#">Offline</a>
+                    <a  class="dropdown-item" href="#">Unavailable</a>
+                    <hr>
 
-    <main class="app-main">
-        <div class="wrapper">
-            <div class="page has-sidebar has-sidebar-expand-xl">
-                <div class="page-inner">
-                    <%= render @view_module, @view_template, assigns %>
-                </div>
+                    <%= link raw("<span class=\"dropdown-icon oi oi-person\"></span> Profile"), to: user_path(@conn, :edit, @current_user), class: "dropdown-item" %>
+                    <%= link raw("<span class=\"dropdown-icon oi oi-account-logout\"></span>Logout"), to: session_path(@conn, :delete, @current_user), method: "delete", class: "dropdown-item" %>
+                    <hr />
+                    <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
+                    <%= link "Analytics", to: admin_path(@conn, :index), class: "dropdown-item" %>
+                                    <% end %>
+                    <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
+                    <%= link "Settings", to: settings_url(@conn, @current_user), class: "dropdown-item" %>
+                                    <% end %>
+                    <%= link "Get support", to: "mailto:support@healthdesk.ai", method: "delete", class: "dropdown-item" %>
+                    <%= link "Terms of use", to: "http://healthdesk.ai/terms", target: "_blank", class: "dropdown-item" %>
+                    <%= link "Privacy policy", to: "http://healthdesk.ai/privacy", target: "_blank", class: "dropdown-item" %>
+
+                </div><!-- /.dropdown-menu -->
             </div>
+
         </div>
-    </main>
+    </div>
+</header>
+<aside class="app-aside app-aside-expand-md app-aside-dark">
+    <div class="aside-content">
+        <header class="aside-header d-block d-md-none">
+
+        </header><!-- /.aside-header -->
+        <div class="aside-menu overflow-hidden">
+            <nav id="stacked-menu" class="stacked-menu">
+                <ul class="menu">
+                    <li class="menu-item">
+                        <a class="menu-link" href="/admin">
+                            <span class="menu-icon oi oi-home"></span>
+                            <span class="menu-text">Dashboard</span>
+                        </a>
+
+                    </li>
+                    <li class="menu-item has-child has-open">
+                        <a class="menu-link" href="#">
+                            <span class="menu-icon oi oi-chat"></span>
+                            <span class="menu-text">Conversations</span>
+                            <span class="badge badge-subtle badge-success">
+                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"current_user" => @current_user}, id: "conversation_count") %>
+                            </span>
+                        </a>
+                        <ul class="menu">
+
+                            <li class="menu-item <%= if assigns[:tab] == "active",do: "has-active",else: "" %>">
+                                <a href="/admin/conversations/active" class="menu-link">Active</a>
+                            </li>
+                            <li class="menu-item <%= if assigns[:tab] == "assigned",do: "has-active",else: "" %>">
+                                <a href="/admin/conversations/assigned" class="menu-link">Assigned</a>
+                            </li>
+                            <li class="menu-item <%= if assigns[:tab] == "closed",do: "has-active",else: "" %>">
+                                <a href="/admin/conversations/closed" class="menu-link">Closed</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menu-item <%= if assigns[:tab] == "campaign",do: "has-active",else: "" %>">
+                        <a class="menu-link" href="/admin/campaigns">
+                            <span class="menu-icon oi oi-laptop"></span>
+                            <span class="menu-text">Campaigns</span>
+                        </a>
+                    </li>
+                    <li class="menu-item <%= if assigns[:tab] == "ticket",do: "has-active",else: "" %>">
+                        <a class="menu-link" href="/admin/tickets">
+                            <span class="menu-icon oi oi-phone"></span>
+                            <span class="menu-text">Tickets</span>
+                        </a>
+                    </li>
+                    <li class="menu-item ">
+                        <%= if @current_user.role == "admin" do %>
+                        <%= link {:safe, "<span class=\"menu-icon oi oi-book\"></span>
+                            <span class=\"menu-text\">Knowledge Base</span>"}, to: team_path(@conn, :index), class: "menu-link" %>
+                    <% end %>
+                        <%= if @current_user.role in ["location-admin", "team-admin"] do %>
+                        <%= link {:safe, "<span class=\"menu-icon oi oi-book\"></span>
+                            <span class=\"menu-text\">Knowledge Base</span>"},
+                                                     to: team_location_path(@conn, :index, @current_user.team_member.team_id), class: "menu-link" %>
+                    <% end %>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</aside>
+<main class="app-main">
+    <div class="wrapper">
+        <%= render @view_module, @view_template, assigns %>
+    </div>
+</main>

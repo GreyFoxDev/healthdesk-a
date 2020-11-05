@@ -20,11 +20,11 @@ defmodule MainWeb.Plug.BuildAnswer do
   If the intent is 'unknown' then the super admin for the location needs to be notified that there is a new
   message in the queue.
   """
-  def call(%{assigns: %{convo: id, opt_in: true, status: "open", intent: nil} = assigns} = conn, _opts) do
+  def call(%{assigns: %{convo: id,  status: "open", intent: nil} = assigns} = conn, _opts) do
     conn
     |> assign(:status, "open")
   end
-  def call(%{assigns: %{convo: id, opt_in: true, status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
+  def call(%{assigns: %{convo: id,  status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
     :ok = notify_admin_user(assigns)
@@ -38,7 +38,7 @@ defmodule MainWeb.Plug.BuildAnswer do
   @doc """
   If there is a known intent then get the corresponding response.
   """
-  def call(%{assigns: %{convo: id, opt_in: true, status: "open", intent: intent, location: location}} = conn, _opts) do
+  def call(%{assigns: %{convo: id, status: "open", intent: intent, location: location}} = conn, _opts) do
     response = Intents.get(intent, location)
 
     location = Location.get_by_phone(location)

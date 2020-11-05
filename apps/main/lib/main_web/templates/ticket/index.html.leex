@@ -161,7 +161,7 @@
                             <%= f = form_for @changeset, "#", [phx_change: :update_ticket] %>
                             <%= hidden_input f, :id, value: @open_ticket.id, id: "ticket_id0" %>
                             <%= select f, :status,
-                        [{"New","new"},{"Open","open"},{"Pending","pending"},{"Resolved","resolved"},{"Closed","closed"}],
+                        [{"New","new"},{"Open","open"},{"Pending","pending"},{"Resolved","resolved"},{"Closed","closed"}, {"Archive","archive"}],
                         prompt: "Select Priority ",required: true,id: "priority_select", class: "custom-select", value: @open_ticket.status  %>
                             <form/>
                         </div><!-- /.time-tracking -->
