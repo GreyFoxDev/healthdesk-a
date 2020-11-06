@@ -100,6 +100,7 @@ defmodule MainWeb.Api.ConversationController do
         "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
         "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
       |> CM.create()
+      Main.LiveUpdates.notify_live_view({convo.location_id, :updated_open})
     end
 
     C.close(id)
