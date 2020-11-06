@@ -108,7 +108,7 @@
                         </a>
 
                     </li>
-                    <li class="menu-item has-child has-open">
+                    <li class="menu-item has-child">
                         <a class="menu-link" href="#">
                             <span class="menu-icon oi oi-chat"></span>
                             <span class="menu-text">Conversations</span>
