@@ -23,7 +23,7 @@ defmodule MainWeb.Plug.AskWit do
     if pending_message_count == 0 && conn.assigns[:team_member_id] == nil  do
       assign(conn, :intent, ask_wit_ai(message))
     else
-      assign(conn, :intent, {:unknown, []})
+      assign(conn, :intent, nil)
     end
   end
 
