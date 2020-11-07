@@ -4,6 +4,7 @@ defmodule MainWeb.PageController do
   def index(conn, _params) do
     conn
     |> put_layout(:default)
+    |> assign(:tab,"none")
     |> render("index.html")
   end
 
