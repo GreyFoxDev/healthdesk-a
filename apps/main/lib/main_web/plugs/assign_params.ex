@@ -36,6 +36,10 @@ defmodule MainWeb.Plug.AssignParams do
 
   def call(%{params: %{"flow_name" => flow} = params} = conn, _opts) do
     location = Location.get(%{role: "admin"}, params["location_id"])
+    IO.inspect("###################")
+    IO.inspect(location)
+    IO.inspect(params)
+    IO.inspect("###################")
 
     conn
     |> assign(:flow_name, flow)
