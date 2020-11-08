@@ -756,11 +756,6 @@ defmodule MainWeb.Live.ConversationsView do
     end
   end
   def handle_info({convo_id, %Data.Schema.ConversationMessage{}=msg}, socket) do
-    IO.inspect("###################")
-    IO.inspect("lets see")
-    IO.inspect("###################")
-
-
     if  socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
       user = socket.assigns.user
       conversation = socket.assigns.open_conversation
