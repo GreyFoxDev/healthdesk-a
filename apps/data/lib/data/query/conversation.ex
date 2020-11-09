@@ -12,7 +12,7 @@ defmodule Data.Query.Conversation do
   Returns a conversation by id
   """
   @spec get(id :: binary(),check :: boolean(), repo :: Ecto.Repo.t()) :: Conversation.t() | nil
-  def get(id, preload_f, repo \\ Read)
+  def get(id, preload_f\\true, repo \\ Read)
   def get(id, false, repo)  do
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
