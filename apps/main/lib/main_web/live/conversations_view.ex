@@ -174,8 +174,7 @@ defmodule MainWeb.Live.ConversationsView do
 
     conversations = user
                     |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
-    open_conversation = conversations |> List.first()
-
+    open_conversation = conversations |> List.first() |>fetch_member()
 
     socket = socket
              |> assign(:team_members, [])
@@ -197,7 +196,7 @@ defmodule MainWeb.Live.ConversationsView do
 
     conversations = user
                     |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) ->(c.team_member && c.team_member.user_id != user.id) end)
-    open_conversation = conversations |> List.first()
+    open_conversation = conversations |> List.first() |>fetch_member()
 
     socket = socket
              |> assign(:team_members, [])
@@ -219,7 +218,7 @@ defmodule MainWeb.Live.ConversationsView do
 
     conversations = user
                     |> Conversations.all(locations,["closed"])
-    open_conversation= conversations |> List.first()
+    open_conversation= conversations |> List.first() |>fetch_member()
 
     socket = socket
              |> assign(:team_members, [])
@@ -497,7 +496,7 @@ defmodule MainWeb.Live.ConversationsView do
 
             socket =
               socket
-              |> assign(:open_conversation, conversations |> List.first())
+              |> assign(:open_conversation, conversations |> List.first()|>fetch_member())
               |> assign(:conversations, conversations)
               |> assign(:changeset, Conversations.get_changeset())
 
@@ -536,7 +535,7 @@ defmodule MainWeb.Live.ConversationsView do
 
           socket =
             socket
-            |> assign(:open_conversation, conversation)
+            |> assign(:open_conversation, conversation|>fetch_member())
             |> assign(:conversations, conversations)
             |> assign(:changeset, Conversations.get_changeset())
           if connected?(socket), do: Process.send_after(self(), :reload_convo, 500)
