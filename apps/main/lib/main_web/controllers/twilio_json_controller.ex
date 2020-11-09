@@ -36,6 +36,13 @@ defmodule MainWeb.TwilioJsonController do
     |> put_status(200)
     |> json(%{message: conn.assigns[:response], pending: pending_message_count})
   end
+  def inbound(%Plug.Conn{assigns: %{status: "open", convo: id}} = conn, _params) do
+    pending_message_count = (ConCache.get(:session_cache, id) || 0)
+    conn
+    |> put_resp_content_type("application/json")
+    |> put_status(200)
+    |> json(%{message: conn.assigns[:response], pending: pending_message_count})
+  end
 
   @doc """
   Handle a successful communication with a member
@@ -52,6 +59,10 @@ defmodule MainWeb.TwilioJsonController do
   Handle an error back to member. This is a catch all function
   """
   def inbound(conn, _params) do
+    IO.inspect("###################")
+    IO.inspect(conn.assigns)
+    IO.inspect("###################")
+
     conn
     |> put_resp_content_type("application/json")
     |> put_status(500)
