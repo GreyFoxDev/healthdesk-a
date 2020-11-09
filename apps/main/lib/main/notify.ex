@@ -168,7 +168,7 @@ defmodule MainWeb.Notify do
       |> Enum.filter(&(&1.user.role == "location-admin"))
       |> IO.inspect(label: "ALL ADMINS")
 
-    conversation = Conversations.get(conversation_id,false) |> fetch_member()
+    conversation = Conversations.get(%{role: "admin"},conversation_id,false) |> fetch_member()
 
     _ = Enum.each(all_admins, fn(admin) ->
       if admin.user.use_email do
