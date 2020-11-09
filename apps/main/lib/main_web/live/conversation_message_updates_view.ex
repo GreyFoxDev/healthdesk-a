@@ -24,6 +24,10 @@ defmodule MainWeb.Live.ConversationMessageUpdatesView do
     case conversation.channel_type do
       "APP" -> {:noreply,socket}
       _ ->  messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
+            IO.inspect("###################")
+            IO.inspect("this is 1")
+            IO.inspect("###################")
+
             Main.LiveUpdates.notify_live_view({id, struct( %Data.Schema.ConversationMessage{},broadcast.payload)})
             {:noreply,socket}
     end

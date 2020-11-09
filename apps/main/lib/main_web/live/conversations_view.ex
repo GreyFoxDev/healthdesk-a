@@ -435,9 +435,9 @@ defmodule MainWeb.Live.ConversationsView do
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-         from = if conversation.team_member && conversation.team_member.user.first_name, do: conversation.team_member.user.first_name, else: location.location_name
+           from = if conversation.team_member && conversation.team_member.user.first_name, do: conversation.team_member.user.first_name, else: location.location_name
 
-         message = %Chatbot.Params{
+           message = %Chatbot.Params{
              provider: :twilio,
              from: from,
              to: conversation.original_number,
@@ -768,6 +768,9 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:child_id, (List.first(messages)).id)
         |> assign(:changeset, Conversations.get_changeset())
       if connected?(socket), do: Process.send_after(self(), :scroll_chat, 200)
+      IO.inspect("###################")
+      IO.inspect("this is 2")
+      IO.inspect("###################")
       {:noreply,socket}
     else
       {:noreply,socket}
