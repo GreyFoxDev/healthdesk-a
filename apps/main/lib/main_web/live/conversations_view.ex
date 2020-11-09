@@ -574,6 +574,7 @@ defmodule MainWeb.Live.ConversationsView do
       }
 
       Conversations.update(%{"id" => conversation.id, "status" => "closed", "team_member_id" => nil})
+      Main.LiveUpdates.notify_live_view( {conversation.location.id, :updated_count})
       ConversationMessages.create(message)
       conversations = user
                       |> Conversations.all(socket.assigns.location_ids,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
@@ -616,9 +617,6 @@ defmodule MainWeb.Live.ConversationsView do
           |> assign(:loading, false)
 
       end
-
-
-      Main.LiveUpdates.notify_live_view( {location.id, :updated_count})
       {:noreply, socket}
     else
       {:noreply, socket}
