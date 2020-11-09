@@ -15,7 +15,6 @@ defmodule Data.Query.Conversation do
   def get(id, preload_f\\true, repo \\ Read)
   def get(id, false, repo)  do
     from(c in Conversation,
-      join: m in assoc(c, :conversation_messages),
       left_join: member in Member,
       on: c.original_number == member.phone_number,
       where: c.id == ^id,
