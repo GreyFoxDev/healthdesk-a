@@ -48,18 +48,20 @@ defmodule MainWeb.Live.OpenConverationsView do
     {:noreply, assign(socket, %{count: count})}
   end
   def handle_info({location_id, :updated_open}, socket) do
-    IO.inspect("###################")
-    IO.inspect("updated_open")
-    IO.inspect(location_id)
-    IO.inspect("###################")
-
     count =
       if Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
         open_convos(socket.assigns.location_ids)
       else
         socket.assigns.count
       end
-    {:noreply, assign(socket, %{count: count})}
+
+    if count != socket.assigns.count do
+      if connected?(socket), do: Process.send_after(self(), :menu_fix, 300)
+      {:noreply, assign(socket, %{count: count})}
+    else
+      {:noreply, socket}
+
+    end
   end
   def handle_info(_, socket) do
     {:noreply, socket}
@@ -68,5 +70,8 @@ defmodule MainWeb.Live.OpenConverationsView do
     %{role: "admin"}
     |> C.all(location_id)
     |> Enum.count(&(&1.status in ["open", "pending"]))
+  end
+  defp handle_info(:menu_fix, socket) do
+    {:noreply, push_event(socket, "menu_fix", %{})}
   end
 end
