@@ -9,6 +9,7 @@ defmodule MainWeb.TwilioController do
   require Logger
 
   plug P.AssignParams
+  plug P.SaveMemberData
   plug P.OpenConversation
   plug P.CacheQuestion
   plug P.AskWit

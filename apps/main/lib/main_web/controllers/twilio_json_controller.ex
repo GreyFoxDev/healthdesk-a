@@ -9,6 +9,7 @@ defmodule MainWeb.TwilioJsonController do
   require Logger
 
   plug P.AssignParams
+  plug P.SaveMemberData
   plug P.OpenConversation
   plug P.CacheQuestion
   plug P.AskWit
@@ -59,9 +60,6 @@ defmodule MainWeb.TwilioJsonController do
   Handle an error back to member. This is a catch all function
   """
   def inbound(conn, _params) do
-    IO.inspect("###################")
-    IO.inspect(conn.assigns)
-    IO.inspect("###################")
 
     conn
     |> put_resp_content_type("application/json")
