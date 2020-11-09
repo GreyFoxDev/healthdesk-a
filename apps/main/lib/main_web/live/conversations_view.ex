@@ -618,6 +618,7 @@ defmodule MainWeb.Live.ConversationsView do
       end
 
 
+      Main.LiveUpdates.notify_live_view( {location.id, :updated_count})
       {:noreply, socket}
     else
       {:noreply, socket}
