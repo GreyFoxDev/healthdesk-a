@@ -371,6 +371,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:child_id, (List.first(messages)).id)
       |> assign(:changeset, Conversations.get_changeset())
     if connected?(socket), do: Process.send_after(self(), :scroll_chat, 200)
+    if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
     {:noreply, socket}
   end
   defp send_message(%{original_number: <<"+1", _ :: binary>>} = conversation, params, location, user) do
