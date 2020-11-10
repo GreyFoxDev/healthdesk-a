@@ -170,6 +170,9 @@ defmodule MainWeb.Live.ConversationsView do
 
     {:ok, socket}
   end
+  def mount(_,_,socket)do
+    {:ok, redirect(socket, to: "/login")}
+  end
   def handle_info({:fetch_c, %{user: user, locations: locations, type: "active"}}, socket) do
 
     conversations = user
