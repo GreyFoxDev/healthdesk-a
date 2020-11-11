@@ -33,11 +33,29 @@ defmodule MainWeb.UpdateMemberController do
       |> render("error.json")
     end
   end
+  def update(member_params)do
+    if member_params["id"] == nil do
+      Member.create(member_params)
+
+    else
+        with %Data.Schema.Member{} = member <- Member.get(%{role: "admin"}, member_params["id"]) do
+          Member.update(member.id, member_params)
+        else
+          nil ->
+            Member.create(member_params)
+        end
+    end
+
+  end
 
   def format_phone("N/A"), do: nil
 
   def format_phone(<< "+1", number :: binary >>),
-    do: format_phone(number)
+      do: format_phone(number)
+
+  def format_phone("") do
+    nil
+  end
 
   def format_phone(phone) do
     "+1#{replace_non_digits(phone)}"

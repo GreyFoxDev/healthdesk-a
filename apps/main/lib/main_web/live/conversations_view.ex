@@ -376,6 +376,15 @@ defmodule MainWeb.Live.ConversationsView do
     if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
     {:noreply, socket}
   end
+  def handle_event("save_member",  %{"member" => m_params} = params, socket) do
+    o_c = socket.assigns.open_conversation
+   socket = case MainWeb.UpdateMemberController.update(m_params) do
+                                                         {:ok,member} -> socket|>assign(:open_conversation,Map.merge(o_c,%{member: member}))
+                                                         _ -> socket
+    end
+    if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
+    {:noreply, socket}
+  end
   defp send_message(%{original_number: <<"+1", _ :: binary>>} = conversation, params, location, user) do
 
     params["conversation_message"]

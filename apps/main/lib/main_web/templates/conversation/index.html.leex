@@ -461,10 +461,11 @@
                                     </div>
                                 </div> -->
                                 <div class="card-footer p-3">
-                                    <!-- .form -->
-                                    <form id="member-form" method="PUT" style="width:100%;">
+                                    <!-- .
+                                    <form id="member-form" method="PUT" style="width:100%;"> -->
+                                    <%= f = form_for :foo, "#", [ phx_submit: :save_member, id: "member-form", style: "width: 100%"] %>
                                         <%= if @open_conversation.member do %>
-                                        <input name="id" type="hidden" value="<%= @open_conversation.member.id %>">
+                                        <input name="member[id]" type="hidden" value="<%= @open_conversation.member.id %>">
                                         <% end %>
                                         <input name="member[team_id]" type="hidden"
                                                value="<%= @open_conversation.location.team_id %>">
@@ -502,8 +503,9 @@
                                                 <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="fl1">Phone Number</label>
-                                                        <input name="member[phone_number]" type="text"
-                                                               class="form-control"
+                                                        <input type="hidden" name="member[phone_number]" value="<%= if @open_conversation.member, do: format_phone(@open_conversation.member.phone_number), else: "N/A" %>">
+                                                        <input disabled type="text"
+                                                               class="form-control" readonly
                                                                value="<%= if @open_conversation.member, do: format_phone(@open_conversation.member.phone_number), else: "N/A" %>">
                                                     </div>
                                                 </div>
@@ -512,7 +514,7 @@
                                                     <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="fl1">Location</label>
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" disabled
                                                                value="<%= @open_conversation.location.location_name %>"
                                                                readonly>
                                                     </div>
@@ -535,7 +537,7 @@
 
 
                                         </fieldset>
-                                        <button type="button" class="btn btn-primary btn-lg btn-block" id="update_member">Update</button>
+                                        <button type="submit" class="btn btn-primary btn-lg btn-block" >Update</button>
 
                                     </form>
 
