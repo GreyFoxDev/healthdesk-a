@@ -503,10 +503,9 @@
                                                 <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="fl1">Phone Number</label>
-                                                        <input type="hidden" name="member[phone_number]" value="<%= if @open_conversation.member, do: format_phone(@open_conversation.member.phone_number), else: "N/A" %>">
-                                                        <input disabled type="text"
+                                                        <input  type="text"
                                                                class="form-control" readonly
-                                                               value="<%= if @open_conversation.member, do: format_phone(@open_conversation.member.phone_number), else: "N/A" %>">
+                                                               value="<%= if @open_conversation.member, do: @open_conversation.member.phone_number, else: "N/A" %>">
                                                     </div>
                                                 </div>
                                                 </div>
