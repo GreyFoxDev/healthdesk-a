@@ -11,7 +11,7 @@
 
     <div class="page-inner page-inner-fill position-relative" >
         <header class="page-navs bg-white shadow-sm d-flex justify-content-between px-2">
-            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..."%>
+            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..." , value: assigns[:search_string] %>
         </header>
         <div class="">
             <button type="button" class="btn btn-primary btn-floated position-absolute" data-toggle="dropdown" data-target="" title="Add new client"><i class="fa fa-plus"></i></button>
@@ -536,7 +536,7 @@
 
 
                                         </fieldset>
-                                        <button type="submit" class="btn btn-primary btn-lg btn-block" >Update</button>
+                                        <button type="submit" class=" updatememeber btn btn-primary btn-lg btn-block" onclick="this.blur();">Update</button>
 
                                     </form>
 

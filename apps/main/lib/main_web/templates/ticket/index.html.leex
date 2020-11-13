@@ -99,7 +99,7 @@
                     <div class="form-group">
                         <label for="priority">Priority</label>
                         <%= select f, :priority,
-                        [{"P0 - Blocker", "P0"},{"P1 - Critical","P1"},{"P2 - Critical","P2"},{"P3 - Major","P3"},{"RFE - Request for Enhancement","RFE"}],
+                        [{"P0 - Blocker", "P0"},{"P1 - Critical","P1"},{"P2 - Major","P2"},{"P3 - Minor","P3"},{"RFE - Request for Enhancement","RFE"}],
                         prompt: "Select Priority ",required: true, class: "custom-select"  %>
                     </div>
                     <div class="form-group">
@@ -178,7 +178,7 @@
                             <%= f = form_for @changeset, "#", [phx_change: :update_ticket] %>
                             <%= hidden_input f, :id, value: @open_ticket.id, id: "ticket_id1" %>
                             <%= select f, :priority,
-                        [{"P0 - Blocker", "P0"},{"P1 - Critical","P1"},{"P2 - Critical","P2"},{"P3 - Major","P3"},{"RFE - Request for Enhancement","RFE"}],
+                        [{"P0 - Blocker", "P0"},{"P1 - Critical","P1"},{"P2 - Major","P2"},{"P3 - Minor","P3"},{"RFE - Request for Enhancement","RFE"}],
                         prompt: "Select Priority ",required: true, class: "custom-select", value: @open_ticket.priority  %>
                             <form/>
                             </select>

@@ -377,11 +377,19 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
   def handle_event("save_member",  %{"member" => m_params} = params, socket) do
+
     o_c = socket.assigns.open_conversation
-   socket = case MainWeb.UpdateMemberController.update(m_params) do
-                                                         {:ok,member} -> socket|>assign(:open_conversation,Map.merge(o_c,%{member: member}))
-                                                         _ -> socket
+    socket = case MainWeb.UpdateMemberController.update(m_params) do
+      {:ok,member} ->
+        conversations = socket.assigns.conversations
+        [head | tail] = conversations
+        conversations = [ Map.merge(head,%{member: member}) | tail]
+        socket
+        |> assign(:open_conversation, Map.merge(o_c,%{member: member}))
+        |> assign(:conversations,conversations)
+      _ -> socket
     end
+
     if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
     {:noreply, socket}
   end
@@ -719,9 +727,6 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def handle_event("new_ticket",%{"ticket" => params}, socket)do
     {:ok, res}=Ticket.create(params)
-    IO.inspect("###################")
-    IO.inspect(res)
-    IO.inspect("###################")
     tm = TeamMember.get(%{role: "admin"}, res.team_member_id)
     notify(%{user_id: tm.user.id, from: res.user_id, ticket_id: res.id, text: " has assigned you a ticket"})
     Process.send_after(self(), :close_new, 10)
@@ -779,18 +784,12 @@ defmodule MainWeb.Live.ConversationsView do
         |> assign(:child_id, (List.first(messages)).id)
         |> assign(:changeset, Conversations.get_changeset())
       if connected?(socket), do: Process.send_after(self(), :scroll_chat, 200)
-      IO.inspect("###################")
-      IO.inspect("this is 2")
-      IO.inspect("###################")
       {:noreply,socket}
     else
       {:noreply,socket}
     end
   end
   def handle_info({location_id, :updated_open}, socket) do
-    IO.inspect("###################")
-    IO.inspect(:updated_open)
-    IO.inspect("###################")
 
     if socket.assigns.tab == "active" && Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
       send(self(), {:fetch_c, %{user: socket.assigns.user, locations: socket.assigns.location_ids, type: "active"}})
@@ -857,13 +856,11 @@ defmodule MainWeb.Live.ConversationsView do
   def handle_event("filter_convo", query, socket) do
     search_string = query["value"]
     conversations = socket.assigns[:o_conversations] || socket.assigns.conversations
-
-
     socket =  socket
               |> assign(:conversations, filter_conversations(conversations, search_string))
+              |> assign(:search_string, search_string)
               |> assign(:o_conversations, conversations)
     if connected?(socket), do: Process.send_after(self(), :reload_convo, 1000)
-
     {:noreply, socket}
 
   end
