@@ -95,7 +95,7 @@ defmodule MainWeb.Api.ConversationController do
                close_conversation(convo.id, location)
              {:unknown, response} ->
 
-               if convo.status != "closed" do
+               if convo.status == "closed" do
                  {:ok, struct}=  CM.create(
                    %{
                      "conversation_id" => convo.id,

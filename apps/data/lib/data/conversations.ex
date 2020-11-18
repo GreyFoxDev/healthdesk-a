@@ -79,7 +79,7 @@ defmodule Data.Conversations do
     with %Location{} = location <- Data.Query.Location.get_by_phone(location),
          nil <- get_by_phone(member, location.id) do
       {member, location.id}
-      |> new_params() |> Map.merge(%{"subject" => subject})
+      |> new_params()
       |> create()
     else
       %Schema{status: "closed"} = conversation ->
