@@ -95,19 +95,21 @@ defmodule MainWeb.Api.ConversationController do
                close_conversation(convo.id, location)
              {:unknown, response} ->
 
+               if convo.status != "open" do
+                 CM.create(
+                   %{
+                     "conversation_id" => convo.id,
+                     "phone_number" => location.phone_number,
+                     "message" => response,
+                     "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                   }
+                 )
+                 C.pending(convo.id)
+                 from
+                 |> Main.Email.generate_reply_email(response, subj)
+                 |> Main.Mailer.deliver_now()
+               end
 
-               CM.create(
-                 %{
-                   "conversation_id" => convo.id,
-                   "phone_number" => location.phone_number,
-                   "message" => response,
-                   "sent_at" => DateTime.add(DateTime.utc_now(), 2)
-                 }
-               )
-               C.pending(convo.id)
-               from
-               |> Main.Email.generate_reply_email(response, subj)
-               |> Main.Mailer.deliver_now()
                Main.LiveUpdates.notify_live_view({location.id, :updated_open})
                :ok =
                  Notify.send_to_admin(
