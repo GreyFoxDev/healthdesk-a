@@ -178,3 +178,13 @@ button#people , button#close {
 span.select2-selection__clear {
     display: none;
 }
+
+@media (max-width: 1199px)
+{
+    .sidebar-section-fill {
+        flex: none;
+    }
+    .has-sidebar-expand-xl .page-sidebar {
+        transform: translateZ(0) !important;
+    }
+}
