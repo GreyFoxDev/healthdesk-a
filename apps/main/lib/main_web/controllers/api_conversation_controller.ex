@@ -52,9 +52,7 @@ defmodule MainWeb.Api.ConversationController do
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
     name = List.first(Regex.split(regex,from))
     from = List.first(Regex.run(regex,from))
-    IO.inspect("###################")
-    IO.inspect(from)
-    IO.inspect("###################")
+    message = ElixirEmailReplyParser.parse_reply message
 
     if from != nil && from != "" do
       with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
