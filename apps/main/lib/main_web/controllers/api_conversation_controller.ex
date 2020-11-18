@@ -105,6 +105,9 @@ defmodule MainWeb.Api.ConversationController do
                  }
                )
                C.pending(convo.id)
+               from
+               |> Main.Email.generate_reply_email(response, subj)
+               |> Main.Mailer.deliver_now()
                Main.LiveUpdates.notify_live_view({location.id, :updated_open})
                :ok =
                  Notify.send_to_admin(
