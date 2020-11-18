@@ -57,12 +57,13 @@ defmodule MainWeb.Api.ConversationController do
     if from != nil && from != "" do
       with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
         Task.start(fn ->  notify_open(convo.location_id) end)
-        CM.create(%{
+        {:ok, struct}= CM.create(%{
           "conversation_id" => convo.id,
           "phone_number" => from,
           "message" => message,
           "sent_at" => DateTime.utc_now()})
         location = Location.get(convo.location_id)
+        Main.LiveUpdates.notify_live_view({convo.id, struct})
         with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, from) do
           Member.update(member.id, %{first_name:  String.replace(name||"","<","")|>String.trim,email: from})
         else
@@ -79,7 +80,7 @@ defmodule MainWeb.Api.ConversationController do
         |> case do
              {:ok, response} ->
 
-             {:ok, struct}=  CM.create(
+               {:ok, struct}=  CM.create(
                  %{
                    "conversation_id" => convo.id,
                    "phone_number" => location.phone_number,
