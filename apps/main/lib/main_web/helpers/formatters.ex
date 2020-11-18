@@ -55,14 +55,28 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_phone(phone_number) do
-    "Unknown Visitor"
+    regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
+
+    if Regex.match?(regex,phone_number) do
+      "Email Support"
+    else
+      "Unknown Visitor"
+    end
   end
 
   def format_assigned(<<"+1", _rest :: binary>>), do: "SMS Bot"
   def format_assigned(<<"messenger:", _rest :: binary>>), do: "Facebook Bot"
   def format_assigned(<<"CH", _rest :: binary>>), do: "Website Bot"
   def format_assigned(<<"APP", _rest :: binary>>), do: "App Bot"
-  def format_assigned(_), do: "Unknown"
+  def format_assigned(phone_number) do
+    regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
+
+    if Regex.match?(regex,phone_number) do
+      "Email Support"
+    else
+      "Unknown"
+    end
+  end
 
   def format_team_member(team_member) do
     name = Enum.join([team_member.first_name, team_member.last_name], " ")

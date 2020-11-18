@@ -97,7 +97,7 @@ defmodule Data.Conversations do
       |> create()
     else
       %Schema{status: "closed"} = conversation ->
-        Query.update(conversation, Map.merge(%{"subject" => subject}))
+        Query.update(conversation, %{"subject" => subject})
 
       %Schema{} = convo ->
         Query.update(convo, %{"subject" => subject})

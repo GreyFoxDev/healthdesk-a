@@ -189,13 +189,13 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:conversations, conversations)
 
     socket = if (socket.assigns.tab == "active" && socket.assigns[:open_conversation] != nil) do
-
+      send(self(), {:fetch_d, %{user: user, locations: locations, convo: socket.assigns[:open_conversation]}})
       socket
     else
+      send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
       socket |> assign(:open_conversation, open_conversation)
     end
     if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
-    send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
     {:noreply, socket}
   end
   def handle_info({:fetch_c, %{user: user, locations: locations, type: "assigned"}}, socket) do
@@ -738,6 +738,9 @@ defmodule MainWeb.Live.ConversationsView do
 
   end
   def handle_event("new_msg", %{"conversation" => c_params, "location_id" => location_id} = params, socket)do
+    IO.inspect("###################")
+    IO.inspect(12333)
+    IO.inspect("###################")
 
     user = socket.assigns.user
     location = user

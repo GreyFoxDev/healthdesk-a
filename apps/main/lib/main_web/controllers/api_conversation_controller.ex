@@ -90,6 +90,7 @@ defmodule MainWeb.Api.ConversationController do
                from
                |> Main.Email.generate_reply_email(response, subj)
                |> Main.Mailer.deliver_now()
+               Main.LiveUpdates.notify_live_view({convo.id, response})
                close_conversation(convo.id, location)
              {:unknown, response} ->
 
@@ -106,6 +107,7 @@ defmodule MainWeb.Api.ConversationController do
                  from
                  |> Main.Email.generate_reply_email(response, subj)
                  |> Main.Mailer.deliver_now()
+                 Main.LiveUpdates.notify_live_view({convo.id, response})
                end
 
                Main.LiveUpdates.notify_live_view({location.id, :updated_open})

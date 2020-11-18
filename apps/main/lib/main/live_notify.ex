@@ -13,11 +13,19 @@ defmodule Main.LiveUpdates do
 
   @doc "notify for all users"
   def notify_live_view(message) do
+    IO.inspect("#######notify_live_view############")
+    IO.inspect(message)
+    IO.inspect("###################")
+
     Phoenix.PubSub.broadcast(Main.PubSub, topic(), message)
   end
 
   @doc "notify for specific user"
   def notify_live_view(user_id, message) do
+    IO.inspect("#######notify_live_view############")
+    IO.inspect(message)
+    IO.inspect("###################")
+
     Phoenix.PubSub.broadcast(Main.PubSub, topic(user_id), message)
   end
 

@@ -161,9 +161,6 @@ defmodule MainWeb.TsiController do
   end
 
   def update(conn, %{"id" => convo_id, "api_key" => api_key} = params) do
-    IO.inspect("###################")
-    IO.inspect(123)
-    IO.inspect("###################")
 
     location = conn.assigns.location
 
