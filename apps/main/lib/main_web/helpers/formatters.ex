@@ -58,7 +58,7 @@ defmodule MainWeb.Helper.Formatters  do
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
 
     if Regex.match?(regex,phone_number) do
-      "Email Support"
+      "Email Bot"
     else
       "Unknown Visitor"
     end
@@ -72,7 +72,7 @@ defmodule MainWeb.Helper.Formatters  do
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
 
     if Regex.match?(regex,phone_number) do
-      "Email Support"
+      "Email Bot"
     else
       "Unknown"
     end
