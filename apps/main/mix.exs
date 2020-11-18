@@ -64,7 +64,8 @@ defmodule Main.Mixfile do
       {:nimble_csv, "~> 0.5.0"},
       {:jason, "~> 1.0"},
       {:tesla, "~> 1.3.0"},
-      {:quantum, "~> 3.0"}
+      {:quantum, "~> 3.0"},
+      {:eximap, "~> 0.1.2-dev"}
     ]
   end
 end

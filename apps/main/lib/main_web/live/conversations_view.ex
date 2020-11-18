@@ -187,12 +187,15 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:dispositions, [])
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
-             |> assign(:open_conversation, open_conversation)
+
+    socket = if (socket.assigns.tab == "active" && socket.assigns[:open_conversation] != nil) do
+
+      socket
+    else
+      socket |> assign(:open_conversation, open_conversation)
+    end
     if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
     send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
-
-    socket
-    |> assign(:open_conversation, open_conversation)
     {:noreply, socket}
   end
   def handle_info({:fetch_c, %{user: user, locations: locations, type: "assigned"}}, socket) do
@@ -487,6 +490,32 @@ defmodule MainWeb.Live.ConversationsView do
          {:ok, message_} ->
 
            Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message_}})
+         _ -> nil
+       end
+
+  end
+  defp send_message(%{original_number: email} = conversation, params, location, user) do
+
+    from = if conversation.team_member do
+      Enum.join(
+        [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
+        " "
+      )
+    else
+      location.location_name
+    end
+
+    params["conversation_message"]
+    |> Map.merge(
+         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
+       )
+    |> ConversationMessages.create()
+    |> case do
+         {:ok, message} ->
+           email
+           |> Main.Email.generate_reply_email(message.message, conversation.subject)
+           |> Main.Mailer.deliver_now()
+           Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message}})
          _ -> nil
        end
 

@@ -5,6 +5,8 @@ defmodule MainWeb.Api.ConversationController do
   alias Data.ConversationMessages, as: CM
   alias Data.Location
   alias Data.Member
+  alias MainWeb.{Notify, Intents}
+  @role %{role: "admin"}
 
   def create(conn, %{"location" => << "messenger:", location :: binary>>, "member" => << "messenger:", _ :: binary>> = member}) do
     location = Location.get_by_messenger_id(location)
@@ -46,7 +48,75 @@ defmodule MainWeb.Api.ConversationController do
       |> json(%{conversation_id: convo.id})
     end
   end
+  def create(conn, %{"from" => from,"subject" => subj,"text" => message,"to" => to} = params) do
+    regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
+    name = List.first(Regex.split(regex,from))
+    from = List.first(Regex.run(regex,from))
+    IO.inspect("###################")
+    IO.inspect(from)
+    IO.inspect("###################")
 
+    if from != nil && from != "" do
+      with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
+        Task.start(fn ->  notify_open(convo.location_id) end)
+        CM.create(%{
+          "conversation_id" => convo.id,
+          "phone_number" => from,
+          "message" => message,
+          "sent_at" => DateTime.utc_now()})
+        location = Location.get(convo.location_id)
+        with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, from) do
+          Member.update(member.id, %{first_name:  String.replace(name||"","<","")|>String.trim,email: from})
+        else
+          nil ->
+            Member.create(%{
+              team_id: location.team_id,
+              first_name: String.replace(name||"","<","")|>String.trim,
+              email: from,
+              phone_number: from
+            })
+        end
+        message
+        |> ask_wit_ai(location)
+        |> case do
+             {:ok, response} ->
+
+               CM.create(
+                 %{
+                   "conversation_id" => convo.id,
+                   "phone_number" => location.phone_number,
+                   "message" => response,
+                   "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                 }
+               )
+               from
+               |> Main.Email.generate_reply_email(response, subj)
+               |> Main.Mailer.deliver_now()
+               close_conversation(convo.id, location)
+             {:unknown, response} ->
+
+
+               CM.create(
+                 %{
+                   "conversation_id" => convo.id,
+                   "phone_number" => location.phone_number,
+                   "message" => response,
+                   "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                 }
+               )
+               C.pending(convo.id)
+               Main.LiveUpdates.notify_live_view({location.id, :updated_open})
+               :ok =
+                 Notify.send_to_admin(
+                   convo.id,
+                   "Message From: #{convo.original_number}\n#{message}",
+                   location.phone_number
+                 )
+           end
+      end
+    end
+    conn |> send_resp(200, "ok")
+  end
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message}) do
     CM.create(%{
       "conversation_id" => id,
@@ -102,7 +172,7 @@ defmodule MainWeb.Api.ConversationController do
       |> CM.create()
       C.close(id)
       Main.LiveUpdates.notify_live_view({convo.location_id, :updated_open})
-      else
+    else
       C.close(id)
     end
 
@@ -150,5 +220,57 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
   def close_convo(_), do: nil
+  defp ask_wit_ai(question, location) do
+    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
+      receive do
+        {:response, response} ->
+          message = Intents.get(response, location.phone_number)
+          if message == location.default_message do
+            {:unknown, location.default_message}
+          else
+            {:ok, message}
+          end
+        _ ->
+          {:unknown, location.default_message}
+      end
+    else
+      {:error, error} ->
+        {:unknown, location.default_message}
+    end
+  end
+  defp close_conversation(convo_id, location) do
+    disposition =
+      %{role: "system"}
+      |> Data.Disposition.get_by_team_id(location.team_id)
+      |> Enum.find(&(&1.disposition_name == "Automated"))
 
+    if disposition do
+      Data.ConversationDisposition.create(
+        %{
+          "conversation_id" => convo_id,
+          "disposition_id" => disposition.id
+        }
+      )
+
+      %{
+        "conversation_id" => convo_id,
+        "phone_number" => location.phone_number,
+        "message" =>
+          "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+        "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+      }
+      |> CM.create()
+    else
+      %{
+        "conversation_id" => convo_id,
+        "phone_number" => location.phone_number,
+        "message" =>
+          "CLOSED: Closed by System",
+        "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+      }
+      |> CM.create()
+    end
+
+    C.close(convo_id)
+  end
 end
