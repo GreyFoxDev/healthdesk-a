@@ -1,3 +1,4 @@
+
 <%= if @loading == true do %>
   <div id="loading">
       <div class="lds-facebook"><div></div><div></div><div></div></div>
@@ -108,7 +109,7 @@
                                     <% end %>
                                 </span></span></span></a>
                         <div class="message-header-actions">
-
+                            <button type="button" id="slide_right_btn" class="btn btn-light btn-icon d-xl-none" data-toggle="sidebar"><i class="fa fa-angle-double-right"></i></button>
                             <!-- assign conversation -->
                             <div class="dropdown d-inline-block">
                                 <button type="button" class="btn btn-light btn-icon" title="Invite members"
