@@ -185,6 +185,6 @@ span.select2-selection__clear {
         flex: none;
     }
     .has-sidebar-expand-xl .page-sidebar {
-        transform: translateZ(0) !important;
+        transform: translateZ(0);
     }
 }
