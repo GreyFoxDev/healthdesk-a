@@ -5,7 +5,7 @@ defmodule Data.Query.TeamMember do
   import Ecto.Query, only: [from: 2]
   import Data.TimezoneOffset
 
-  alias Data.Schema.{TeamMember, User, TeamMemberLocation, Location}
+  alias Data.Schema.{TeamMember,Team, User, TeamMemberLocation, Location}
   alias Data.ReadOnly.Repo, as: Read
   alias Data.WriteOnly.Repo, as: Write
   alias Ecto.Adapters.SQL
@@ -20,9 +20,11 @@ defmodule Data.Query.TeamMember do
     from(t in TeamMember,
       join: u in User,
       left_join: l in assoc(t, :team_member_locations),
+      join: r in Team,
+      where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
-      where: is_nil(t.deleted_at),
+      where: is_nil(r.deleted_at),
       order_by: [u.first_name, u.last_name],
       preload: [locations: l, user: u]
     )
@@ -36,6 +38,8 @@ defmodule Data.Query.TeamMember do
   def get(id, repo \\ Read) do
     from(t in TeamMember,
       join: u in User,
+      join: r in Team,
+      where: is_nil(r.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: t.id == ^id,
@@ -52,6 +56,8 @@ defmodule Data.Query.TeamMember do
   def get_by_team_id(team_id, repo \\ Read) do
     from(t in TeamMember,
       join: u in User,
+      join: r in Team,
+      where: is_nil(r.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: t.team_id == ^team_id,
@@ -69,6 +75,8 @@ defmodule Data.Query.TeamMember do
     from(t in TeamMember,
       join: u in User,
       left_join: l in assoc(t, :team_member_locations),
+      join: r in Team,
+      where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: l.location_id == ^location_id or t.location_id == ^location_id,

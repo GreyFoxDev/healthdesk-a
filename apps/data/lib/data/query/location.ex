@@ -14,9 +14,10 @@ defmodule Data.Query.Location do
   @spec all(repo :: Ecto.Repo.t()) :: [Location.t()]
   def all(repo \\ Read) do
     from(t in Location,
-      where: is_nil(t.deleted_at)
+      where: is_nil(t.deleted_at),
+      preload: [:team]
     )
-    |> repo.all()
+    |> repo.all() |> Enum.filter(&(&1.team.deleted_at == nil))
   end
 
   @doc """
