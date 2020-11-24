@@ -119,6 +119,8 @@ defmodule MainWeb.Api.ConversationController do
                    location.phone_number
                  )
            end
+      else
+      _ -> nil
       end
     end
     conn |> send_resp(200, "ok")
