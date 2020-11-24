@@ -44,7 +44,7 @@
                                     <span><b><%= hour.day_of_week %></b></span>
                                     <span><%= hour.open_at %> - <%= hour.close_at %></span>
 
-                                    <%= link {:safe, "<i class=\"fas fa-trash-alt\"></i>"}, to: team_location_normal_hour_path(@conn, :delete, @location.team_id, @location.id, hour.id), method: "delete" %>
+                                    <%= link {:safe, "<i class=\" hours-icon fas fa-trash-alt\"></i>"}, to: team_location_normal_hour_path(@conn, :delete, @location.team_id, @location.id, hour.id), method: "delete" %>
 
                                 </div>
                             <% end %>

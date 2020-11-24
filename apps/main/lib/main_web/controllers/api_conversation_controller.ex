@@ -159,9 +159,6 @@ defmodule MainWeb.Api.ConversationController do
         "message" => message,
         "sent_at" => DateTime.utc_now()})
     end
-    IO.inspect("########api###########")
-    IO.inspect(params)
-    IO.inspect("###################")
 
     if params["disposition"] do
       convo = C.get(id)

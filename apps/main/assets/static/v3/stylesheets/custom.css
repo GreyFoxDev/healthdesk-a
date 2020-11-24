@@ -188,3 +188,6 @@ span.select2-selection__clear {
         transform: translateZ(0);
     }
 }
+.hours-icon {
+    color: #6657cc !important;
+}
