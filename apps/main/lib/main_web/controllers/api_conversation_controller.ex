@@ -53,7 +53,7 @@ defmodule MainWeb.Api.ConversationController do
     name = List.first(Regex.split(regex,from))
     from = List.first(Regex.run(regex,from))
     message = ElixirEmailReplyParser.parse_reply message
-
+    to = List.first(Regex.run(regex,to))
     if from != nil && from != "" do
       with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
         Task.start(fn ->  notify_open(convo.location_id) end)
