@@ -45,7 +45,7 @@ defmodule MainWeb.AdminController do
       sms_totals: team_totals_by_channel("SMS", team_id),
       app_totals: team_totals_by_channel("APP", team_id),
       facebook_totals: team_totals_by_channel("FACEBOOK", team_id),
-      email_totals: totals_by_channel("MAIL",team_id),
+      email_totals: team_totals_by_channel("MAIL",team_id),
       response_time: response_time.median_response_time||0,
       team_admin_count: team_admin_count,
       teammate_count: teammate_count,
@@ -89,7 +89,7 @@ defmodule MainWeb.AdminController do
       sms_totals: location_totals_by_channel("SMS", location_id),
       app_totals: location_totals_by_channel("APP", location_id),
       facebook_totals: location_totals_by_channel("FACEBOOK", location_id),
-      email_totals: totals_by_channel("MAIL",location_id),
+      email_totals: location_totals_by_channel("MAIL",location_id),
       team_admin_count: team_admin_count,
       teammate_count: teammate_count,
       locations: locations,
@@ -128,6 +128,9 @@ defmodule MainWeb.AdminController do
         Campaign.get_by_location_id(location.id)
       end)
       |> List.flatten()
+      IO.inspect("###################")
+      IO.inspect(totals_by_channel("MAIL"))
+      IO.inspect("###################")
 
       render(conn, "index.html",
         metrics: [],
@@ -177,7 +180,7 @@ defmodule MainWeb.AdminController do
         sms_totals: team_totals_by_channel("SMS", current_user.team_member.team_id),
         app_totals: team_totals_by_channel("APP", current_user.team_member.team_id),
         facebook_totals: team_totals_by_channel("FACEBOOK", current_user.team_member.team_id),
-        email_totals: totals_by_channel("MAIL",current_user.team_member.team_id),
+        email_totals: team_totals_by_channel("MAIL",current_user.team_member.team_id),
         teams: teams,
         team_admin_count: team_admin_count,
         teammate_count: teammate_count,
