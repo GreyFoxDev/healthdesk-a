@@ -173,21 +173,23 @@
      const ctx = document.getElementById('canvas-sessions-by-channel').getContext('2d');
      const chartData = {
          labels: [
-             'Web',
              'SMS',
+             'Email',
              'Facebook',
+             'Web',
              'App'
          ],
          datasets: [{
              data: [
-                 <%= @web_totals %>,
                  <%= @sms_totals %>,
+                 <%= @email_totals %>,
                  <%= @facebook_totals %>,
+                 <%= @web_totals %>,
                  <%= @app_totals %>
              ],
              borderWidth: 5,
-             backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40'],
-             hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70'],
+             backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40','#ff973d'],
+             hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70','#ff973d'],
          }],
      };
      new Chart(ctx, {

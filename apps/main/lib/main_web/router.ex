@@ -27,7 +27,7 @@ defmodule MainWeb.Router do
   scope "/", MainWeb do
     pipe_through [:browser, :not_live]
 
-    get "/", PageController, :index
+    get "/", SessionController, :new
     get "/login", SessionController, :new
     post "/login", SessionController, :create
 

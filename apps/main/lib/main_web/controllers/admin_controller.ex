@@ -137,6 +137,7 @@ defmodule MainWeb.AdminController do
         sms_totals: totals_by_channel("SMS"),
         app_totals: totals_by_channel("APP"),
         facebook_totals: totals_by_channel("FACEBOOK"),
+        email_totals: totals_by_channel("MAIL"),
         teams: teams,
         team_admin_count: team_admin_count,
         teammate_count: teammate_count,

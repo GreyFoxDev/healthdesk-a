@@ -236,7 +236,13 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:conversations, conversations)
              |> assign(:open_conversation, open_conversation)
     if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
-    send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
+    socket = if (socket.assigns.tab == "closed" && socket.assigns[:open_conversation] != nil) do
+      send(self(), {:fetch_d, %{user: user, locations: locations, convo: socket.assigns[:open_conversation]}})
+      socket
+    else
+      send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
+      socket |> assign(:open_conversation, open_conversation)
+    end
 
     socket
     |> assign(:open_conversation, open_conversation)
@@ -825,6 +831,9 @@ defmodule MainWeb.Live.ConversationsView do
 
     if socket.assigns.tab == "active" && Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
       send(self(), {:fetch_c, %{user: socket.assigns.user, locations: socket.assigns.location_ids, type: "active"}})
+    end
+    if socket.assigns.tab == "closed" && Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
+      send(self(), {:fetch_c, %{user: socket.assigns.user, locations: socket.assigns.location_ids, type: "closed"}})
     end
     {:noreply, socket}
 
