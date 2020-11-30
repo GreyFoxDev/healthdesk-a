@@ -12,6 +12,7 @@ defmodule MainWeb.SessionController do
   def new(conn, _params) do
     conn
     |> put_layout(:login)
+    |> assign(:tab,"login")
     |> render("new.html")
   end
 

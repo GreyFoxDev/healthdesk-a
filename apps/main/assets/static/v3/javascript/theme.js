@@ -660,7 +660,8 @@ var Theme = /*#__PURE__*/function () {
 
         if (window.PerfectScrollbar) {
           ps = new PerfectScrollbar('.aside-menu', {
-            suppressScrollX: true
+            suppressScrollX: true,
+            wheelSpeed: 0.5
           });
         }
       }
@@ -1009,7 +1010,8 @@ var Theme = /*#__PURE__*/function () {
       if (window.PerfectScrollbar && this.isExists('.perfect-scrollbar')) {
         $('.perfect-scrollbar:not(".aside-menu")').each(function () {
           new PerfectScrollbar(this, {
-            suppressScrollX: true
+            suppressScrollX: true,
+            wheelSpeed: 0.5
           });
         });
       }

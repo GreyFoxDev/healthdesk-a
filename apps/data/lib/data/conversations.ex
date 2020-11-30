@@ -56,7 +56,9 @@ defmodule Data.Conversations do
   end
 
   def get(%{role: role}, id) when role in @roles,
-      do: Query.get(id)
+      do: Query.get(id,true)
+  def get(%{role: role}, id, preload_f) when role in @roles,
+      do: Query.get(id,preload_f)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
@@ -85,6 +87,20 @@ defmodule Data.Conversations do
 
       %Schema{} = convo ->
         {:ok, convo}
+    end
+  end
+  def find_or_start_conversation(member, location,subject) do
+    with %Location{} = location <- Data.Query.Location.get_by_phone(location),
+         nil <- get_by_phone(member, location.id) do
+      {member, location.id}
+      |> new_params() |> Map.merge(%{"subject" => subject})
+      |> create()
+    else
+      %Schema{status: "closed"} = conversation ->
+        Query.update(conversation, %{"subject" => subject})
+
+      %Schema{} = convo ->
+        Query.update(convo, %{"subject" => subject})
     end
   end
 

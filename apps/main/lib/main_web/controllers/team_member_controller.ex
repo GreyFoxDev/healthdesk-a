@@ -13,6 +13,7 @@ defmodule MainWeb.TeamMemberController do
       conn
       |> current_user()
       |> TeamMember.get_by_team_id(team_id)
+      |> Enum.uniq_by(& &1.id)
 
     render conn, "index.html", location: nil, team_members: team_members, team: team, teams: teams(conn)
   end

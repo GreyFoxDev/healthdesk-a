@@ -161,9 +161,6 @@ defmodule MainWeb.TsiController do
   end
 
   def update(conn, %{"id" => convo_id, "api_key" => api_key} = params) do
-    IO.inspect("###################")
-    IO.inspect(123)
-    IO.inspect("###################")
 
     location = conn.assigns.location
 
@@ -202,11 +199,6 @@ defmodule MainWeb.TsiController do
         |> ask_wit_ai(location)
         |> case do
              {:ok, response} ->
-
-               IO.inspect("###################")
-               IO.inspect(321)
-               IO.inspect("###################")
-
                CM.create(
                  %{
                    "conversation_id" => convo.id,
@@ -218,11 +210,6 @@ defmodule MainWeb.TsiController do
 
                close_conversation(convo_id, location)
              {:unknown, response} ->
-
-               IO.inspect("###################")
-               IO.inspect(323)
-               IO.inspect("###################")
-
                CM.create(
                  %{
                    "conversation_id" => convo.id,

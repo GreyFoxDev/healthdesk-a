@@ -11,8 +11,19 @@ defmodule Data.Query.Conversation do
   @doc """
   Returns a conversation by id
   """
-  @spec get(id :: binary(), repo :: Ecto.Repo.t()) :: Conversation.t() | nil
-  def get(id, repo \\ Read) do
+  @spec get(id :: binary(),check :: boolean(), repo :: Ecto.Repo.t()) :: Conversation.t() | nil
+  def get(id, preload_f\\true, repo \\ Read)
+  def get(id, false, repo)  do
+    from(c in Conversation,
+      left_join: member in Member,
+      on: c.original_number == member.phone_number,
+      where: c.id == ^id,
+      preload: [:location, team_member: [:user]],
+      select: %{c | member: member}
+    )
+    |> repo.one()
+  end
+  def get(id,true, repo) do
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
       left_join: member in Member,
@@ -24,6 +35,7 @@ defmodule Data.Query.Conversation do
     )
     |> repo.one()
   end
+
 
   @doc """
   Return a list of conversations for a location

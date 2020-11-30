@@ -1,3 +1,4 @@
+
 <%= if @loading == true do %>
   <div id="loading">
       <div class="lds-facebook"><div></div><div></div><div></div></div>
@@ -11,7 +12,7 @@
 
     <div class="page-inner page-inner-fill position-relative" >
         <header class="page-navs bg-white shadow-sm d-flex justify-content-between px-2">
-            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..."%>
+            <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..." , value: assigns[:search_string] %>
         </header>
         <div class="">
             <button type="button" class="btn btn-primary btn-floated position-absolute" data-toggle="dropdown" data-target="" title="Add new client"><i class="fa fa-plus"></i></button>
@@ -40,6 +41,9 @@
                         <% end %>
                         <%=  if c.channel_type == "APP" do  %>
                         <a href="#" class="tile tile-circle bg-yellow"><i class="fas fa-mobile"></i></a>
+                        <% end %>
+                        <%=  if c.channel_type == "MAIL" do  %>
+                        <a href="#" class="tile tile-circle bg-yellow"><i class="fas fa-envelope"></i></a>
                         <% end %>
                     </div>
                     <div class="list-group-item-body">
@@ -105,7 +109,7 @@
                                     <% end %>
                                 </span></span></span></a>
                         <div class="message-header-actions">
-
+                            <button type="button" id="slide_right_btn" class="btn btn-light btn-icon d-xl-none" data-toggle="sidebar"><i class="fa fa-angle-double-right"></i></button>
                             <!-- assign conversation -->
                             <div class="dropdown d-inline-block">
                                 <button type="button" class="btn btn-light btn-icon" title="Invite members"
@@ -164,7 +168,7 @@
                             </div><!-- / close dispositions -->
                             <% end %>
 
-                            <button type="button" class="btn btn-light btn-icon d-xl-none" data-toggle="sidebar"><i
+                            <button type="button" class="btn btn-light btn-icon d-xl-none" id="slide_left_btn" data-toggle="sidebar"><i
                                     class="fa fa-angle-double-left"></i></button>
                         </div>
                     </div><!-- /message header -->
@@ -376,13 +380,12 @@
                 </div><!-- /.message -->
             </div>
             <!--Sidebar Window-->
-            <div class="col-lg-4 p-0  bg-white"
-                 style="    border-left: 1px solid rgba(34,34,48,.1);height: calc(100vh - 3.5rem);overflow-y:scroll;">
+             <div class="col-lg-4 p-0  bg-white conversation_details" style="border-left: 1px solid rgba(34,34,48,.1);height: calc(100vh - 3.5rem);overflow-y:scroll;">
                 <!-- .sidebar-header -->
                 <header class="sidebar-header d-sm-none">
                     <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item">
-                            <a class="prevent-default" href="#" onclick="Looper.toggleSidebar()"><i
+                            <a class="prevent-default" href="#" id="close_side_toggle"><i
                                     class="breadcrumb-icon fa fa-angle-left mr-2"></i>Back</a>
                         </li>
                     </ol>
@@ -461,10 +464,11 @@
                                     </div>
                                 </div> -->
                                 <div class="card-footer p-3">
-                                    <!-- .form -->
-                                    <form id="member-form" method="PUT" style="width:100%;">
+                                    <!-- .
+                                    <form id="member-form" method="PUT" style="width:100%;"> -->
+                                    <%= f = form_for :foo, "#", [ phx_submit: :save_member, id: "member-form", style: "width: 100%"] %>
                                         <%= if @open_conversation.member do %>
-                                        <input name="id" type="hidden" value="<%= @open_conversation.member.id %>">
+                                        <input name="member[id]" type="hidden" value="<%= @open_conversation.member.id %>">
                                         <% end %>
                                         <input name="member[team_id]" type="hidden"
                                                value="<%= @open_conversation.location.team_id %>">
@@ -502,9 +506,9 @@
                                                 <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="fl1">Phone Number</label>
-                                                        <input name="member[phone_number]" type="text"
-                                                               class="form-control"
-                                                               value="<%= if @open_conversation.member, do: format_phone(@open_conversation.member.phone_number), else: "N/A" %>">
+                                                        <input  type="text"
+                                                               class="form-control" readonly
+                                                               value="<%= if @open_conversation.member, do: @open_conversation.member.phone_number, else: "N/A" %>">
                                                     </div>
                                                 </div>
                                                 </div>
@@ -512,7 +516,7 @@
                                                     <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="fl1">Location</label>
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" disabled
                                                                value="<%= @open_conversation.location.location_name %>"
                                                                readonly>
                                                     </div>
@@ -535,7 +539,7 @@
 
 
                                         </fieldset>
-                                        <button type="button" class="btn btn-primary btn-lg btn-block" id="update_member">Update</button>
+                                        <button type="submit" class=" updatememeber btn btn-primary btn-lg btn-block" onclick="this.blur();">Update</button>
 
                                     </form>
 

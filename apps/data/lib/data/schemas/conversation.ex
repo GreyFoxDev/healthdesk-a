@@ -11,6 +11,7 @@ defmodule Data.Schema.Conversation do
           original_number: String.t(),
           channel_type: String.t() | nil,
           status: String.t() | nil,
+          subject: String.t() | nil,
           started_at: :utc_datetime | nil
         }
 
@@ -24,6 +25,7 @@ defmodule Data.Schema.Conversation do
   started_at
   team_member_id
   channel_type
+  subject
   |a
 
   @all_fields @required_fields ++ @optional_fields
@@ -33,6 +35,7 @@ defmodule Data.Schema.Conversation do
     field(:status, :string)
     field(:started_at, :utc_datetime)
     field(:channel_type, :string)
+    field(:subject, :string)
 
     field(:member, :map, virtual: true, default: %Data.Schema.Member{})
 
@@ -82,4 +85,8 @@ defmodule Data.Schema.Conversation do
   defp set_channel_type(<<"APP", _::binary>>, changeset) do
     put_change(changeset, :channel_type, "APP")
   end
+  defp set_channel_type(_email, changeset) do
+    put_change(changeset, :channel_type, "MAIL")
+  end
 end
+

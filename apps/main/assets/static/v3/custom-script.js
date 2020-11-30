@@ -1,4 +1,15 @@
 $(document).ready(function() {
+    $("#slide_right_btn").click(function(){
+            $(".has-sidebar-expand-xl .page-sidebar").css({"transform":"translate3d(100%, 0, 0)"});
+        });
+        $("#slide_left_btn").click(function(){
+            $(".conversation_details").css({"position":"fixed","transform":"translateZ(0)","top":"50px"});
+        });
+
+        $("#close_side_toggle").click(function(){
+            $(".conversation_details").css({"position":"relative","transform":"translateZ(0)","top":"0px"});
+        });
+    
     var url = window.location;
 
 

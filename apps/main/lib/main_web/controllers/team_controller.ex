@@ -4,7 +4,7 @@ defmodule MainWeb.TeamController do
   alias Data.{Disposition, Team}
 
   def index(conn, _params) do
-    render conn, "index.html", teams: teams(conn), location: nil
+    render conn, "index.html", teams: teams(conn), location: nil, tab: "knowledge"
   end
 
   def show(conn, %{"id" => id}) do

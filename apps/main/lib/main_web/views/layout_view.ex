@@ -43,6 +43,9 @@ defmodule MainWeb.LayoutView do
       "active"    -> "Healthdesk.ai - Active Conversations"
       "assigned"    -> "Healthdesk.ai -  Assigned Conversations"
       "closed"    -> "Healthdesk.ai -  Closed Conversations"
+      "login"    -> "Healthdesk.ai -  Login"
+      "none"    -> "Healthdesk.ai"
+      "knowledge"    -> "Healthdesk.ai -  Knowledge Base"
 
       _ -> "Healthdesk.ai - Analytics"
     end
