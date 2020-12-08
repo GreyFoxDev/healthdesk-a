@@ -1,14 +1,11 @@
-$(document).load(function () {
-$("#slide_right_btn").click(function(){
-            $(".has-sidebar-expand-xl .page-sidebar").css({"transform":"translate3d(100%, 0, 0)"});
-        });
-        $("#slide_left_btn").click(function(){
-            $(".conversation_details").css({"position":"fixed","transform":"translateZ(0)","top":"50px"});
-        });
-
-        $("#close_side_toggle").click(function(){
-            $(".conversation_details").css({"position":"relative","transform":"translateZ(0)","top":"0px"});
-        });
+$('body').on("click","#slide_right_btn", function () {
+    $(".has-sidebar-expand-xl .page-sidebar").css({"transform":"translate3d(100%, 0, 0)"});
+});
+$('body').on("click","#slide_left_btn", function () {
+    $(".conversation_details").css({"position":"fixed","transform":"translateZ(0)","top":"50px"});
+});
+$('body').on("click","#close_side_toggle", function () {
+    $(".conversation_details").css({"position":"relative","transform":"translateZ(0)","top":"0px"});
 });
 
 $(document).ready(function() {
