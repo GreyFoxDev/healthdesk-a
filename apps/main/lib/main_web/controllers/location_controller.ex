@@ -37,7 +37,11 @@ defmodule MainWeb.LocationController do
     |> Ueberauth.run_request(provider, provider_config)
   end
   def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider,"code" => code}=params) do
-    res = Ueberauth.Strategy.Google.OAuth.get_access_token [code: code,redirect_uri: "http://localhost:4000/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback"]
+    res = Ueberauth.Strategy.Google.OAuth.get_access_token [code: code,redirect_uri: "http://staging.healthdesk.ai/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback"]
+    IO.inspect("###################")
+    IO.inspect(res)
+    IO.inspect("###################")
+
     case res do
              {:ok,
              %OAuth2.AccessToken{access_token: token, refresh_token: rtoken}} ->
