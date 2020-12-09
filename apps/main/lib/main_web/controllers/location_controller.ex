@@ -85,7 +85,7 @@ defmodule MainWeb.LocationController do
 
   def edit(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider}=params) do
     provider_config = {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/calendar",request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
-      callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback"] }
+      callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",prompt: "consent", access_type: "offline"] }
     conn
     |> Ueberauth.run_request(provider, provider_config)
 
