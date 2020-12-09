@@ -76,9 +76,20 @@ defmodule MainWeb.Intents do
     end
   end
 
-  def get({"routeNewSales", _}, location) do
+  def get({"salesQuestion", _}, location) do
     """
-    We'd be happy to share information about our membership plans and pricing. When are you able to stop by for a tour? Or if you'd prefer, when's the best time to give you a call?
+    We'd be happy to share information about our membership plans and pricing. What can I get booked for you? (I'm a bot) Please send the corresponding number.
+
+    1. Club Tour
+    2. Fitness Assessment
+    """
+  end
+  def get({"bookAppointment", _}, location) do
+    """
+    Sure, what can I get booked for you? (I'm a bot) Please send the corresponding number.
+
+    1. Club Tour
+    2. Fitness Assessment
     """
   end
 

@@ -49,11 +49,15 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
   def create(conn, %{"from" => from,"subject" => subj,"text" => message,"to" => to} = params) do
+
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
     name = List.first(Regex.split(regex,from))
     from = List.first(Regex.run(regex,from))
     message = ElixirEmailReplyParser.parse_reply message
     to = List.first(Regex.run(regex,to))
+    IO.inspect(from, limit: :infinity)
+    IO.inspect(to, limit: :infinity)
+    IO.inspect(subj, limit: :infinity)
     if from != nil && from != "" do
       with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
         Task.start(fn ->  notify_open(convo.location_id) end)

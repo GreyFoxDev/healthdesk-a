@@ -125,16 +125,28 @@
                         <%= text_input f, :messenger_id, class: "form-control" %>
                         <label>Default Message</label>
                         <%= textarea f, :default_message, class: "form-control" %>
-                    </div>
+
                     <%= if @conn.assigns.current_user.role == "admin" && @conn.assigns.team.use_mindbody do %>
                         <label>Mindbody Location ID</label>
                         <%= text_input f, :mindbody_location_id, class: "form-control" %>
                     <% end %>
+                        <label>Google Token</label>
+                        <%= text_input f, :google_token, class: "form-control", disabled: true %>
+                        <label>Google Refresh Token</label>
+                        <%= text_input f, :google_refresh_token, class: "form-control",disabled: true %>
+                        <label>calender_id</label>
+                        <%= text_input f, :calender_id, class: "form-control" %>
+                    </div>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>
                     </div>
                 </fieldset>
             <% end %>
+            <br/>
+            <a class="btn btn-primary btn-lg" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location.id %>/edit/google">
+                <i class="fa fa-google"></i>
+                Sign in with Google
+            </a>
         </div>
     </section>
 </div>

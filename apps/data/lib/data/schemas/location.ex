@@ -5,29 +5,32 @@ defmodule Data.Schema.Location do
   use Data.Schema
 
   @type t :: %__MODULE__{
-          id: binary(),
-          team_id: binary(),
-          location_name: String.t() | nil,
-          phone_number: String.t() | nil,
-          api_key: String.t() | nil,
-          web_greeting: String.t() | nil,
-          web_handle: String.t() | nil,
-          web_chat: boolean() | nil,
-          timezone: String.t() | nil,
-          address_1: String.t() | nil,
-          address_2: String.t() | nil,
-          city: String.t() | nil,
-          state: String.t() | nil,
-          postal_code: String.t() | nil,
-          default_message: String.t() | nil,
-          slack_integration: String.t() | nil,
-          messenger_id: String.t() | nil,
-          users: List.t() | nil,
-          team_members: List.t() | nil,
-          conversations: List.t() | nil,
-          mindbody_location_id: String.t() | nil,
-          deleted_at: :utc_datetime | nil
-        }
+               id: binary(),
+               team_id: binary(),
+               location_name: String.t() | nil,
+               phone_number: String.t() | nil,
+               api_key: String.t() | nil,
+               web_greeting: String.t() | nil,
+               web_handle: String.t() | nil,
+               web_chat: boolean() | nil,
+               timezone: String.t() | nil,
+               address_1: String.t() | nil,
+               address_2: String.t() | nil,
+               city: String.t() | nil,
+               state: String.t() | nil,
+               google_token: String.t() | nil,
+               google_refresh_token: String.t() | nil,
+               calender_id: String.t() | nil,
+               postal_code: String.t() | nil,
+               default_message: String.t() | nil,
+               slack_integration: String.t() | nil,
+               messenger_id: String.t() | nil,
+               users: List.t() | nil,
+               team_members: List.t() | nil,
+               conversations: List.t() | nil,
+               mindbody_location_id: String.t() | nil,
+               deleted_at: :utc_datetime | nil
+             }
 
   @required_fields ~w|
   location_name
@@ -36,6 +39,9 @@ defmodule Data.Schema.Location do
   |a
 
   @optional_fields ~w|
+  google_token
+  google_refresh_token
+  calender_id
   api_key
   web_greeting
   web_handle
@@ -62,6 +68,9 @@ defmodule Data.Schema.Location do
     field(:address_2, :string)
     field(:city, :string)
     field(:state, :string)
+    field(:google_token, :string)
+    field(:google_refresh_token, :string)
+    field(:calender_id, :string)
     field(:postal_code, :string)
     field(:timezone, :string)
     field(:api_key, :string)

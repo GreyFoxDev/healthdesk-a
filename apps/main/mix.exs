@@ -23,7 +23,7 @@ defmodule Main.Mixfile do
   def application do
     [
       mod: {Main.Application, []},
-      extra_applications: [:logger, :runtime_tools, :con_cache, :data, :chatbot, :nimble_csv, :honeybadger, :elixir_email_reply_parser]
+      extra_applications: [:logger, :runtime_tools, :con_cache, :data, :chatbot, :nimble_csv, :honeybadger, :elixir_email_reply_parser, :timex, :ueberauth, :ueberauth_google]
     ]
   end
 
@@ -66,7 +66,12 @@ defmodule Main.Mixfile do
       {:tesla, "~> 1.3.0"},
       {:quantum, "~> 3.0"},
       {:eximap, "~> 0.1.2-dev"},
-      {:elixir_email_reply_parser, "~> 0.1.2"}
+      {:elixir_email_reply_parser, "~> 0.1.2"},
+      {:timex, "~> 3.5"},
+      {:google_api_calendar, "~> 0.19"},
+      {:ueberauth, "~> 0.6"},
+      {:ueberauth_google, "~> 0.10"},
+      {:google_api_o_auth2, "~> 0.13.0"}
     ]
   end
 end

@@ -9,7 +9,9 @@ defmodule MainWeb.Plug.BuildAnswer do
 
   alias MainWeb.{Intents, Notify}
   alias Data.Location
-
+  alias Data.Conversations, as: C
+  alias Data.ConversationMessages, as: CM
+  alias Main.Service.Appointment
   @spec init(list()) :: list()
   def init(opts), do: opts
 
@@ -24,26 +26,26 @@ defmodule MainWeb.Plug.BuildAnswer do
     conn
     |> assign(:status, "open")
   end
-  def call(%{assigns: %{convo: id,  status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
-    pending_message_count = (ConCache.get(:session_cache, id) || 0)
-
-    :ok = notify_admin_user(assigns)
-    :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
-
-    conn
-    |> assign(:status, "pending")
-    |> assign(:response, Intents.get(:unknown_intent, assigns.location))
-  end
+#  def call(%{assigns: %{convo: id,  status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
+#    pending_message_count = (ConCache.get(:session_cache, id) || 0)
+#
+#    :ok = notify_admin_user(assigns)
+#    :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
+#
+#    conn
+#    |> assign(:status, "pending")
+#    |> assign(:response, Intents.get(:unknown_intent, assigns.location))
+#  end
 
   @doc """
   If there is a known intent then get the corresponding response.
   """
   def call(%{assigns: %{convo: id, status: "open", intent: intent, location: location}} = conn, _opts) do
-    response = Intents.get(intent, location)
+    response = Appointment.get_next_reply(id,intent, location)
 
     location = Location.get_by_phone(location)
 
-    if response == location.default_message do
+    if String.contains?(response,location.default_message)do
       pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
       :ok = notify_admin_user(conn.assigns)

@@ -32,6 +32,15 @@ config :main, MainWeb.Endpoint,
 
 config :tesla, adapter: Tesla.Adapter.Hackney
 
+config :ueberauth, Ueberauth,
+       providers: [
+         google: {Ueberauth.Strategy.Google, [request_path: "/admin/teams/:team_id/locations/:location_id/:provider",
+           callback_path: "/admin/teams/:team_id/locations/:location_id/:provider/callback"] }
+       ]
+config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+       client_id: System.get_env("GOOGLE_CLIENT_ID"),
+       client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

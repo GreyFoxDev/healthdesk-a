@@ -26,6 +26,8 @@ defmodule Data.Schema.Conversation do
   team_member_id
   channel_type
   subject
+  appointment
+  step
   |a
 
   @all_fields @required_fields ++ @optional_fields
@@ -36,6 +38,8 @@ defmodule Data.Schema.Conversation do
     field(:started_at, :utc_datetime)
     field(:channel_type, :string)
     field(:subject, :string)
+    field(:appointment, :boolean)
+    field(:step, :integer)
 
     field(:member, :map, virtual: true, default: %Data.Schema.Member{})
 

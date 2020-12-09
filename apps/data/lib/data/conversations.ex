@@ -150,6 +150,34 @@ defmodule Data.Conversations do
     end
   end
 
+  def appointment_open(id) do
+    with %Schema{id: ^id} = convo <- Query.get(id),
+         %Schema{id: ^id} = convo <- Query.update(convo, %{"appointment" => true, "step" => "1","status" => "open"}) do
+      {:ok, convo}
+    else
+      _ ->
+        {:error, "Unable to close conversation."}
+    end
+  end
+  def appointment_close(id) do
+    with %Schema{id: ^id} = convo <- Query.get(id),
+         %Schema{id: ^id} = convo <- Query.update(convo, %{"appointment" => false, "step" => "","status" => "open"}) do
+      {:ok, convo}
+    else
+      _ ->
+        {:error, "Unable to close conversation."}
+    end
+  end
+  def appointment_step(id,step) do
+    with %Schema{id: ^id} = convo <- Query.get(id),
+         %Schema{id: ^id} = convo <- Query.update(convo, %{"step" => step,"status" => "open"}) do
+      {:ok, convo}
+    else
+      _ ->
+        {:error, "Unable to close conversation."}
+    end
+  end
+
   defp new_params({member, location_id}) do
     %{
       "location_id" => location_id,
