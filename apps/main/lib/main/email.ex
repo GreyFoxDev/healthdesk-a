@@ -2,7 +2,7 @@ defmodule Main.Email do
   import Bamboo.Email
 
   @from "info@healthdesk.ai"
-  @from "info@theclub.healthdesk.ai"
+  @from1 "info@theclub.healthdesk.ai"
   @default_subject "[Healthdesk] You have a new alert"
 
   def generate_email(to, message, subject \\ @default_subject) do
@@ -16,7 +16,7 @@ defmodule Main.Email do
   def generate_reply_email(to, message, subject \\ @default_subject) do
     new_email(
       to: to,
-      from: @from,
+      from: @from1,
       subject: "RE: "<> subject,
       text_body: message
     )
