@@ -62,7 +62,7 @@ defmodule Main.Service.Appointment do
         {get({"bookAppointment",[]}, location.phone_number),1}
       {"connectAgent",_}  ->
         C.appointment_close(id)
-        Intents.get(:unknown, location.phone_number)
+        {Intents.get(:unknown, location.phone_number),1}
       {:unknown,[number: [%{"value" => value}]]} ->
         {res,step}=  get_next_step(appointment,step,value,location)
         C.appointment_step(id,step)
