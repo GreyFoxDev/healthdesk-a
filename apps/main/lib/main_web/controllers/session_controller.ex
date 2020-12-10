@@ -13,12 +13,9 @@ defmodule MainWeb.SessionController do
     conn
     |> put_layout(:login)
     |> assign(:tab,"login")
-    |> assign(:bg,get_url(conn))
     |> render("new.html")
   end
-  def get_url(conn) do
 
-  end
   def create(conn, %{"session" => %{"phone_number" => phone_number}})
   when is_nil(phone_number) do
     conn
@@ -28,7 +25,8 @@ defmodule MainWeb.SessionController do
   end
 
   def create(conn, %{"session" => %{"verification_code" => code, "phone_number" => phone_number}}) do
-    with user when not is_nil(user) <- Query.get_by_phone(phone_number)do
+    with user when not is_nil(user) <- Query.get_by_phone(phone_number),
+         :ok <- Twilio.check(phone_number, code) do
       case user.role do
         "admin" ->
           redirect_to(conn, user, "/admin/")
@@ -48,7 +46,8 @@ defmodule MainWeb.SessionController do
   end
 
   def create(conn, %{"session" => %{"phone_number" => phone_number}}) do
-    with user when not is_nil(user) <- Query.get_by_phone(phone_number) do
+    with user when not is_nil(user) <- Query.get_by_phone(phone_number),
+         :ok <- Twilio.verify(phone_number) do
       conn
       |> put_layout(:login)
       |> put_flash(:success, "Please verify the phone number #{user.first_name}!")
