@@ -150,12 +150,12 @@ defmodule Main.Service.Appointment do
       """
       Here's our schedule on Friday, December 4. What time would you like to stop by?
 
-      1. 11am
-      2. 12:15pm
-      3. 1pm
-      4. 2pm
-      5. 3:30pm
-      6. 6pm
+      1. 10am
+      2. 12pm
+      3. 2pm
+      4. 3pm
+      5. 4pm
+      6. 5pm
       7. Pick different day
       8. Show full calendar
       """
@@ -167,12 +167,12 @@ defmodule Main.Service.Appointment do
       """
       Here's our schedule on #{format_date(dt)}. What time would you like to stop by?
 
-      1. 11am
-      2. 12:15pm
-      3. 1pm
-      4. 2pm
-      5. 3:30pm
-      6. 6pm
+      1. 10am
+      2. 12pm
+      3. 2pm
+      4. 3pm
+      5. 4pm
+      6. 5pm
       7. Pick different day
       8. Show full calendar
       """
