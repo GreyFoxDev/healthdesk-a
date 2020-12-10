@@ -172,7 +172,7 @@
         <!-- .metric -->
         <div class="card-metric">
             <div class="metric">
-                <h2 class="metric-label"> Appointments</h2>
+                <h2 class="metric-label"> APPOINTMENTS </h2>
                 <p class="metric-label">
                     <canvas id="canvas-appointments" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
                 </p>

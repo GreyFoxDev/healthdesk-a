@@ -23,14 +23,10 @@ defmodule Main.Service.Appointment do
   end
   defp get_next_intent(id,step,intent,location,appointment) when appointment == false do
     case intent do
-      {check,_} when check in ["bookAppointment","salesQuestion", "startOver"]  ->
+      {check,_} when check in ["bookAppointment","salesQuestion"]  ->
         C.appointment_open(id)
         AP.create(%{conversation_id: id})
         get(intent, location.phone_number)
-      {check,_} when check in ["startOver"]  ->
-        C.appointment_open(id)
-        AP.create(%{conversation_id: id})
-        get({"bookAppointment",[]}, location.phone_number)
       _ ->
         Intents.get(intent, location.phone_number)
     end
@@ -250,7 +246,7 @@ defmodule Main.Service.Appointment do
     else
       ""
     end
-    AP.update(%{"id" => appointment.id,"confirmed" => true})
+    AP.update(%{"id" => appointment.id,"confirmed" => true, "link" => url})
 
     res = """
     You're all set. Please check your email for the calendar invite. We'll call you then!
