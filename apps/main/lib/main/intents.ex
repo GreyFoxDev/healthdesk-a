@@ -109,6 +109,12 @@ defmodule MainWeb.Intents do
     Thank you for your message. Can you please confirm your first and last name?
     """
   end
+  def get({"connectAgent", _}, location) do
+    get({:unknown, _}, location)
+  end
+  def get({"startOver", _}, location) do
+    get({:unknown, _}, location)
+  end
 
   def get({intent, args}, location) do
     args = remove_intent(args)
