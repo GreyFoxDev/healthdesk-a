@@ -75,7 +75,11 @@ defmodule MainWeb.Intents do
       @default_response
     end
   end
-
+  def get({"salesQuestion", _}, location) do
+    """
+    We'd be happy to share information about our membership plans and pricing. When are you able to stop by for a tour? Or if you'd prefer, when's the best time to give you a call?
+    """
+  end
   def get({"routeHousekeeping", _}, location) do
     """
     Thank you for your message. We apologize for any inconvenience and are notifying our front desk now. Would you like us to follow-up with you?
@@ -108,11 +112,13 @@ defmodule MainWeb.Intents do
 
   def get({intent, args}, location) do
     args = remove_intent(args)
-
-    intent
-    |> String.to_existing_atom()
-    |> fetch_module()
-    |> apply(:build_response, [args, location])
+    with atom <- String.to_existing_atom(intent)do
+      atom
+      |> fetch_module()
+      |> apply(:build_response, [args, location])
+    else
+      err ->     MainWeb.Intents |> apply(:build_response, [args, location])
+    end
   end
 
   def build_response(_args, location) do

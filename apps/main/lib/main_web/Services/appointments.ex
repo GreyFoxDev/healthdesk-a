@@ -9,15 +9,28 @@ defmodule Main.Service.Appointment do
   @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
 
   def get_next_reply(id,intent,location)do
+    IO.inspect("###################")
+    IO.inspect(intent)
+
     location = Data.Location.get_by_phone(location)
 
     convo = C.get(id)
     step = convo.step
     appointment = convo.appointment
+    IO.inspect("###################")
+    IO.inspect(appointment)
+    IO.inspect(location.google_token)
+    IO.inspect("###################")
+
     if location.google_token do
       get_next_intent(id,step,intent,location,appointment)
     else
-      Intents.get(intent, location.phone_number)
+      case intent do
+        {check,_} when check in ["bookAppointment", "startOver", "connectAgent"]  ->
+          Intents.get(:unknown, location.phone_number)
+        _ ->
+          Intents.get(intent, location.phone_number)
+      end
     end
 
   end
@@ -27,6 +40,8 @@ defmodule Main.Service.Appointment do
         C.appointment_open(id)
         AP.create(%{conversation_id: id})
         get(intent, location.phone_number)
+      {check,_} when check in [ "startOver", "connectAgent"]  ->
+        Intents.get(:unknown, location.phone_number)
       _ ->
         Intents.get(intent, location.phone_number)
     end
