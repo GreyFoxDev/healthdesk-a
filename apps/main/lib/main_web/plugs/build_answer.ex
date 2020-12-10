@@ -27,14 +27,20 @@ defmodule MainWeb.Plug.BuildAnswer do
     |> assign(:status, "open")
   end
   def call(%{assigns: %{convo: id,  status: "open", intent: {:unknown, []}=intent, location: location} = assigns} = conn, _opts) do
-    pending_message_count = (ConCache.get(:session_cache, id) || 0)
+    convo = C.get(id)
+    appointment = convo.appointment
+    if appointment do
+      conn
+      |> assign(:response, Appointment.get_next_reply(id,intent, location))
+    else
+      pending_message_count = (ConCache.get(:session_cache, id) || 0)
+      :ok = notify_admin_user(assigns)
+      :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
 
-    :ok = notify_admin_user(assigns)
-    :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
-
-    conn
-    |> assign(:status, "pending")
-    |> assign(:response, Appointment.get_next_reply(id,intent, location))
+      conn
+      |> assign(:status, "pending")
+      |> assign(:response, Appointment.get_next_reply(id,intent, location))
+    end
   end
 
   @doc """
