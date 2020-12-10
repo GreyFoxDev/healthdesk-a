@@ -14,14 +14,11 @@ defmodule Main.Service.Appointment do
     convo = C.get(id)
     step = convo.step
     appointment = convo.appointment
-
-    IO.inspect("##########intent#########")
-    IO.inspect(intent)
-    IO.inspect(step)
-    IO.inspect(appointment)
-    IO.inspect("###################")
-
-    get_next_intent(id,step,intent,location,appointment)
+    if location.google_token do
+      get_next_intent(id,step,intent,location,appointment)
+    else
+      Intents.get(intent, location.phone_number)
+    end
 
   end
   defp get_next_intent(id,step,intent,location,appointment) when appointment == false do
@@ -29,11 +26,11 @@ defmodule Main.Service.Appointment do
       {check,_} when check in ["bookAppointment","salesQuestion", "startOver"]  ->
         C.appointment_open(id)
         AP.create(%{conversation_id: id})
-        Intents.get(intent, location.phone_number)
+        get(intent, location.phone_number)
       {check,_} when check in ["startOver"]  ->
         C.appointment_open(id)
         AP.create(%{conversation_id: id})
-        Intents.get({"bookAppointment",[]}, location.phone_number)
+        get({"bookAppointment",[]}, location.phone_number)
       _ ->
         Intents.get(intent, location.phone_number)
     end
@@ -450,5 +447,21 @@ address = "#{location.address_1} #{location.city} #{location.state} #{location.p
       1 -> "Club Tour"
       2 -> "Fitness Assessment"
     end
+  end
+  defp get({"salesQuestion", _}, location) do
+    """
+    We'd be happy to share information about our membership plans and pricing. What can I get booked for you? (I'm a bot) Please send the corresponding number.
+
+    1. Club Tour
+    2. Fitness Assessment
+    """
+  end
+  defp get({"bookAppointment", _}, location) do
+    """
+    Sure, what can I get booked for you? (I'm a bot) Please send the corresponding number.
+
+    1. Club Tour
+    2. Fitness Assessment
+    """
   end
 end
