@@ -32,3 +32,7 @@ apps/data/data.iml
 apps/main/main.iml
 
 *.iml
+
+apps/main/lib/main_web/controllers/session_controller.ex
+
+apps/data/config/dev.exs
