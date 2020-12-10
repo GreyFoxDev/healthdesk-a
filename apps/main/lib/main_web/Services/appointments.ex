@@ -56,10 +56,10 @@ defmodule Main.Service.Appointment do
     {res, step_next} = case intent do
       {check,_} when check in ["bookAppointment","salesQuestion"]  ->
         C.appointment_open(id)
-        {Intents.get(intent, location.phone_number),1}
+        {get(intent, location.phone_number),1}
       {check,_} when check in ["startOver"]  ->
         C.appointment_open(id)
-        {Intents.get({"bookAppointment",[]}, location.phone_number),1}
+        {get({"bookAppointment",[]}, location.phone_number),1}
       {"connectAgent",_}  ->
         C.appointment_close(id)
         Intents.get(:unknown, location.phone_number)
