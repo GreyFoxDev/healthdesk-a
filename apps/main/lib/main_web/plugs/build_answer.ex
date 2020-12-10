@@ -26,8 +26,9 @@ defmodule MainWeb.Plug.BuildAnswer do
     conn
     |> assign(:status, "open")
   end
-  def call(%{assigns: %{convo: id,  status: "open", intent: {:unknown, []}} = assigns} = conn, _opts) do
+  def call(%{assigns: %{convo: id,  status: "open", intent: {:unknown, []}=intent, location: location} = assigns} = conn, _opts) do
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
+    location = Location.get_by_phone(location)
 
     :ok = notify_admin_user(assigns)
     :ok = ConCache.put(:session_cache, id, pending_message_count + 1)
