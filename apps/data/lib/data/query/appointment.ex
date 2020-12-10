@@ -34,10 +34,6 @@ defmodule Data.Query.Appointment do
   @spec create(params :: map(), repo :: Ecto.Repo.t()) ::
           {:ok, Appointment.t()} | {:error, Ecto.Changeset.t()}
   def create(params, repo \\ Write) do
-    IO.inspect("1123131231321312312312321312312312")
-    IO.inspect(1123131231321312312312321312312312)
-    IO.inspect("1123131231321312312312321312312312")
-
     %Appointment{}
     |> Appointment.changeset(params)
     |> case do
@@ -64,4 +60,52 @@ defmodule Data.Query.Appointment do
         {:error, changeset}
     end
   end
+
+  @spec count_all(repo :: Ecto.Repo.t()) :: [map()]
+  def count_all(repo \\ Read) do
+    from(a in Data.Schema.Appointment,
+      group_by: [a.confirmed],
+      distinct: [a.confirmed],
+      order_by: a.confirmed,
+      select: %{confirmed: a.confirmed, count: count(a.id)}
+    )
+    |> repo.all()
+  end
+
+  @doc """
+  Return a list of dispositions with count of usage by team
+  """
+  @spec count_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_team_id(team_id, repo \\ Read) do
+    from(a in Data.Schema.Appointment,
+      join: c in assoc(a, :conversation),
+      join: l in assoc(c, :location),
+      group_by: [a.confirmed],
+      where: l.team_id == ^team_id,
+      distinct: [a.confirmed],
+      order_by: [a.confirmed],
+      select: %{confirmed: a.confirmed, count: count(a.id)}
+    )
+    |> repo.all()
+  end
+
+  @doc """
+  Return a list of dispositions with count of usage by location
+  """
+  @spec count_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_location_id(location_id, repo \\ Read) do
+    from(a in Data.Schema.Appointment,
+      join: c in assoc(a, :conversation),
+      join: l in assoc(c, :location),
+      group_by: [a.confirmed],
+      where: l.id == ^location_id,
+      distinct: [a.confirmed],
+      order_by: [a.confirmed],
+      select: %{confirmed: a.confirmed, count: count(a.id)}
+    )
+    |> repo.all()
+  end
+
+
+
 end

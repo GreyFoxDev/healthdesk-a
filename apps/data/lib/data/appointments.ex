@@ -15,6 +15,9 @@ defmodule Data.Appointments do
   defdelegate create(params), to: Query
   defdelegate get_by_conversation( convo_id), to: Query
   defdelegate get( convo_id), to: Query
+  defdelegate count_all(), to: Query
+  defdelegate count_by_team_id(team_id), to: Query
+  defdelegate count_by_location_id(location_id), to: Query
 
   @doc """
   Get changesets for conversations.
