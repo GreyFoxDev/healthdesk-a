@@ -1,8 +1,6 @@
 defmodule MainWeb.LocationController do
   use MainWeb.SecuredContoller
-  plug Ueberauth
 
-  alias Ueberauth.Strategy.Helpers
   alias Data.{Location, Team}
 
   def index(conn, %{"team_id" => team_id}) do
@@ -13,11 +11,13 @@ defmodule MainWeb.LocationController do
     else
       teammate_locations(conn)
     end
+
+
     render conn, "index.html",
-           location: nil,
-           locations: locations,
-           team: team,
-           teams: teams(conn)
+      location: nil,
+      locations: locations,
+      team: team,
+      teams: teams(conn)
   end
 
   def show(conn, %{"id" => id}) do
@@ -27,47 +27,6 @@ defmodule MainWeb.LocationController do
       |> Location.get(id)
 
     render conn, "show.json", data: location
-  end
-
-  def request(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider}=params) do
-    # Present an authentication challenge to the user
-    provider_config = {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/calendar.events",request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
-      callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",callback_methods: ["POST"]] }
-    conn
-    |> Ueberauth.run_request(provider, provider_config)
-  end
-  def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider,"code" => code}=params) do
-    res = Ueberauth.Strategy.Google.OAuth.get_access_token [code: code,redirect_uri: "https://staging.healthdesk.ai/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback", prompt: "consent",access_type: "offline" ]
-    IO.inspect("###################")
-    IO.inspect(res)
-    IO.inspect("###################")
-
-    case res do
-             {:ok,
-             %OAuth2.AccessToken{access_token: token, refresh_token: rtoken}} ->
-                 location_params = %{google_token: token, google_refresh_token:  rtoken}
-                 case Location.update(id, location_params) do
-                   {:ok, %Data.Schema.Location{}} ->
-                     with %Data.Schema.User{} = user <- current_user(conn),
-                          {:ok, changeset} <- Location.get_changeset(id, user) do
-
-                       team = Team.get(user, team_id)
-
-                       render(conn, "edit.html",
-                         changeset: changeset,
-                         team_id: team_id,
-                         teams: teams(conn),
-                         team: team,
-                         callback_url: Helpers.callback_url(conn),
-                         location: changeset.data,
-                         errors: [])
-                     end
-                 end
-             _ ->
-                 conn
-                 |> redirect(to: team_location_path(conn, :edit, team_id, id))
-    end
-
   end
 
   def new(conn, %{"team_id" => team_id}) do
@@ -83,15 +42,7 @@ defmodule MainWeb.LocationController do
       errors: [])
   end
 
-  def edit(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider}=params) do
-    provider_config = {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/calendar",request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
-      callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",prompt: "consent", access_type: "offline"] }
-    conn
-    |> Ueberauth.run_request(provider, provider_config)
-
-  end
-  def edit(conn, %{"id" => id, "team_id" => team_id}=params) do
-
+  def edit(conn, %{"id" => id, "team_id" => team_id}) do
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- Location.get_changeset(id, user) do
 
@@ -102,7 +53,6 @@ defmodule MainWeb.LocationController do
         team_id: team_id,
         teams: teams(conn),
         team: team,
-        callback_url: Helpers.callback_url(conn),
         location: changeset.data,
         errors: [])
     end
@@ -114,7 +64,7 @@ defmodule MainWeb.LocationController do
     |> Location.create()
     |> case do
          {:ok, %Data.Schema.Location{}} ->
-           conn
+          conn
            |> put_flash(:success, "Location created successfully.")
            |> redirect(to: team_location_path(conn, :index, team_id))
          {:error, changeset} ->

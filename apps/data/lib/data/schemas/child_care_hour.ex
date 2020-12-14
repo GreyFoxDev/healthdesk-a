@@ -8,10 +8,6 @@ defmodule Data.Schema.ChildCareHour do
           id: binary(),
           location_id: binary(),
           day_of_week: String.t() | nil,
-          morning_open_at: String.t() | nil,
-          morning_close_at: String.t() | nil,
-          afternoon_open_at: String.t() | nil,
-          afternoon_close_at: String.t() | nil,
           active: boolean() | nil,
           deleted_at: :utc_datetime | nil
         }
@@ -22,10 +18,6 @@ defmodule Data.Schema.ChildCareHour do
 
   @optional_fields ~w|
   day_of_week
-  morning_open_at
-  morning_close_at
-  afternoon_open_at
-  afternoon_close_at
   active
   deleted_at
   |a
@@ -34,15 +26,17 @@ defmodule Data.Schema.ChildCareHour do
 
   schema "child_care_hours" do
     field(:day_of_week, :string)
-    field(:morning_open_at, :string)
-    field(:morning_close_at, :string)
-    field(:afternoon_open_at, :string)
-    field(:afternoon_close_at, :string)
     field(:active, :boolean)
 
     field(:deleted_at, :utc_datetime)
 
     belongs_to(:location, Data.Schema.Location)
+    embeds_many :times, Times, on_replace: :delete do
+      field(:morning_open_at, :string)
+      field(:morning_close_at, :string)
+      field(:afternoon_open_at, :string)
+      field(:afternoon_close_at, :string)
+      end
 
     timestamps()
   end
@@ -51,5 +45,17 @@ defmodule Data.Schema.ChildCareHour do
     model
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
+  end
+
+  def update_changeset(model, params \\ %{}) do
+    model
+    |> cast(params, @all_fields)
+    |> cast_embed(:times, with: &times_changeset/2)
+    |> validate_required(@required_fields)
+  end
+
+  defp times_changeset(model, params \\ %{}) do
+    model
+    |> cast(params, [:morning_open_at, :morning_close_at, :afternoon_open_at, :afternoon_close_at])
   end
 end

@@ -1,0 +1,17 @@
+<ul class="header-nav nav">
+    <!-- .nav-item -->
+    <li class="nav-item dropdown header-nav-dropdown <%= @read && "has-notified" %>">
+        <a class="nav-link" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="oi oi-envelope-open"></span>
+        </a> <!-- .dropdown-menu -->
+        <div class="dropdown-menu dropdown-menu-rich dropdown-menu-right">
+            <div class="dropdown-arrow"></div>
+            <h6 class="dropdown-header stop-propagation">
+                <span>Notifications <span class="badge"></span></span>
+            </h6><!-- .dropdown-scroll -->
+            <div class="dropdown-scroll perfect-scrollbar">
+                <%= live_render(@socket, MainWeb.Live.NotificationAlertsView, session: %{"current_user" => @current_user}, id: "notialert") %>
+            </div>
+        </div>
+    </li><!-- /.nav-item -->
+</ul>

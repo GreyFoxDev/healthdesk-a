@@ -628,7 +628,7 @@ defmodule MainWeb.Live.ConversationsView do
         "sent_at" => DateTime.utc_now()
       }
 
-      Conversations.update(%{"id" => conversation.id, "status" => "closed","appointment" => false, "team_member_id" => nil})
+      Conversations.update(%{"id" => conversation.id, "status" => "closed", "team_member_id" => nil})
       Main.LiveUpdates.notify_live_view( {conversation.location.id, :updated_open})
       ConversationMessages.create(message)
       conversations = user
