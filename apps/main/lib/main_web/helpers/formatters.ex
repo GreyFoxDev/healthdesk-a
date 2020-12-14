@@ -179,9 +179,6 @@ defmodule MainWeb.Helper.Formatters  do
      delimit_integer(value,",")
      |> String.Chars.to_string
   end
-  defp delimit_integer(nil, delimiter) do
-    ""
-  end
   defp delimit_integer(number, delimiter) do
     abs(number)
     |> Integer.to_charlist()

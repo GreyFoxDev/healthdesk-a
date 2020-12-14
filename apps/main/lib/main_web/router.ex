@@ -22,7 +22,7 @@ defmodule MainWeb.Router do
   end
 
   pipeline :auth,
-    do: plug MainWeb.Auth.AuthAccessPipeline
+           do: plug MainWeb.Auth.AuthAccessPipeline
 
   scope "/", MainWeb do
     pipe_through [:browser, :not_live]
@@ -45,6 +45,10 @@ defmodule MainWeb.Router do
     live "/tickets/:id" , Live.TicketsView
 
   end
+  scope "/auth" do
+    pipe_through [:browser]
+
+  end
   scope "/admin", MainWeb do
     pipe_through [:browser, :auth, :not_live]
 
@@ -59,6 +63,9 @@ defmodule MainWeb.Router do
       resources "/members", MemberController
       resources "/team-members", TeamMemberController
       resources "/locations", LocationController do
+        get "/edit/:provider", LocationController, :edit
+        get "/:provider/callback", LocationController, :callback
+        post "/:provider/callback", LocationController, :callback
         resources "/class-schedule", ClassScheduleController, only: [:new, :create]
         live "/conversations" , Live.ConversationsView, only: [:index]
         resources "/conversations", ConversationController, except: [:index] do
@@ -69,16 +76,12 @@ defmodule MainWeb.Router do
         resources "/team-members", LocationTeamMemberController
         resources "/holiday-hours", HolidayHourController
         resources "/normal-hours", NormalHourController
-        live "/normal-hours/form" , Live.NormalHourForm, :form
-#        post "/add", NormalHourController, :add
-#        post "/remove", NormalHourController, :remove
         resources "/child-care-hours", ChildCareHourController
         resources "/wifi-network", WifiNetworkController
         resources "/pricing-plans", PricingPlanController
         resources "/saved-replies", SavedReplyController
       end
     end
-    live "/admin/teams/:location_team_id/locations/:location_id/normal-hours/" , Live.NormalHourForm, :index
 
     resources "/users", UserController, only: [:edit, :update]
 

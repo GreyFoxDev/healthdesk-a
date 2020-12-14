@@ -12,6 +12,8 @@ defmodule Data.Schema.HolidayHour do
           location_id: binary(),
           holiday_name: String.t() | nil,
           holiday_date: :utc_datetime | nil,
+          open_at: String.t() | nil,
+          close_at: String.t() | nil,
           deleted_at: :utc_datetime | nil
         }
 
@@ -22,6 +24,8 @@ defmodule Data.Schema.HolidayHour do
   @optional_fields ~w|
   holiday_name
   holiday_date
+  open_at
+  close_at
   deleted_at
   |a
 
@@ -30,14 +34,12 @@ defmodule Data.Schema.HolidayHour do
   schema "holiday_hours" do
     field(:holiday_name, :string)
     field(:holiday_date, :utc_datetime)
+    field(:open_at, :string)
+    field(:close_at, :string)
 
     field(:deleted_at, :utc_datetime)
 
     belongs_to(:location, Data.Schema.Location)
-    embeds_many :times, Times, on_replace: :delete do
-      field(:open_at, :string)
-      field(:close_at, :string)
-    end
 
     timestamps()
   end
@@ -50,23 +52,9 @@ defmodule Data.Schema.HolidayHour do
     |> validate_required(@required_fields)
   end
 
-  def update_changeset(model, params \\ %{}) do
-    params = convert_date(params)
-
-    model
-    |> cast(params, @all_fields)
-    |> cast_embed(:times, with: &times_changeset/2)
-    |> validate_required(@required_fields)
-  end
-
   defp convert_date(%{"holiday_date" => date} = params) do
     Map.merge(params, %{"holiday_date" => "#{date} 00:00:00Z"})
   end
 
   defp convert_date(params), do: params
-
-  defp times_changeset(model, params \\ %{}) do
-    model
-    |> cast(params, [:open_at, :close_at])
-  end
 end

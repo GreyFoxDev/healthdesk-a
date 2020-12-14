@@ -11,29 +11,26 @@ defmodule MainWeb.NormalHourController do
 
     hours = NormalHours.get_by_location_id(location_id)
 
-    render(
-      conn,
-      "index.html",
-      location: location,
-      hours: hours,
-      teams: teams(conn),
-      changeset: NormalHours.get_changeset(),
-      rows: [%{open_at: "", close_at: ""}]
-    )
+    render conn, "index.html", location: location, hours: hours, teams: teams(conn), changeset: NormalHours.get_changeset()
   end
 
-  def edit(conn, %{"id" => id, "location_id" => location_id}) do
-
+  def new(conn, %{"location_id" => location_id}) do
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
 
-    hours = NormalHours.get_by_location_id(location_id)
+    render(conn, "new.html",
+      changeset: NormalHours.get_changeset(),
+      location: location,
+      errors: [])
+  end
 
-    hour = Enum.filter(hours, fn f -> f.id == id  end) |> List.first()
-
-    rows = Enum.map(hour.times, fn time -> %{"open_at" => time.open_at, "close_at" => time.close_at} end)
+  def edit(conn, %{"id" => id, "location_id" => location_id}) do
+    location =
+      conn
+      |> current_user()
+      |> Location.get(location_id)
 
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- NormalHours.get_changeset(id, user) do
@@ -41,10 +38,25 @@ defmodule MainWeb.NormalHourController do
       render(conn, "edit.html",
         changeset: changeset,
         location: location,
-        rows: rows,
-        day_of_week: "#{changeset.data.day_of_week}",
         errors: [])
     end
+  end
+
+  def create(conn, %{"normal_hour" => hours, "team_id" => team_id, "location_id" => location_id}) do
+    hours
+    |> Map.put("location_id", location_id)
+    |> NormalHours.create()
+    |> case do
+         {:ok, _hours} ->
+           conn
+           |> put_flash(:success, "Normal Hours created successfully.")
+           |> redirect(to: team_location_normal_hour_path(conn, :index, team_id, location_id))
+
+         {:error, changeset} ->
+           conn
+           |> put_flash(:error, "Normal Hours failed to create")
+           |> render_page("new.html", changeset, changeset.errors)
+       end
   end
 
   def update(conn, %{"id" => id, "normal_hour" => hours, "team_id" => team_id, "location_id" => location_id}) do
@@ -63,23 +75,29 @@ defmodule MainWeb.NormalHourController do
        end
   end
 
-  def delete(conn, %{"id" => id, "location_id" => location_id}) do
+  def delete(conn, %{"id" => id, "team_id" => team_id, "location_id" => location_id}) do
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
+
     %{"id" => id, "deleted_at" => DateTime.utc_now()}
     |> NormalHours.update()
     |> case do
          {:ok, _hours} ->
-           NormalHours.get_by_location_id(location_id)
+           hours = NormalHours.get_by_location_id(location_id)
 
-           redirect(conn, to: "/admin/teams/#{location.team_id}}/locations/#{location.id}/normal-hours")
+           conn
+           |> put_flash(:success, "Normal Hours deleted successfully.")
+           |> render "index.html", location: location, hours: hours, teams: teams(conn), changeset: NormalHours.get_changeset()
 
          {:error, _changeset} ->
-           NormalHours.get_by_location_id(location_id)
+           hours = NormalHours.get_by_location_id(location_id)
 
-           redirect(conn, to: "/admin/teams/#{location.team_id}}/locations/#{location.id}/normal-hours")
+           conn
+           |> put_flash(:error, "Normal Hours failed to delete")
+           |> render conn, "index.html", location: location, hours: hours, teams: teams(conn), changeset: NormalHours.get_changeset()
+           |> render_page("index.html", team_id, location_id)
        end
   end
 

@@ -8,6 +8,8 @@ defmodule Data.Schema.NormalHour do
           id: binary(),
           location_id: binary(),
           day_of_week: String.t() | nil,
+          open_at: String.t() | nil,
+          close_at: String.t() | nil,
           active: boolean() | nil,
           deleted_at: :utc_datetime | nil
         }
@@ -18,22 +20,23 @@ defmodule Data.Schema.NormalHour do
 
   @optional_fields ~w|
   day_of_week
+  open_at
+  close_at
   active
   deleted_at
   |a
 
   @all_fields @required_fields ++ @optional_fields
+
   schema "normal_hours" do
     field(:day_of_week, :string)
+    field(:open_at, :string)
+    field(:close_at, :string)
 
     field(:active, :boolean)
     field(:deleted_at, :utc_datetime)
 
     belongs_to(:location, Data.Schema.Location)
-    embeds_many :times, Times, on_replace: :delete do
-      field(:open_at, :string)
-      field(:close_at, :string)
-    end
 
     timestamps()
   end
@@ -42,17 +45,5 @@ defmodule Data.Schema.NormalHour do
     model
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
-  end
-
-  def update_changeset(model, params \\ %{}) do
-    model
-    |> cast(params, @all_fields)
-    |> cast_embed(:times, with: &times_changeset/2)
-    |> validate_required(@required_fields)
-  end
-
-  defp times_changeset(model, params \\ %{}) do
-    model
-    |> cast(params, [:open_at, :close_at])
   end
 end

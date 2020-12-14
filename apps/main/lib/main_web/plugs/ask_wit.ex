@@ -33,6 +33,10 @@ defmodule MainWeb.Plug.AskWit do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
       receive do
         {:response, response} ->
+          IO.inspect("###################")
+          IO.inspect(response)
+          IO.inspect("###################")
+
           response
         _ ->
           {:unknown_intent, []}

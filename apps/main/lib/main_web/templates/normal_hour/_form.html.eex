@@ -1,0 +1,39 @@
+<div class="panel-body">
+    <section class="card">
+        <div class="card-body">
+            <%= form_for @data, @action, fn f -> %>
+                <div class="list-group list-group-flush list-group-bordered">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <fieldset>
+                            <span>Day of Week</span>
+                            <span>
+                                <%=
+                                select f,
+                                :day_of_week,
+                                ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                                class: "form-control"
+                                %>
+                            </span>
+
+                            <span>Open</span>
+                            <span>
+                                <%= text_input f, :open_at, class: "form-control" %>
+                            </span>
+                            <span>Close</span>
+                            <span>
+                                <%= text_input f, :close_at, class: "form-control" %>
+                            </span>
+                        </fieldset>
+                    </div>
+                </div>
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                <%= submit "Save", class: "btn btn-primary" %>
+                <%= link "Cancel", to: team_location_normal_hour_path(@conn, :index, @location.team_id, @location.id)  %>
+            </div>
+            <% end %>
+
+        </div>
+    </section>
+</div>

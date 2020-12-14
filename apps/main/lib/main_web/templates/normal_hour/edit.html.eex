@@ -1,14 +1,12 @@
-<% location = @location %>
-
 <header class="page-title-bar">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active">
-                <a href="<%= team_location_path(@conn, :index, location.team_id) %>"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Locations</a>
+                <a href="<%= team_location_path(@conn, :index, @team_id) %>"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Locations</a>
             </li>
         </ol>
     </nav>
-    <h6 class="page-title">Edit <%= location.location_name %></h6>
+    <h6 class="page-title">Edit <%= @changeset.data.location_name %></h6>
 </header>
 
 <div class="page-section">
@@ -17,6 +15,7 @@
             <div class="card card-fluid">
                 <div class="card-header">
                     <nav class="nav nav-tabs flex-column border-0">
+                        <% location = @location %>
                         <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link">Details</a>
                         <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link active">Hours</a>
                         <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Holiday Hrs</a>
@@ -32,13 +31,16 @@
             <div class="card card-fluid">
                 <h6 class="card-header"> Normal Hours </h6><!-- .card-body -->
                 <div class="card-body">
-                    <%= live_render(@conn, MainWeb.Live.NormalHourEditForm, session: %{
-                            "changeset" => @changeset,
-                            "action" => team_location_normal_hour_path(@conn, :index, @location.team_id, @location.id),
-                            "location" => @location,
-                            "day_of_week" => @day_of_week,
-                            "rows" => @rows
-                            } ,id: "koib#{@location.id}") %>
+                    <%=
+                    render "_form.html",
+                    data: @changeset,
+                    action: team_location_normal_hour_path(@conn, :update, @location.team_id, @location.id, @changeset.data),
+                    location: @location,
+                    conn: @conn,
+                    errors: @errors %>
+
+                    <%= render "_form.html", data: @changeset, action: team_location_path(@conn, :update, @team_id, @changeset.data), conn: @conn, errors: @errors %>
+
                 </div><!-- /.card-body -->
             </div>
         </div>

@@ -39,31 +39,24 @@
                                 <div class="alert alert-warning mx-3"> There are no hours for this location. </div>
                             </div>
                         <% else %>
-                        <%= for hour <- @hours do %>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><b><%= hour.day_of_week %></b></span>
+                            <%= for hour <- @hours do %>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><b><%= hour.day_of_week %></b></span>
+                                    <span><%= hour.open_at %> - <%= hour.close_at %></span>
 
-                            <%= for time <- hour.times do%>
-                            <span><%= time.open_at %> - <%= time.close_at %></span>
+                                    <%= link {:safe, "<i class=\" hours-icon fas fa-trash-alt\"></i>"}, to: team_location_normal_hour_path(@conn, :delete, @location.team_id, @location.id, hour.id), method: "delete" %>
+
+                                </div>
                             <% end %>
-                            <div>
-                                <%= link {:safe, "<i class=\"hours-icon fas fa-edit\"></i>"},
-                                to: team_location_normal_hour_path(@conn, :edit, @location.team_id, @location.id, hour.id),
-                                method: "get" %>
-                                <%= link {:safe, "<i class=\"hours-icon fas fa-trash-alt\"></i>"},
-                                to: team_location_normal_hour_path(@conn, :delete, @location.team_id, @location.id, hour.id),
-                                method: "delete" %>
-                            </div>
-                        </div>
-                        <% end %>
                         <% end %>
                         <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <%= live_render(@conn, MainWeb.Live.NormalHourForm, session: %{
-                            "changeset" => @changeset,
-                            "action" => team_location_normal_hour_path(@conn, :index, @location.team_id, @location.id),
-                            "location" => @location,
-                            "rows" => @rows
-                            } ,id: "koib#{@location.id}") %>
+                            <%=
+                            render "_form.html",
+                            data: @changeset,
+                            action: team_location_normal_hour_path(@conn, :create, @location.team_id, @location.id),
+                            location: @location,
+                            conn: @conn,
+                            errors: @changeset.errors %>
                         </div>
 
                     </div><!-- /.card-body -->

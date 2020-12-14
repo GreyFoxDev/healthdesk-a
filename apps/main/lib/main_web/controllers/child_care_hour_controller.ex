@@ -9,35 +9,31 @@ defmodule MainWeb.ChildCareHourController do
       |> current_user()
       |> Location.get(location_id)
 
-    hours = ChildCareHours.get_by_location_id(location_id)
+    hours =
+      conn
+      |> current_user()
+      |> ChildCareHours.all(location_id)
 
-    render(
-      conn, "index.html",
-      location: location,
-      hours: hours,
-      teams: teams(conn),
-      changeset: ChildCareHours.get_changeset(),
-      rows: [%{morning_open_at: "", morning_close_at: "",
-        afternoon_open_at: "", afternoon_close_at: ""}]
-    )
+    render conn, "index.html", location: location, hours: hours, teams: teams(conn), changeset: ChildCareHours.get_changeset()
   end
 
-  def edit(conn, %{"id" => id, "location_id" => location_id}) do
-
+  def new(conn, %{"location_id" => location_id}) do
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
 
-    hours = ChildCareHours.get_by_location_id(location_id)
+    render(conn, "new.html",
+      changeset: ChildCareHours.get_changeset(),
+      location: location,
+      errors: [])
+  end
 
-    hour = Enum.filter(hours, fn f -> f.id == id  end) |> List.first()
-
-    rows = Enum.map(hour.times, fn
-      time ->
-      %{morning_open_at: time.morning_open_at, morning_close_at: time.morning_close_at,
-        afternoon_open_at: time.afternoon_open_at, afternoon_close_at: time.afternoon_close_at}
-    end)
+  def edit(conn, %{"id" => id, "location_id" => location_id}) do
+    location =
+      conn
+      |> current_user()
+      |> Location.get(location_id)
 
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- ChildCareHours.get_changeset(id, user) do
@@ -45,8 +41,6 @@ defmodule MainWeb.ChildCareHourController do
       render(conn, "edit.html",
         changeset: changeset,
         location: location,
-        rows: rows,
-        day_of_week: "#{changeset.data.day_of_week}",
         errors: [])
     end
   end

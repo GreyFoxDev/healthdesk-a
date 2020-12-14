@@ -168,6 +168,19 @@
             </div>
         </div><!-- /.metric -->
     </div><!-- /metric column -->
+    <div class="col-12 col-sm-6 col-lg-4">
+        <!-- .metric -->
+        <div class="card-metric">
+            <div class="metric">
+                <h2 class="metric-label"> APPOINTMENTS </h2>
+                <p class="metric-label">
+                    <canvas id="canvas-appointments" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
+                </p>
+            </div>
+        </div><!-- /.metric -->
+    </div><!-- /metric column -->
+    <% confirmed = Enum.reduce(@appointments,0, fn %{confirmed: f, count: c}, acc ->  if f,do: acc+c , else: acc end) %>
+    <% pending = Enum.reduce(@appointments,0, fn %{confirmed: f, count: c}, acc ->  if !f,do: acc+c , else: acc end) %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
     <script>
      const ctx = document.getElementById('canvas-sessions-by-channel').getContext('2d');
@@ -202,6 +215,61 @@
                  display: true,
                  position: 'left'
              },
+         },
+     });
+    </script>
+    <script>
+     const ctx2 = document.getElementById('canvas-appointments').getContext('2d');
+     const chartData2 = {
+         labels: [
+             'Confirmed',
+             'Pending'
+         ],
+         datasets: [{
+             data: [
+                 <%= confirmed %>,
+                 <%= pending %>,
+             ],
+             borderWidth: 5,
+             backgroundColor: [ '#2ECC40','#ff973d'],
+             hoverBackgroundColor: [ '#01FF70','#ff973d'],
+         }],
+     };
+     new Chart(ctx2, {
+         type: 'pie',
+         data: chartData2,
+         maintainAspectRatio: false,
+         responsive: true,
+         options: {
+             legend: {
+                 display: true,
+                 position: 'left'
+             },
+             tooltips: {
+                 custom: function(tooltip) {
+                     tooltip.displayColors = false;
+                 },
+                 callbacks: {
+                     label: function (tooltipItem, data) {
+                         var labels = data.labels;
+                         var values = data.datasets[tooltipItem.datasetIndex].data;
+                         var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                         var colour = data.datasets[tooltipItem.datasetIndex].backgroundColor
+                         var total = 0;
+                         for (var i in values) {
+                             total += values[i];
+                         }
+                         var totally = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                         var label = [];
+                         for (var j in labels) {
+                             var percentage = Math.round((values[j] / total) * 100);
+                             label.push (labels[j] + " : " + values[j].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' (' + percentage + '%)');
+                         }
+                         label.push("Total : " + totally)
+                         return label;
+                     }
+                 }
+             }
          },
      });
     </script>

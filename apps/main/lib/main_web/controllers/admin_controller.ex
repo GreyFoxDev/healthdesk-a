@@ -1,12 +1,13 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages}
+  alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages, Appointments}
 
   def index(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_team_id(current_user, team_id)
     dispositions = Disposition.count_by_team_id(team_id)
+    appointments = Appointments.count_by_team_id(team_id)
     dispositions_per_day =
       case Disposition.average_per_day_for_team(team_id) do
         [result] -> result
@@ -40,6 +41,7 @@ defmodule MainWeb.AdminController do
     render(conn, "index.html",
       dispositions: dispositions,
       campaigns: campaigns,
+      appointments: appointments,
       dispositions_per_day: dispositions_per_day,
       web_totals: team_totals_by_channel("WEB", team_id),
       sms_totals: team_totals_by_channel("SMS", team_id),
@@ -61,6 +63,7 @@ defmodule MainWeb.AdminController do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_location_id(current_user, location_id)
     dispositions = Disposition.count_by_location_id(location_id)
+    appointments = Appointments.count_by_location_id(location_id)
     response_time = ConversationMessages.count_by_location_id(location_id)
     dispositions_per_day =
       case Disposition.average_per_day_for_location(location_id) do
@@ -82,6 +85,7 @@ defmodule MainWeb.AdminController do
 
     render(conn, "index.html",
       dispositions: dispositions,
+    appointments: appointments,
       campaigns: Campaign.get_by_location_id(location_id),
       dispositions_per_day: dispositions_per_day,
       response_time: response_time.median_response_time||0,
@@ -117,6 +121,7 @@ defmodule MainWeb.AdminController do
 
     if current_user.role == "admin" do
       dispositions = Disposition.count_all()
+      appointments = Appointments.count_all()
       [dispositions_per_day] = Disposition.average_per_day()
       locations = Location.all()
 
@@ -136,6 +141,7 @@ defmodule MainWeb.AdminController do
         metrics: [],
         campaigns: campaigns,
         dispositions: dispositions,
+        appointments: appointments,
         dispositions_per_day: dispositions_per_day,
         response_time: response_time,
         web_totals: totals_by_channel("WEB"),
@@ -152,6 +158,7 @@ defmodule MainWeb.AdminController do
         team_id: nil)
     else
       dispositions = Disposition.count_by_team_id(current_user.team_member.team_id)
+      appointments = Appointments.count_by_team_id(current_user.team_member.team_id)
       dispositions_per_day =
         case Disposition.average_per_day_for_team(current_user.team_member.team_id) do
           [result] -> result
@@ -174,6 +181,7 @@ defmodule MainWeb.AdminController do
         metrics: [],
         campaigns: campaigns,
         dispositions: dispositions,
+        appointments: appointments,
         dispositions_per_day: dispositions_per_day,
         response_time: response_time.median_response_time||0,
         web_totals: team_totals_by_channel("WEB", current_user.team_member.team_id),
