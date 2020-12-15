@@ -18,8 +18,8 @@
                 <div class="card-header">
                     <nav class="nav nav-tabs flex-column border-0">
                         <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link">Details</a>
-                        <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link active">Hours</a>
-                        <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Holiday Hrs</a>
+                        <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Hours</a>
+                        <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link active">Holiday Hrs</a>
                         <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hrs</a>
                         <a href="<%= team_location_wifi_network_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Wifi</a>
                         <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Pass Prices</a>
@@ -30,15 +30,16 @@
         </div>
         <div class="col-lg-8">
             <div class="card card-fluid">
-                <h6 class="card-header"> Normal Hours </h6><!-- .card-body -->
+                <h6 class="card-header"> Holiday Hours </h6><!-- .card-body -->
                 <div class="card-body">
-                    <%= live_render(@conn, MainWeb.Live.NormalHourEditForm, session: %{
+                    <%= live_render(@conn, MainWeb.Live.HolidayHourEditForm, session: %{
                             "changeset" => @changeset,
-                            "action" => team_location_normal_hour_path(@conn, :index, @location.team_id, @location.id),
+                            "action" => team_location_holiday_hour_path(@conn, :create, @location.team_id, @location.id),
                             "location" => @location,
-                            "day_of_week" => @day_of_week,
-                            "rows" => @rows
-                            } ,id: "koib#{@location.id}") %>
+                            "rows" => @rows,
+                            "holiday_name" => @holiday_name,
+                            "holiday_date" => @holiday_date
+                            } ,id: "wohi#{@location.id}") %>
                 </div><!-- /.card-body -->
             </div>
         </div>

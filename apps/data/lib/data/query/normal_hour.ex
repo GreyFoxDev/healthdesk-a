@@ -21,6 +21,21 @@ defmodule Data.Query.NormalHour do
   end
 
   @doc """
+  Returns a normal hour by id
+  """
+  @spec get_by(location_id :: binary(), day_of_week :: String.t, repo :: Ecto.Repo.t()) :: NormalHour.t() | nil
+  def get_by(location_id, day_of_week, repo \\ Read) do
+    from(
+      t in NormalHour,
+      where: is_nil(t.deleted_at),
+      where: t.location_id == ^location_id,
+      where: t.day_of_week == ^day_of_week
+    )
+    |> repo.all()
+    |> List.last
+  end
+
+  @doc """
   Return a list of active normal hours for a location
   """
   @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [NormalHour.t()]
@@ -39,7 +54,7 @@ defmodule Data.Query.NormalHour do
           {:ok, NormalHour.t()} | {:error, Ecto.Changeset.t()}
   def create(params, repo \\ Write) do
     %NormalHour{}
-    |> NormalHour.changeset(params)
+    |> NormalHour.update_changeset(params)
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
         repo.insert(changeset)
@@ -56,7 +71,7 @@ defmodule Data.Query.NormalHour do
           {:ok, NormalHour.t()} | {:error, Ecto.Changeset.t()}
   def update(%NormalHour{} = original, params, repo \\ Write) when is_map(params) do
     original
-    |> NormalHour.changeset(params)
+    |> NormalHour.update_changeset(params)
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
         repo.update(changeset)

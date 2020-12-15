@@ -13,6 +13,7 @@ defmodule Data.ChildCareHours do
   ]
 
   defdelegate create(params), to: Query
+  defdelegate get_by(location_id, day_of_week), to: Query
   defdelegate get_by_location_id(location_id), to: Query
 
   def get_changeset(),
@@ -25,6 +26,10 @@ defmodule Data.ChildCareHours do
       |> Schema.changeset()
 
     {:ok, changeset}
+  end
+
+  def get_update_changeset(params) do
+    Schema.update_changeset(%Schema{}, params)
   end
 
   def all(%{role: role}, location_id) when role in @roles,
@@ -41,5 +46,9 @@ defmodule Data.ChildCareHours do
     id
     |> Query.get()
     |> Query.update(params)
+  end
+
+  def delete(%{"id" => id} = params) do
+    Query.delete(params)
   end
 end

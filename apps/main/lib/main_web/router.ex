@@ -22,7 +22,7 @@ defmodule MainWeb.Router do
   end
 
   pipeline :auth,
-           do: plug MainWeb.Auth.AuthAccessPipeline
+    do: plug MainWeb.Auth.AuthAccessPipeline
 
   scope "/", MainWeb do
     pipe_through [:browser, :not_live]
@@ -76,12 +76,16 @@ defmodule MainWeb.Router do
         resources "/team-members", LocationTeamMemberController
         resources "/holiday-hours", HolidayHourController
         resources "/normal-hours", NormalHourController
+        live "/normal-hours/form" , Live.NormalHourForm, :form
+#        post "/add", NormalHourController, :add
+#        post "/remove", NormalHourController, :remove
         resources "/child-care-hours", ChildCareHourController
         resources "/wifi-network", WifiNetworkController
         resources "/pricing-plans", PricingPlanController
         resources "/saved-replies", SavedReplyController
       end
     end
+    live "/admin/teams/:location_team_id/locations/:location_id/normal-hours/" , Live.NormalHourForm, :index
 
     resources "/users", UserController, only: [:edit, :update]
 

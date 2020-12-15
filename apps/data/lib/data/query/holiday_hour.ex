@@ -21,6 +21,20 @@ defmodule Data.Query.HolidayHour do
   end
 
   @doc """
+  Returns a holiday hour by id
+  """
+  @spec get_by(location_id :: binary(), holiday_name :: String.t, repo :: Ecto.Repo.t()) :: HolidayHour.t() | nil
+  def get_by(location_id, holiday_name, repo \\ Read) do
+    from(t in HolidayHour,
+      where: is_nil(t.deleted_at),
+      where: t.location_id == ^location_id,
+      where: t.holiday_name == ^holiday_name
+    )
+    |> repo.all()
+    |> List.last
+  end
+
+  @doc """
   Return a list of active holiday hours for a location
   """
   @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [HolidayHour.t()]
@@ -39,7 +53,7 @@ defmodule Data.Query.HolidayHour do
           {:ok, HolidayHour.t()} | {:error, Ecto.Changeset.t()}
   def create(params, repo \\ Write) do
     %HolidayHour{}
-    |> HolidayHour.changeset(params)
+    |> HolidayHour.update_changeset(params)
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
         repo.insert(changeset)
@@ -56,7 +70,7 @@ defmodule Data.Query.HolidayHour do
           {:ok, HolidayHour.t()} | {:error, Ecto.Changeset.t()}
   def update(%HolidayHour{} = original, params, repo \\ Write) when is_map(params) do
     original
-    |> HolidayHour.changeset(params)
+    |> HolidayHour.update_changeset(params)
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
         repo.update(changeset)
