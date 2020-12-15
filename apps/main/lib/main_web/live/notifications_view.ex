@@ -13,20 +13,65 @@ defmodule MainWeb.Live.NotificationsView do
   def mount(_params, session, socket) do
     Main.LiveUpdates.subscribe_live_view(session["current_user"].id)
     notifications = Notifications.get_by_user(session["current_user"].id)
-    read= Enum.reduce_while(notifications, false, fn x, acc ->
-      if x.read, do: {:cont, false}, else: {:halt, true}
-    end)
-    socket= socket
-            |> assign( :session, session)
-            |> assign( :read, read)
-            |> assign(:current_user, session["current_user"])
+    socket = socket
+             |> assign(:session, session)
+             |> assign(:current_user, session["current_user"])
+             |> assign(:notifications, notifications)
+    read = Enum.reduce_while(
+      notifications,
+      false,
+      fn x, acc ->
+        if !x.read, do: {:halt, true}, else: {:cont, false}
+      end
+    )
+    IO.inspect("###################")
+    IO.inspect("this is mount")
+    IO.inspect("###################")
+
+    socket = socket
+             |> assign(:read, read)
     {:ok, socket}
   end
-
-  def handle_info({_requesting_module, :plzzwork}, socket) do
-    socket= socket
-            |> assign(:read, true)
+  def handle_info({_requesting_module, :new_notif}, socket) do
+    notifications = Notifications.get_by_user(socket.assigns.current_user.id)
+    socket = socket
+             |> assign(:notifications, notifications)
     {:noreply, socket}
+  end
+
+  def handle_event("conversation", params, socket) do
+    Notifications.update(%{"id" => params["nid"], "read" => true})
+    notifications = Notifications.get_by_user(socket.assigns.current_user.id)
+    read = Enum.reduce_while(
+      notifications,
+      false,
+      fn x, acc ->
+        if !x.read, do: {:halt, true}, else: {:cont, false}
+      end
+    )
+    socket = socket
+             |> assign(:read, read)
+             |> assign(:notifications, notifications)
+    url = if params["cid"] do
+      "/admin/conversations/#{params["cid"]}"
+
+    else
+      if params["tid"] do
+        "/admin/tickets/#{params["tid"]}"
+      end
+    end
+    Process.send_after(self(), {:update_notif, %{url: url}},300)
+    {:noreply, socket}
+  end
+
+  def handle_info({:update_notif, %{url: url}}, socket) do
+    Main.LiveUpdates.notify_live_view(socket.assigns.current_user.id,{__MODULE__, :new_notif})
+    {
+      :noreply,
+      socket
+      |> redirect(to: url)
+    }
+
   end
 
 end

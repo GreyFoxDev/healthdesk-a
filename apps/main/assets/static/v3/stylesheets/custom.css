@@ -195,3 +195,10 @@ span.select2-selection__clear {
 .hours-icon {
     color: #6657cc !important;
 }
+a.dropdown-item.unread {
+    background: #2c3b6038;
+    font-style: italic;
+}
+a.dropdown-item.unread:hover {
+    background: #6657cc;
+}

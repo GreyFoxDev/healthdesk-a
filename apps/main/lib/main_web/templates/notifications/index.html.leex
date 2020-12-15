@@ -10,7 +10,23 @@
                 <span>Notifications <span class="badge"></span></span>
             </h6><!-- .dropdown-scroll -->
             <div class="dropdown-scroll perfect-scrollbar">
-                <%= live_render(@socket, MainWeb.Live.NotificationAlertsView, session: %{"current_user" => @current_user}, id: "notialert") %>
+                <%= for n <- @notifications do %>
+                <%= if n.conversation do %>
+                <a href="#" class="dropdown-item <%= !n.read && "unread" %>" phx-click="conversation" phx-value-cid="<%= n.conversation.id %>"
+                   phx-value-nid="<%= n.id %>">
+                    <% else %>
+                    <a href="#" class="dropdown-item <%= !n.read && "unread" %>" phx-click="conversation" phx-value-tid="<%= n.ticket.id %>"
+                       phx-value-nid="<%= n.id %>">
+                        <% end %>
+                        <div class="user-avatar">
+                            <img src="<%= if @current_user.avatar != "", do: @current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt="">
+                        </div>
+                        <div class="dropdown-item-body">
+                            <p class="text">  <%= n.sender.first_name %> <%= n.sender.last_name %> <%= n.text %> </p><span
+                                class="date"><%= format_date(n.inserted_at) %></span>
+                        </div>
+                    </a>
+                    <% end %>
             </div>
         </div>
     </li><!-- /.nav-item -->
