@@ -8,18 +8,14 @@ defmodule MainWeb.Live.NotificationAlertsView do
 
 
   def render(assigns) do
-    View.render("index.html", assigns)
+    View.render("show.html", assigns)
   end
 
   def mount(_params,  session, socket) do
     Main.LiveUpdates.subscribe_live_view(session["current_user"].id)
     notifications = Notifications.get_by_user(session["current_user"].id)
-    read= Enum.reduce_while(notifications, false, fn x, acc ->
-      if x.read, do: {:cont, false}, else: {:halt, true}
-    end)
     socket= socket
     |> assign( :session, session)
-    |> assign( :read, read)
     |> assign(:current_user, session["current_user"])
     |> assign(:notifications, notifications)
     {:ok, socket}
@@ -29,7 +25,6 @@ defmodule MainWeb.Live.NotificationAlertsView do
     notifications =  Notifications.get_by_user(socket.assigns.current_user.id)
     socket= socket
             |> assign(:notifications, notifications)
-            |> assign(:read, true)
     {:noreply, socket}
   end
 

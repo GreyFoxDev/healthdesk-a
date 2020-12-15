@@ -1,0 +1,64 @@
+<div class="panel-body">
+    <section class="card">
+        <div class="card-body">
+            <%= form_for @changeset, @action, [phx_change: :validate, phx_submit: :save], fn f -> %>
+                <div class="list-group list-group-flush list-group-bordered">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <fieldset>
+                            <span>Holiday Name</span>
+                            <span>
+                                <%=
+                                text_input f,
+                                :holiday_name,
+                                class: "form-control",
+                                value: "#{@holiday_name}",
+                                name: "holiday_name"%>
+                            </span>
+                            <span>Holiday Date</span>
+                            <span>
+                                <%=
+                                date_input f,
+                                :holiday_date,
+                                class: "form-control",
+                                value: "#{@holiday_date}",
+                                name: "holiday_date" %>
+                            </span>
+                            <%= for {map, index} <- Enum.with_index(@rows) do %>
+                            <div class="row">
+                                <div class="col">
+                                    <span>Open</span>
+                                    <%=
+                                text_input f,
+                                :open_at,
+                                name: "rows[#{index}][open_at]",
+                                value: "#{map["open_at"]}",
+                                class: "form-control"
+                                %>
+                                </div>
+                                <div class="col">
+                                    <span>Close</span>
+                                    <%=
+                                text_input f,
+                                :close_at,
+                                name: "rows[#{index}][close_at]",
+                                value: "#{map["close_at"]}",
+                                class: "form-control"
+                                %>
+                                </div>
+                                <a href="#" phx-click="remove" phx-value-index="<%= index %>" class="align-self-end btn-sm"><i class=" hours-icon fas fa-trash-alt"></i></a>
+                            </div>
+                            <% end %>
+                        </fieldset>
+                    </div>
+                </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= submit "Save", class: "btn btn-primary" %>
+                <a id="addtime" href="#" phx-click="add" class="btn btn-secondary float-right">Add Time</a>
+                <a id="addtime" href="#" phx-click="cancel" class="btn btn">Cancel</a>
+            </div>
+            <% end %>
+        </div>
+    </section>
+</div>
