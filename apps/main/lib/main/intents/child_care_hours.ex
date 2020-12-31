@@ -6,7 +6,7 @@ defmodule MainWeb.Intents.ChildCareHours do
   alias Data.{
     ChildCareHours,
     Location
-  }
+    }
 
   @behaviour MainWeb.Intents
 
@@ -23,7 +23,7 @@ defmodule MainWeb.Intents.ChildCareHours do
     location = Location.get_by_phone(location)
     <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
-    with {:normal, day_of_week} <- get_day_of_week({year, month, day}),
+    with {:normal, day_of_week} <- get_day_of_week({year, month, day},location),
          [hours] <- get_hours(location.id, {:normal, day_of_week}) do
 
       prefix = date_prefix({:normal, day_of_week}, {year, month, day}, location.timezone)
@@ -53,7 +53,7 @@ defmodule MainWeb.Intents.ChildCareHours do
         @no_child_care
 
       [] ->
-        {term, day_of_week} = get_day_of_week({year, month, day})
+        {term, day_of_week} = get_day_of_week({year, month, day},location)
 
         String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
       _ ->
@@ -77,16 +77,16 @@ defmodule MainWeb.Intents.ChildCareHours do
           |> Stream.map(&format_schedule/1)
           |> Enum.join("\n")
 
-      String.replace(@all_hours, "[schedule]", schedule)
+        String.replace(@all_hours, "[schedule]", schedule)
     end
   end
 
-  defp get_day_of_week({year, month, day} = date) do
-    with nil <- MainWeb.HolidayDates.is_holiday?(date) do
-      {:normal, lookup_day_of_week(date)}
+  defp get_day_of_week({year, month, day} = date,location) do
+    with [holiday] <- find_holiday(location, date) do
+      {:holiday, holiday}
     else
-      holiday ->
-        {:holiday, holiday}
+      _ ->
+        {:normal, lookup_day_of_week(date)}
     end
   end
 
@@ -94,8 +94,14 @@ defmodule MainWeb.Intents.ChildCareHours do
     "#{day.day_of_week}: #{day.morning_open_at} to #{day.morning_close_at}"
   end
 
-  defp format_schedule(day) do
-    "#{day.day_of_week}: #{day.morning_open_at} to #{day.morning_close_at} and #{day.afternoon_open_at} to #{day.afternoon_close_at}"
+  defp format_schedule(%{times: []}=day) do
+    ""
+  end
+  defp format_schedule(%{times: times}=day) do
+    {morning,evening} = times |> Enum.reduce({[],[]},fn b, {morning,evening} -> {[(b.morning_open_at <> " to " <> b.morning_close_at) | morning], [(b.afternoon_open_at <> " to " <> b.afternoon_close_at) | evening]}end)
+    morning = morning |> Enum.join(",")
+    evening = evening |> Enum.join(",")
+    "#{day.day_of_week}: morning(#{morning}) and afternoon(#{evening})"
   end
 
   defp get_hours(location) do
@@ -136,8 +142,20 @@ defmodule MainWeb.Intents.ChildCareHours do
   defp convert_to_integer({year, month, day}) do
     {check_binary(year), check_binary(month), check_binary(day)}
   end
-
   defp check_binary(value) when is_binary(value), do: String.to_integer(value)
   defp check_binary(value) when is_integer(value), do: value
+
+  defp find_holiday(location_id, erl_date) do
+    location_id
+    |> HolidayHours.get_by_location_id()
+    |> Enum.filter(fn d ->
+      match_date?(d.holiday_date, erl_date)
+    end)
+  end
+  defp match_date?(nil, _), do: false
+
+  defp match_date?(date, erl_date) do
+    Date.to_erl(date) == erl_date
+  end
 
 end

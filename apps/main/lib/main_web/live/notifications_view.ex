@@ -24,10 +24,6 @@ defmodule MainWeb.Live.NotificationsView do
         if !x.read, do: {:halt, true}, else: {:cont, false}
       end
     )
-    IO.inspect("###################")
-    IO.inspect("this is mount")
-    IO.inspect("###################")
-
     socket = socket
              |> assign(:read, read)
     {:ok, socket}
@@ -53,7 +49,7 @@ defmodule MainWeb.Live.NotificationsView do
              |> assign(:read, read)
              |> assign(:notifications, notifications)
     url = if params["cid"] do
-      "/admin/conversations/#{params["cid"]}"
+      "/admin/conversations/#{params["cid"]}/notes"
 
     else
       if params["tid"] do

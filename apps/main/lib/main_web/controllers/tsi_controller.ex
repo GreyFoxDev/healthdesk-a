@@ -295,6 +295,10 @@ defmodule MainWeb.TsiController do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
       receive do
         {:response, response} ->
+          IO.inspect("###################")
+          IO.inspect(response)
+          IO.inspect("###################")
+
           message = Intents.get(response, location.phone_number)
           if message == location.default_message do
             {:unknown, location.default_message}

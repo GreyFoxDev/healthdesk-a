@@ -127,8 +127,11 @@ defmodule MainWeb.Live.ConversationsView do
 
     {:ok, socket}
   end
-  def mount(%{"id" => conversation_id},session, socket) do
-
+  def mount(%{"id" => conversation_id}=params,session, socket) do
+    tab1 = case params["tab"] do
+      nil -> "details"
+      _ -> "notes"
+    end
 
     {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
 
@@ -161,7 +164,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:count, 0)
       |> assign(:loading, true)
       |> assign(:tab, "active")
-      |> assign(:tab1, "details")
+      |> assign(:tab1, tab1)
       |> assign(:search_string, "")
       |> assign(:changeset, Conversations.get_changeset())
       |> assign(:mchangeset, ConversationMessages.get_changeset())
@@ -870,7 +873,7 @@ defmodule MainWeb.Live.ConversationsView do
     end
 
     Enum.each(notifications,fn n ->
-      notify(%{user_id: n.user.id, from: user.id, conversation_id: conversation_id, text: " has mention you in a conversation"},n,location,user)
+      notify(%{user_id: n.user.id, from: user.id, conversation_id: conversation_id, text: " has mentioned you in a conversation"},n,location,user)
     end)
 
     params = %{"conversation_id" => conversation_id,"user_id" => user.id,"text" => text_}

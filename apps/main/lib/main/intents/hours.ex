@@ -4,20 +4,20 @@ defmodule MainWeb.Intents.Hours do
     HolidayHours,
     NormalHours,
     Location
-  }
+    }
 
   @behaviour MainWeb.Intents
-
-  @hours "[date_prefix], our hours are [open] to [close]. Is there anything else we can assist you with?"
+  @string "[open] to [close]"
+  @hours "[date_prefix], our hours are [hours]. Is there anything else we can assist you with?"
   @closed "[date_prefix], we are closed. Is there anything else we can assist you with?"
   @days_of_week ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
   @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
-  @alt_response "Members have 24/7 keycard access. [date_prefix], our staff hours are [open] to [close]. Is there anything else we can assist you with?"
+  @alt_response "Members have 24/7 keycard access. [date_prefix], our staff hours are [hours]. Is there anything else we can assist you with?"
 
 
   @impl MainWeb.Intents
   def build_response([datetime: {datetime, _}], location),
-    do: build_response([datetime: datetime], location)
+      do: build_response([datetime: datetime], location)
 
   def build_response([datetime: datetime], location) do
     location = Location.get_by_phone(location)
@@ -29,17 +29,19 @@ defmodule MainWeb.Intents.Hours do
 
       prefix = date_prefix({term, day_of_week}, {year, month, day}, location.timezone)
 
-      if hours.open_at && hours.close_at do
+      if length(hours.times) do
+        times =
+          hours.times
+          |> Enum.reduce([],fn b,acc ->[(b.open_at<>" to "<>b.close_at)|acc] end)
+          |> Enum.join(" and ")
         if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
           @alt_response
           |> String.replace("[date_prefix]", prefix)
-          |> String.replace("[open]", hours.open_at)
-          |> String.replace("[close]", hours.close_at)
+          |> String.replace("[hours]", times)
         else
           @hours
           |> String.replace("[date_prefix]", prefix)
-          |> String.replace("[open]", hours.open_at)
-          |> String.replace("[close]", hours.close_at)
+          |> String.replace("[hours]", times)
         end
       else
         String.replace(@closed, "[data_prefix]", prefix)
@@ -55,7 +57,7 @@ defmodule MainWeb.Intents.Hours do
         else
           @default_response
         end
-      end
+    end
   end
 
   def build_response([], location) do
@@ -69,17 +71,19 @@ defmodule MainWeb.Intents.Hours do
     with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week(erl_date, location.id),
          [hours] <- get_hours(location.id, {term, day_of_week}) do
 
-      if hours.open_at && hours.close_at do
+      if length(hours.times) do
+        times =
+          hours.times
+          |> Enum.reduce([],fn b,acc ->[(b.open_at<>" to "<>b.close_at)|acc] end)
+          |> Enum.join(" and ")
         if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
           @alt_response
           |> String.replace("[date_prefix]", "Today")
-          |> String.replace("[open]", hours.open_at)
-          |> String.replace("[close]", hours.close_at)
+          |> String.replace("[hours]", times)
         else
           @hours
           |> String.replace("[date_prefix]", "Today")
-          |> String.replace("[open]", hours.open_at)
-          |> String.replace("[close]", hours.close_at)
+          |> String.replace("[hours]", times)
         end
       else
         String.replace(@closed, "[data_prefix]", "Today")
@@ -88,7 +92,7 @@ defmodule MainWeb.Intents.Hours do
       [] ->
         {term, day_of_week} = get_day_of_week(erl_date, location.id)
 
-      String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, erl_date, location.timezone))
+        String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, erl_date, location.timezone))
       _ ->
         if location.default_message != "" do
           location.default_message
@@ -99,12 +103,17 @@ defmodule MainWeb.Intents.Hours do
   end
 
   def build_response(wtf, location) do
-    location = Location.get_by_phone(location)
+    case wtf[:datetime] do
+      nil ->
 
-    if location.default_message != "" do
-      location.default_message
-    else
-      @default_response
+        location = Location.get_by_phone(location)
+
+        if location.default_message != "" do
+          location.default_message
+        else
+          @default_response
+        end
+      datetime -> build_response([datetime: datetime], location)
     end
   end
 

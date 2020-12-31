@@ -24,14 +24,14 @@
                                 text_input f,
                                 :morning_open_at,
                                 name: "rows[#{index}][morning_open_at]",
-                                value: map.morning_open_at,
+                                value: map["morning_open_at"],
                                 class: "form-control" %>
                                 <span>PM Open</span>
                                 <%=
                                 text_input f,
                                 :afternoon_open_at,
                                 name: "rows[#{index}][afternoon_open_at]",
-                                value: map.afternoon_open_at,
+                                value: map["afternoon_open_at"],
                                 class: "form-control" %>
                             </div>
                             <div class="col">
@@ -40,14 +40,14 @@
                                 text_input f,
                                 :morning_close_at,
                                 name: "rows[#{index}][morning_close_at]",
-                                value: map.morning_close_at,
+                                value: map["morning_close_at"],
                                 class: "form-control" %>
                                 <span>PM Close</span>
                                 <%=
                                 text_input f,
                                 :afternoon_close_at,
                                 name: "rows[#{index}][afternoon_close_at]",
-                                value: map.afternoon_close_at,
+                                value: map["afternoon_close_at"],
                                 class: "form-control" %>
                             </div>
                             <a href="#" phx-click="remove" phx-value-index="<%= index %>"

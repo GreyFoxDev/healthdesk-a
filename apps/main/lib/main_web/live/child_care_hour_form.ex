@@ -78,6 +78,7 @@ defmodule MainWeb.Live.ChildCareHourForm do
   end
 
   def handle_event("validate", params, socket) do
+
     {
       :noreply,
       socket

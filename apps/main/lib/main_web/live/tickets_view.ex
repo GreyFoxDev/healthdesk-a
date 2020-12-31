@@ -141,7 +141,7 @@ defmodule MainWeb.Live.TicketsView do
     end
 
     Enum.each(notifications,fn n ->
-      notify(%{user_id: n.user.id, from: user.id, ticket_id: params["ticket_id"], text: " has mention you in a ticket"},n,user)
+      notify(%{user_id: n.user.id, from: user.id, ticket_id: params["ticket_id"], text: " has mentioned you in a ticket"},n,user)
     end)
     {:ok, res} = TicketNote.create(params)
     #    note =

@@ -118,6 +118,10 @@ defmodule MainWeb.Intents do
 
   def get({intent, args}, location) do
     args = remove_intent(args)
+    IO.inspect("###################")
+    IO.inspect(args)
+    IO.inspect("###################")
+
     with atom <- String.to_existing_atom(intent)do
       atom
       |> fetch_module()
