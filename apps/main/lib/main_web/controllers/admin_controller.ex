@@ -207,9 +207,10 @@ defmodule MainWeb.AdminController do
     case type do
       "Automated" ->
         test = dispositions |> Enum.count(&(&1.name == "GENERAL - Test")) || 0
-        (automated / (total - (call_transferred + call_deflected + call_hung_up + test))) * 100
+        (automated / (if (total - (call_transferred + call_deflected + call_hung_up + test))== 0.0,do: 1,else: (total - (call_transferred + call_deflected + call_hung_up + test)))) * 100
       "Call deflected" ->
-        call_deflected  / (call_transferred + call_deflected + call_hung_up) * 100
+
+        (call_deflected  / (if (call_transferred + call_deflected + call_hung_up)==0.0,do: 1,else: (call_transferred + call_deflected + call_hung_up))) * 100
     end
   end
   defp sum(results) do
