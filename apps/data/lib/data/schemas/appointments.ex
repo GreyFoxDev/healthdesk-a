@@ -50,7 +50,7 @@ defmodule Data.Schema.Appointment do
 
 
     belongs_to(:conversation, Data.Schema.Conversation)
-    belongs_to(:members, Data.Schema.Member)
+    belongs_to(:member, Data.Schema.Member)
 
     timestamps()
   end
