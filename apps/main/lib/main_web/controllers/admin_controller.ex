@@ -1,8 +1,6 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
-
   alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages, Appointments}
-
   def index(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_team_id(current_user, team_id)
@@ -13,19 +11,15 @@ defmodule MainWeb.AdminController do
         [result] -> result
         _ -> %{sessions_per_day: 0}
       end
-
     team_admin_count =
       team_members
       |> Enum.map(&(&1.user.role in ["location-admin", "team-admin"]))
       |> Enum.count()
-
     teammate_count =
       team_members
       |> Enum.map(&(&1.user.role == "teammate"))
       |> Enum.count()
-
     locations = Location.get_by_team_id(current_user, team_id)
-
     location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
     response_time=ConversationMessages.count_by_team_id(team_id)
     campaigns = if location_id do
@@ -37,11 +31,12 @@ defmodule MainWeb.AdminController do
       end)
       |> List.flatten()
     end
-
     render(conn, "index.html",
       dispositions: dispositions,
       campaigns: campaigns,
       appointments: appointments,
+      automated: calculate_percentage("Automated", dispositions),
+      call_deflected: calculate_percentage("Call deflected", dispositions),
       dispositions_per_day: dispositions_per_day,
       web_totals: team_totals_by_channel("WEB", team_id),
       sms_totals: team_totals_by_channel("SMS", team_id),
@@ -58,7 +53,6 @@ defmodule MainWeb.AdminController do
       location_id: location_id,
       location: nil)
   end
-
   def index(conn, %{"location_id" => location_id}) do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_location_id(current_user, location_id)
@@ -70,22 +64,20 @@ defmodule MainWeb.AdminController do
         [result] -> result
         _ -> %{sessions_per_day: 0}
       end
-
     team_admin_count =
       team_members
       |> Enum.map(&(&1.user.role in ["location-admin", "team-admin"]))
       |> Enum.count()
-
     teammate_count =
       team_members
       |> Enum.map(&(&1.user.role == "teammate"))
       |> Enum.count()
-
     locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
-
     render(conn, "index.html",
       dispositions: dispositions,
-    appointments: appointments,
+      automated: calculate_percentage("Automated", dispositions),
+      call_deflected: calculate_percentage("Call deflected", dispositions),
+      appointments: appointments,
       campaigns: Campaign.get_by_location_id(location_id),
       dispositions_per_day: dispositions_per_day,
       response_time: response_time.median_response_time||0,
@@ -103,7 +95,6 @@ defmodule MainWeb.AdminController do
       location_id: location_id,
       location: nil)
   end
-
   def index(conn, _params) do
     current_user = current_user(conn)
     teams = teams(conn)
@@ -112,28 +103,23 @@ defmodule MainWeb.AdminController do
       team_members
       |> Enum.map(&(&1.user.role in ["location-admin", "team-admin"]))
       |> Enum.count()
-
     teammate_count =
       team_members
       |> Enum.map(&(&1.user.role == "teammate"))
       |> Enum.count()
-
-
     if current_user.role == "admin" do
       dispositions = Disposition.count_all()
       appointments = Appointments.count_all()
       [dispositions_per_day] = Disposition.average_per_day()
       locations = Location.all()
-
       response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id).median_response_time||0 end)
       middle_index = response_times |> length() |> div(2)
       response_time = response_times |> Enum.sort |> Enum.at(middle_index)
       campaigns = locations
-      |> Enum.map(fn(location) ->
+                  |> Enum.map(fn(location) ->
         Campaign.get_by_location_id(location.id)
       end)
-      |> List.flatten()
-
+                  |> List.flatten()
       render(conn, "index.html",
         metrics: [],
         campaigns: campaigns,
@@ -175,7 +161,6 @@ defmodule MainWeb.AdminController do
         end)
         |> List.flatten()
       end
-
       render(conn, "index.html",
         metrics: [],
         campaigns: campaigns,
@@ -200,43 +185,36 @@ defmodule MainWeb.AdminController do
         team_id: nil)
     end
   end
-
   defp totals_by_channel(channel_type) do
     results = ConversationDisposition.count_all_by_channel_type(channel_type)
     sum(results)
   end
-
   defp team_totals_by_channel(channel_type, team_id) do
     results = ConversationDisposition.count_channel_type_by_team_id(channel_type, team_id)
     sum(results)
   end
-
   defp location_totals_by_channel(channel_type, location_id) do
     results = ConversationDisposition.count_channel_type_by_location_id(channel_type, location_id)
     sum(results)
   end
-
   defp calculate_percentage(type, dispositions) do
-    total =  Enum.count(dispositions)
-    call_transferred = dispositions |> Enum.filter(&(&1.name == "Call Transferred")) |> Enum.find_value(&(&1.count)) || 0
-    call_deflected =  dispositions |> Enum.filter(&(&1.name == "Call deflected")) |> Enum.find_value(&(&1.count)) || 0
-    call_hung_up =  dispositions |> Enum.filter(&(&1.name == "Call Hang Up")) |> Enum.find_value(&(&1.count)) || 0
-    test = dispositions |> Enum.count(&(&1.name == "GENERAL - Test")) || 0
-    automated = dispositions |> Enum.filter(&(&1.name == "Automated")) |> Enum.find_value(&(&1.count)) || 0
+    total =  Enum.map(dispositions, &(&1.count)) |> Enum.sum()
 
-    percentage = case type do
+    call_transferred = (dispositions |> Enum.filter(&(&1.name == "Call Transferred")) |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
+    call_deflected =  (dispositions |> Enum.filter(&(&1.name == "Call deflected"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
+    call_hung_up =  (dispositions |> Enum.filter(&(&1.name == "Call Hang Up"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
+    automated = (dispositions |> Enum.filter(&(&1.name == "Automated"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
+    case type do
       "Automated" ->
-        automated / (total - (call_transferred + call_deflected + call_hung_up + test)) * 100
-
+        test = dispositions |> Enum.count(&(&1.name == "GENERAL - Test")) || 0
+        (automated / (total - (call_transferred + call_deflected + call_hung_up + test))) * 100
       "Call deflected" ->
         call_deflected  / (call_transferred + call_deflected + call_hung_up) * 100
     end
   end
-
   defp sum(results) do
     results
     |> Enum.map(&(&1.disposition_count))
     |> Enum.sum()
   end
-
 end

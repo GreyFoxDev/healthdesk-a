@@ -1,166 +1,166 @@
 <div class="page"><div class="page-inner">
-<%= if @current_user.role == "admin" do %>
+    <%= if @current_user.role == "admin" do %>
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> TEAMS </h2>
             <select class="form-control" id="team_id" name="team[id]" onchange="filterTeam(this)">
                 <%= unless @team_id do %>
-                    <option selected value="-99">All Teams</option>
+                <option selected value="-99">All Teams</option>
                 <% else %>
-                    <option value="-99">All Teams</option>
+                <option value="-99">All Teams</option>
                 <% end %>
                 <%= for team <- @teams do %>
-                    <%= if team.id == @team_id do %>
-                        <option selected value="<%= team.id %>"><%= team.team_name %></option>
-                    <% else %>
-                        <option value="<%= team.id %>"><%= team.team_name %></option>
-                    <% end %>
+                <%= if team.id == @team_id do %>
+                <option selected value="<%= team.id %>"><%= team.team_name %></option>
+                <% else %>
+                <option value="<%= team.id %>"><%= team.team_name %></option>
+                <% end %>
                 <% end %>
             </select>
         </div><!-- /metric column -->
     </div>
     <script>
-     function filterTeam(e) {
-         if (e.value == "-99") {
-             window.location.href = window.location.origin + '/admin';
-         }
-         else
-         {
-             window.location.href = window.location.origin + '/admin?team_id=' + e.value ;
-         }
-     }
+        function filterTeam(e) {
+            if (e.value == "-99") {
+                window.location.href = window.location.origin + '/admin';
+            }
+            else
+            {
+                window.location.href = window.location.origin + '/admin?team_id=' + e.value ;
+            }
+        }
     </script>
-<% end %>
+    <% end %>
 
-<div class="metric-row">
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> LOCATIONS </h2>
-                <p class="metric-value h3">
-                    <sub><i class="oi oi-fork"></i></sub> <span class="value">
+    <div class="metric-row">
+        <!-- metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> LOCATIONS </h2>
+                    <p class="metric-value h3">
+                        <sub><i class="oi oi-fork"></i></sub> <span class="value">
                         <%= @location_count |> format_comma_numbers %>
                     </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> ADMINS </h2>
-                <p class="metric-value h3">
-                    <sub><i class="oi oi-people"></i></sub> <span class="value">
+                    </p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+        <!-- metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> ADMINS </h2>
+                    <p class="metric-value h3">
+                        <sub><i class="oi oi-people"></i></sub> <span class="value">
                         <%= @team_admin_count |> format_comma_numbers %>
                     </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> TEAMMATES </h2>
-                <p class="metric-value h3">
-                    <sub><i class="oi oi-people"></i></sub> <span class="value">
+                    </p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+        <!-- metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> TEAMMATES </h2>
+                    <p class="metric-value h3">
+                        <sub><i class="oi oi-people"></i></sub> <span class="value">
                         <%= @teammate_count |> format_comma_numbers %>
                     </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-</div>
+                    </p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+    </div>
 
-<%= if @current_user.role in ["team-admin", "location-admin"] do %>
+    <%= if @current_user.role in ["team-admin", "location-admin"] do %>
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> LOCATIONS </h2>
             <select class="form-control" id="team_id" name="team[id]" onchange="filterLocation(this)">
                 <%= unless @team_id do %>
-                    <option selected value="-99">All Locations</option>
+                <option selected value="-99">All Locations</option>
                 <% else %>
-                    <option value="-99">All Locations</option>
+                <option value="-99">All Locations</option>
                 <% end %>
                 <%= for location <- @locations do %>
-                    <%= if location.id == @location_id do %>
-                        <option selected value="<%= location.id %>"><%= location.location_name %></option>
-                    <% else %>
-                        <option value="<%= location.id %>"><%= location.location_name %></option>
-                    <% end %>
+                <%= if location.id == @location_id do %>
+                <option selected value="<%= location.id %>"><%= location.location_name %></option>
+                <% else %>
+                <option value="<%= location.id %>"><%= location.location_name %></option>
+                <% end %>
                 <% end %>
             </select>
         </div><!-- /metric column -->
     </div>
     <script>
-     function filterLocation(e) {
-         if (e.value == "-99") {
-             window.location.href = window.location.origin + '/admin';
-         }
-         else
-         {
-             window.location.href = window.location.origin + '/admin?location_id=' + e.value ;
-         }
-     }
+        function filterLocation(e) {
+            if (e.value == "-99") {
+                window.location.href = window.location.origin + '/admin';
+            }
+            else
+            {
+                window.location.href = window.location.origin + '/admin?location_id=' + e.value ;
+            }
+        }
     </script>
 
-<% end %>
-<div class="metric-row">
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric" data-toggle="modal" data-target="#exampleModalLong">
-            <div class="metric">
-                <h2 class="metric-label"> DISPOSITIONS </h2>
-                <p class="metric-value h3">
+    <% end %>
+    <div class="metric-row">
+        <!-- metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric" data-toggle="modal" data-target="#exampleModalLong">
+                <div class="metric">
+                    <h2 class="metric-label"> DISPOSITIONS </h2>
+                    <p class="metric-value h3">
                     <span class="value"><%= Enum.map(@dispositions, &(&1.count)) |> Enum.sum() |> format_comma_numbers %>
                     </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> AVG. PER DAY </h2>
-                <p class="metric-value h3">
+                    </p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+        <!-- metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> AVG. PER DAY </h2>
+                    <p class="metric-value h3">
                     <span class="value">
                         <%= format_comma_numbers(@dispositions_per_day.sessions_per_day) %>
                     </span>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> RESPONSIVENESS </h2>
-                <p class="metric-value h3">
+                    </p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> RESPONSIVENESS </h2>
+                    <p class="metric-value h3">
                     <span class="value">
                         <%= format_time_sec(@response_time)%>
                     </span>
-                </p>
-                <p class="metric-label">
-                    <span>Median Response Time</span></p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-</div>
-<div class="metric-row">
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> CALLS DEFLECTED </h2>
-                <p class="metric-value h3">
+                    </p>
+                    <p class="metric-label">
+                        <span>Median Response Time</span></p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+    </div>
+    <div class="metric-row">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> CALLS DEFLECTED </h2>
+                    <p class="metric-value h3">
                     <span class="value">
                         <%= if @call_deflected == 0.0 do %>
                         0%
@@ -168,18 +168,18 @@
                         <%= @call_deflected |> Decimal.from_float() |> Decimal.round(1) %>%
                         <% end %>
                     </span>
-                </p>
-                <p class="metric-label">
-                    <span>Percentage</span></p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> AUTOMATED </h2>
-                <p class="metric-value h3">
+                    </p>
+                    <p class="metric-label">
+                        <span>Percentage</span></p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> AUTOMATED </h2>
+                    <p class="metric-value h3">
                     <span class="value">
                         <%= if @automated == 0.0 do %>
                         0%
@@ -187,132 +187,132 @@
                         <%= @automated |> Decimal.from_float() |> Decimal.round(1) %>%
                         <% end %>
                     </span>
-                </p>
-                <p class="metric-label">
-                    <span>Percentage</span></p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-</div>
-<div class="metric-row">
-    <!-- metric column -->
-    <div class="col-12 col-sm-6 col-lg-4">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> SESSIONS BY CHANNEL </h2>
-                <p class="metric-label">
-                    <canvas id="canvas-sessions-by-channel" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <div class="col-12 col-sm-6 col-lg-4">
-        <!-- .metric -->
-        <div class="card-metric">
-            <div class="metric">
-                <h2 class="metric-label"> APPOINTMENTS </h2>
-                <p class="metric-label">
-                    <canvas id="canvas-appointments" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
-                </p>
-            </div>
-        </div><!-- /.metric -->
-    </div><!-- /metric column -->
-    <% confirmed = Enum.reduce(@appointments,0, fn %{confirmed: f, count: c}, acc ->  if f,do: acc+c , else: acc end) %>
+                    </p>
+                    <p class="metric-label">
+                        <span>Percentage</span></p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+    </div>
+    <div class="metric-row">
+        <!-- metric column -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> SESSIONS BY CHANNEL </h2>
+                    <p class="metric-label">
+                        <canvas id="canvas-sessions-by-channel" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
+                    </p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> APPOINTMENTS </h2>
+                    <p class="metric-label">
+                        <canvas id="canvas-appointments" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
+                    </p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+        <% confirmed = Enum.reduce(@appointments,0, fn %{confirmed: f, count: c}, acc ->  if f,do: acc+c , else: acc end) %>
     <% pending = Enum.reduce(@appointments,0, fn %{confirmed: f, count: c}, acc ->  if !f,do: acc+c , else: acc end) %>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-    <script>
-     const ctx = document.getElementById('canvas-sessions-by-channel').getContext('2d');
-     const chartData = {
-         labels: [
-             'SMS',
-             'Email',
-             'Facebook',
-             'Web',
-             'App'
-         ],
-         datasets: [{
-             data: [
-                 <%= @sms_totals %>,
-                 <%= @email_totals %>,
-                 <%= @facebook_totals %>,
-                 <%= @web_totals %>,
-                 <%= @app_totals %>
-             ],
-             borderWidth: 5,
-             backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40','#ff973d'],
-             hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70','#ff973d'],
-         }],
-     };
-     new Chart(ctx, {
-         type: 'pie',
-         data: chartData,
-         maintainAspectRatio: false,
-         responsive: true,
-         options: {
-             legend: {
-                 display: true,
-                 position: 'left'
-             },
-         },
-     });
-    </script>
-    <script>
-     const ctx2 = document.getElementById('canvas-appointments').getContext('2d');
-     const chartData2 = {
-         labels: [
-             'Confirmed',
-             'Pending'
-         ],
-         datasets: [{
-             data: [
-                 <%= confirmed %>,
-                 <%= pending %>,
-             ],
-             borderWidth: 5,
-             backgroundColor: [ '#2ECC40','#ff973d'],
-             hoverBackgroundColor: [ '#01FF70','#ff973d'],
-         }],
-     };
-     new Chart(ctx2, {
-         type: 'pie',
-         data: chartData2,
-         maintainAspectRatio: false,
-         responsive: true,
-         options: {
-             legend: {
-                 display: true,
-                 position: 'left'
-             },
-             tooltips: {
-                 custom: function(tooltip) {
-                     tooltip.displayColors = false;
-                 },
-                 callbacks: {
-                     label: function (tooltipItem, data) {
-                         var labels = data.labels;
-                         var values = data.datasets[tooltipItem.datasetIndex].data;
-                         var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                         var colour = data.datasets[tooltipItem.datasetIndex].backgroundColor
-                         var total = 0;
-                         for (var i in values) {
-                             total += values[i];
-                         }
-                         var totally = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                         var label = [];
-                         for (var j in labels) {
-                             var percentage = Math.round((values[j] / total) * 100);
-                             label.push (labels[j] + " : " + values[j].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' (' + percentage + '%)');
-                         }
-                         label.push("Total : " + totally)
-                         return label;
-                     }
-                 }
-             }
-         },
-     });
-    </script>
-</div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+        <script>
+            const ctx = document.getElementById('canvas-sessions-by-channel').getContext('2d');
+            const chartData = {
+                labels: [
+                    'SMS',
+                    'Email',
+                    'Facebook',
+                    'Web',
+                    'App'
+                ],
+                datasets: [{
+                    data: [
+                        <%= @sms_totals %>,
+                        <%= @email_totals %>,
+                        <%= @facebook_totals %>,
+                        <%= @web_totals %>,
+                        <%= @app_totals %>
+                    ],
+                    borderWidth: 5,
+                    backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40','#ff973d'],
+                    hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70','#ff973d'],
+                }],
+            };
+            new Chart(ctx, {
+                type: 'pie',
+                data: chartData,
+                maintainAspectRatio: false,
+                responsive: true,
+                options: {
+                    legend: {
+                        display: true,
+                        position: 'left'
+                    },
+                },
+            });
+        </script>
+        <script>
+            const ctx2 = document.getElementById('canvas-appointments').getContext('2d');
+            const chartData2 = {
+                labels: [
+                    'Confirmed',
+                    'Pending'
+                ],
+                datasets: [{
+                    data: [
+                        <%= confirmed %>,
+                        <%= pending %>,
+                    ],
+                    borderWidth: 5,
+                    backgroundColor: [ '#2ECC40','#ff973d'],
+                    hoverBackgroundColor: [ '#01FF70','#ff973d'],
+                }],
+            };
+            new Chart(ctx2, {
+                type: 'pie',
+                data: chartData2,
+                maintainAspectRatio: false,
+                responsive: true,
+                options: {
+                    legend: {
+                        display: true,
+                        position: 'left'
+                    },
+                    tooltips: {
+                        custom: function(tooltip) {
+                            tooltip.displayColors = false;
+                        },
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var labels = data.labels;
+                                var values = data.datasets[tooltipItem.datasetIndex].data;
+                                var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                                var colour = data.datasets[tooltipItem.datasetIndex].backgroundColor
+                                var total = 0;
+                                for (var i in values) {
+                                    total += values[i];
+                                }
+                                var totally = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                var label = [];
+                                for (var j in labels) {
+                                    var percentage = Math.round((values[j] / total) * 100);
+                                    label.push (labels[j] + " : " + values[j].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' (' + percentage + '%)');
+                                }
+                                label.push("Total : " + totally)
+                                return label;
+                            }
+                        }
+                    }
+                },
+            });
+        </script>
+    </div>
 </div> </div>
 <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -325,10 +325,10 @@
             </div>
             <div class="modal-body">
                 <ul class="list-group">
-                    <%= for disposition <- @dispositions |> Enum.sort_by(&(&1.count)) |> Enum.uniq_by(&(&1.name)) |> Enum.map(&(&1.name)) do %>
+                    <%= for {name, count} <- @dispositions |> Enum.group_by(&(&1.name),&(&1.count)) |> Enum.map(fn {k,v} -> {k,Enum.sum(v)} end) |> Enum.sort_by(fn {k,v} -> v end, fn a,b -> a>b end ) do %>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <%= disposition %>
-                        <span class="badge badge-primary badge-pill"><%= Enum.filter(@dispositions, &(&1.name == disposition)) |> Enum.map(&(&1.count)) |> Enum.sum() |> format_comma_numbers %></span>
+                        <%= name %>
+                        <span class="badge badge-primary badge-pill"><%= count |> format_comma_numbers %></span>
                     </li>
                     <% end %>
                 </ul>
