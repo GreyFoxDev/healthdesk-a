@@ -23,6 +23,7 @@ defmodule MainWeb.Live.HolidayHourForm do
              |> assign(:hours, hours)
              |> assign(:holiday_name, "")
              |> assign(:holiday_date, "")
+             |> assign(:closed, false)
              |> assign(:action, session["action"])
 
     {:ok, socket}
@@ -54,29 +55,30 @@ defmodule MainWeb.Live.HolidayHourForm do
     }
   end
 
-  def handle_event("validate", params, socket) do
+  def handle_event("validate", %{"closed" => closed} =  params, socket) do
+    closed =  if(closed == "true") do true else false end
     {
       :noreply,
       socket
       |> assign(:rows, Map.values params["rows"])
       |> assign(:holiday_name, params["holiday_name"])
       |> assign(:holiday_date, params["holiday_date"])
+      |> assign(:closed, closed)
     }
   end
 
-  def handle_event("save", %{"holiday_name" => holiday_name, "holiday_date" => holiday_date} = params, socket) do
-
+  def handle_event("save", %{"holiday_name" => holiday_name, "holiday_date" => holiday_date, "closed" => closed} = params, socket) do
     location = socket.assigns.location
 
     params = Map.merge(params, %{"times" => socket.assigns.rows, "location_id" => location.id})
-             |> Map.merge(%{"holiday_name" => holiday_name, "holiday_date" => holiday_date})
+             |> Map.merge(%{"holiday_name" => holiday_name, "holiday_date" => holiday_date, "closed" => closed})
 
     case HolidayHours.get_by(location.id, holiday_name) do
       nil ->
         HolidayHours.create(params)
       hour ->
         times = Enum.map(hour.times, fn time -> %{"open_at" => time.open_at, "close_at" => time.close_at} end)
-        HolidayHours.update(%{"id" => hour.id, "times" => times ++ socket.assigns.rows})
+        HolidayHours.update(%{"id" => hour.id, "closed" => closed, "times" => times ++ socket.assigns.rows})
     end
     {
       :noreply,

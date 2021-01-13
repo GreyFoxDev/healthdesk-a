@@ -25,10 +25,7 @@ defmodule Data.Query.Location do
   """
   @spec get(id :: binary(), repo :: Ecto.Repo.t()) :: Location.t() | nil
   def get(id, repo \\ Read) do
-    from(t in Location,
-      where: is_nil(t.deleted_at),
-      where: t.id == ^id
-    )
+    from(t in Location, where: is_nil(t.deleted_at), where: t.id == ^id)
     |> repo.one()
   end
 

@@ -256,6 +256,7 @@ defmodule MainWeb.ConversationController do
       {:error, changeset} -> {:error, changeset}
     end
   end
+
   def create_convo(%{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name} = params},location,current_user) when campaign_name != "" do
     send_at_utc = if params["scheduled"] && params["send_at"] do
       offset =
@@ -299,6 +300,7 @@ defmodule MainWeb.ConversationController do
       {:error, changeset} -> {:error, changeset}
     end
   end
+
   def create_convo(%{"location_id" => location_id, "conversation" => %{"original_number" => original_number}} = params,location,current_user) when original_number != ""do
     with {:ok, conversation, params} <- find_or_start_conversation(
       %{
@@ -367,9 +369,11 @@ defmodule MainWeb.ConversationController do
 
     :ok
   end
+
   defp handle_sending_message({:error, _, _params}), do: :error
 
   defp update_conn(:ok, conn), do: put_flash(conn, :success, "Sending message was successful")
+
   defp update_conn(:error, conn), do: put_flash(conn, :error, "Sending message failed")
 
 end

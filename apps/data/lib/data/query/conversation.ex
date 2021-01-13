@@ -11,7 +11,7 @@ defmodule Data.Query.Conversation do
   @doc """
   Returns a conversation by id
   """
-  @spec get(id :: binary(),check :: boolean(), repo :: Ecto.Repo.t()) :: Conversation.t() | nil
+  @spec get(id :: binary(), check :: boolean(), repo :: Ecto.Repo.t()) :: Conversation.t() | nil
   def get(id, preload_f\\true, repo \\ Read)
   def get(id, false, repo)  do
     from(c in Conversation,
@@ -36,11 +36,28 @@ defmodule Data.Query.Conversation do
     |> repo.one()
   end
 
+  @doc """
+  Update Conversations
+  """
+  @spec update_conversation(repo :: Ecto.Repo.t()) :: [Conversation.t()]
+  def update_conversation(repo \\ Read) do
+    time = DateTime.add(DateTime.utc_now(), -24 * 3600)
+    query = from(
+              c in Conversation,
+              where: c.appointment == true and c.updated_at > ^time,
+              select: c.appointment
+            )
+            |> repo.update_all(
+                 set: [
+                   appointment: false
+                 ]
+               )
+  end
 
   @doc """
   Return a list of conversations for a location
   """
-  @spec get_by_status(location_id :: [binary()],status :: [binary()], repo :: Ecto.Repo.t()) :: [Conversation.t()]
+  @spec get_by_status(location_id :: [binary()], status :: [binary()], repo :: Ecto.Repo.t()) :: [Conversation.t()]
   def get_by_status(location_id, status, repo \\ Read) when is_list(status) do
     time = DateTime.add(DateTime.utc_now(), -1296000, :seconds)
 

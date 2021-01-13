@@ -11,6 +11,7 @@ defmodule Data.Schema.HolidayHour do
           id: binary(),
           location_id: binary(),
           holiday_name: String.t() | nil,
+          closed: boolean() | nil,
           holiday_date: :utc_datetime | nil,
           deleted_at: :utc_datetime | nil
         }
@@ -22,6 +23,7 @@ defmodule Data.Schema.HolidayHour do
   @optional_fields ~w|
   holiday_name
   holiday_date
+  closed
   deleted_at
   |a
 
@@ -30,6 +32,7 @@ defmodule Data.Schema.HolidayHour do
   schema "holiday_hours" do
     field(:holiday_name, :string)
     field(:holiday_date, :utc_datetime)
+    field(:closed, :boolean)
 
     field(:deleted_at, :utc_datetime)
 

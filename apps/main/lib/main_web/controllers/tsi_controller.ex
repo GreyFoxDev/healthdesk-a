@@ -9,6 +9,7 @@ defmodule MainWeb.TsiController do
   alias Data.Conversations, as: C
   alias Data.ConversationMessages, as: CM
   alias Data.Schema.Conversation, as: Schema
+  alias Main.Service.Appointment
 
   alias MainWeb.{Notify, Intents}
 
@@ -196,7 +197,7 @@ defmodule MainWeb.TsiController do
 
       if convo.status == "closed" do
         message
-        |> ask_wit_ai(location)
+        |> ask_wit_ai(convo_id, location)
         |> case do
              {:ok, response} ->
                CM.create(
@@ -291,15 +292,12 @@ defmodule MainWeb.TsiController do
     end
   end
 
-  defp ask_wit_ai(question, location) do
+  defp ask_wit_ai(question,convo_id, location) do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
       receive do
         {:response, response} ->
-          IO.inspect("###################")
-          IO.inspect(response)
-          IO.inspect("###################")
 
-          message = Intents.get(response, location.phone_number)
+          message =  Appointment.get_next_reply(convo_id,response, location.phone_number)
           if message == location.default_message do
             {:unknown, location.default_message}
           else

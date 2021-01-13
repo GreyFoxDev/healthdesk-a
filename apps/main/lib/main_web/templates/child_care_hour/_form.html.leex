@@ -5,8 +5,10 @@
             <div class="list-group list-group-flush list-group-bordered">
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <fieldset>
-                        <span>Day of Week</span>
-                        <span>
+                        <div class="row">
+                            <div class="col-11">
+                                <span>Day of Week</span>
+                                <span>
                                 <%=
                                 select f,
                                 :day_of_week,
@@ -16,6 +18,21 @@
                                 name: "day_of_week"
                                 %>
                             </span>
+                            </div>
+                            <div class="row">
+                                <label class="control-label" for="closed"> Closed</label>
+                            </div>
+                            <div class="row">
+                                <%=
+                            checkbox f,
+                            :closed,
+                            name: "closed",
+                            class: "control-input align-self-center mt-4",
+                            id: "closed",
+                            checked: @closed
+                            %>
+                            </div>
+                        </div>
                         <%= for {map, index} <- Enum.with_index(@rows) do %>
                         <div class="row">
                             <div class="col">

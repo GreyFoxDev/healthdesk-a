@@ -5,6 +5,8 @@
                 <div class="list-group list-group-flush list-group-bordered">
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <fieldset>
+                            <div class="row">
+                            <div class="col-11">
                             <span>Holiday Name</span>
                             <span>
                                 <%=
@@ -14,6 +16,21 @@
                                 value: "#{@holiday_name}",
                                 name: "holiday_name"%>
                             </span>
+                            </div>
+                                <div class="row">
+                                    <label class="control-label" for="closed"> Closed</label>
+                                </div>
+                                <div class="row">
+                                    <%=
+                            checkbox f,
+                            :closed,
+                            name: "closed",
+                            class: "control-input align-self-center mt-4",
+                            id: "closed",
+                            checked: @closed
+                            %>
+                                </div>
+                            </div>
                             <span>Holiday Date</span>
                             <span>
                                 <%=
@@ -30,7 +47,9 @@
                                     <%=
                                 text_input f,
                                 :open_at,
-                                name: "rows[#{index}][open_at]",
+                                name: "rows[#{
+
+                                index}][open_at]",
                                 value: "#{map["open_at"]}",
                                 class: "form-control"
                                 %>

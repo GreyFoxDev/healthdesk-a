@@ -74,6 +74,24 @@ defmodule Data.Query.Member do
   end
 
   @doc """
+  Upsert a member
+  """
+  @spec upsert(params :: map(), repo :: Ecto.Repo.t()) ::
+          {:ok, Member.t()} | {:error, Ecto.Changeset.t()}
+  def upsert(params, repo \\ Write) do
+    query = from(m in Member,
+    where: m.phone_number == ^params.phone_number,
+    where: m.team_id == ^params.team_id
+    )
+    case repo.one(query) do
+      nil ->
+       _o_o = create(params)
+      member ->
+       _o_o = update(member, params)
+    end
+  end
+
+  @doc """
   Updates an existing member
   """
   @spec update(member :: Member.t(), params :: map(), repo :: Ecto.Repo.t()) ::

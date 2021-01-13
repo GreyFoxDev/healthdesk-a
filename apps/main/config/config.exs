@@ -4,6 +4,7 @@
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
 use Mix.Config
+alias Main.Scheduler
 
 # General application configuration
 config :main,
@@ -31,6 +32,11 @@ config :main, MainWeb.Endpoint,
            adapter: Phoenix.PubSub.PG2]
 
 config :tesla, adapter: Tesla.Adapter.Hackney
+
+config :main, Main.Scheduler,
+        jobs: [
+          {"*/60 * * * *", {Scheduler, :schedule_conversation, []}},
+        ]
 
 config :ueberauth, Ueberauth,
        providers: [

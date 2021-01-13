@@ -133,14 +133,13 @@ defmodule MainWeb.AdminController do
         Campaign.get_by_location_id(location.id)
       end)
       |> List.flatten()
-      IO.inspect("###################")
-      IO.inspect(totals_by_channel("MAIL"))
-      IO.inspect("###################")
 
       render(conn, "index.html",
         metrics: [],
         campaigns: campaigns,
         dispositions: dispositions,
+        automated: calculate_percentage("Automated", dispositions),
+        call_deflected: calculate_percentage("Call deflected", dispositions),
         appointments: appointments,
         dispositions_per_day: dispositions_per_day,
         response_time: response_time,
@@ -182,6 +181,8 @@ defmodule MainWeb.AdminController do
         campaigns: campaigns,
         dispositions: dispositions,
         appointments: appointments,
+        automated: calculate_percentage("Automated", dispositions),
+        call_deflected: calculate_percentage("Call deflected", dispositions),
         dispositions_per_day: dispositions_per_day,
         response_time: response_time.median_response_time||0,
         web_totals: team_totals_by_channel("WEB", current_user.team_member.team_id),
@@ -213,6 +214,23 @@ defmodule MainWeb.AdminController do
   defp location_totals_by_channel(channel_type, location_id) do
     results = ConversationDisposition.count_channel_type_by_location_id(channel_type, location_id)
     sum(results)
+  end
+
+  defp calculate_percentage(type, dispositions) do
+    total =  Enum.count(dispositions)
+    call_transferred = dispositions |> Enum.filter(&(&1.name == "Call Transferred")) |> Enum.find_value(&(&1.count)) || 0
+    call_deflected =  dispositions |> Enum.filter(&(&1.name == "Call deflected")) |> Enum.find_value(&(&1.count)) || 0
+    call_hung_up =  dispositions |> Enum.filter(&(&1.name == "Call Hang Up")) |> Enum.find_value(&(&1.count)) || 0
+    test = dispositions |> Enum.count(&(&1.name == "GENERAL - Test")) || 0
+    automated = dispositions |> Enum.filter(&(&1.name == "Automated")) |> Enum.find_value(&(&1.count)) || 0
+
+    percentage = case type do
+      "Automated" ->
+        automated / (total - (call_transferred + call_deflected + call_hung_up + test)) * 100
+
+      "Call deflected" ->
+        call_deflected  / (call_transferred + call_deflected + call_hung_up) * 100
+    end
   end
 
   defp sum(results) do

@@ -18,21 +18,12 @@ defmodule MainWeb.Live.ChildCareHourForm do
 
     socket = socket
              |> assign(:changeset, ChildCareHours.get_changeset())
-             |> assign(
-                  :rows,
-                  [
-                    %{
-                      morning_open_at: "",
-                      morning_close_at: "",
-                      afternoon_open_at: "",
-                      afternoon_close_at: ""
-                    }
-                  ]
-                )
              |> assign(:location, location)
              |> assign(:hours, hours)
              |> assign(:day_of_week, "Monday")
+             |> assign(:closed, false)
              |> assign(:action, session["action"])
+             |> assign(:rows, [%{morning_open_at: "", morning_close_at: "", afternoon_open_at: "", afternoon_close_at: ""}])
 
     {:ok, socket}
   end
@@ -42,23 +33,9 @@ defmodule MainWeb.Live.ChildCareHourForm do
     rows = socket.assigns.rows
 
     rows = if rows && rows == [] do
-      [
-        %{
-          morning_open_at: "",
-          morning_close_at: "",
-          afternoon_open_at: "",
-          afternoon_close_at: ""
-        }
-      ]
+      [%{"morning_open_at" => "", "morning_close_at" => "", "afternoon_open_at" => "", "afternoon_close_at" => ""}]
     else
-      rows ++ [
-        %{
-          morning_open_at: "",
-          morning_close_at: "",
-          afternoon_open_at: "",
-          afternoon_close_at: ""
-        }
-      ]
+      rows ++ [%{"morning_open_at" => "", "morning_close_at" => "", "afternoon_open_at" => "", "afternoon_close_at" => ""}]
     end
     {
       :noreply,
@@ -77,22 +54,23 @@ defmodule MainWeb.Live.ChildCareHourForm do
     }
   end
 
-  def handle_event("validate", params, socket) do
-
+  def handle_event("validate", %{"closed" => closed} = params, socket) do
+    closed =  if(closed == "true") do true else false end
     {
       :noreply,
       socket
       |> assign(:rows, Map.values params["rows"])
       |> assign(:day_of_week, params["day_of_week"])
+      |> assign(:closed, closed)
     }
   end
 
-  def handle_event("save", %{"day_of_week" => day_of_week} = params, socket) do
+  def handle_event("save", %{"day_of_week" => day_of_week, "closed" => closed} = params, socket) do
 
     location = socket.assigns.location
 
     params = Map.merge(params, %{"times" => socket.assigns.rows, "location_id" => location.id})
-             |> Map.merge(%{"day_of_week" => day_of_week})
+             |> Map.merge(%{"day_of_week" => day_of_week, "closed" => closed})
     case ChildCareHours.get_by(location.id, day_of_week) do
       nil ->
         ChildCareHours.create(params)
@@ -100,15 +78,12 @@ defmodule MainWeb.Live.ChildCareHourForm do
         times = Enum.map(
           hour.times,
           fn time ->
-            %{
-              "morning_open_at" => time.morning_open_at,
-              "morning_close_at" => time.morning_close_at,
-              "afternoon_open_at" => time.afternoon_open_at,
-              "afternoon_close_at" => time.afternoon_close_at
+            %{"morning_open_at" => time.morning_open_at, "morning_close_at" => time.morning_close_at,
+              "afternoon_open_at" => time.afternoon_open_at, "afternoon_close_at" => time.afternoon_close_at
             }
           end
         )
-        ChildCareHours.update(%{"id" => hour.id, "times" => times ++ socket.assigns.rows})
+        ChildCareHours.update(%{"id" => hour.id, "closed" => closed, "times" => times ++ socket.assigns.rows})
     end
     {
       :noreply,

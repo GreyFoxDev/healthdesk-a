@@ -65,6 +65,7 @@ defmodule MainWeb.Router do
       resources "/team-members", TeamMemberController
       resources "/locations", LocationController do
         get "/edit/:provider", LocationController, :edit
+        get "/remove", LocationController, :remove_config
         get "/:provider/callback", LocationController, :callback
         post "/:provider/callback", LocationController, :callback
         resources "/class-schedule", ClassScheduleController, only: [:new, :create]
@@ -78,8 +79,6 @@ defmodule MainWeb.Router do
         resources "/holiday-hours", HolidayHourController
         resources "/normal-hours", NormalHourController
         live "/normal-hours/form" , Live.NormalHourForm, :form
-#        post "/add", NormalHourController, :add
-#        post "/remove", NormalHourController, :remove
         resources "/child-care-hours", ChildCareHourController
         resources "/wifi-network", WifiNetworkController
         resources "/pricing-plans", PricingPlanController

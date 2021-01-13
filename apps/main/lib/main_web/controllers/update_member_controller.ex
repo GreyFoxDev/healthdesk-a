@@ -33,6 +33,7 @@ defmodule MainWeb.UpdateMemberController do
       |> render("error.json")
     end
   end
+
   def update(member_params)do
     if member_params["id"] == nil do
       Member.create(member_params)

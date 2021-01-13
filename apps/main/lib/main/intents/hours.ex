@@ -29,28 +29,57 @@ defmodule MainWeb.Intents.Hours do
 
       prefix = date_prefix({term, day_of_week}, {year, month, day}, location.timezone)
 
-      if length(hours.times) do
-        times =
-          hours.times
-          |> Enum.reduce([],fn b,acc ->[(b.open_at<>" to "<>b.close_at)|acc] end)
-          |> Enum.join(" and ")
-        if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
-          @alt_response
-          |> String.replace("[date_prefix]", prefix)
-          |> String.replace("[hours]", times)
+      if(hours.closed == false) do
+        if length(hours.times) do
+          times =
+            hours.times
+            |> Enum.reduce([],fn b,acc ->[(b.open_at<>" to "<>b.close_at)|acc] end)
+            |> Enum.join(" and ")
+
+          if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
+            @alt_response
+            |> String.replace("[date_prefix]", prefix)
+            |> String.replace("[hours]", times)
+
+          else
+            @hours
+            |> String.replace("[date_prefix]", prefix)
+            |> String.replace("[hours]", times)
+
+          end
         else
-          @hours
-          |> String.replace("[date_prefix]", prefix)
-          |> String.replace("[hours]", times)
+          String.replace(@closed, "[data_prefix]", prefix)
         end
-      else
-        String.replace(@closed, "[data_prefix]", prefix)
+
+        else
+        if length(hours.times) do
+          times =
+            hours.times
+            |> Enum.reduce([],fn b,acc ->[(b.open_at<>" to "<>b.close_at)|acc] end)
+            |> Enum.join(" and ")
+
+          if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
+            @alt_response
+            |> String.replace("[date_prefix]", prefix)
+            |> String.replace("[hours]", times)
+
+          else
+            {term, day_of_week} = get_day_of_week({year, month, day}, location.id)
+
+            String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
+
+          end
+        else
+          String.replace(@closed, "[data_prefix]", prefix)
+        end
       end
+
     else
       [] ->
         {term, day_of_week} = get_day_of_week({year, month, day}, location.id)
 
         String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, {year, month, day}, location.timezone))
+
       _ ->
         if location.default_message != "" do
           location.default_message

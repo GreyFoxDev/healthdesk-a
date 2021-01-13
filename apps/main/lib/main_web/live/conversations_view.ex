@@ -170,7 +170,6 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:mchangeset, ConversationMessages.get_changeset())
       |> assign(:tchangeset, Ticket.get_changeset())
 
-
     {:ok, socket}
   end
   def mount(_,_,socket)do

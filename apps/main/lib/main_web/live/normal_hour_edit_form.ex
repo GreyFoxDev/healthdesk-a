@@ -22,6 +22,7 @@ defmodule MainWeb.Live.NormalHourEditForm do
              |> assign(:location, location)
              |> assign(:hours, hours)
              |> assign(:day_of_week, session["day_of_week"])
+             |> assign(:closed, session["closed"])
              |> assign(:action, session["action"])
 
     {:ok, socket}
@@ -53,27 +54,32 @@ defmodule MainWeb.Live.NormalHourEditForm do
     }
   end
 
-  def handle_event("validate", params, socket) do
+  def handle_event("validate", %{"closed" => closed} = params, socket) do
+    closed =  if(closed == "true") do true else false end
+
     {
       :noreply,
       socket
       |> assign(:rows, Map.values params["rows"])
       |> assign(:day_of_week, params["day_of_week"])
+      |> assign(:closed, closed)
     }
   end
 
-  def handle_event("save", %{"day_of_week" => day_of_week} = params, socket) do
+  def handle_event("save",
+        %{"day_of_week" => day_of_week, "closed" => closed} = params, socket) do
 
     location = socket.assigns.location
 
-    params = Map.merge(params, %{"times" => socket.assigns.rows, "location_id" => location.id}) |> Map.merge(%{"day_of_week" => day_of_week})
+    params = Map.merge(params, %{"times" => socket.assigns.rows, "location_id" => location.id})
+             |> Map.merge(%{"day_of_week" => day_of_week, "closed" => closed})
 
     case NormalHours.get_by(location.id, day_of_week) do
       nil ->
         NormalHours.create(params)
       hour ->
         _times = Enum.map(hour.times, fn time -> %{"open_at" => time.open_at, "close_at" => time.close_at} end)
-        NormalHours.update(%{"id" => hour.id, "times" => socket.assigns.rows})
+        NormalHours.update(%{"id" => hour.id, "closed" => closed, "times" => socket.assigns.rows})
     end
     {
       :noreply,

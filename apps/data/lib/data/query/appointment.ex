@@ -24,6 +24,7 @@ defmodule Data.Query.Appointment do
       where: n.conversation_id == ^convo_id,
       where: n.confirmed == false,
       order_by: [desc: n.inserted_at],
+      preload: [:conversation]
     )
     |> repo.all()
   end

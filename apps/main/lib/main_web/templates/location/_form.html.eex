@@ -136,9 +136,14 @@
                         <%= text_input f, :google_refresh_token, class: "form-control",disabled: true %>
                         <label>calender_id</label>
                         <%= text_input f, :calender_id, class: "form-control" %>
+                        <label>Google Calender URL</label>
+                        <%= text_input f, :calender_url, class: "form-control" %>
+                        <label>Google Form URL</label>
+                        <%= text_input f, :form_url, class: "form-control" %>
                     </div>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>
+                        <a id="addtime" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location.id %>/remove" class="btn btn-secondary ">Remove Configuration </a>
                     </div>
                 </fieldset>
             <% end %>

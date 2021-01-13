@@ -175,6 +175,9 @@ defmodule MainWeb.Helper.Formatters  do
   defp hour_string(s) when s < 10, do: "#{s}h "
   defp hour_string(s), do: "#{s}h "
 
+  def format_comma_numbers(nil)do
+     ""
+  end
   def format_comma_numbers(value)do
      delimit_integer(value,",")
      |> String.Chars.to_string

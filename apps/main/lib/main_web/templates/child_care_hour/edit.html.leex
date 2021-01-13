@@ -20,10 +20,10 @@
                             </span>
                             </div>
                             <div class="row">
-                               <label class="control-label" for="closed"> Closed</label>
+                                <label class="control-label" for="closed"> Closed</label>
                             </div>
                             <div class="row">
-                               <%=
+                                <%=
                             checkbox f,
                             :closed,
                             name: "closed",
@@ -36,26 +36,39 @@
                         <%= for {map, index} <- Enum.with_index(@rows) do %>
                         <div class="row">
                             <div class="col">
-                                <span>Open</span>
+                                <span>AM Open</span>
                                 <%=
                                 text_input f,
-                                :open_at,
-                                name: "rows[#{index}][open_at]",
-                                value: "#{map["open_at"]}",
-                                class: "form-control"
-                                %>
+                                :morning_open_at,
+                                name: "rows[#{index}][morning_open_at]",
+                                value: map.morning_open_at,
+                                class: "form-control" %>
+                                <span>PM Open</span>
+                                <%=
+                                text_input f,
+                                :afternoon_open_at,
+                                name: "rows[#{index}][afternoon_open_at]",
+                                value: map.afternoon_open_at,
+                                class: "form-control" %>
                             </div>
                             <div class="col">
-                                <span>Close</span>
+                                <span>AM Close</span>
                                 <%=
                                 text_input f,
-                                :close_at,
-                                name: "rows[#{index}][close_at]",
-                                value: "#{map["close_at"]}",
-                                class: "form-control"
-                                %>
+                                :morning_close_at,
+                                name: "rows[#{index}][morning_close_at]",
+                                value: map.morning_close_at,
+                                class: "form-control" %>
+                                <span>PM Close</span>
+                                <%=
+                                text_input f,
+                                :afternoon_close_at,
+                                name: "rows[#{index}][afternoon_close_at]",
+                                value: map.afternoon_close_at,
+                                class: "form-control" %>
                             </div>
-                            <a href="#" phx-click="remove" phx-value-index="<%= index %>" class="align-self-end btn-sm"><i class=" hours-icon fas fa-trash-alt"></i></a>
+                            <a href="#" phx-click="remove" phx-value-index="<%= index %>"
+                               class="align-self-center btn"><i class=" hours-icon fas fa-trash-alt"></i></a>
                         </div>
                         <% end %>
                     </fieldset>

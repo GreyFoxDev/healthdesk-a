@@ -37,6 +37,7 @@
                             "action" => team_location_holiday_hour_path(@conn, :create, @location.team_id, @location.id),
                             "location" => @location,
                             "rows" => @rows,
+                            "closed" => @closed,
                             "holiday_name" => @holiday_name,
                             "holiday_date" => @holiday_date
                             } ,id: "wohi#{@location.id}") %>

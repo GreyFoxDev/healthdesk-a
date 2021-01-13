@@ -35,19 +35,23 @@ defmodule MainWeb.ChildCareHourController do
 
     rows = Enum.map(hour.times, fn
       time ->
-      %{morning_open_at: time.morning_open_at, morning_close_at: time.morning_close_at,
-        afternoon_open_at: time.afternoon_open_at, afternoon_close_at: time.afternoon_close_at}
+      %{"morning_open_at" => time.morning_open_at, "morning_close_at" => time.morning_close_at,
+        "afternoon_open_at" => time.afternoon_open_at, "afternoon_close_at" => time.afternoon_close_at}
     end)
 
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- ChildCareHours.get_changeset(id, user) do
 
-      render(conn, "edit.html",
+      render(
+        conn,
+        "edit.html",
         changeset: changeset,
         location: location,
         rows: rows,
         day_of_week: "#{changeset.data.day_of_week}",
-        errors: [])
+        closed: changeset.data.closed,
+        errors: []
+      )
     end
   end
 

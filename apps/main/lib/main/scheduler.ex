@@ -1,8 +1,9 @@
 defmodule Main.Scheduler do
   use Quantum, otp_app: :main
 
-  alias Data.{Campaign, CampaignRecipient, Location}
+  alias Data.{Campaign, CampaignRecipient, Location, Conversations}
   alias Quantum.Job
+
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
   def schedule_campaign(id) do
@@ -24,10 +25,16 @@ defmodule Main.Scheduler do
     |> add_job()
 
   end
+
+  def schedule_conversation() do
+    Conversations.update_conversation()
+  end
+
   def send_campaign(id) do
     campaign = Campaign.get(id)
     send_to_recipients(campaign)|> complete_campaign()
   end
+
   defp send_to_recipients(campaign) do
     location = Location.get(campaign.location_id)
 

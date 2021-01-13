@@ -43,6 +43,7 @@ defmodule MainWeb.NormalHourController do
         location: location,
         rows: rows,
         day_of_week: "#{changeset.data.day_of_week}",
+        closed: changeset.data.closed,
         errors: [])
     end
   end

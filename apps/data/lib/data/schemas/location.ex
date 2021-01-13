@@ -21,6 +21,8 @@ defmodule Data.Schema.Location do
                google_token: String.t() | nil,
                google_refresh_token: String.t() | nil,
                calender_id: String.t() | nil,
+               calender_url: String.t() | nil,
+               form_url: String.t() | nil,
                postal_code: String.t() | nil,
                default_message: String.t() | nil,
                slack_integration: String.t() | nil,
@@ -42,6 +44,8 @@ defmodule Data.Schema.Location do
   google_token
   google_refresh_token
   calender_id
+  calender_url
+  form_url
   api_key
   web_greeting
   web_handle
@@ -71,6 +75,8 @@ defmodule Data.Schema.Location do
     field(:google_token, :string)
     field(:google_refresh_token, :string)
     field(:calender_id, :string)
+    field(:calender_url, :string)
+    field(:form_url, :string)
     field(:postal_code, :string)
     field(:timezone, :string)
     field(:api_key, :string)

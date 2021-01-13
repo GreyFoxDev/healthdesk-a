@@ -9,6 +9,7 @@ defmodule Data.Schema.ChildCareHour do
           location_id: binary(),
           day_of_week: String.t() | nil,
           active: boolean() | nil,
+          closed: boolean() | nil,
           deleted_at: :utc_datetime | nil
         }
 
@@ -19,6 +20,7 @@ defmodule Data.Schema.ChildCareHour do
   @optional_fields ~w|
   day_of_week
   active
+  closed
   deleted_at
   |a
 
@@ -27,6 +29,7 @@ defmodule Data.Schema.ChildCareHour do
   schema "child_care_hours" do
     field(:day_of_week, :string)
     field(:active, :boolean)
+    field(:closed, :boolean)
 
     field(:deleted_at, :utc_datetime)
 

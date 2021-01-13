@@ -20,6 +20,7 @@ defmodule Data.Conversations do
   defdelegate create(params), to: Query
   defdelegate get_by_phone(phone_number, location_id), to: Query
   defdelegate get(conversation_id), to: Query
+  defdelegate update_conversation(), to: Query
 
   @doc """
   Get changesets for conversations.

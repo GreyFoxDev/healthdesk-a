@@ -29,18 +29,16 @@ defmodule MainWeb.LocationController do
     render conn, "show.json", data: location
   end
 
-  def request(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider}=params) do
+  def request(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = params) do
     # Present an authentication challenge to the user
     provider_config = {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/calendar.events",request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
       callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",callback_methods: ["POST"]] }
     conn
     |> Ueberauth.run_request(provider, provider_config)
   end
+
   def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider,"code" => code}=params) do
     res = Ueberauth.Strategy.Google.OAuth.get_access_token [code: code,redirect_uri: "https://staging.healthdesk.ai/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback", prompt: "consent",access_type: "offline" ]
-    IO.inspect("###################")
-    IO.inspect(res)
-    IO.inspect("###################")
 
     case res do
              {:ok,
@@ -83,14 +81,15 @@ defmodule MainWeb.LocationController do
       errors: [])
   end
 
-  def edit(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider}=params) do
+  def edit(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = params) do
     provider_config = {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/calendar",request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
       callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",prompt: "consent", access_type: "offline"] }
     conn
     |> Ueberauth.run_request(provider, provider_config)
 
   end
-  def edit(conn, %{"id" => id, "team_id" => team_id}=params) do
+
+  def edit(conn, %{"id" => id, "team_id" => team_id} = params) do
 
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- Location.get_changeset(id, user) do
@@ -124,14 +123,17 @@ defmodule MainWeb.LocationController do
        end
   end
 
-  def update(conn, %{"id" => id, "location" => location, "team_id" => team_id}) do
+  def update(conn, %{"id" => id, "location" => location, "team_id" => team_id} = params) do
+
     location = Map.put(location, "team_id", team_id)
 
     case Location.update(id, location) do
+
       {:ok, %Data.Schema.Location{}} ->
         conn
         |> put_flash(:success, "Location updated successfully.")
         |> redirect(to: team_location_path(conn, :index, team_id))
+
       {:error, changeset} ->
         conn
         |> put_flash(:error, "Location failed to update")
@@ -149,6 +151,46 @@ defmodule MainWeb.LocationController do
         conn
         |> put_flash(:error, "Location failed to delete")
         |> render("index.html", team_id)
+    end
+  end
+
+  def remove_config(conn, %{"location_id" => location_id, "team_id" => team_id} = params) do
+    location = Location.get(location_id)
+
+    case Location.update(location_id, location = %{
+      form_url: nil,
+      calender_url: nil,
+      calender_id: nil,
+      google_refresh_token: nil,
+      google_token: nil
+    }) do
+
+      {:ok, %Data.Schema.Location{}} ->
+        current_user = current_user(conn)
+        case Location.get_changeset(location_id, current_user) do
+
+          {:ok, changeset} ->
+            team = Team.get(current_user, team_id)
+            render(
+              conn,
+              "edit.html",
+              changeset: changeset,
+              team_id: team_id,
+              teams: teams(conn),
+              team: team,
+              callback_url: Helpers.callback_url(conn),
+              location: changeset.data,
+              errors: []
+            )
+
+            _ ->
+              {:error, "failed"}
+        end
+
+      {:error, changeset} ->
+        conn
+        |> put_flash(:error, "Location failed to update")
+        |> render_page("edit.html", changeset, changeset.errors)
     end
   end
 

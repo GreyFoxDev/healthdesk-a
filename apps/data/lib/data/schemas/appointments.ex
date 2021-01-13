@@ -13,6 +13,7 @@ defmodule Data.Schema.Appointment do
                phone: String.t(),
                date: String.t(),
                time: String.t(),
+               member_id: String.t(),
                link: String.t(),
                confirmed: :boolean | false
         }
@@ -28,6 +29,7 @@ defmodule Data.Schema.Appointment do
   conversation_id
   date
   time
+  member_id
   link
   confirmed
   |a
@@ -42,6 +44,7 @@ defmodule Data.Schema.Appointment do
     field(:phone, :string)
     field(:date, :string)
     field(:time, :string)
+    field(:member_id, :string)
     field(:link, :string)
     field(:confirmed, :boolean, default: false)
 

@@ -52,6 +52,7 @@ defmodule MainWeb.HolidayHourController do
         hours: hours,
         rows: rows,
         holiday_name: "#{changeset.data.holiday_name}",
+        closed: changeset.data.closed,
         holiday_date: date,
         errors: [])
     end

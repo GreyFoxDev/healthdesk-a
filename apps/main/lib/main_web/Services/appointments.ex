@@ -5,6 +5,7 @@ defmodule Main.Service.Appointment do
   alias Data.Conversations, as: C
   alias Data.ConversationMessages, as: CM
   alias Data.Appointments, as: AP
+  alias Data.Member, as: MB
   use Timex
   @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
 
@@ -211,18 +212,24 @@ defmodule Main.Service.Appointment do
     """
     {res,2}
   end
-  defp get_next_step(appointment,step,value,location) when value in [8] and step in [3,15,16] do
+  defp get_next_step(appointment, step, value, location) when value in [8] and step in [3,15,16] do
     {get_calendar(location),4}
   end
   defp get_next_step(appointment,step,value,location) when is_binary(value) and step in [4,17,18] do
-    AP.update(%{"id" => appointment.id,"name" => value})
+    {:ok, member} = MB.upsert(params = %{
+      first_name: value,
+      team_id: location.team_id,
+      phone_number: appointment.conversation.original_number
+    })
+    AP.update(%{"id" => appointment.id,"name" => value, "member_id" => member.id})
+
     name = value |> String.split |> Enum.map(&String.capitalize/1)|>Enum.join(" ")
     res = """
     Thanks #{name}. Can I please get your 10-digit phone number?
     """
     {res,5}
   end
-  defp get_next_step(appointment,step,value,location) when is_binary(value) and step in [5,21,22] do
+  defp get_next_step(appointment, step,value, location) when is_binary(value) and step in [5,21,22] do
     AP.update(%{"id" => appointment.id,"phone" => value})
 
     res = """
@@ -230,8 +237,19 @@ defmodule Main.Service.Appointment do
     """
     {res,6}
   end
-  defp get_next_step(appointment,step,value,location) when is_binary(value) and step in [6,19,20] do
+  defp get_next_step(appointment, step, value, location) when is_binary(value) and step in [6,19,20] do
     {:ok, appointment} = AP.update(%{"id" => appointment.id,"email" => value})
+    case MB.get(appointment.member_id) do
+      member ->
+        MB.update(member.id, params = %{
+          team_id: location.team_id,
+          phone_number: appointment.conversation.original_number,
+          email: value
+        })
+
+      _ ->
+        {:error, "error"}
+    end
 
     name = appointment.name |> String.split |> Enum.map(&String.capitalize/1)|>Enum.join(" ")
 
@@ -385,10 +403,10 @@ defmodule Main.Service.Appointment do
     url = if location.google_token != nil do
       connection = get_connection(location)
       {:ok, calendar}=GoogleApi.Calendar.V3.Api.Calendars.calendar_calendars_get(connection, location.calender.id)
-      "https://calendar.google.com/"
+      location.calender_url
 
     else
-      "https://calendar.google.com/"
+      location.calender_url
     end
     #    case GoogleApi.Calendar.V3.Api.CalendarList.calendar_calendar_list_get c , id do
     #       ->
