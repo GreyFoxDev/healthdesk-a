@@ -19,7 +19,7 @@
                     <nav class="nav nav-tabs flex-column border-0">
                         <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link active">Details</a>
                         <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Normal Hours</a>
-                        <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Holiday Hours</a>
+                        <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Special Hours</a>
                         <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hours</a>
                         <a href="<%= team_location_wifi_network_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Wifi Network</a>
                         <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Pass Prices</a>
