@@ -3,7 +3,7 @@ defmodule Data.ReadOnly.Repo.Migrations.AlterTableAppointmentsAddMemberId do
 
   def change do
     alter table(:appointments) do
-      add(:memeber_id, :string)
+      add(:member_id, references(:members))
     end
   end
 end

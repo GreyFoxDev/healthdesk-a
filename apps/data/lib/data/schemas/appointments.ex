@@ -13,7 +13,7 @@ defmodule Data.Schema.Appointment do
                phone: String.t(),
                date: String.t(),
                time: String.t(),
-               member_id: String.t(),
+               member_id: binary(),
                link: String.t(),
                confirmed: :boolean | false
         }
@@ -44,13 +44,13 @@ defmodule Data.Schema.Appointment do
     field(:phone, :string)
     field(:date, :string)
     field(:time, :string)
-    field(:member_id, :string)
     field(:link, :string)
     field(:confirmed, :boolean, default: false)
 
 
 
     belongs_to(:conversation, Data.Schema.Conversation)
+    belongs_to(:members, Data.Schema.Member)
 
     timestamps()
   end
