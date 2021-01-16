@@ -55,9 +55,11 @@ defmodule Data.Query.Appointment do
     |> Appointment.changeset(params)
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
-        repo.update(changeset)
+        {:ok, appt} = repo.update(changeset)
+        appt |> repo.preload([:conversation])
 
-      changeset ->
+
+         changeset ->
         {:error, changeset}
     end
   end

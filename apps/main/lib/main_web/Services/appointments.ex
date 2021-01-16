@@ -8,20 +8,15 @@ defmodule Main.Service.Appointment do
   alias Data.Member, as: MB
   use Timex
   @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
+  @role %{role: "admin"}
 
   def get_next_reply(id,intent,location)do
-    IO.inspect("###################")
-    IO.inspect(intent)
 
     location = Data.Location.get_by_phone(location)
 
     convo = C.get(id)
     step = convo.step
     appointment = convo.appointment
-    IO.inspect("###################")
-    IO.inspect(appointment)
-    IO.inspect(location.google_token)
-    IO.inspect("###################")
 
     if location.google_token do
       get_next_intent(id,step,intent,location,appointment)
@@ -142,9 +137,6 @@ defmodule Main.Service.Appointment do
   end
   defp get_next_step(appointment,step,value,location) when value in [1,2,3,4,5] and step in [2,13,14] do
     date = get_dates(value)
-    IO.inspect("######ddddd#############")
-    IO.inspect(date)
-    IO.inspect("###################")
 
     AP.update(%{"id" => appointment.id,"date" => date})
     res =
@@ -238,8 +230,9 @@ defmodule Main.Service.Appointment do
     {res,6}
   end
   defp get_next_step(appointment, step, value, location) when is_binary(value) and step in [6,19,20] do
-    {:ok, appointment} = AP.update(%{"id" => appointment.id,"email" => value})
-    case MB.get(appointment.member_id) do
+    appointment = AP.update(%{"id" => appointment.id,"email" => value})
+
+    case MB.get(@role,appointment.member_id) do
       member ->
         MB.update(member.id, params = %{
           team_id: location.team_id,
@@ -270,9 +263,6 @@ defmodule Main.Service.Appointment do
     {res,7}
   end
   defp get_next_step(appointment,step,value,location) when value in [1] and step in [7] do
-    IO.inspect("###################")
-    IO.inspect(location)
-    IO.inspect("###################")
 
     url = if location.google_token do
       event(appointment,location)
@@ -408,12 +398,9 @@ defmodule Main.Service.Appointment do
     else
       location.calender_url
     end
-    #    case GoogleApi.Calendar.V3.Api.CalendarList.calendar_calendar_list_get c , id do
-    #       ->
-    #    end
-#    """
-#    Here's the calendar! Feel free to book the time that works best for you. If you're stuck, just say 'agent' to chat with a person. #{url}
-#    """
+    """
+    Here's the calendar! Feel free to book the time that works best for you. If you're stuck, just say 'agent' to chat with a person. #{url}
+    """
   end
   defp get_connection(location)do
     client = OAuth2.Client.new([
@@ -446,7 +433,7 @@ defmodule Main.Service.Appointment do
     dts = %GoogleApi.Calendar.V3.Model.EventDateTime{dateTime: dt}
     dte = %GoogleApi.Calendar.V3.Model.EventDateTime{dateTime: Timex.shift(dt,minutes: 30)}
     name = appointment.name |> String.split |> Enum.map(&String.capitalize/1)|>Enum.join(" ")
-address = "#{location.address_1} #{location.city} #{location.state} #{location.postal_code}"
+    address = "#{location.address_1} #{location.city} #{location.state} #{location.postal_code}"
     description = """
     #{appointment.type} with #{name}
     #{appointment.phone}
