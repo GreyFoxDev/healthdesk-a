@@ -179,7 +179,8 @@ defmodule MainWeb.Live.ConversationsView do
 
     conversations = user
                     |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
-    open_conversation = conversations |> List.first() |>fetch_member()
+
+    open_conversation = conversations |> List.first() |> fetch_member()
 
     socket = socket
              |> assign(:team_members, [])
@@ -367,7 +368,12 @@ defmodule MainWeb.Live.ConversationsView do
     location = socket.assigns.open_conversation.location
     user = socket.assigns.user
     conversation = socket.assigns.open_conversation
+    conversations = socket.assigns.conversations
 
+
+    conversations =   conversations
+    |> Enum.filter(&(&1.original_number  != conversation.original_number))
+    |> List.insert_at(0, conversation)
 
     send_message(conversation, params, location, user)
     conversation =
@@ -377,27 +383,32 @@ defmodule MainWeb.Live.ConversationsView do
 
     messages =
       user
-      |> ConversationMessages.all(conversation.id) |>Enum.reverse()
+      |> ConversationMessages.all(conversation.id) |> Enum.reverse()
     socket =
       socket
-      |> assign(:open_conversation, Map.merge(conversation,%{conversation_messages: messages}))
+      |> assign(:open_conversation, Map.merge(conversation, %{conversation_messages: messages}))
       |> assign(:child_id, (List.first(messages)).id)
+      |> assign(:conversations, conversations)
       |> assign(:changeset, Conversations.get_changeset())
     if connected?(socket), do: Process.send_after(self(), :scroll_chat, 200)
     if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
     {:noreply, socket}
   end
   def handle_event("save_member",  %{"member" => m_params} = params, socket) do
-
     o_c = socket.assigns.open_conversation
+
     socket = case MainWeb.UpdateMemberController.update(m_params) do
       {:ok,member} ->
         conversations = socket.assigns.conversations
-        [head | tail] = conversations
-        conversations = [ Map.merge(head,%{member: member}) | tail]
+
+        res = Enum.find(conversations, fn f -> f.original_number == member.phone_number end)
+        res = %{res | member: member}
+        conversations = List.replace_at(conversations,
+          Enum.find_index(conversations, fn f -> f.original_number == member.phone_number end), res)
+
         socket
         |> assign(:open_conversation, Map.merge(o_c,%{member: member}))
-        |> assign(:conversations,conversations)
+        |> assign(:conversations, conversations)
       _ -> socket
     end
 
