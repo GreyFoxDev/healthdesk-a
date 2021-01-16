@@ -401,8 +401,8 @@ defmodule Main.Service.Appointment do
   end
   defp get_calendar(location) do
     url = if location.google_token != nil do
-      connection = get_connection(location)
-      {:ok, calendar}=GoogleApi.Calendar.V3.Api.Calendars.calendar_calendars_get(connection, location.calender.id)
+#      connection = get_connection(location)
+#      {:ok, calendar}=GoogleApi.Calendar.V3.Api.Calendars.calendar_calendars_get(connection, location.calender.id)
       location.calender_url
 
     else
@@ -411,9 +411,9 @@ defmodule Main.Service.Appointment do
     #    case GoogleApi.Calendar.V3.Api.CalendarList.calendar_calendar_list_get c , id do
     #       ->
     #    end
-    """
-    Here's the calendar! Feel free to book the time that works best for you. If you're stuck, just say 'agent' to chat with a person. #{url}
-    """
+#    """
+#    Here's the calendar! Feel free to book the time that works best for you. If you're stuck, just say 'agent' to chat with a person. #{url}
+#    """
   end
   defp get_connection(location)do
     client = OAuth2.Client.new([
