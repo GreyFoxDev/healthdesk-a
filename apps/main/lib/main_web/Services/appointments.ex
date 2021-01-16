@@ -345,12 +345,12 @@ defmodule Main.Service.Appointment do
   defp get_time(num) do
     today = Timex.today |> Timex.to_datetime
     val = case num do
-      1 -> Timex.set today, [hour: 11]
-      2 -> Timex.set today, [hour: 12, minute: 30]
-      3 -> Timex.set today, [hour: 13]
-      4 -> Timex.set today, [hour: 14]
-      5 -> Timex.set today, [hour: 15, minute: 30]
-      6 -> Timex.set today, [hour: 18]
+      1 -> Timex.set today, [hour: 10]
+      2 -> Timex.set today, [hour: 12]
+      3 -> Timex.set today, [hour: 14]
+      4 -> Timex.set today, [hour: 15]
+      5 -> Timex.set today, [hour: 16]
+      6 -> Timex.set today, [hour: 17]
     end
 
     format_time(val)
