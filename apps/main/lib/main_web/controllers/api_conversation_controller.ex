@@ -48,7 +48,7 @@ defmodule MainWeb.Api.ConversationController do
       |> json(%{conversation_id: convo.id})
     end
   end
-  def create(conn, %{"from" => from,"subject" => subj,"text" => message,"to" => to} = params) do
+  def create(conn, %{"from" => from, "subject" => subj, "text" => message,"to" => to} = params) do
 
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
     name = List.first(Regex.split(regex,from))
@@ -79,52 +79,63 @@ defmodule MainWeb.Api.ConversationController do
               phone_number: from
             })
         end
-        message
-        |> ask_wit_ai(location)
-        |> case do
-             {:ok, response} ->
+        if convo.status == "closed"  do
+          message
+          |> ask_wit_ai(location)
+          |> case do
+               {:ok, response} ->
+                 if convo.status == "closed" do
+                   {:ok, struct}=  CM.create(
+                     %{
+                       "conversation_id" => convo.id,
+                       "phone_number" => location.phone_number,
+                       "message" => response,
+                       "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                     }
+                   )
+                   close_conversation(convo.id, location)
+                   from
+                   |> Main.Email.generate_reply_email(response, subj)
+                   |> Main.Mailer.deliver_now()
+                   Main.LiveUpdates.notify_live_view({convo.id, struct})
+                 end
 
-               {:ok, struct}=  CM.create(
-                 %{
-                   "conversation_id" => convo.id,
-                   "phone_number" => location.phone_number,
-                   "message" => response,
-                   "sent_at" => DateTime.add(DateTime.utc_now(), 2)
-                 }
-               )
-               from
-               |> Main.Email.generate_reply_email(response, subj)
-               |> Main.Mailer.deliver_now()
-               Main.LiveUpdates.notify_live_view({convo.id, struct})
-               close_conversation(convo.id, location)
-             {:unknown, response} ->
+               {:unknown, response} ->
 
-               if convo.status == "closed" do
-                 {:ok, struct}=  CM.create(
-                   %{
-                     "conversation_id" => convo.id,
-                     "phone_number" => location.phone_number,
-                     "message" => response,
-                     "sent_at" => DateTime.add(DateTime.utc_now(), 2)
-                   }
-                 )
-                 C.pending(convo.id)
-                 from
-                 |> Main.Email.generate_reply_email(response, subj)
-                 |> Main.Mailer.deliver_now()
-                 Main.LiveUpdates.notify_live_view({convo.id, struct})
-               end
+                 if convo.status == "closed" do
+                   {:ok, struct}=  CM.create(
+                     %{
+                       "conversation_id" => convo.id,
+                       "phone_number" => location.phone_number,
+                       "message" => response,
+                       "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                     }
+                   )
+                   C.pending(convo.id)
+                   from
+                   |> Main.Email.generate_reply_email(response, subj)
+                   |> Main.Mailer.deliver_now()
+                   Main.LiveUpdates.notify_live_view({convo.id, struct})
+                 end
 
-               Main.LiveUpdates.notify_live_view({location.id, :updated_open})
-               :ok =
-                 Notify.send_to_admin(
-                   convo.id,
-                   "Message From: #{convo.original_number}\n#{message}",
-                   location.phone_number
-                 )
-           end
+                 Main.LiveUpdates.notify_live_view({location.id, :updated_open})
+                 :ok =
+                   Notify.send_to_admin(
+                     convo.id,
+                     "Message From: #{convo.original_number}\n#{message}",
+                     location.phone_number
+                   )
+             end
+        else
+          :ok =
+            Notify.send_to_admin(
+              convo.id,
+              "Message From: #{convo.original_number}\n#{message}",
+              location.phone_number
+            )
+        end
       else
-      _ -> nil
+        _ -> nil
       end
     end
     conn |> send_resp(200, "ok")

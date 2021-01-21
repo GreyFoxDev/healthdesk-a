@@ -372,8 +372,8 @@ defmodule MainWeb.Live.ConversationsView do
 
 
     conversations =   conversations
-    |> Enum.filter(&(&1.original_number  != conversation.original_number))
-    |> List.insert_at(0, conversation)
+                      |> Enum.filter(&(&1.original_number  != conversation.original_number))
+                      |> List.insert_at(0, conversation)
 
     send_message(conversation, params, location, user)
     conversation =
@@ -459,7 +459,6 @@ defmodule MainWeb.Live.ConversationsView do
        end
   end
   defp send_message(%{original_number: <<"CH", _ :: binary>>} = conversation, params, location, user) do
-
 
     from_name = if conversation.team_member do
       Enum.join(
@@ -757,9 +756,6 @@ defmodule MainWeb.Live.ConversationsView do
 
   end
   def handle_event("new_msg", %{"conversation" => c_params, "location_id" => location_id} = params, socket)do
-    IO.inspect("###################")
-    IO.inspect(12333)
-    IO.inspect("###################")
 
     user = socket.assigns.user
     location = user
@@ -823,7 +819,7 @@ defmodule MainWeb.Live.ConversationsView do
     end
   end
   def handle_info({convo_id, %Data.Schema.ConversationMessage{}=msg}, socket) do
-    if  socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
+    if socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
       user = socket.assigns.user
       conversation = socket.assigns.open_conversation
       messages =

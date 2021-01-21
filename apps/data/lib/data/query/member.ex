@@ -85,9 +85,9 @@ defmodule Data.Query.Member do
     )
     case repo.one(query) do
       nil ->
-       _o_o = create(params)
+       create(params)
       member ->
-       _o_o = update(member, params)
+       update(member, params)
     end
   end
 

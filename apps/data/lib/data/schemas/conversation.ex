@@ -48,7 +48,7 @@ defmodule Data.Schema.Conversation do
 
     has_many(:conversation_messages, Data.Schema.ConversationMessage)
 
-    timestamps()
+    timestamps([type: :naive_datetime_usec])
   end
 
   def changeset(model, params \\ %{}) do
@@ -93,4 +93,3 @@ defmodule Data.Schema.Conversation do
     put_change(changeset, :channel_type, "MAIL")
   end
 end
-

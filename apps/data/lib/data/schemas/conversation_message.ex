@@ -3,7 +3,6 @@ defmodule Data.Schema.ConversationMessage do
   The schema for a conversation's messages
   """
   use Data.Schema
-
   @type t :: %__MODULE__{
                id: binary(),
                conversation_id: binary(),
@@ -34,7 +33,7 @@ defmodule Data.Schema.ConversationMessage do
     field(:user, :map, virtual: true)
     field(:member, :map, virtual: true)
 
-    timestamps()
+    timestamps([type: :naive_datetime_usec])
   end
 
   def changeset(model, params \\ %{}) do

@@ -13,7 +13,8 @@ defmodule Data.Query.Appointment do
   @spec get(id :: binary(), repo :: Ecto.Repo.t()) :: Appointment.t() | nil
   def get(id, repo \\ Read) do
     from(c in Appointment,
-      where: c.id == ^id
+      where: c.id == ^id,
+      preload: [:conversation]
     )
     |> repo.one()
   end
@@ -55,11 +56,9 @@ defmodule Data.Query.Appointment do
     |> Appointment.changeset(params)
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
-        {:ok, appt} = repo.update(changeset)
-        appt |> repo.preload([:conversation])
+        repo.update(changeset)
 
-
-         changeset ->
+      changeset ->
         {:error, changeset}
     end
   end
