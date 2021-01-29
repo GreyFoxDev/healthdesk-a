@@ -10,5 +10,4 @@ defmodule Data.Campaign do
   defdelegate active_campaigns(), to: Query
   defdelegate get_by_location_id(location_id), to: Query
   defdelegate delete(campaign), to: Query
-
 end

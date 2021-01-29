@@ -5,17 +5,17 @@ defmodule Data.Schema.Appointment do
   use Data.Schema
 
   @type t :: %__MODULE__{
-               id: binary(),
-               conversation_id: binary() | nil,
-               name: String.t(),
-               type: String.t(),
-               email: String.t(),
-               phone: String.t(),
-               date: String.t(),
-               time: String.t(),
-               member_id: binary(),
-               link: String.t(),
-               confirmed: :boolean | false
+          id: binary(),
+          conversation_id: binary() | nil,
+          name: String.t(),
+          type: String.t(),
+          email: String.t(),
+          phone: String.t(),
+          date: String.t(),
+          time: String.t(),
+          member_id: binary(),
+          link: String.t(),
+          confirmed: :boolean | false
         }
 
   @required_fields ~w|
@@ -37,7 +37,6 @@ defmodule Data.Schema.Appointment do
   @all_fields @required_fields ++ @optional_fields
 
   schema "appointments" do
-
     field(:name, :string)
     field(:type, :string)
     field(:email, :string)
@@ -46,8 +45,6 @@ defmodule Data.Schema.Appointment do
     field(:time, :string)
     field(:link, :string)
     field(:confirmed, :boolean, default: false)
-
-
 
     belongs_to(:conversation, Data.Schema.Conversation)
     belongs_to(:member, Data.Schema.Member)
@@ -60,6 +57,4 @@ defmodule Data.Schema.Appointment do
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
   end
-
-
 end

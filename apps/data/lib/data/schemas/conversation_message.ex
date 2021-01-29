@@ -3,14 +3,15 @@ defmodule Data.Schema.ConversationMessage do
   The schema for a conversation's messages
   """
   use Data.Schema
+
   @type t :: %__MODULE__{
-               id: binary(),
-               conversation_id: binary(),
-               phone_number: String.t(),
-               message: String.t(),
-               read: :boolean | false,
-               sent_at: :utc_datetime | nil
-             }
+          id: binary(),
+          conversation_id: binary(),
+          phone_number: String.t(),
+          message: String.t(),
+          read: :boolean | false,
+          sent_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   conversation_id
@@ -28,12 +29,11 @@ defmodule Data.Schema.ConversationMessage do
     field(:sent_at, :utc_datetime)
     field(:read, :boolean, default: false)
 
-
     belongs_to(:conversation, Data.Schema.Conversation)
     field(:user, :map, virtual: true)
     field(:member, :map, virtual: true)
 
-    timestamps([type: :naive_datetime_usec])
+    timestamps(type: :naive_datetime_usec)
   end
 
   def changeset(model, params \\ %{}) do

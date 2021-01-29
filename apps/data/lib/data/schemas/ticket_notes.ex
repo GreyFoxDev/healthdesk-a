@@ -5,10 +5,10 @@ defmodule Data.Schema.TicketNote do
   use Data.Schema
 
   @type t :: %__MODULE__{
-               id: binary(),
-               user_id: binary(),
-               ticket_id: binary() ,
-               note: String.t(),
+          id: binary(),
+          user_id: binary(),
+          ticket_id: binary(),
+          note: String.t()
         }
 
   @required_fields ~w|
@@ -32,6 +32,4 @@ defmodule Data.Schema.TicketNote do
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
   end
-
-
 end

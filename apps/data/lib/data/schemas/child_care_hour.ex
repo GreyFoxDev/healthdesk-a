@@ -34,12 +34,13 @@ defmodule Data.Schema.ChildCareHour do
     field(:deleted_at, :utc_datetime)
 
     belongs_to(:location, Data.Schema.Location)
+
     embeds_many :times, Times, on_replace: :delete do
       field(:morning_open_at, :string)
       field(:morning_close_at, :string)
       field(:afternoon_open_at, :string)
       field(:afternoon_close_at, :string)
-      end
+    end
 
     timestamps()
   end

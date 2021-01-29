@@ -57,7 +57,7 @@ defmodule Data.Schema.Member do
     model
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
-    |> unique_constraint(:phone_number , name: :members_phone_number_team_id_index)
-    |> unique_constraint( :team_id , name: :members_phone_number_team_id_index)
+    |> unique_constraint(:phone_number, name: :members_phone_number_team_id_index)
+    |> unique_constraint(:team_id, name: :members_phone_number_team_id_index)
   end
 end

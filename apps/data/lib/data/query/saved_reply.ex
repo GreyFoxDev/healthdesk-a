@@ -60,12 +60,12 @@ defmodule Data.Query.SavedReply do
     original
     |> SavedReply.changeset(params)
     |> case do
-         %Ecto.Changeset{valid?: true} = changeset ->
-           repo.update(changeset)
+      %Ecto.Changeset{valid?: true} = changeset ->
+        repo.update(changeset)
 
-         changeset ->
-           {:error, changeset}
-       end
+      changeset ->
+        {:error, changeset}
+    end
   end
 
   @doc """
@@ -77,13 +77,11 @@ defmodule Data.Query.SavedReply do
     id
     |> get(repo)
     |> case do
-         %SavedReply{} = saved_reply ->
-           repo.delete(saved_reply)
+      %SavedReply{} = saved_reply ->
+        repo.delete(saved_reply)
 
-         nil ->
-           {:error, :no_record_found}
-       end
+      nil ->
+        {:error, :no_record_found}
+    end
   end
-
-
 end

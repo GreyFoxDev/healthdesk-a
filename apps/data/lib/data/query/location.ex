@@ -17,7 +17,8 @@ defmodule Data.Query.Location do
       where: is_nil(t.deleted_at),
       preload: [:team]
     )
-    |> repo.all() |> Enum.filter(&(&1.team.deleted_at == nil))
+    |> repo.all()
+    |> Enum.filter(&(&1.team.deleted_at == nil))
   end
 
   @doc """

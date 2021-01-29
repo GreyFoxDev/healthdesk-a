@@ -21,7 +21,12 @@ defmodule Data.Query.CampaignRecipientTest do
     end
 
     test "returns holiday hour with a valid id", %{campaign: campaign} do
-      recipient = insert(:campaign_recipient, %{campaign_id: campaign.id, recipient_name: "Bob Dobbs", phone_number: "000 555-1212"})
+      recipient =
+        insert(:campaign_recipient, %{
+          campaign_id: campaign.id,
+          recipient_name: "Bob Dobbs",
+          phone_number: "000 555-1212"
+        })
 
       assert found = Query.get(recipient.id, Repo)
       assert "Bob Dobbs" = found.recipient_name
@@ -37,8 +42,19 @@ defmodule Data.Query.CampaignRecipientTest do
     test "returns recipients for a campaign id", %{campaign: campaign, location: location} do
       campaign2 = insert(:campaign, %{location_id: location.id})
 
-      recipient = insert(:campaign_recipient, %{campaign_id: campaign.id, recipient_name: "Bob Dobbs", phone_number: "000 555-1212"})
-      _ = insert(:campaign_recipient, %{campaign_id: campaign2.id, recipient_name: "Jane Dobbs", phone_number: "111 111-1111"})
+      recipient =
+        insert(:campaign_recipient, %{
+          campaign_id: campaign.id,
+          recipient_name: "Bob Dobbs",
+          phone_number: "000 555-1212"
+        })
+
+      _ =
+        insert(:campaign_recipient, %{
+          campaign_id: campaign2.id,
+          recipient_name: "Jane Dobbs",
+          phone_number: "111 111-1111"
+        })
 
       assert [found] = Query.get_by_campaign_id(campaign.id, Repo)
       assert recipient.id == found.id
@@ -85,7 +101,7 @@ defmodule Data.Query.CampaignRecipientTest do
 
     test "returns the updated recipient on success", %{recipient: recipient} do
       params = %{
-        phone_number: "111 111-1111",
+        phone_number: "111 111-1111"
       }
 
       assert {:ok, %CampaignRecipient{} = updated} = Query.update(recipient, params, Repo)
@@ -95,5 +111,4 @@ defmodule Data.Query.CampaignRecipientTest do
       assert params.phone_number == updated.phone_number
     end
   end
-
 end

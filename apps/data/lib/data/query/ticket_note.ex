@@ -1,5 +1,4 @@
 defmodule Data.Query.TicketNote do
-
   @moduledoc """
   Module for the TicketNote queries
   """
@@ -22,19 +21,18 @@ defmodule Data.Query.TicketNote do
     |> repo.one()
   end
 
-
   @doc """
   Creates a new TicketNote
   """
   @spec create(params :: map(), repo :: Ecto.Repo.t()) ::
           {:ok, TicketNote.t()} | {:error, Ecto.Changeset.t()}
   def create(params, repo \\ Write) do
-
     %TicketNote{}
     |> TicketNote.changeset(params)
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
         repo.insert(changeset)
+
       changeset ->
         {:error, changeset}
     end

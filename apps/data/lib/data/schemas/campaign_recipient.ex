@@ -10,7 +10,7 @@ defmodule Data.Schema.CampaignRecipient do
           recipient_name: String.t() | nil,
           phone_number: String.t(),
           sent_at: :utc_datetime | nil,
-          sent_successfully: :boolean | nil,
+          sent_successfully: :boolean | nil
         }
 
   @required_fields ~w|

@@ -23,7 +23,8 @@ defmodule Data.Query.NormalHour do
   @doc """
   Returns a normal hour by id
   """
-  @spec get_by(location_id :: binary(), day_of_week :: String.t, repo :: Ecto.Repo.t()) :: NormalHour.t() | nil
+  @spec get_by(location_id :: binary(), day_of_week :: String.t(), repo :: Ecto.Repo.t()) ::
+          NormalHour.t() | nil
   def get_by(location_id, day_of_week, repo \\ Read) do
     from(
       t in NormalHour,
@@ -32,7 +33,7 @@ defmodule Data.Query.NormalHour do
       where: t.day_of_week == ^day_of_week
     )
     |> repo.all()
-    |> List.last
+    |> List.last()
   end
 
   @doc """

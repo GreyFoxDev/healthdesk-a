@@ -81,7 +81,7 @@ defmodule Data.Query.CampaignTest do
 
     test "returns the updated campaign on success", %{campaign: campaign} do
       params = %{
-        campaign_name: "Updated Campaign",
+        campaign_name: "Updated Campaign"
       }
 
       assert {:ok, %Campaign{} = updated} = Query.update(campaign, params, Repo)

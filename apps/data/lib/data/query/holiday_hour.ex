@@ -23,7 +23,8 @@ defmodule Data.Query.HolidayHour do
   @doc """
   Returns a holiday hour by id
   """
-  @spec get_by(location_id :: binary(), holiday_name :: String.t, repo :: Ecto.Repo.t()) :: HolidayHour.t() | nil
+  @spec get_by(location_id :: binary(), holiday_name :: String.t(), repo :: Ecto.Repo.t()) ::
+          HolidayHour.t() | nil
   def get_by(location_id, holiday_name, repo \\ Read) do
     from(t in HolidayHour,
       where: is_nil(t.deleted_at),
@@ -31,7 +32,7 @@ defmodule Data.Query.HolidayHour do
       where: t.holiday_name == ^holiday_name
     )
     |> repo.all()
-    |> List.last
+    |> List.last()
   end
 
   @doc """

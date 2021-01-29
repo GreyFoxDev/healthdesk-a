@@ -26,45 +26,48 @@ defmodule Data.Conversations do
   Get changesets for conversations.
   """
   def get_changeset(),
-      do: Data.Schema.Conversation.changeset(%Data.Schema.Conversation{})
+    do: Data.Schema.Conversation.changeset(%Data.Schema.Conversation{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
       |> Query.get()
       |> Schema.changeset()
+
     {:ok, changeset}
   end
 
   def all(%{role: role}, location_id) when role in @roles and is_list(location_id) do
     Query.get_by_location_ids(location_id) |> Enum.take(200)
   end
+
   def all(%{role: role}, location_id) when role in @roles do
     Query.get_by_location_id(location_id)
   end
-  def all(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do
 
-    Query.get_by_status(location_id,status) |> Enum.take(200)
+  def all(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do
+    Query.get_by_status(location_id, status) |> Enum.take(200)
   end
 
   def all(_, _), do: {:error, :invalid_permissions}
 
-  def all_open(%{role: role}, location_id, limit , offset ) when role in @roles do
-       Query.get_open_by_location_id(location_id, limit, offset)
+  def all_open(%{role: role}, location_id, limit, offset) when role in @roles do
+    Query.get_open_by_location_id(location_id, limit, offset)
   end
-  def all_closed(%{role: role}, location_id, limit , offset ) when role in @roles do
-       Query.get_closed_by_location_id(location_id, limit, offset)
+
+  def all_closed(%{role: role}, location_id, limit, offset) when role in @roles do
+    Query.get_closed_by_location_id(location_id, limit, offset)
   end
 
   def get(%{role: role}, id) when role in @roles,
-      do: Query.get(id,true)
+    do: Query.get(id, true)
+
   def get(%{role: role}, id, preload_f) when role in @roles,
-      do: Query.get(id,preload_f)
+    do: Query.get(id, preload_f)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
   def update(%{"id" => id} = params) do
-
     id
     |> Query.get()
     |> Query.update(params)
@@ -90,11 +93,13 @@ defmodule Data.Conversations do
         {:ok, convo}
     end
   end
-  def find_or_start_conversation(member, location,subject) do
+
+  def find_or_start_conversation(member, location, subject) do
     with %Location{} = location <- Data.Query.Location.get_by_phone(location),
          nil <- get_by_phone(member, location.id) do
       {member, location.id}
-      |> new_params() |> Map.merge(%{"subject" => subject})
+      |> new_params()
+      |> Map.merge(%{"subject" => subject})
       |> create()
     else
       %Schema{status: "closed"} = conversation ->
@@ -153,25 +158,29 @@ defmodule Data.Conversations do
 
   def appointment_open(id) do
     with %Schema{id: ^id} = convo <- Query.get(id),
-         %Schema{id: ^id} = convo <- Query.update(convo, %{"appointment" => true, "step" => "1","status" => "open"}) do
+         %Schema{id: ^id} = convo <-
+           Query.update(convo, %{"appointment" => true, "step" => "1", "status" => "open"}) do
       {:ok, convo}
     else
       _ ->
         {:error, "Unable to close conversation."}
     end
   end
+
   def appointment_close(id) do
     with %Schema{id: ^id} = convo <- Query.get(id),
-         %Schema{id: ^id} = convo <- Query.update(convo, %{"appointment" => false, "step" => "","status" => "open"}) do
+         %Schema{id: ^id} = convo <-
+           Query.update(convo, %{"appointment" => false, "step" => "", "status" => "open"}) do
       {:ok, convo}
     else
       _ ->
         {:error, "Unable to close conversation."}
     end
   end
-  def appointment_step(id,step) do
+
+  def appointment_step(id, step) do
     with %Schema{id: ^id} = convo <- Query.get(id),
-         %Schema{id: ^id} = convo <- Query.update(convo, %{"step" => step,"status" => "open"}) do
+         %Schema{id: ^id} = convo <- Query.update(convo, %{"step" => step, "status" => "open"}) do
       {:ok, convo}
     else
       _ ->

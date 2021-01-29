@@ -5,13 +5,13 @@ defmodule Data.Schema.Ticket do
   use Data.Schema
 
   @type t :: %__MODULE__{
-               id: binary(),
-               user_id: binary(),
-               team_member_id: binary() | nil,
-               location_id: binary() | nil,
-               description: String.t(),
-               status: String.t(),
-               priority: String.t(),
+          id: binary(),
+          user_id: binary(),
+          team_member_id: binary() | nil,
+          location_id: binary() | nil,
+          description: String.t(),
+          status: String.t(),
+          priority: String.t()
         }
 
   @required_fields ~w|
@@ -30,7 +30,7 @@ defmodule Data.Schema.Ticket do
 
   schema "tickets" do
     field(:description, :string)
-    field(:status, :string , default: "new")
+    field(:status, :string, default: "new")
     field(:priority, :string)
     belongs_to(:user, Data.Schema.User)
     belongs_to(:location, Data.Schema.Location)
@@ -45,6 +45,4 @@ defmodule Data.Schema.Ticket do
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
   end
-
-
 end

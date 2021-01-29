@@ -1,5 +1,4 @@
 defmodule Data.Query.Appointment do
-
   @moduledoc """
   Module for the Appointment queries
   """
@@ -41,6 +40,7 @@ defmodule Data.Query.Appointment do
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
         repo.insert(changeset)
+
       changeset ->
         {:error, changeset}
     end
@@ -107,7 +107,4 @@ defmodule Data.Query.Appointment do
     )
     |> repo.all()
   end
-
-
-
 end

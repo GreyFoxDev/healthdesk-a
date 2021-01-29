@@ -23,7 +23,8 @@ defmodule Data.Query.ChildCareHour do
   @doc """
   Returns a child care hour by id
   """
-  @spec get_by(location_id :: binary(), day_of_week :: String.t, repo :: Ecto.Repo.t()) :: ChildCareHour.t() | nil
+  @spec get_by(location_id :: binary(), day_of_week :: String.t(), repo :: Ecto.Repo.t()) ::
+          ChildCareHour.t() | nil
   def get_by(location_id, day_of_week, repo \\ Read) do
     from(
       t in ChildCareHour,
@@ -32,7 +33,7 @@ defmodule Data.Query.ChildCareHour do
       where: t.day_of_week == ^day_of_week
     )
     |> repo.all()
-    |> List.last
+    |> List.last()
   end
 
   @doc """

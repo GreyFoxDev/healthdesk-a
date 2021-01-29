@@ -7,7 +7,7 @@ defmodule Data.TicketNote do
 
   defdelegate get(id), to: Query
   defdelegate create(params), to: Query
-  def get_changeset(),
-      do: TicketNote.changeset(%TicketNote{})
 
+  def get_changeset(),
+    do: TicketNote.changeset(%TicketNote{})
 end

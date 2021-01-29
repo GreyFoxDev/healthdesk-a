@@ -4,7 +4,7 @@ defmodule Data.Query.Conversation do
   """
   import Ecto.Query, only: [from: 2]
 
-  alias Data.Schema.{Conversation,ConversationMessage, Member}
+  alias Data.Schema.{Conversation, ConversationMessage, Member}
   alias Data.ReadOnly.Repo, as: Read
   alias Data.WriteOnly.Repo, as: Write
 
@@ -12,8 +12,9 @@ defmodule Data.Query.Conversation do
   Returns a conversation by id
   """
   @spec get(id :: binary(), check :: boolean(), repo :: Ecto.Repo.t()) :: Conversation.t() | nil
-  def get(id, preload_f\\true, repo \\ Read)
-  def get(id, false, repo)  do
+  def get(id, preload_f \\ true, repo \\ Read)
+
+  def get(id, false, repo) do
     from(c in Conversation,
       left_join: member in Member,
       on: c.original_number == member.phone_number,
@@ -23,14 +24,15 @@ defmodule Data.Query.Conversation do
     )
     |> repo.one()
   end
-  def get(id,true, repo) do
+
+  def get(id, true, repo) do
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
       left_join: member in Member,
       on: c.original_number == member.phone_number,
       where: c.id == ^id,
       order_by: [desc: m.sent_at],
-      preload: [:location, conversation_messages: m, team_member: [ :user]],
+      preload: [:location, conversation_messages: m, team_member: [:user]],
       select: %{c | member: member}
     )
     |> repo.one()
@@ -42,24 +44,28 @@ defmodule Data.Query.Conversation do
   @spec update_conversation(repo :: Ecto.Repo.t()) :: [Conversation.t()]
   def update_conversation(repo \\ Read) do
     time = DateTime.add(DateTime.utc_now(), -24 * 3600)
-    query = from(
-              c in Conversation,
-              where: c.appointment == true and c.updated_at > ^time,
-              select: c.appointment
-            )
-            |> repo.update_all(
-                 set: [
-                   appointment: false
-                 ]
-               )
+
+    query =
+      from(
+        c in Conversation,
+        where: c.appointment == true and c.updated_at > ^time,
+        select: c.appointment
+      )
+      |> repo.update_all(
+        set: [
+          appointment: false
+        ]
+      )
   end
 
   @doc """
   Return a list of conversations for a location
   """
-  @spec get_by_status(location_id :: [binary()], status :: [binary()], repo :: Ecto.Repo.t()) :: [Conversation.t()]
+  @spec get_by_status(location_id :: [binary()], status :: [binary()], repo :: Ecto.Repo.t()) :: [
+          Conversation.t()
+        ]
   def get_by_status(location_id, status, repo \\ Read) when is_list(status) do
-    time = DateTime.add(DateTime.utc_now(), -1296000, :seconds)
+    time = DateTime.add(DateTime.utc_now(), -1_296_000, :seconds)
 
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
@@ -67,7 +73,7 @@ defmodule Data.Query.Conversation do
       on: c.original_number == member.phone_number,
       where: c.location_id in ^location_id,
       where: c.status in ^status,
-      where: m.sent_at >=  ^time ,
+      where: m.sent_at >= ^time,
 
       # most recent first
       order_by: [desc: m.sent_at],
@@ -76,7 +82,10 @@ defmodule Data.Query.Conversation do
     )
     |> repo.all()
   end
-  @spec get_by_location_ids(location_id :: [binary()], repo :: Ecto.Repo.t()) :: [Conversation.t()]
+
+  @spec get_by_location_ids(location_id :: [binary()], repo :: Ecto.Repo.t()) :: [
+          Conversation.t()
+        ]
   def get_by_location_ids(location_id, repo \\ Read) do
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
@@ -90,6 +99,7 @@ defmodule Data.Query.Conversation do
     )
     |> repo.all()
   end
+
   @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [Conversation.t()]
   def get_by_location_id(location_id, repo \\ Read) do
     from(c in Conversation,
@@ -126,12 +136,12 @@ defmodule Data.Query.Conversation do
     %Conversation{}
     |> Conversation.changeset(params)
     |> case do
-         %Ecto.Changeset{valid?: true} = changeset ->
-           repo.insert(changeset)
+      %Ecto.Changeset{valid?: true} = changeset ->
+        repo.insert(changeset)
 
-         changeset ->
-           {:error, changeset}
-       end
+      changeset ->
+        {:error, changeset}
+    end
   end
 
   @doc """
@@ -143,11 +153,11 @@ defmodule Data.Query.Conversation do
     original
     |> Conversation.changeset(params)
     |> case do
-         %Ecto.Changeset{valid?: true} = changeset ->
-           repo.update(changeset)
+      %Ecto.Changeset{valid?: true} = changeset ->
+        repo.update(changeset)
 
-         changeset ->
-           {:error, changeset}
-       end
+      changeset ->
+        {:error, changeset}
+    end
   end
 end

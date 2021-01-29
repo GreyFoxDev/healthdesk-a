@@ -5,11 +5,11 @@ defmodule Data.Schema.SavedReply do
   use Data.Schema
 
   @type t :: %__MODULE__{
-               id: binary(),
-               location_id: binary(),
-               title: String.t(),
-               draft: String.t(),
-             }
+          id: binary(),
+          location_id: binary(),
+          title: String.t(),
+          draft: String.t()
+        }
 
   @required_fields ~w|
   location_id

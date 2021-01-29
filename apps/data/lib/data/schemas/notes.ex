@@ -5,10 +5,10 @@ defmodule Data.Schema.Note do
   use Data.Schema
 
   @type t :: %__MODULE__{
-               id: binary(),
-               user_id: binary(),
-               conversation_id: binary() | nil,
-               text: String.t(),
+          id: binary(),
+          user_id: binary(),
+          conversation_id: binary() | nil,
+          text: String.t()
         }
 
   @required_fields ~w|
@@ -17,7 +17,6 @@ defmodule Data.Schema.Note do
   conversation_id
 
   |a
-
 
   @all_fields @required_fields
 
@@ -35,6 +34,4 @@ defmodule Data.Schema.Note do
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
   end
-
-
 end

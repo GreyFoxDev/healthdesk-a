@@ -5,13 +5,13 @@ defmodule Data.Schema.Notification do
   use Data.Schema
 
   @type t :: %__MODULE__{
-               id: binary(),
-               user_id: binary(),
-               conversation_id: binary() | nil,
-               ticket_id: binary() | nil,
-               from: binary() | nil,
-               text: String.t(),
-               read: :boolean | false
+          id: binary(),
+          user_id: binary(),
+          conversation_id: binary() | nil,
+          ticket_id: binary() | nil,
+          from: binary() | nil,
+          text: String.t(),
+          read: :boolean | false
         }
 
   @required_fields ~w|
@@ -33,7 +33,7 @@ defmodule Data.Schema.Notification do
     field(:read, :boolean, default: false)
 
     belongs_to(:user, Data.Schema.User)
-    belongs_to(:sender, Data.Schema.User,[foreign_key: :from])
+    belongs_to(:sender, Data.Schema.User, foreign_key: :from)
     belongs_to(:conversation, Data.Schema.Conversation)
     belongs_to(:ticket, Data.Schema.Ticket)
 
@@ -45,6 +45,4 @@ defmodule Data.Schema.Notification do
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
   end
-
-
 end

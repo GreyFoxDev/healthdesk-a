@@ -7,5 +7,4 @@ defmodule Data.CampaignRecipient do
   defdelegate create(params), to: Query
   defdelegate update(recipient, params), to: Query
   defdelegate get_by_campaign_id(campaign_id), to: Query
-
 end

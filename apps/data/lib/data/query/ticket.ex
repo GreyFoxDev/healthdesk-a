@@ -1,5 +1,4 @@
 defmodule Data.Query.Ticket do
-
   @moduledoc """
   Module for the Ticket queries
   """
@@ -10,7 +9,6 @@ defmodule Data.Query.Ticket do
   alias Data.ReadOnly.Repo, as: Read
   alias Data.WriteOnly.Repo, as: Write
 
-
   @doc """
   Returns a ticket by id
   """
@@ -18,7 +16,7 @@ defmodule Data.Query.Ticket do
   def get(id, repo \\ Read) do
     from(t in Ticket,
       where: t.id == ^id,
-      preload: [:user,:location, team_member: [:user],notes: [:user]]
+      preload: [:user, :location, team_member: [:user], notes: [:user]]
     )
     |> repo.one()
   end
@@ -29,12 +27,12 @@ defmodule Data.Query.Ticket do
   @spec create(params :: map(), repo :: Ecto.Repo.t()) ::
           {:ok, Ticket.t()} | {:error, Ecto.Changeset.t()}
   def create(params, repo \\ Write) do
-
     %Ticket{}
     |> Ticket.changeset(params)
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
         repo.insert(changeset)
+
       changeset ->
         {:error, changeset}
     end
@@ -63,7 +61,7 @@ defmodule Data.Query.Ticket do
       where: t.location_id in ^location_id,
       where: t.status != "archive",
       order_by: [desc: t.updated_at],
-      preload: [:user,:location, team_member: [:user],notes: [:user]],
+      preload: [:user, :location, team_member: [:user], notes: [:user]],
       limit: 100
     )
     |> repo.all()

@@ -1,5 +1,4 @@
 defmodule Data.Query.Notification do
-
   @moduledoc """
   Module for the Notification queries
   """
@@ -23,7 +22,7 @@ defmodule Data.Query.Notification do
     from(n in Notification,
       where: n.user_id == ^user_id,
       order_by: [desc: n.inserted_at],
-      preload: [:user, :sender, :conversation, :ticket],
+      preload: [:user, :sender, :conversation, :ticket]
     )
     |> repo.all()
   end
@@ -39,6 +38,7 @@ defmodule Data.Query.Notification do
     |> case do
       %Ecto.Changeset{valid?: true} = changeset ->
         repo.insert(changeset)
+
       changeset ->
         {:error, changeset}
     end

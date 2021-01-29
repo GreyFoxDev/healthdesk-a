@@ -22,7 +22,9 @@ defmodule Data.Query.CampaignRecipient do
   @doc """
   Return a list of active campaign recipient for a campaign
   """
-  @spec get_by_campaign_id(campaign_id :: binary(), repo :: Ecto.Repo.t()) :: [CampaignRecipient.t()]
+  @spec get_by_campaign_id(campaign_id :: binary(), repo :: Ecto.Repo.t()) :: [
+          CampaignRecipient.t()
+        ]
   def get_by_campaign_id(campaign_id, repo \\ Read) do
     from(t in CampaignRecipient,
       where: t.campaign_id == ^campaign_id
@@ -63,5 +65,4 @@ defmodule Data.Query.CampaignRecipient do
         {:error, changeset}
     end
   end
-
 end

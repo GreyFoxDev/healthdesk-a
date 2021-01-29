@@ -13,19 +13,20 @@ defmodule Data.Notes do
   ]
 
   defdelegate create(params), to: Query
-  defdelegate get_by_conversation( conversation_id), to: Query
+  defdelegate get_by_conversation(conversation_id), to: Query
 
   @doc """
   Get changesets for conversations.
   """
   def get_changeset(),
-      do: Data.Schema.Note.changeset(%Data.Schema.Note{})
+    do: Data.Schema.Note.changeset(%Data.Schema.Note{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
       id
       |> Query.get()
       |> Schema.changeset()
+
     {:ok, changeset}
   end
 

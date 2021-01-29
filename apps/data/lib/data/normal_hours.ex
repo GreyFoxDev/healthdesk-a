@@ -48,6 +48,6 @@ defmodule Data.NormalHours do
   end
 
   def delete(%{"id" => id} = params) do
-     Query.delete(params)
+    Query.delete(params)
   end
 end

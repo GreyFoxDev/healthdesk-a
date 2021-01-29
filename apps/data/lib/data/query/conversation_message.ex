@@ -21,35 +21,35 @@ defmodule Data.Query.ConversationMessage do
     )
     |> repo.one()
   end
+
   @doc """
   Return median response time based on location
   """
   @spec count_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
   def count_by_location_id(location_id, repo \\ Read) do
-
     repo
-    |> SQL.query!("SELECT count_messages_by_location_id('#{location_id}') AS #{:median_response_time}")
+    |> SQL.query!(
+      "SELECT count_messages_by_location_id('#{location_id}') AS #{:median_response_time}"
+    )
     |> build_results()
-
   end
+
   @doc """
   Return median response time based on team
   """
   @spec count_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
   def count_by_team_id(team_id, repo \\ Read) do
-
     repo
     |> SQL.query!("SELECT count_messages_by_team_id('#{team_id}') AS #{:median_response_time}")
     |> build_results()
-
   end
 
   @doc """
   Return a list of conversation messages for a conversation
   """
   @spec get_by_conversation_id(conversation_id :: binary(), repo :: Ecto.Repo.t()) :: [
-                                                                                        ConversationMessage.t()
-                                                                                      ]
+          ConversationMessage.t()
+        ]
   def get_by_conversation_id(conversation_id, repo \\ Read) do
     from(
       c in ConversationMessage,
@@ -70,39 +70,45 @@ defmodule Data.Query.ConversationMessage do
     %ConversationMessage{}
     |> ConversationMessage.changeset(params)
     |> case do
-         %Ecto.Changeset{valid?: true} = changeset ->
-           repo.insert(changeset)
+      %Ecto.Changeset{valid?: true} = changeset ->
+        repo.insert(changeset)
 
-         changeset ->
-           {:error, changeset}
-       end
+      changeset ->
+        {:error, changeset}
+    end
   end
 
   @doc """
   mark a message as read
   """
   @spec get_by_conversation_id(msg :: ConversationMessage.t(), repo :: Ecto.Repo.t()) :: [
-                                                                                           ConversationMessage.t()
-                                                                                         ]
+          ConversationMessage.t()
+        ]
   def mark_read(msg, repo \\ Write)
+
   def mark_read(%{read: false} = msg, repo) do
-    cs = msg
-    |> ConversationMessage.changeset(%{read: true})
+    cs =
+      msg
+      |> ConversationMessage.changeset(%{read: true})
+
     cs
     |> case do
-         %Ecto.Changeset{valid?: true} = changeset ->
-           repo.update(changeset)
-         changeset ->
-           {:error, changeset}
-       end
+      %Ecto.Changeset{valid?: true} = changeset ->
+        repo.update(changeset)
+
+      changeset ->
+        {:error, changeset}
+    end
   end
-  def mark_read(%{read: true} = msg, repo ) do
-    {:ok,msg}
+
+  def mark_read(%{read: true} = msg, repo) do
+    {:ok, msg}
   end
 
   defp build_results(results) do
     cols = Enum.map(results.columns, &String.to_existing_atom/1)
+
     Enum.map(results.rows, fn row -> Map.new(Enum.zip(cols, row)) end)
-    |> List.first
+    |> List.first()
   end
 end

@@ -10,8 +10,7 @@ defmodule Main.Service.Appointment do
   @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
   @role %{role: "admin"}
 
-  def get_next_reply(id,intent,location)do
-
+  def get_next_reply(id, intent, location)do
     location = Data.Location.get_by_phone(location)
 
     convo = C.get(id)
@@ -30,19 +29,19 @@ defmodule Main.Service.Appointment do
     end
 
   end
-  defp get_next_intent(id,step,intent,location,appointment) when appointment == false do
+  defp get_next_intent(id, step, intent, location, appointment) when appointment == false do
     case intent do
-      {check,_} when check in ["bookAppointment","salesQuestion"]  ->
+      {check,_} when check in ["bookAppointment", "salesQuestion"]  ->
         C.appointment_open(id)
         AP.create(%{conversation_id: id})
         get(intent, location.phone_number)
-      {check,_} when check in [ "startOver", "connectAgent"]  ->
+      {check,_} when check in ["startOver", "connectAgent"]  ->
         Intents.get(:unknown, location.phone_number)
       _ ->
         Intents.get(intent, location.phone_number)
     end
   end
-  defp get_next_intent(id,step,intent,location,appointment) do
+  defp get_next_intent(id, step, intent, location, appointment) do
     appointment = AP.get_by_conversation(id) |> List.first
     appointment =
       case appointment  do
@@ -50,50 +49,47 @@ defmodule Main.Service.Appointment do
         appointment ->appointment
       end
     {res, step_next} = case intent do
-      {check,_} when check in ["bookAppointment","salesQuestion"]  ->
+      {check,_} when check in ["bookAppointment", "salesQuestion"]  ->
         C.appointment_open(id)
         {get(intent, location.phone_number),1}
       {check,_} when check in ["startOver"]  ->
         C.appointment_open(id)
         {get({"bookAppointment",[]}, location.phone_number),1}
-      {"connectAgent",_}  ->
+      {"connectAgent", _}  ->
         C.appointment_close(id)
-        {Intents.get(:unknown, location.phone_number),1}
+        {Intents.get(:unknown, location.phone_number), 1}
       {:unknown,[number: [%{"value" => value}]]} ->
-        {res,step}=  get_next_step(appointment,step,value,location)
+        {res, step}=  get_next_step(appointment, step, value, location)
         C.appointment_step(id,step)
         {res,step}
       {:unknown,[datetime: date]} ->
         {:ok, dt} = Timex.parse(date, "{ISO:Extended}")
-        {res,step}=  get_next_step(appointment,step,dt,location)
+        {res,step}=  get_next_step(appointment, step, dt, location)
         C.appointment_step(id,step)
         {res,step}
       {:unknown,[datetime: date, greetings: _ ]} ->
         {:ok, dt} = Timex.parse(date, "{ISO:Extended}")
-        {res,step}=  get_next_step(appointment,step,dt,location)
+        IO.inspect(step)
+        {res,step}=  get_next_step(appointment, step, dt, location)
         C.appointment_step(id,step)
         {res,step}
       {:unknown,[contact: [%{"value" => value}]]} ->
-        {res,step}=  get_next_step(appointment,step,value,location)
-        C.appointment_step(id,step)
-        {res,step}
-      {:unknown,[phone_number: [%{"value" => value}]]} ->
-        {res,step}=  get_next_step(appointment,step,value,location)
+        {res,step}=  get_next_step(appointment, step, value, location)
         C.appointment_step(id,step)
         {res,step}
       {:unknown,[response: [%{"value" => value}]]} ->
         value = String.to_integer value
-        {res,step}=  get_next_step(appointment,step,value,location)
+        {res,step}=  get_next_step(appointment, step, value, location)
         C.appointment_step(id,step)
         {res,step}
       {:unknown,[email: [%{"value" => value}]]} ->
-        {res,step_next}=  get_next_step(appointment,step,value,location)
+        {res,step_next}=  get_next_step(appointment, step, value, location)
         {res,step_next}
       {:unknown,_} ->
-        {res,step}=  get_next_step(appointment,step,:unknown,location)
-        C.appointment_step(id,step)
+        {res,step}=  get_next_step(appointment, step, :unknown, location)
+        C.appointment_step(id, step)
         {res,step}
-      _ -> {Intents.get(intent, location.phone_number),35}
+      _ -> {Intents.get(intent, location.phone_number), 35}
     end
     cond do
       step_next in [13] && step in [1,11,12] ->
@@ -104,23 +100,27 @@ defmodule Main.Service.Appointment do
         C.appointment_close(id)
       step_next in [19] && step in [4,17,18] ->
         C.appointment_close(id)
-      step_next in [23] && step in [5,21,22] ->
+      step_next in [21] && step in [5,19,20] ->
         C.appointment_close(id)
-      step_next in [21] && step in [6,19,20] ->
+      step_next in [23] && step in [6,21,22] ->
+        C.appointment_close(id)
+      step_next in [7] && step in [7,23,24] ->
         C.appointment_close(id)
       step_next in [8] ->
+        C.appointment_close(id)
+      step_next in [25] ->
         C.appointment_close(id)
       step_next in [35] ->
         C.appointment_close(id)
       true ->
-        C.appointment_step(id,step_next)
+        C.appointment_step(id, step_next)
     end
     res
 
   end
 
 
-  defp get_next_step(appointment,step,value,location) when value in [1,2] and step in [1,11,12] do
+  defp get_next_step(appointment, step, value, location) when value in [1,2] and step in [1,11,12] do
     AP.update(%{"id" => appointment.id,"type" => type(value)})
     dates = get_dates()
     res =  """
@@ -133,9 +133,9 @@ defmodule Main.Service.Appointment do
     5. #{dates.e}
     6. Show full calendar
     """
-    {res,2}
+    {res, 2}
   end
-  defp get_next_step(appointment,step,value,location) when value in [1,2,3,4,5] and step in [2,13,14] do
+  defp get_next_step(appointment, step, value, location) when value in [1,2,3,4,5] and step in [2,13,14] do
     date = get_dates(value)
 
     AP.update(%{"id" => appointment.id,"date" => date})
@@ -152,9 +152,9 @@ defmodule Main.Service.Appointment do
       7. Pick different day
       8. Show full calendar
       """
-    {res,3}
+    {res, 3}
   end
-  defp get_next_step(appointment,step, %DateTime{} = dt,location) when step in [2,13,14] do
+  defp get_next_step(appointment, step, %DateTime{} = dt, location) when step in [2,13,14] do
     AP.update(%{"id" => appointment.id,"date" => format_date(dt)})
     res =
       """
@@ -169,28 +169,28 @@ defmodule Main.Service.Appointment do
       7. Pick different day
       8. Show full calendar
       """
-    {res,3}
+    {res, 3}
   end
-  defp get_next_step(appointment,step,value,location) when value in [6] and step in [2,13,14] do
+  defp get_next_step(appointment, step, value, location) when value in [6] and step in [2,13,14] do
     {get_calendar(location),3}
   end
-  defp get_next_step(appointment,step,value,location) when value in [1,2,3,4,5,6] and step in [3,15,16] do
-    AP.update(%{"id" => appointment.id,"time" => get_time(value)})
+  defp get_next_step(appointment, step, value, location) when value in [1,2,3,4,5,6] and step in [3,15,16] do
+    AP.update(%{"id" => appointment.id, "time" => get_time(value)})
     res =
       """
       Great, I'll just need a few more pieces of information. What's your full name?
       """
-    {res,4}
+    {res, 4}
   end
-  defp get_next_step(appointment,step,%DateTime{} = dt,location) when step in [3,15,16] do
-    AP.update(%{"id" => appointment.id,"time" => format_time(dt)})
+  defp get_next_step(appointment, step, %DateTime{} = dt, location) when step in [3,15,16] do
+    AP.update(%{"id" => appointment.id, "time" => format_time(dt)})
     res =
       """
       Great, I'll just need a few more pieces of information. What's your full name?
       """
-    {res,4}
+    {res, 4}
   end
-  defp get_next_step(appointment,step,value,location) when value in [7] and step in [3,15,16] do
+  defp get_next_step(appointment, step, value, location) when value in [7] and step in [3,15,16] do
     dates = get_dates()
     res =  """
     What day works for you? You can also ask for a specific day if you don't see a date that works:
@@ -202,12 +202,12 @@ defmodule Main.Service.Appointment do
     5. #{dates.e}
     6. Show full calendar
     """
-    {res,2}
+    {res, 2}
   end
   defp get_next_step(appointment, step, value, location) when value in [8] and step in [3,15,16] do
-    {get_calendar(location),4}
+    {get_calendar(location), 4}
   end
-  defp get_next_step(appointment,step,value,location) when is_binary(value) and step in [4,17,18] do
+  defp get_next_step(appointment, step, value, location) when is_binary(value) and step in [4,17,18] do
     {:ok, member} = MB.upsert(params = %{
       first_name: value,
       team_id: location.team_id,
@@ -219,15 +219,15 @@ defmodule Main.Service.Appointment do
     res = """
     Thanks #{name}. Can I please get your 10-digit phone number?
     """
-    {res,5}
+    {res, 5}
   end
-  defp get_next_step(appointment, step,value, location) when is_binary(value) and step in [5,21,22] do
+  defp get_next_step(appointment, step, value, location) when is_binary(value) and step in [5,21,22] do
     AP.update(%{"id" => appointment.id,"phone" => value})
 
     res = """
     Where do you want me to email the calendar invite?
     """
-    {res,6}
+    {res, 6}
   end
   defp get_next_step(appointment, step, value, location) when is_binary(value) and step in [6,19,20] do
     {:ok, appointment} = AP.update(%{"id" => appointment.id,"email" => value})
@@ -243,7 +243,7 @@ defmodule Main.Service.Appointment do
         {:error, "error"}
     end
 
-    name = appointment.name |> String.split |> Enum.map(&String.capitalize/1)|>Enum.join(" ")
+    name = appointment.name |> String.split |> Enum.map(&String.capitalize/1) |>Enum.join(" ")
 
     res = """
     Before I schedule your free Fitness Assessment, does everything look right?
@@ -259,16 +259,15 @@ defmodule Main.Service.Appointment do
     #{appointment.date} @ #{appointment.time}
     #{location.address_1} #{location.city} #{location.state} #{location.postal_code}
     """
-    {res,7}
+    {res, 7}
   end
-  defp get_next_step(appointment,step,value,location) when value in [1] and step in [7] do
-
+  defp get_next_step(appointment, step, value, location) when value in [1] and step in [7] do
     url = if location.google_token do
-      event(appointment,location)
+      event(appointment, location)
     else
       ""
     end
-    AP.update(%{"id" => appointment.id,"confirmed" => true, "link" => url})
+    AP.update(%{"id" => appointment.id, "confirmed" => true, "link" => url})
 
     res = """
     You're all set. Please check your email for the calendar invite. We'll call you then!
@@ -278,9 +277,9 @@ defmodule Main.Service.Appointment do
     To make the most of our appointment, please fill out this form prior to your visit: https://forms.gle/MiJxNwmZb5hcHiwW7
 
     """
-    {res,step+1}
+    {res, step+1}
   end
-  defp get_next_step(appointment,step,value,location) when value in [2] and step in [7] do
+  defp get_next_step(appointment, step, value, location) when value in [2] and step in [7] do
     res = """
     Could you please rephrase that? (I'm a bot) Would you like to book?
 
@@ -289,43 +288,44 @@ defmodule Main.Service.Appointment do
 
     (If you need help, you can always say 'agent' to chat with a person. You can also text 'start over' anytime.)
     """
-    {res,step}
+    {res, step}
   end
-  defp get_next_step(appointment,step,_,location) when step in [1,2,3,11,12,13,14,15,16] do
+  defp get_next_step(appointment, step, _, location) when step in [1,2,3,11,12,13,14,15,16] do
     res= case step do
       1 -> 11
       2 -> 13
       3 -> 15
       s -> s+1
     end
-    {fallback_intent(res,location),res}
+    {fallback_intent(res, location),res}
   end
-  defp get_next_step(appointment,step,_,location) when step in [4,5,6,17,18,19,20,21,22] do
+  defp get_next_step(appointment, step, _, location) when step in [4,5,6,7,17,18,19,20,21,22,23,24] do
     res= case step do
-      1 -> 11
-      2 -> 13
-      3 -> 15
+      4 -> 17
+      5 -> 19
+      6 -> 21
+      7 -> 23
       s -> s+1
     end
-    {fallback_intent(res,location),res}
+    {fallback_intent(res, location),res}
   end
-  defp get_next_step(appointment,step,value,location) when value in [:unknown] and step in [17,18] do
+  defp get_next_step(appointment, step, value, location) when value in [:unknown] and step in [17,18] do
     res = """
     Please enter a valid name.
     """
-    {res,step+1}
+    {res, step+1}
   end
-  defp get_next_step(appointment,step,value,location) when value in [:unknown] and step in [19,20] do
-    res = """
-    Please enter a valid email address.
-    """
-    {res,step+1}
-  end
-  defp get_next_step(appointment,step,value,location) when value in [:unknown] and step in [21,22] do
+  defp get_next_step(appointment, step, value, location) when value in [:unknown] and step in [19,20] do
     res = """
     Please enter a valid 10-digit phone number. No spaces, dashes, or special characters.
     """
-    {res,step+1}
+    {res, step+1}
+  end
+  defp get_next_step(appointment, step, value, location) when value in [:unknown] and step in [21,22] do
+    res = """
+    Please enter a valid email address.
+    """
+    {res, step+1}
   end
   defp get_dates() do
     today = Timex.today
@@ -344,12 +344,12 @@ defmodule Main.Service.Appointment do
   defp get_time(num) do
     today = Timex.today |> Timex.to_datetime
     val = case num do
-      1 -> Timex.set today, [hour: 10]
-      2 -> Timex.set today, [hour: 12]
-      3 -> Timex.set today, [hour: 14]
-      4 -> Timex.set today, [hour: 15]
-      5 -> Timex.set today, [hour: 16]
-      6 -> Timex.set today, [hour: 17]
+      1 -> Timex.set today, [hour: 11]
+      2 -> Timex.set today, [hour: 12, minute: 30]
+      3 -> Timex.set today, [hour: 13]
+      4 -> Timex.set today, [hour: 14]
+      5 -> Timex.set today, [hour: 15, minute: 30]
+      6 -> Timex.set today, [hour: 18]
     end
 
     format_time(val)
@@ -435,7 +435,7 @@ defmodule Main.Service.Appointment do
     dts = %GoogleApi.Calendar.V3.Model.EventDateTime{dateTime: dt}
     dte = %GoogleApi.Calendar.V3.Model.EventDateTime{dateTime: Timex.shift(dt,minutes: 30)}
     name = appointment.name |> String.split |> Enum.map(&String.capitalize/1)|>Enum.join(" ")
-address = "#{location.address_1} #{location.city} #{location.state} #{location.postal_code}"
+    address = "#{location.address_1} #{location.city} #{location.state} #{location.postal_code}"
     description = """
     #{appointment.type} with #{name}
     #{appointment.phone}

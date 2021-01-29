@@ -11,7 +11,7 @@ defmodule Data.Ticket do
   defdelegate active_tickets(), to: Query
   defdelegate get_by_location_ids(location_id), to: Query
   defdelegate delete(ticket), to: Query
-  def get_changeset(),
-      do: Ticket.changeset(%Ticket{})
 
+  def get_changeset(),
+    do: Ticket.changeset(%Ticket{})
 end

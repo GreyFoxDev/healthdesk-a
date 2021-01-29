@@ -37,6 +37,7 @@ defmodule Data.Schema.HolidayHour do
     field(:deleted_at, :utc_datetime)
 
     belongs_to(:location, Data.Schema.Location)
+
     embeds_many :times, Times, on_replace: :delete do
       field(:open_at, :string)
       field(:close_at, :string)
