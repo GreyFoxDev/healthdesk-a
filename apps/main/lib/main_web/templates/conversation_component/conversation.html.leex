@@ -1,0 +1,54 @@
+<div class="board p-0 perfect-scrollbar ps ps--active-y">
+    <!-- .list-group -->
+    <header class="page-navs bg-white shadow-sm d-flex justify-content-between px-2">
+        <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..." , value: assigns[:search_string] %>
+    </header>
+    <div class="list-group list-group-flush list-group-divider border-top" data-toggle="radiolist">
+        <!-- .list-group-item -->
+        <%= for c <- @conversations do %>
+        <div class="list-group-item <%=  if c.id == @open_conversation.id,do: "active",else: ""  %>"  phx-click="openconvo" phx-value-cid="<%= c.id %>">
+            <div class="list-group-item-figure">
+                <%=  if c.channel_type == "WEB" do  %>
+                <a href="#" class="tile tile-circle bg-pink"><i class="fab fa-chrome"></i></a>
+                <% end %>
+                <%=  if c.channel_type == "FACEBOOK" do  %>
+                <a href="#" class="tile tile-circle bg-blue"><i class="fab fa-facebook-f"></i></a>
+                <% end %>
+                <%=  if c.channel_type == "SMS" do  %>
+                <a href="#" class="tile tile-circle bg-purple"><i class="fas fa-sms"></i></a>
+                <% end %>
+                <%=  if c.channel_type == "APP" do  %>
+                <a href="#" class="tile tile-circle bg-yellow"><i class="fas fa-mobile"></i></a>
+                <% end %>
+                <%=  if c.channel_type == "MAIL" do  %>
+                <a href="#" class="tile tile-circle bg-yellow"><i class="fas fa-envelope"></i></a>
+                <% end %>
+            </div>
+            <div class="list-group-item-body">
+                <h4 class="list-group-item-title font-weight-bold">
+                    <a href="#">
+                        <%= if c.member && c.member.first_name do %>
+                        <%= Enum.join([c.member.first_name, c.member.last_name], " ") %>
+                                <% else %>
+                        <%= format_phone(c.original_number) %>
+                                <% end %>
+                    </a>
+                </h4>
+                <p class="list-group-item-text"> <%= c.location.location_name %> </p>
+            </div>
+            <%= if !c.team_member || c.status == "closed" do %>
+            <div class="list-group-item-figure">
+                <button class="btn btn-sm btn-icon text-white bg-success" phx-click="assign" phx-value-cid="<%= c.id %>"><i class="fas fa-check"></i></button>
+            </div>
+            <% end %>
+        </div>
+        <% end %>
+
+    </div><!-- /.list-group -->
+    <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+        <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+    </div>
+    <div class="ps__rail-y" style="top: 0px; height: 454px; right: 0px;">
+        <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 194px;"></div>
+    </div>
+</div>

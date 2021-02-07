@@ -1,0 +1,199 @@
+<div class="sidebar-section-fill">
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <!-- #team-profile -->
+        <div id="team-profile" class="tab-pane fade <%= if @tab1 == "details", do: " active show",else: ""  %>" role="tabpanel"
+             aria-labelledby="team-profile">
+            <!-- .card -->
+            <div class="">
+                <!-- .card-body -->
+                <div class="card-body text-center">
+                    <!-- team avatar -->
+                    <a href="#" class="user-avatar user-avatar-xl my-3"><img
+                            src="/images/unknown-profile.jpg"></a>
+                    <!-- /team avatar -->
+                    <h3 class="card-title text-truncate">
+                        <%= if @open_conversation.member && @open_conversation.member.first_name, do: @open_conversation.member.first_name<>" "<>(@open_conversation.member.last_name||""), else: "N/A" %>
+                    </h3>
+                    <h6 class="card-subtitle text-muted mb-3"> <%= @open_conversation.location.location_name %>
+                        || <%= if @open_conversation.member, do: format_date(@open_conversation.member.inserted_at), else: "" %></h6>
+                    <!-- grid row -->
+                </div><!-- /.card-body -->
+                <!--  <div class="card-footer">
+                      <div class="card-footer-item">
+                          Delinquent
+                          <div class="text-muted small"> Status</div>
+                      </div>
+                      <div class="card-footer-item">
+                          Basic - Single
+                          <div class="text-muted small"> Plan</div>
+                      </div>
+                  </div>
+
+
+                <div class="card-footer">
+                    <div class="card-footer-item card-footer-item-bordered">
+                        <div class="metric">
+                            <p class="metric-label mb-1"> Payment Due Date </p>
+                            <p class="metric-value"><strong> Apr 20, 2020 </strong></p>
+                        </div>
+                    </div>
+                    <div class="card-footer-item card-footer-item-bordered">
+                        <div class="metric">
+                            <p class="metric-label mb-1"> Amount Due </p>
+                            <p class="metric-value"><strong> $57.64 </strong></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-footer-item card-footer-item-bordered">
+                        <div class="metric">
+                            <p class="metric-label mb-1"> Last Check-In </p>
+                            <p class="metric-value"><strong> Jan 20, 2020 </strong></p>
+                        </div>
+                    </div>
+                    <div class="card-footer-item card-footer-item-bordered">
+                        <div class="metric">
+                            <p class="metric-label mb-1"> Check-In Streak </p>
+                            <p class="metric-value"><strong> 7 </strong></p>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="card-footer p-3">
+                    <!-- .
+                    <form id="member-form" method="PUT" style="width:100%;"> -->
+                    <%= f = form_for :foo, "#", [ phx_submit: :save_member, id: "member-form", style: "width: 100%"] %>
+                    <%= if @open_conversation.member do %>
+                    <input name="member[id]" type="hidden" value="<%= @open_conversation.member.id %>">
+                    <% end %>
+                    <input name="member[team_id]" type="hidden"
+                           value="<%= @open_conversation.location.team_id %>">
+                    <fieldset>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input name="member[email]" type="text" class="form-control"
+                                           value="<%= if @open_conversation.member, do: @open_conversation.member.email, else: "N/A" %>">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="fl1">First Name</label>
+                                    <input name="member[first_name]" type="text"
+                                           class="form-control"
+                                           value="<%= if @open_conversation.member, do: @open_conversation.member.first_name, else: "N/A" %>">
+                                </div>
+                            </div></div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="fl1">Last Name</label>
+                                    <input name="member[last_name]" type="text" class="form-control"
+                                           value="<%= if @open_conversation.member, do: @open_conversation.member.last_name||"", else: "N/A" %>">
+                                </div>
+                            </div>
+
+                        </div><!-- /.form-group -->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="fl1">Phone Number</label>
+                                    <input  type="text"
+                                            class="form-control" readonly
+                                            value="<%= if @open_conversation.member, do: @open_conversation.member.phone_number, else: "N/A" %>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="fl1">Location</label>
+                                    <input type="text" class="form-control" disabled
+                                           value="<%= @open_conversation.location.location_name %>"
+                                           readonly>
+                                </div>
+                            </div>
+                        </div><!-- /.form-group -->
+                        <div class="form-group">
+                            <!-- .control-label -->
+                            <label class="control-label" for="select2-tagging">Status</label>
+                            <!-- you can put options directly in data attribute -->
+                            <select id="member-status" name="member[status]" class="form-control">
+                                <%= for {key, value} <- member_status() do %>
+                                <%= if @open_conversation.member && @open_conversation.member.status == value do %>
+                                <option value="<%= value %>" selected><%= key %></option>
+                                <% else %>
+                                <option value="<%= value %>"><%= key %></option>
+                                <% end %>
+                                                    <% end %>
+                            </select>
+                        </div>
+
+
+                    </fieldset>
+                    <button type="submit" class=" updatememeber btn btn-primary btn-lg btn-block" onclick="this.blur();">Update</button>
+
+                    </form>
+
+                    <!-- .fieldset -->
+                    <!-- /.form-group -->
+                    <!-- .form-group -->
+
+                </div><!-- /.card-footer -->
+
+            </div><!-- /.card -->
+            <!-- .list-group -->
+
+        </div><!-- /#team-profile -->
+        <!-- #message-files -->
+        <div id="message-files" class="tab-pane fade <%= if @tab1 == "notes", do: " active show",else: ""  %>" role="tabpanel" aria-labelledby="message-files">
+            <div class="card-body border-top" style="overflow-y:scroll;z-index: 2;max-height: 65vh;">
+                <ul class="timeline timeline-fluid p-0">
+                    <%= for n <- @notes do %>
+                    <!-- .timeline-item -->
+                    <li class="timeline-item py-2">
+
+                        <!-- .timeline-body -->
+                        <div class="timeline-body m-0">
+                            <!-- .media -->
+                            <div class="media">
+                                <!-- .media-body -->
+                                <div class="media-body">
+                                    <p class="mb-0">
+                                        <%= n.user.first_name %> <%= n.user.last_name %>
+                                        : <%= text_to_html(n.text,[escape: false]) |> safe_to_string |> raw %>
+                                    </p><span
+                                        class="timeline-date"><%= format_date(n.inserted_at) %></span>
+                                </div><!-- /.media-body -->
+                            </div><!-- /.media -->
+                        </div><!-- /.timeline-body -->
+                    </li><!-- /.timeline-item -->
+                    <% end %>
+
+                </ul><!-- /.timeline -->
+            </div>
+            <div class="card-footer p-3 bg-white"
+                 style="position: absolute;width:100%;bottom:0;z-index:10000;">
+                <!-- .form -->
+                <%= f = form_for :foo, "#", [ phx_submit: :new_note, style: "width:100%;"] %>
+                <!-- .fieldset -->
+                <fieldset>
+                    <div class="form-group">
+                        <label for="tf6">Private Note</label>
+                        <%= textarea f, :text, prompt: "Enter Notes", id: "tag_user_"<>@open_conversation.id, rows: "3", class: "form-control"  %>
+                    </div>
+
+                </fieldset><!-- /.fieldset -->
+                <button type="submit" class="btn btn-primary btn-lg btn-block" type="submit">Add
+                </button>
+                </form><!-- /.form -->
+
+            </div><!-- /.card-footer -->
+        </div><!-- /#message-files -->
+    </div><!-- /Tab panes -->
+</div>

@@ -13,6 +13,10 @@ defmodule MainWeb.Live.NotificationsView do
   def mount(_params, session, socket) do
     Main.LiveUpdates.subscribe_live_view(session["current_user"].id)
     notifications = Notifications.get_by_user(session["current_user"].id)
+    IO.inspect("USER ID----")
+    IO.inspect(session["current_user"].id)
+    IO.inspect("notifications----")
+    IO.inspect(notifications)
     socket = socket
              |> assign(:session, session)
              |> assign(:current_user, session["current_user"])
