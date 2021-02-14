@@ -1040,7 +1040,7 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
 
   end
-  def handle_event("filter_convo", query, socket) do
+  def handle_event("filter_convo",query, socket) do
     search_string = query["value"]
     conversations = socket.assigns[:o_conversations] || socket.assigns.conversations
     socket =  socket

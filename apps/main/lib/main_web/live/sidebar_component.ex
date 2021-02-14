@@ -12,6 +12,8 @@ defmodule MainWeb.Live.SidebarComponent do
              |> assign(:open_conversation, assigns.open_conversation)
              |> assign(:tab1, assigns.tab1)
              |> assign(:notes, assigns.notes)
+             |> assign(:team_members, assigns.team_members)
+             |> assign(:saved_replies, assigns.saved_replies)
 
     {:ok, socket}
   end

@@ -33,7 +33,7 @@
                     <!-- message header -->
                     <!-- message body -->
                     <!-- message publisher -->
-                        <%= live_component @socket, MainWeb.Live.MessageComponent, typing: assigns[:typing], online: assigns[:online], open_conversation: @open_conversation, user: @user, team_members: @team_members, mchangeset: @mchangeset, team_members_all: @team_members_all, dispositions: @dispositions, id: "message_body" %>
+                        <%= live_component @socket, MainWeb.Live.MessageComponent, typing: assigns[:typing], online: assigns[:online], open_conversation: @open_conversation, user: @user, team_members: @team_members, mchangeset: @mchangeset, team_members_all: @team_members_all, dispositions: @dispositions, notes: @notes, saved_replies: @saved_replies, id: "message_body" %>
                     <!-- /message header -->
                     <!-- /message body -->
                     <!-- /message publisher -->
@@ -62,7 +62,7 @@
                     </li>
                 </ul><!-- /.nav-tabs -->
                 <!-- .sidebar-section-fill -->
-                 <%= live_component @socket, MainWeb.Live.SidebarComponent, open_conversation: @open_conversation, tab1: @tab1, notes: @notes, id: "message_sidebar" %>
+                 <%= live_component @socket, MainWeb.Live.SidebarComponent, open_conversation: @open_conversation, tab1: @tab1, team_members: @team_members, saved_replies: @saved_replies, notes: @notes, id: "message_sidebar" %>
             </div>
 
 
@@ -77,19 +77,6 @@
     </div>
     <% end%>
 
-</div>
-
-<div style="display: none" id="availableTags">
-
-    <%= for saved_reply <- @saved_replies do %>
-    <p><span><%= saved_reply.draft %></span><span><%= saved_reply.title %></span></p>
-    <% end %>
-</div>
-<div style="display: none" id="availableMembers">
-
-    <%= for x <- @team_members do %>
-    <p><span><%= x.id %></span><span><%= x.user.first_name <> " " <> x.user.last_name %></span></p>
-    <% end %>
 </div>
 <div class="modal fade" id="newTicket" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
      aria-hidden="true">

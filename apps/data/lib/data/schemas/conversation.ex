@@ -48,7 +48,7 @@ defmodule Data.Schema.Conversation do
 
     has_many(:conversation_messages, Data.Schema.ConversationMessage)
 
-    timestamps(type: :naive_datetime_usec)
+    timestamps([type: :naive_datetime_usec])
   end
 
   def changeset(model, params \\ %{}) do

@@ -258,13 +258,12 @@
 <div class="message-publisher">
     <%= if @open_conversation.status != "closed" do %>
     <!-- form -->
-    <%= f = form_for @mchangeset, "#", [ phx_submit: :save] %>
+    <%= f = form_for @mchangeset, "#", [ phx_submit: :save ] %>
     <!-- .media -->
     <div class="media mb-1">
-
         <div class="media-body">
             <%= text_input f, :message,
-                                     id: "messagetext_"<>@open_conversation.id,
+                                     id: "taguser_"<>@open_conversation.id,
                                      class: "form-control border-0 shadow-none",
                                      place_holder: "Type a message",
                                      phx_focus: :focused,
@@ -275,14 +274,23 @@
 
         </div>
         <div class="d-flex align-items-center">
-
-
-
-            <button type="submit" class="btn btn-light btn-icon"><i
-                    class="far fa-paper-plane"></i></button>
+            <button type="submit" class="btn btn-light btn-icon">
+                <i class="far fa-paper-plane"></i>
+            </button>
         </div>
     </div><!-- /.media -->
     </form><!-- /form -->
-    <%  end %>
+    <% end %>
+</div>
+<div style="display: none" id="availableTags">
 
+    <%= for saved_reply <- @saved_replies do %>
+    <p><span><%= saved_reply.draft %></span><span><%= saved_reply.title %></span></p>
+    <% end %>
+</div>
+<div style="display: none" id="availableMembers">
+
+    <%= for x <- @team_members do %>
+    <p><span><%= x.id %></span><span><%= x.user.first_name <> " " <> x.user.last_name %></span></p>
+    <% end %>
 </div>

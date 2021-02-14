@@ -77,6 +77,10 @@ defmodule Main.Service.Appointment do
         {res,step}=  get_next_step(appointment, step, value, location)
         C.appointment_step(id,step)
         {res,step}
+      {:unknown,[phone_number: [%{"value" => value}]]} ->
+        {res,step}=  get_next_step(appointment, step, value, location)
+        C.appointment_step(id,step)
+        {res,step}
       {:unknown,[response: [%{"value" => value}]]} ->
         value = String.to_integer value
         {res,step}=  get_next_step(appointment, step, value, location)
@@ -85,30 +89,28 @@ defmodule Main.Service.Appointment do
       {:unknown,[email: [%{"value" => value}]]} ->
         {res,step_next}=  get_next_step(appointment, step, value, location)
         {res,step_next}
-      {:unknown,_} ->
+      {:unknown, _} ->
         {res,step}=  get_next_step(appointment, step, :unknown, location)
         C.appointment_step(id, step)
         {res,step}
       _ -> {Intents.get(intent, location.phone_number), 35}
     end
     cond do
-      step_next in [13] && step in [1,11,12] ->
+      step_next in [12] && step in [1,11,12] ->
         C.appointment_close(id)
-      step_next in [15] && step in [2,13,14] ->
+      step_next in [14] && step in [2,13,14] ->
         C.appointment_close(id)
-      step_next in [17] && step in [3,15,16] ->
+      step_next in [16] && step in [3,15,16] ->
         C.appointment_close(id)
-      step_next in [19] && step in [4,17,18] ->
+      step_next in [18] && step in [4,17,18] ->
         C.appointment_close(id)
-      step_next in [21] && step in [5,19,20] ->
+      step_next in [20] && step in [5,19,20] ->
         C.appointment_close(id)
-      step_next in [23] && step in [6,21,22] ->
+      step_next in [22] && step in [6,21,22] ->
         C.appointment_close(id)
-      step_next in [7] && step in [7,23,24] ->
+      step_next in [24] && step in [7,23,24] ->
         C.appointment_close(id)
-      step_next in [8] ->
-        C.appointment_close(id)
-      step_next in [25] ->
+      step_next in [25] && step in [8,25] ->
         C.appointment_close(id)
       step_next in [35] ->
         C.appointment_close(id)
@@ -221,7 +223,7 @@ defmodule Main.Service.Appointment do
     """
     {res, 5}
   end
-  defp get_next_step(appointment, step, value, location) when is_binary(value) and step in [5,21,22] do
+  defp get_next_step(appointment, step, value, location) when is_binary(value) and step in [5,19,20] do
     AP.update(%{"id" => appointment.id,"phone" => value})
 
     res = """
@@ -229,7 +231,7 @@ defmodule Main.Service.Appointment do
     """
     {res, 6}
   end
-  defp get_next_step(appointment, step, value, location) when is_binary(value) and step in [6,19,20] do
+  defp get_next_step(appointment, step, value, location) when is_binary(value) and step in [6,21,22] do
     {:ok, appointment} = AP.update(%{"id" => appointment.id,"email" => value})
     case MB.get(@role, appointment.member_id) do
       member ->
@@ -290,6 +292,27 @@ defmodule Main.Service.Appointment do
     """
     {res, step}
   end
+  defp get_next_step(appointment, step, value, location) when value in [:unknown] and step in [4,17,18] do
+    res = case step do
+      4 -> 17
+      s -> s+1
+    end
+    {fallback_intent(res, location),res}
+  end
+  defp get_next_step(appointment, step, value, location) when value in [:unknown] and step in [5,19,20] do
+    res = case step do
+      5 -> 19
+      s -> s+1
+    end
+    {fallback_intent(res, location),res}
+  end
+  defp get_next_step(appointment, step, value, location) when value in [:unknown] and step in [6,21,22] do
+    res = case step do
+      6 -> 21
+      s -> s+1
+    end
+    {fallback_intent(res, location),res}
+  end
   defp get_next_step(appointment, step, _, location) when step in [1,2,3,11,12,13,14,15,16] do
     res= case step do
       1 -> 11
@@ -308,24 +331,6 @@ defmodule Main.Service.Appointment do
       s -> s+1
     end
     {fallback_intent(res, location),res}
-  end
-  defp get_next_step(appointment, step, value, location) when value in [:unknown] and step in [17,18] do
-    res = """
-    Please enter a valid name.
-    """
-    {res, step+1}
-  end
-  defp get_next_step(appointment, step, value, location) when value in [:unknown] and step in [19,20] do
-    res = """
-    Please enter a valid 10-digit phone number. No spaces, dashes, or special characters.
-    """
-    {res, step+1}
-  end
-  defp get_next_step(appointment, step, value, location) when value in [:unknown] and step in [21,22] do
-    res = """
-    Please enter a valid email address.
-    """
-    {res, step+1}
   end
   defp get_dates() do
     today = Timex.today
@@ -363,18 +368,33 @@ defmodule Main.Service.Appointment do
     {:ok,val}=Timex.format(date, "{h12}:{m} {am}")
     val
   end
-  defp fallback_intent(s,_) when s in [11,13,15] do
+  defp fallback_intent(s,_) when s in [11,13,15,23] do
     """
     Not sure I understood that (I'm a bot). Which option did you mean?
 
     (If you need help, you can always say 'agent' to chat with a person. You can also text 'start over' anytime.)
     """
   end
-  defp fallback_intent(s,_) when s in [12,14,16]do
+  defp fallback_intent(s,_) when s in [12,14,16,24]do
     """
     Sorry, I'm not understanding. Which option did you mean? Please send the corresponding number.
 
     (If you need help, you can always say 'agent' to chat with a person. You can also text 'start over' anytime.)
+    """
+  end
+  defp fallback_intent(s,_) when s in [17,18]do
+    """
+    Please enter a valid name.
+    """
+  end
+  defp fallback_intent(s,_) when s in [19,20]do
+    """
+    Please enter a valid 10-digit phone number. No spaces, dashes, or special characters.
+    """
+  end
+  defp fallback_intent(s,_) when s in [21,22]do
+    """
+    Please enter a valid email address.
     """
   end
   defp fallback_intent(_,location)do

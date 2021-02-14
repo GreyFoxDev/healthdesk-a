@@ -185,7 +185,12 @@
                 <fieldset>
                     <div class="form-group">
                         <label for="tf6">Private Note</label>
-                        <%= textarea f, :text, prompt: "Enter Notes", id: "tag_user_"<>@open_conversation.id, rows: "3", class: "form-control"  %>
+                        <%= textarea f,
+                        :text,
+                        prompt: "Enter Notes",
+                        id: "tag_user_"<>@open_conversation.id,
+                        rows: "3",
+                        class: "form-control" %>
                     </div>
 
                 </fieldset><!-- /.fieldset -->
@@ -196,4 +201,16 @@
             </div><!-- /.card-footer -->
         </div><!-- /#message-files -->
     </div><!-- /Tab panes -->
+</div>
+<div style="display: none" id="availableTags">
+
+    <%= for saved_reply <- @saved_replies do %>
+    <p><span><%= saved_reply.draft %></span><span><%= saved_reply.title %></span></p>
+    <% end %>
+</div>
+<div style="display: none" id="availableMembers">
+
+    <%= for x <- @team_members do %>
+    <p><span><%= x.id %></span><span><%= x.user.first_name <> " " <> x.user.last_name %></span></p>
+    <% end %>
 </div>

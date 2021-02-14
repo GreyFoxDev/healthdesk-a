@@ -33,7 +33,7 @@ defmodule Data.Schema.Notification do
     field(:read, :boolean, default: false)
 
     belongs_to(:user, Data.Schema.User)
-    belongs_to(:sender, Data.Schema.User, foreign_key: :from)
+    belongs_to(:sender, Data.Schema.User,[foreign_key: :from])
     belongs_to(:conversation, Data.Schema.Conversation)
     belongs_to(:ticket, Data.Schema.Ticket)
 

@@ -292,14 +292,14 @@ defmodule MainWeb.TsiController do
     end
   end
 
-  defp ask_wit_ai(question,convo_id, location) do
+  defp ask_wit_ai(question, convo_id, location) do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
       receive do
         {:response, response} ->
 
-          message =  Appointment.get_next_reply(convo_id,response, location.phone_number)
-          if message == location.default_message do
-            {:unknown, location.default_message}
+          message =  Appointment.get_next_reply(convo_id, response, location.phone_number)
+          if String.contains?(message,location.default_message) do
+            {:unknown, message}
           else
             {:ok, message}
           end
@@ -308,6 +308,7 @@ defmodule MainWeb.TsiController do
       end
     else
       {:error, error} ->
+
         {:unknown, location.default_message}
     end
   end
