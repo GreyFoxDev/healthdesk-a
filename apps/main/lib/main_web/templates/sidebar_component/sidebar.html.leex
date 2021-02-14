@@ -75,7 +75,7 @@
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input name="member[email]" type="text" class="form-control"
-                                           value="<%= if @open_conversation.member, do: @open_conversation.member.email, else: "N/A" %>">
+                                           value="<%= if @open_conversation.member, do: @open_conversation.member.email, else: "" %>">
                                 </div>
                             </div>
 
@@ -86,7 +86,7 @@
                                     <label for="fl1">First Name</label>
                                     <input name="member[first_name]" type="text"
                                            class="form-control"
-                                           value="<%= if @open_conversation.member, do: @open_conversation.member.first_name, else: "N/A" %>">
+                                           value="<%= if @open_conversation.member, do: @open_conversation.member.first_name, else: "" %>">
                                 </div>
                             </div></div>
                         <div class="row">
@@ -94,7 +94,7 @@
                                 <div class="form-group">
                                     <label for="fl1">Last Name</label>
                                     <input name="member[last_name]" type="text" class="form-control"
-                                           value="<%= if @open_conversation.member, do: @open_conversation.member.last_name||"", else: "N/A" %>">
+                                           value="<%= if @open_conversation.member, do: @open_conversation.member.last_name||"", else: "" %>">
                                 </div>
                             </div>
 
@@ -103,9 +103,9 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label for="fl1">Phone Number</label>
-                                    <input  type="text"
+                                    <input  type="text" name="member[phone_number]"
                                             class="form-control" readonly
-                                            value="<%= if @open_conversation.member, do: @open_conversation.member.phone_number, else: "N/A" %>">
+                                            value="<%= if @open_conversation.member, do: @open_conversation.member.phone_number, else: @open_conversation.original_number %>">
                                 </div>
                             </div>
                         </div>

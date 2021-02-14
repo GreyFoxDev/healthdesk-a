@@ -22,7 +22,7 @@ defmodule MainWeb.Plug.CloseConversation do
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
     if pending_message_count <= 1 do
-      CM.create(%{
+     _ = CM.create(%{
             "conversation_id" => id,
             "phone_number" => location,
             "message" => conn.assigns[:response],
@@ -55,7 +55,7 @@ defmodule MainWeb.Plug.CloseConversation do
   """
   def call(%{assigns: %{convo: id, location: location} = assigns} = conn, _opts) do
     datetime = DateTime.utc_now()
-    CM.create(%{
+    _ = CM.create(%{
           "conversation_id" => id,
           "phone_number" => location,
           "message" => conn.assigns[:response],
@@ -70,13 +70,13 @@ defmodule MainWeb.Plug.CloseConversation do
 
       Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
 
-      %{"conversation_id" => id,
+      _ =  %{"conversation_id" => id,
         "phone_number" => location.phone_number,
         "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
         "sent_at" => DateTime.add(datetime, 3)}
       |> CM.create()
     else
-      %{"conversation_id" => id,
+      _ =  %{"conversation_id" => id,
         "phone_number" => location.phone_number,
         "message" => "CLOSED: Closed by System",
         "sent_at" => DateTime.add(datetime, 3)}

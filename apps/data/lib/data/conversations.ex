@@ -94,7 +94,37 @@ defmodule Data.Conversations do
     end
   end
 
-  def find_or_start_conversation(member, location, subject) do
+  def find_or_start_conversation(member, location, subject) when is_binary(location) do
+    with %Location{} = location <- Data.Query.Location.get_by_phone(location),
+         nil <- get_by_phone(member, location.id) do
+      {member, location.id}
+      |> new_params()
+      |> Map.merge(%{"subject" => subject})
+      |> create()
+    else
+      %Schema{status: "closed"} = conversation ->
+        Query.update(conversation, %{"subject" => subject})
+
+      %Schema{} = convo ->
+        Query.update(convo, %{"subject" => subject})
+    end
+  end
+  def find_or_start_conversation(member, location, subject) when is_list(location) do
+    with %Location{} = location <- Data.Query.Location.get_by_phone(location),
+         nil <- get_by_phone(member, location.id) do
+      {member, location.id}
+      |> new_params()
+      |> Map.merge(%{"subject" => subject})
+      |> create()
+    else
+      %Schema{status: "closed"} = conversation ->
+        Query.update(conversation, %{"subject" => subject})
+
+      %Schema{} = convo ->
+        Query.update(convo, %{"subject" => subject})
+    end
+  end
+  def find_or_start_conversation(member, location, subject) when is_binary(location) do
     with %Location{} = location <- Data.Query.Location.get_by_phone(location),
          nil <- get_by_phone(member, location.id) do
       {member, location.id}

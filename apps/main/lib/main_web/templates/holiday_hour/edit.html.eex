@@ -30,7 +30,7 @@
         </div>
         <div class="col-lg-8">
             <div class="card card-fluid">
-                <h6 class="card-header"> Holiday Hours </h6><!-- .card-body -->
+                <h6 class="card-header"> Special Hours </h6><!-- .card-body -->
                 <div class="card-body">
                     <%= live_render(@conn, MainWeb.Live.HolidayHourEditForm, session: %{
                             "changeset" => @changeset,

@@ -54,7 +54,7 @@ defmodule MainWeb.Api.ConversationController do
     name = List.first(Regex.split(regex,from))
     from = List.first(Regex.run(regex,from))
     message = ElixirEmailReplyParser.parse_reply message
-    to = List.first(Regex.run(regex,to))
+    to = Regex.scan(regex,to) |> List.flatten |> Enum.uniq
     IO.inspect(from, limit: :infinity)
     IO.inspect(to, limit: :infinity)
     IO.inspect(subj, limit: :infinity)
@@ -141,7 +141,7 @@ defmodule MainWeb.Api.ConversationController do
     conn |> send_resp(200, "ok")
   end
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message}) do
-    CM.create(%{
+    _ = CM.create(%{
       "conversation_id" => id,
       "phone_number" => from,
       "message" => message,
@@ -162,7 +162,7 @@ defmodule MainWeb.Api.ConversationController do
 
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message} = params) do
     if message == "Sent to Slack" do
-      CM.create(%{
+      _ =  CM.create(%{
         "conversation_id" => id,
         "phone_number" => from,
         "message" => params["slack_message"],
@@ -170,7 +170,7 @@ defmodule MainWeb.Api.ConversationController do
 
       :ok = MainWeb.Notify.send_to_admin(id, params["slack_message"], from)
     else
-      CM.create(%{
+      _ =  CM.create(%{
         "conversation_id" => id,
         "phone_number" => from,
         "message" => message,
@@ -185,7 +185,7 @@ defmodule MainWeb.Api.ConversationController do
 
       Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
 
-      %{"conversation_id" => id,
+      _ =  %{"conversation_id" => id,
         "phone_number" => location.phone_number,
         "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
         "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
@@ -226,7 +226,7 @@ defmodule MainWeb.Api.ConversationController do
 
             Data.ConversationDisposition.create(%{"conversation_id" => convo.id, "disposition_id" => disposition.id})
 
-            %{"conversation_id" => convo.id,
+            _ =  %{"conversation_id" => convo.id,
               "phone_number" => location.phone_number,
               "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
               "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
@@ -272,7 +272,7 @@ defmodule MainWeb.Api.ConversationController do
         }
       )
 
-      %{
+      _ = %{
         "conversation_id" => convo_id,
         "phone_number" => location.phone_number,
         "message" =>
@@ -281,7 +281,7 @@ defmodule MainWeb.Api.ConversationController do
       }
       |> CM.create()
     else
-      %{
+      _ =  %{
         "conversation_id" => convo_id,
         "phone_number" => location.phone_number,
         "message" =>

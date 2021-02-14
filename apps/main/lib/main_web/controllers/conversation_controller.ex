@@ -333,7 +333,7 @@ defmodule MainWeb.ConversationController do
           _ -> nil
         end
       end
-      res
+      conversation
 
     else
       err -> {:error,:error}

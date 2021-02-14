@@ -266,6 +266,7 @@ defmodule MainWeb.Live.ConversationsView do
               |> assign(:open_conversation, conversations |> List.first()|>fetch_member())
               |> assign(:conversations, conversations)
               |> assign(:changeset, Conversations.get_changeset())
+            if connected?(socket), do: Process.send_after(self(), :menu_fix, 100)
 
             {:noreply, socket}
           else
@@ -400,135 +401,20 @@ defmodule MainWeb.Live.ConversationsView do
     Main.LiveUpdates.notify_live_view(convo_id, {__MODULE__, :agent_typing_stop})
     {:noreply, socket}
   end
-  defp send_message(%{original_number: <<"+1", _ :: binary>>} = conversation, params, location, user) do
-
-    params["conversation_message"]
-    |> Map.merge(
-         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
-       )
-    |> ConversationMessages.create()
-    |> case do
-         {:ok, message_} ->
-           message = %{
-             provider: :twilio,
-             from: location.phone_number,
-             to: conversation.original_number,
-             body: params["conversation_message"]["message"]
-           }
-           @chatbot.send(message)
-
-           Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message_}})
-
-         {:error, _changeset} ->
-           nil
-       end
-  end
-  defp send_message(%{original_number: <<"messenger:", _ :: binary>>} = conversation, params, location, user) do
-
-    params["conversation_message"]
-    |> Map.merge(
-         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
-       )
-    |> ConversationMessages.create()
-    |> case do
-         {:ok, _message} ->
-           message = %Chatbot.Params{
-             provider: :twilio,
-             from: "messenger:#{location.messenger_id}",
-             to: conversation.original_number,
-             body: params["conversation_message"]["message"]
-           }
-           Chatbot.Client.Twilio.call(message)
-         {:error, _changeset} ->
-           nil
-       end
-  end
-  defp send_message(%{original_number: <<"CH", _ :: binary>>} = conversation, params, location, user) do
-
-    from_name = if conversation.team_member do
-      Enum.join(
-        [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
-        " "
-      )
-    else
-      location.location_name
-    end
-
-    params["conversation_message"]
-    |> Map.merge(
-         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
-       )
-    |> ConversationMessages.create()
-    |> case do
-         {:ok, _message} ->
-           from = if conversation.team_member && conversation.team_member.user.first_name, do: conversation.team_member.user.first_name, else: location.location_name
-
-           message = %Chatbot.Params{
-             provider: :twilio,
-             from: from,
-             to: conversation.original_number,
-             body: params["conversation_message"]["message"]
-           }
-           Chatbot.Client.Twilio.channel(message)
-         {:error, _changeset} -> nil
-       end
-  end
-  defp send_message(%{original_number: <<"APP", _ :: binary>>} = conversation, params, location, user) do
-
-    from = if conversation.team_member do
-      Enum.join(
-        [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
-        " "
-      )
-    else
-      location.location_name
-    end
-
-    params["conversation_message"]
-    |> Map.merge(
-         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
-       )
-    |> ConversationMessages.create()
-    |> case do
-         {:ok, message_} ->
-
-           Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message_}})
-         _ -> nil
-       end
-
-  end
-  defp send_message(%{original_number: email} = conversation, params, location, user) do
-
-    from = if conversation.team_member do
-      Enum.join(
-        [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
-        " "
-      )
-    else
-      location.location_name
-    end
-
-    params["conversation_message"]
-    |> Map.merge(
-         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
-       )
-    |> ConversationMessages.create()
-    |> case do
-         {:ok, message} ->
-           email
-           |> Main.Email.generate_reply_email(message.message, conversation.subject)
-           |> Main.Mailer.deliver_now()
-           Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message}})
-         _ -> nil
-       end
-
-  end
 
   def handle_event("save_member",  %{"member" => m_params} = params, socket) do
     o_c = socket.assigns.open_conversation
+    IO.inspect("###################")
+    IO.inspect(1111)
+    IO.inspect(m_params)
+    IO.inspect("###################")
 
     socket = case MainWeb.UpdateMemberController.update(m_params) do
       {:ok,member} ->
+        IO.inspect("###################")
+        IO.inspect(member)
+        IO.inspect("###################")
+
         conversations = socket.assigns.conversations
 
         res = Enum.find(conversations, fn f -> f.original_number == member.phone_number end)
@@ -953,12 +839,18 @@ defmodule MainWeb.Live.ConversationsView do
                |> Location.get(location_id)
 
     open_convo = MainWeb.ConversationController.create_convo(params, location, user)
-
+    open_convo = user
+    |> Conversations.get(open_convo.id)
+    |> fetch_member()
     socket = %{
       socket |
       assigns: Map.delete(Map.delete(Map.delete(socket.assigns, :conversation_id), :conversation), :new),
       changed: Map.put_new(socket.changed, :key, true)
     }
+    IO.inspect("###################")
+    IO.inspect(open_convo)
+    IO.inspect("###################")
+
 
     socket = socket |> assign(open_conversation: open_convo)
     send(self(), {:fetch_c, %{user: user, locations: socket.assigns.location_ids, type: socket.assigns.tab}})

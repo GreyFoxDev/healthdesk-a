@@ -22,11 +22,8 @@ defmodule MainWeb.Plug.OpenConversation do
   def call(%{assigns: %{member: member, location: location}} = conn, _opts)
   when is_binary(member) and is_binary(location) do
     with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({member, location}) do
-      IO.inspect("###################")
-      IO.inspect(convo)
-      IO.inspect("###################")
 
-      CM.create(%{
+      _ = CM.create(%{
             "conversation_id" => convo.id,
             "phone_number" => member,
             "message" => conn.assigns[:message],

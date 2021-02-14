@@ -1,6 +1,6 @@
 defmodule Data.HolidayHours do
   @moduledoc """
-  This is the Holiday Hours API for the data layer
+  This is the Special Hours API for the data layer
   """
   alias Data.Query.HolidayHour, as: Query
   alias Data.Schema.HolidayHour, as: Schema

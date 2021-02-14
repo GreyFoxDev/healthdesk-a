@@ -201,7 +201,7 @@ defmodule MainWeb.AdminController do
     total =  Enum.map(dispositions, &(&1.count)) |> Enum.sum()
 
     call_transferred = (dispositions |> Enum.filter(&(&1.name == "Call Transferred")) |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
-    call_deflected =  (dispositions |> Enum.filter(&(&1.name == "Call deflected"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
+    call_deflected =  (dispositions |> Enum.filter(&( &1.name == "Call Deflected"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
     call_hung_up =  (dispositions |> Enum.filter(&(&1.name == "Call Hang Up"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
     automated = (dispositions |> Enum.filter(&(&1.name == "Automated"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
     case type do

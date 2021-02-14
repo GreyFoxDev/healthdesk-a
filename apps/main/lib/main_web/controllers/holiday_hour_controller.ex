@@ -64,12 +64,12 @@ defmodule MainWeb.HolidayHourController do
     |> case do
          {:ok, _hours} ->
            conn
-           |> put_flash(:success, "Holiday Hours deleted successfully.")
+           |> put_flash(:success, "Special Hours deleted successfully.")
            |> redirect(to: team_location_holiday_hour_path(conn, :index, team_id, location_id))
 
          {:error, _changeset} ->
            conn
-           |> put_flash(:error, "Holiday Hours failed to delete")
+           |> put_flash(:error, "Special Hours failed to delete")
            |> redirect(to: team_location_holiday_hour_path(conn, :index, team_id, location_id))
        end
   end

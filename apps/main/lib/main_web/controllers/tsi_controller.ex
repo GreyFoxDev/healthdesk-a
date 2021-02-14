@@ -131,7 +131,7 @@ defmodule MainWeb.TsiController do
 
     with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({phone_number, location.phone_number}) do
       message = extract_question(params)
-      CM.create(
+      _ = CM.create(
         %{
           "conversation_id" => convo.id,
           "phone_number" => phone_number,
@@ -140,7 +140,7 @@ defmodule MainWeb.TsiController do
         }
       )
 
-      CM.create(
+      _ = CM.create(
         %{
           "conversation_id" => convo.id,
           "phone_number" => location.phone_number,
@@ -200,7 +200,7 @@ defmodule MainWeb.TsiController do
         |> ask_wit_ai(convo_id, location)
         |> case do
              {:ok, response} ->
-               CM.create(
+               _ = CM.create(
                  %{
                    "conversation_id" => convo.id,
                    "phone_number" => location.phone_number,
@@ -211,7 +211,7 @@ defmodule MainWeb.TsiController do
 
                close_conversation(convo_id, location)
              {:unknown, response} ->
-               CM.create(
+               _ = CM.create(
                  %{
                    "conversation_id" => convo.id,
                    "phone_number" => location.phone_number,
@@ -327,7 +327,7 @@ defmodule MainWeb.TsiController do
         }
       )
 
-      %{
+      _ =  %{
         "conversation_id" => convo_id,
         "phone_number" => location.phone_number,
         "message" =>
@@ -336,7 +336,7 @@ defmodule MainWeb.TsiController do
       }
       |> CM.create()
     else
-      %{
+      _ = %{
         "conversation_id" => convo_id,
         "phone_number" => location.phone_number,
         "message" =>

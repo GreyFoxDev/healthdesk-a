@@ -31,11 +31,11 @@ defmodule MainWeb.CampaignController do
             Scheduler.delete_job(String.to_atom(campaign.campaign_name))
            conn
            |> put_flash(:success, "Campaign deleted successfully.")
-           |> redirect(to: "/admin")
+           |> redirect(to: "/admin/campaigns")
          {:error, _} ->
            conn
            |> put_flash(:success, "Campaign failed to delete.")
-           |> redirect(to: "/admin")
+           |> redirect(to: "/admin/campaigns")
        end
   end
 

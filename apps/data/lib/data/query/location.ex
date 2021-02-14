@@ -33,8 +33,25 @@ defmodule Data.Query.Location do
   @doc """
   Return a single active location by a unique phone number
   """
-  @spec get_by_phone(phone_number :: String.t(), repo :: Ecto.Repo.t()) :: Location.t() | nil
-  def get_by_phone(phone_number, repo \\ Read) do
+  def get_by_phone(phone_number, repo \\ Read) when is_binary(phone_number) do
+    from(t in Location,
+      where: is_nil(t.deleted_at),
+      where: t.phone_number == ^phone_number,
+      limit: 1,
+      preload: [:team]
+    )
+    |> repo.one()
+  end
+  def get_by_phone(phone_number, repo ) when is_list(phone_number) do
+    from(t in Location,
+      where: is_nil(t.deleted_at),
+      where: t.phone_number in ^phone_number,
+      limit: 1,
+      preload: [:team]
+    )
+    |> repo.all() |> List.first
+  end
+  def get_by_phone(phone_number, repo ) do
     from(t in Location,
       where: is_nil(t.deleted_at),
       where: t.phone_number == ^phone_number,

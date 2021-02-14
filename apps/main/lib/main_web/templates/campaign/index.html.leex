@@ -128,7 +128,12 @@
                                     <td class="align-middle"><%= campaign.location.location_name %></td>
                                     <td class="align-middle"><%= format_date_time_split(campaign.send_at, campaign.location.timezone) %></td>
                                     <td class="align-middle">
-                                        <%= link raw("<button type=\"button\" class=\"btn btn-sm btn-icon btn-secondary\"><i class=\"fa fa-download\"></i> <span class=\"sr-only\">Edit</span></button>"), to: campaign_path(@socket, :export, campaign.id), class: "nav-link" %>
+                                        <%= link raw("<button type=\"button\" class=\"btn btn-sm btn-icon btn-secondary\"><i class=\"fa fa-download\"></i> <span class=\"sr-only\">Edit</span></button>"), to: campaign_path(@socket, :export, campaign.id), class: "" %>
+                                   <%= if !campaign.completed && campaign.scheduled do %>
+                                     <%= link raw("<button type=\"button\" class=\"btn btn-sm btn-icon btn-secondary\"><i class=\"fa fa-trash\"></i> <span class=\"sr-only\">Edit</span></button>"), to: campaign_path(@socket, :delete, campaign.id), method: :delete, class: "" %>
+
+                                    <% end %>
+
                                     </td>
                                 </tr>
 
