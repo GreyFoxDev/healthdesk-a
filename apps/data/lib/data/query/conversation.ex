@@ -57,16 +57,14 @@ defmodule Data.Query.Conversation do
         ]
       )
   end
-
   @doc """
   Return a list of conversations for a location
   """
   @spec get_by_status(location_id :: [binary()], status :: [binary()], repo :: Ecto.Repo.t()) :: [
-          Conversation.t()
-        ]
+                                                                                                   Conversation.t()
+                                                                                                 ]
   def get_by_status(location_id, status, repo \\ Read) when is_list(status) do
     time = DateTime.add(DateTime.utc_now(), -1_296_000, :seconds)
-
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
       left_join: member in Member,
@@ -74,10 +72,41 @@ defmodule Data.Query.Conversation do
       where: c.location_id in ^location_id,
       where: c.status in ^status,
       where: m.sent_at >= ^time,
-
       # most recent first
       order_by: [desc: m.sent_at],
       preload: [conversation_messages: m, team_member: [:user], location: []],
+      select: %{c | member: member}
+    )
+    |> repo.all()
+  end
+
+  @doc """
+  Return a list of limited conversations for a location
+  """
+  @spec get_limited_conversations(location_id :: [binary()], status :: [binary()], limit :: nil, offset :: nil, repo :: Ecto.Repo.t()) :: [
+                                                                                                   Conversation.t()
+                                                                                                 ]
+  def get_limited_conversations(location_id, status, offset \\ 0, limit \\ 30, repo \\ Read) when is_list(status) do
+    status_str = Enum.join(status, "', '")
+    statuses = "('" <> status_str <> "')"
+    location_str = Enum.join(location_id, "', '")
+    location = "('" <> location_str <> "')"
+    query = "SELECT DISTINCT conversations.id FROM conversations JOIN conversation_messages ON conversations.id = conversation_messages.conversation_id LEFT JOIN members ON conversations.original_number = members.phone_number WHERE conversations.status in #{statuses} AND conversations.location_id in #{location} LIMIT #{limit} OFFSET #{offset}"
+    case Ecto.Adapters.SQL.query(Data.ReadOnly.Repo, query) do
+      {:ok, %{rows: data}} ->  List.flatten(data) |> Enum.map(&UUID.binary_to_string!(&1)) |> get_conversations(repo)
+      error -> error
+    end
+  end
+
+  def get_conversations(ids, repo) do
+    from(c in Conversation,
+      join: m in assoc(c, :conversation_messages),
+      left_join: member in Member,
+      on: c.original_number == member.phone_number,
+      where: c.id in ^ids,
+
+      order_by: [desc: m.sent_at],
+      preload: [:location, conversation_messages: m, team_member: [:user]],
       select: %{c | member: member}
     )
     |> repo.all()
@@ -92,6 +121,7 @@ defmodule Data.Query.Conversation do
       left_join: member in Member,
       on: c.original_number == member.phone_number,
       where: c.location_id in ^location_id,
+
       # most recent first
       order_by: [desc: m.sent_at],
       preload: [conversation_messages: m, team_member: [:user]],
@@ -107,6 +137,7 @@ defmodule Data.Query.Conversation do
       left_join: member in Member,
       on: c.original_number == member.phone_number,
       where: c.location_id == ^location_id,
+
       # most recent first
       order_by: [desc: m.sent_at],
       preload: [conversation_messages: m, team_member: [:user]],

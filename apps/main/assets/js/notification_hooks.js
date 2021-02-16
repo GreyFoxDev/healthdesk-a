@@ -1,6 +1,6 @@
 const NotificationHook = {
     mounted(){
-       console.log("mounted");
+        console.log("mounted");
     },
     updated() {
         console.log("updated");

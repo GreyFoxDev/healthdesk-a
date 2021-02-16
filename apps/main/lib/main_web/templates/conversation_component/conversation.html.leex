@@ -1,4 +1,9 @@
-<div class="board p-0 perfect-scrollbar ps ps--active-y">
+<div
+class="board p-0 perfect-scrollbar ps ps--active-y"
+id="scrolll"
+phx-hook="InfiniteScroll"
+data-page=<%= @page %>
+>
     <!-- .list-group -->
     <header class="page-navs bg-white shadow-sm d-flex justify-content-between px-2">
         <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..." , value: assigns[:search_string] %>

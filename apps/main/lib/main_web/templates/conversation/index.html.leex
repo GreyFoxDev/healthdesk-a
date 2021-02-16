@@ -19,7 +19,7 @@
             </div>
         </div>
 
-        <%= live_component @socket, MainWeb.Live.ConversationComponent, conversations: @conversations, open_conversation: @open_conversation, user: @user, location_ids: @location_ids, id: "convo_list_sidebar" %>
+        <%= live_component @socket, MainWeb.Live.ConversationComponent, conversations: @conversations, open_conversation: @open_conversation, user: @user, location_ids: @location_ids, page: @page, tab: @tab, loadmore: @loadmore, id: "convo_list_sidebar" %>
     <!-- /board -->
     </div>
     <!-- Conversation Window -->

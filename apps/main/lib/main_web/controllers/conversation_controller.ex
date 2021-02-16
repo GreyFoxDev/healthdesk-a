@@ -59,7 +59,7 @@ defmodule MainWeb.ConversationController do
     messages =
       conn
       |> current_user()
-      |> ConversationMessages.all(id)
+      |> ConversationMessages.get_by_conversation_id(id)
 
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- Conversations.get_changeset(id, user) do
