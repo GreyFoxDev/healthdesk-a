@@ -232,7 +232,7 @@ defmodule MainWeb.Live.ConversationsView do
 
     messages =
       user
-      |> ConversationMessages.get(conversation.id) |> Enum.reverse()
+      |> ConversationMessages.all(conversation.id) |> Enum.reverse()
     socket =
       socket
       |> assign(:open_conversation, Map.merge(conversation, %{conversation_messages: messages}))
