@@ -170,6 +170,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> assign(:count, 0)
       |> assign(:page, 0)
       |> assign(:loading, true)
+      |> assign(:loadmore, true)
       |> assign(:tab, "active")
       |> assign(:tab1, tab1)
       |> assign(:search_string, "")
@@ -204,6 +205,7 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:saved_replies, [])
              |> assign(:dispositions, [])
              |> assign(:loading, false)
+             |> assign(:loadmore, true)
              |> assign(:open_conversation, convo)
              |> assign(:online, false)
              |> assign(:typing, false)
@@ -264,8 +266,10 @@ defmodule MainWeb.Live.ConversationsView do
               |> Conversations.get(conversation.id)
               |> fetch_member()
             locations = socket.assigns.location_ids
-            conversations = user
-                            |> Conversations.all(locations,["open", "pending"]) |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
+            conversations =
+              user
+              |> Conversations.all(locations, ["open", "pending"])
+              |> Enum.filter(fn (c) -> (!c.team_member) || (c.team_member && c.team_member.user_id == user.id) end)
 
             socket =
               socket
@@ -810,7 +814,7 @@ defmodule MainWeb.Live.ConversationsView do
 
       messages =
         user
-        |> ConversationMessages.get(id)
+        |> ConversationMessages.all(id)
 
       saved_replies = SavedReply.get_by_location_id(location.id)
 

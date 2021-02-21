@@ -17,16 +17,16 @@ import LiveSocket from "phoenix_live_view"
 import NotificationHook from "./notification_hooks";
 import CsvUpload from "./csv_upload";
 import ReloadTable from "./reload_table";
+import LiveViewHook from "./live_view_hooks";
 
-let Hooks = { NotificationHook, CsvUpload, ReloadTable };
+let Hooks = { NotificationHook, CsvUpload, ReloadTable, LiveViewHook };
 
 let scrollAt = () => {
     let elem = $(".board")[0]
     let scrollTop = elem.scrollTop
     let scrollHeight = elem.scrollHeight
     let clientHeight = elem.clientHeight
-    console.log(scrollTop)
-    console.log(scrollHeight-clientHeight)
+
     return scrollTop / (scrollHeight - clientHeight) * 100
 }
 
@@ -37,18 +37,12 @@ Hooks.InfiniteScroll = {
     mounted(){
         this.pending = this.page()
         $(".board").on("scroll", e => {
-            console.log("page:")
-            console.log(this.page())
-            console.log(this.page())
             if(this.pending === this.page() && scrollAt() > 95){
-                console.log("HELP HELP HELP")
                 this.pending = this.page() + 1
-                console.log("------------start------------");
-                console.log(this.pending);
-                console.log("----------end----------------");
                 this.pushEventTo("#scrolll","loadmore", {page: this.pending})
             }
         })
+        // $('.board').animate({scrollTop: $('.list-group').length.offset().top}, 100)
     },
     updated(){
         this.pending = this.page()
@@ -58,7 +52,7 @@ Hooks.InfiniteScroll = {
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken},hooks: Hooks });
 liveSocket.connect()
-if(Notification.permission != "denied" && Notification.permission != "granted") {
+if(Notification.permission !== "denied" && Notification.permission !== "granted") {
     Notification.requestPermission()
 }
 // Import local files

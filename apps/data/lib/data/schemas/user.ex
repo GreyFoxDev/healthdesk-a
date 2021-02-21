@@ -12,6 +12,7 @@ defmodule Data.Schema.User do
           last_name: String.t() | nil,
           email: String.t() | nil,
           avatar: String.t() | nil,
+          logged_in_at: :utc_datetime | nil,
           deleted_at: :utc_datetime | nil
         }
 
@@ -31,6 +32,7 @@ defmodule Data.Schema.User do
     start_do_not_disturb
     end_do_not_disturb
     timezone
+    logged_in_at
     deleted_at
   |a
 
@@ -52,6 +54,7 @@ defmodule Data.Schema.User do
     field(:timezone, :string)
 
     field(:deleted_at, :utc_datetime)
+    field(:logged_in_at, :utc_datetime)
 
     has_one(:team_member, Data.Schema.TeamMember)
 

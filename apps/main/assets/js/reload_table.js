@@ -82,12 +82,18 @@ const reload_convo = function (){
     tribute2.collection[0].values=availableMembers
     tribute.collection[0].values=availableTags
     tribute2.attach($('[id^="tag_user"]')[0]);
-    if ($('[id^="messagetext"]')[0] != undefined) {
-        tribute.attach($('[id^="messagetext"]')[0]);
+    tribute2.attach($('[id^="taguser"]')[0]);
+    if ($('[id^="taguser"]')[0] != undefined) {
+        tribute.attach($('[id^="taguser"]')[0]);
+    }
+    if ($('[id^="tag_user"]')[0] != undefined) {
+        tribute.attach($('[id^="tag_user"]')[0]);
     }
     $('.perfect-scrollbar:not(".aside-menu")').each(function() {
         new PerfectScrollbar(this, {
-            suppressScrollX: true
+            suppressScrollX: true,
+            wheelSpeed: 0.05,
+            swipeEasing: true
         });
     });
 
