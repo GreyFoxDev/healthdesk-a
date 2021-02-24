@@ -4,10 +4,6 @@ id="scrolll"
 phx-hook="InfiniteScroll"
 data-page=<%= @page %>
 >
-    <!-- .list-group -->
-    <header class="page-navs bg-white shadow-sm d-flex justify-content-between px-2">
-        <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..." , value: assigns[:search_string] %>
-    </header>
     <div class="list-group list-group-flush list-group-divider border-top" data-toggle="radiolist">
         <!-- .list-group-item -->
         <%= for c <- @conversations do %>

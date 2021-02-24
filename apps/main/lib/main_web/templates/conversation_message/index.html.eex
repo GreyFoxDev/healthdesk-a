@@ -109,6 +109,7 @@
      .scrollable {
          height: 70vh; /* or any value */
          overflow-y: auto;
+         scroll-behavior: smooth;
      }
     </style>
 

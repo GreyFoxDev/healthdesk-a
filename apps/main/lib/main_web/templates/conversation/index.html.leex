@@ -18,6 +18,10 @@
                 <button type="button" class="dropdown-item" data-toggle="modal" data-target="#newTicket">New Ticket</button>
             </div>
         </div>
+         <!-- .list-group -->
+            <header class="page-navs bg-white shadow-sm d-flex justify-content-between px-2">
+                <%= text_input :f, :filter_text, class: "form-control", phx_keyup: "filter_convo", placeholder: "Search..." , value: assigns[:search_string] %>
+            </header>
 
         <%= live_component @socket, MainWeb.Live.ConversationComponent, conversations: @conversations, open_conversation: @open_conversation, user: @user, location_ids: @location_ids, page: @page, tab: @tab, loadmore: @loadmore, id: "convo_list_sidebar" %>
     <!-- /board -->

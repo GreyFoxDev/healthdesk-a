@@ -13,7 +13,7 @@ defmodule MainWeb.AssignTeamMemberController do
       render(conn, "ok.json")
     else
       {:error, _changeset} ->
-      render(conn, "error.json")
+        render(conn, "error.json")
     end
 
 

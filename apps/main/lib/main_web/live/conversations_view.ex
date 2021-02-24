@@ -280,7 +280,7 @@ defmodule MainWeb.Live.ConversationsView do
 
             {:noreply, socket}
           else
-            {:noreply, redirect(socket, to: "/admin/conversations/active")}
+            {:noreply, redirect(socket, to: "/admin/conversations/assigned")}
           end
         _ ->
           {:noreply, socket}
@@ -289,7 +289,6 @@ defmodule MainWeb.Live.ConversationsView do
     end
 
   end
-
   def handle_event("assign", %{"cid" => conversation_id} = params, socket)do
     user = socket.assigns.user
     conversation =

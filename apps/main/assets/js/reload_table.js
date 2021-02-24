@@ -79,10 +79,13 @@ const reload_convo = function (){
         },
         values: []
     });
-    tribute2.collection[0].values=availableMembers
-    tribute.collection[0].values=availableTags
+
+    tribute2.collection[0].values = remove_duplicates(availableMembers, "key")
+    tribute.collection[0].values = remove_duplicates(availableTags, "key")
+
     tribute2.attach($('[id^="tag_user"]')[0]);
     tribute2.attach($('[id^="taguser"]')[0]);
+
     if ($('[id^="taguser"]')[0] != undefined) {
         tribute.attach($('[id^="taguser"]')[0]);
     }
@@ -147,5 +150,19 @@ const close_edit = function (){
 }
 const open_edit = function (){
     $("#editTicket").modal('show')
+}
+
+const remove_duplicates = function(array, prop) {
+    let newArray = [];
+    let lookupObject  = {};
+
+    for(let i in array) {
+        lookupObject[array[i][prop]] = array[i];
+    }
+
+    for(let i in lookupObject) {
+        newArray.push(lookupObject[i]);
+    }
+    return newArray;
 }
 export default ReloadTable;
