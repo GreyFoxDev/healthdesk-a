@@ -58,7 +58,8 @@ defmodule MainWeb.Api.ConversationController do
     IO.inspect(from, limit: :infinity)
     IO.inspect(to, limit: :infinity)
     IO.inspect(subj, limit: :infinity)
-    if from != nil && from != "" do
+    subj = String.slice(subj, 1..200)
+    if from != nil && from != "" && message != nil && message != "" do
       with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
         Task.start(fn ->  notify_open(convo.location_id) end)
         {:ok, struct}= CM.create(%{

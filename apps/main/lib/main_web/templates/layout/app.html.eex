@@ -55,7 +55,7 @@
                         <%= if @current_user.role in ["location-admin", "team-admin"] do %>
                         <%= link {:safe, "<span class=\"menu-icon oi oi-book\"></span>
                             <span class=\"menu-text\">Knowledge Base</span>"},
-                                                     to: team_location_path(@conn, :index, @current_user.team_member.team_id), class: "menu-link" %>
+                            to: team_location_path(@conn, :index, @current_user.team_member.team_id), class: "menu-link" %>
                     <% end %>
                     </li>
                 </ul>

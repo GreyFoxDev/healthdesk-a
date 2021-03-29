@@ -69,7 +69,6 @@ defmodule Main.Service.Appointment do
         {res,step}
       {:unknown,[datetime: date, greetings: _ ]} ->
         {:ok, dt} = Timex.parse(date, "{ISO:Extended}")
-        IO.inspect(step)
         {res,step}=  get_next_step(appointment, step, dt, location)
         C.appointment_step(id,step)
         {res,step}

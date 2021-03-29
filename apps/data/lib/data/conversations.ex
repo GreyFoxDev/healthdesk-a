@@ -26,7 +26,7 @@ defmodule Data.Conversations do
   Get changesets for conversations.
   """
   def get_changeset(),
-    do: Data.Schema.Conversation.changeset(%Data.Schema.Conversation{})
+      do: Data.Schema.Conversation.changeset(%Data.Schema.Conversation{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
@@ -64,10 +64,10 @@ defmodule Data.Conversations do
   end
 
   def get(%{role: role}, id) when role in @roles,
-    do: Query.get(id, true)
+      do: Query.get(id, true)
 
   def get(%{role: role}, id, preload_f) when role in @roles,
-    do: Query.get(id, preload_f)
+      do: Query.get(id, preload_f)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
@@ -95,6 +95,9 @@ defmodule Data.Conversations do
 
       %Schema{} = convo ->
         {:ok, convo}
+
+      error -> error
+
     end
   end
 
@@ -111,6 +114,9 @@ defmodule Data.Conversations do
 
       %Schema{} = convo ->
         Query.update(convo, %{"subject" => subject})
+
+      error -> error
+
     end
   end
   def find_or_start_conversation(member, location, subject) when is_list(location) do
@@ -126,6 +132,7 @@ defmodule Data.Conversations do
 
       %Schema{} = convo ->
         Query.update(convo, %{"subject" => subject})
+      error -> error
     end
   end
   def find_or_start_conversation(member, location, subject) when is_binary(location) do

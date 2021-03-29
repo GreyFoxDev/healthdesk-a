@@ -6,7 +6,11 @@ defmodule MainWeb.Live.CampaignsView do
   def render(assigns), do: MainWeb.CampaignView.render("index.html", assigns)
 
   def mount(params, session, socket) do
-    {:ok, user, claims} = MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"])
+    {:ok, user, claims} =
+      case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
+        {:error, :token_expired} -> socket = socket |> redirect(to: "/")
+        res -> res
+      end
     locations = user
                 |> teammate_locations()
     campaigns =

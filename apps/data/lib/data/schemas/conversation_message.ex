@@ -10,7 +10,7 @@ defmodule Data.Schema.ConversationMessage do
           phone_number: String.t(),
           message: String.t(),
           read: :boolean | false,
-          sent_at: :utc_datetime | nil
+          sent_at: :utc_datetime_usec | nil
         }
 
   @required_fields ~w|
@@ -26,7 +26,7 @@ defmodule Data.Schema.ConversationMessage do
   schema "conversation_messages" do
     field(:phone_number, :string)
     field(:message, :string)
-    field(:sent_at, :utc_datetime)
+    field(:sent_at, :utc_datetime_usec)
     field(:read, :boolean, default: false)
 
     belongs_to(:conversation, Data.Schema.Conversation)

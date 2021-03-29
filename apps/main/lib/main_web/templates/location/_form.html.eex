@@ -143,12 +143,12 @@
                     </div>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>
-                        <a id="addtime" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location.id %>/remove" class="btn btn-secondary ">Remove Configuration </a>
+                        <a id="addtime" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location && @conn.assigns.location.id %>/remove" class="btn btn-secondary ">Remove Configuration </a>
                     </div>
                 </fieldset>
             <% end %>
             <br/>
-            <a class="btn btn-primary btn-lg" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location.id %>/edit/google">
+            <a class="btn btn-primary btn-lg" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location && @conn.assigns.location.id %>/edit/google">
                 Sign in with Google
             </a>
         </div>
