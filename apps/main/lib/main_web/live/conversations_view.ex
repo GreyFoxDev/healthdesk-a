@@ -324,7 +324,7 @@ defmodule MainWeb.Live.ConversationsView do
           locations = socket.assigns.location_ids
           conversations =
             user
-            |> Conversations.all(locations,["open", "pending"], (socket.assigns.page * 10)+20)
+            |> Conversations.all(locations,["open", "pending"], (socket.assigns.page * 30))
             |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
 
           socket =
