@@ -46,7 +46,7 @@ defmodule Data.Conversations do
   end
 
   def all(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do
-    Query.get_by_status(location_id, status) |> Enum.take(200)
+    Query.get_by_status(location_id, status)
   end
 
   def all(%{role: role}, location_id, status, offset) when role in @roles and is_list(location_id) do
