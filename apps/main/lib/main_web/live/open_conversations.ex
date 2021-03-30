@@ -88,7 +88,7 @@ defmodule MainWeb.Live.OpenConverationsView do
   end
   defp open_convos(location_id) do
     %{role: "admin"}
-    |> C.all(location_id,["open", "pending"])
+    |> C.all_count(location_id,["open", "pending"])
     |> Enum.count(&(&1.status in ["open", "pending"]))
   end
 end

@@ -80,6 +80,21 @@ defmodule Data.Query.Conversation do
     |> repo.all()
   end
 
+  def get_by_status_count(location_id, status, repo \\ Read) when is_list(status) do
+    from(c in Conversation,
+      join: m in assoc(c, :conversation_messages),
+      left_join: member in Member,
+      on: c.original_number == member.phone_number,
+      where: c.location_id in ^location_id,
+      where: c.status in ^status,
+      # most recent first
+      order_by: [desc: m.sent_at],
+      preload: [conversation_messages: m, team_member: [:user], location: []],
+      select: %{c | member: member}
+    )
+    |> repo.all()
+  end
+
   @doc """
   Return a list of limited conversations for a location
   """
