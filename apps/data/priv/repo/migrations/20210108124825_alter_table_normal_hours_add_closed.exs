@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTableNormalHoursAddClosed do
+defmodule Data.Repo.Migrations.AlterTableNormalHoursAddClosed do
   use Ecto.Migration
 
   def change do

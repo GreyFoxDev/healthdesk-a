@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.MoveAvatarToUsers do
+defmodule Data.Repo.Migrations.MoveAvatarToUsers do
   use Ecto.Migration
 
   def up do

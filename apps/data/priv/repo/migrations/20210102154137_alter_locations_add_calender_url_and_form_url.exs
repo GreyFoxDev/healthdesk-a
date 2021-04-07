@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AddCalenderUrlAndFormUrl do
+defmodule Data.Repo.Migrations.AddCalenderUrlAndFormUrl do
   use Ecto.Migration
 
   def change do

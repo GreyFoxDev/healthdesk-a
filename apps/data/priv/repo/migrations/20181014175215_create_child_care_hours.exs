@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateChildCareHours do
+defmodule Data.Repo.Migrations.CreateChildCareHours do
   use Ecto.Migration
 
   def change do

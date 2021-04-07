@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterLocationsAddWebGreeting do
+defmodule Data.Repo.Migrations.AlterLocationsAddWebGreeting do
   use Ecto.Migration
 
   def change do

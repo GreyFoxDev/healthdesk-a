@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateSavedReplies do
+defmodule Data.Repo.Migrations.CreateSavedReplies do
   use Ecto.Migration
 
   def change do

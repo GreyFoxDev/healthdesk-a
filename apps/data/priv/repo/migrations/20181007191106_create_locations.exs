@@ -1,4 +1,4 @@
-defmodule Data.WriteOnly.Repo.Migrations.CreateLocations do
+defmodule Data.Repo.Migrations.CreateLocations do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateFunctionsForConversationAnalytics do
+defmodule Data.Repo.Migrations.CreateFunctionsForConversationAnalytics do
   use Ecto.Migration
 
   def down do

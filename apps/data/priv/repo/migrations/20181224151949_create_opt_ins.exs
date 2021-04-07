@@ -1,4 +1,4 @@
-defmodule Data.WriteOnly.Repo.Migrations.CreateOptIns do
+defmodule Data.Repo.Migrations.CreateOptIns do
   use Ecto.Migration
 
   def change do

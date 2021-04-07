@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AddDefaultsToClassSchedules do
+defmodule Data.Repo.Migrations.AddDefaultsToClassSchedules do
   use Ecto.Migration
 
   def up do

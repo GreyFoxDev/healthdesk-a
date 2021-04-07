@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateConversationDispositions do
+defmodule Data.Repo.Migrations.CreateConversationDispositions do
   use Ecto.Migration
 
   def change do

@@ -6,8 +6,8 @@ defmodule Data.Query.ConversationMessage do
 
   alias Data.Schema.ConversationMessage
   alias Data.Schema.Conversation
-  alias Data.ReadOnly.Repo, as: Read
-  alias Data.WriteOnly.Repo, as: Write
+  alias Data.Repo, as: Read
+  alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL
 
   @doc """

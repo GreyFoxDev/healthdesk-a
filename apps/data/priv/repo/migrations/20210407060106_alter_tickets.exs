@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTickets do
+defmodule Data.Repo.Migrations.AlterTickets do
   use Ecto.Migration
 
   def change do

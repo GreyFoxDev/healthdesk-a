@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterLocationsAddTimezone do
+defmodule Data.Repo.Migrations.AlterLocationsAddTimezone do
   use Ecto.Migration
 
   def change do

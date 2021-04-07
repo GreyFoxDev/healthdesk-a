@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateIndexOnOptinForPhoneNumber do
+defmodule Data.Repo.Migrations.CreateIndexOnOptinForPhoneNumber do
   use Ecto.Migration
 
   def change do

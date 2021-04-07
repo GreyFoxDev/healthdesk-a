@@ -1,4 +1,4 @@
-defmodule Data.WriteOnly.Repo.Migrations.ModifyMetricsTeamsViewSessions do
+defmodule Data.Repo.Migrations.ModifyMetricsTeamsViewSessions do
   use Ecto.Migration
 
   def up do

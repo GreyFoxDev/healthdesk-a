@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterMetricsViewForLeftJoin do
+defmodule Data.Repo.Migrations.AlterMetricsViewForLeftJoin do
   use Ecto.Migration
 
   def up do

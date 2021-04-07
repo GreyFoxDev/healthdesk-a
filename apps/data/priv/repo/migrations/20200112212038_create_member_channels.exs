@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateMemberChannels do
+defmodule Data.Repo.Migrations.CreateMemberChannels do
   use Ecto.Migration
 
   def change do

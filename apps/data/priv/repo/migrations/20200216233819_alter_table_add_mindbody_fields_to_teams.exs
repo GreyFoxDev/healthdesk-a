@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTableAddMindbodyFieldsToTeams do
+defmodule Data.Repo.Migrations.AlterTableAddMindbodyFieldsToTeams do
   use Ecto.Migration
 
   def change do

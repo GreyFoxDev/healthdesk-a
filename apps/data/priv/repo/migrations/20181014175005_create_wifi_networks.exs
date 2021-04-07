@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateWifiNetworks do
+defmodule Data.Repo.Migrations.CreateWifiNetworks do
   use Ecto.Migration
 
   def change do

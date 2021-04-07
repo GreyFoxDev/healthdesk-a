@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterLocationsIncludeMessangerId do
+defmodule Data.Repo.Migrations.AlterLocationsIncludeMessangerId do
   use Ecto.Migration
 
   def change do

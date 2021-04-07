@@ -6,8 +6,8 @@ defmodule Data.Query.Appointment do
   import Ecto.Query, only: [from: 2]
 
   alias Data.Schema.{Appointment}
-  alias Data.ReadOnly.Repo, as: Read
-  alias Data.WriteOnly.Repo, as: Write
+  alias Data.Repo, as: Read
+  alias Data.Repo, as: Write
 
   @spec get(id :: binary(), repo :: Ecto.Repo.t()) :: Appointment.t() | nil
   def get(id, repo \\ Read) do

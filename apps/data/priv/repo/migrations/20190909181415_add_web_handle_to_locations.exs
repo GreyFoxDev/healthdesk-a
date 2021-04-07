@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AddWebHandleToLocations do
+defmodule Data.Repo.Migrations.AddWebHandleToLocations do
   use Ecto.Migration
 
   def change do

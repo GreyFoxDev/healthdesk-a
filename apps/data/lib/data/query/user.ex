@@ -5,8 +5,8 @@ defmodule Data.Query.User do
   import Ecto.Query, only: [from: 2]
 
   alias Data.Schema.User
-  alias Data.ReadOnly.Repo, as: Read
-  alias Data.WriteOnly.Repo, as: Write
+  alias Data.Repo, as: Read
+  alias Data.Repo, as: Write
 
   @doc """
   Return a list of active users

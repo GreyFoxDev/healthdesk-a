@@ -2,7 +2,7 @@ defmodule Data.Factory do
   @moduledoc """
 
   """
-  use ExMachina.Ecto, repo: Data.WriteOnly.Repo
+  use ExMachina.Ecto, repo: Data.Repo
 
   import Data.TestHelper, only: [phone_number: 0]
 

@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateIntentMaps do
+defmodule Data.Repo.Migrations.CreateIntentMaps do
   use Ecto.Migration
 
   def change do

@@ -10,7 +10,7 @@ defmodule Data.DataCase do
 
       import Data.Factory
 
-      alias Data.WriteOnly.Repo
+      alias Data.Repo
 
       setup _tags do
         :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)

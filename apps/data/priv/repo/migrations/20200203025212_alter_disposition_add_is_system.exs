@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterDispositionAddIsSystem do
+defmodule Data.Repo.Migrations.AlterDispositionAddIsSystem do
   use Ecto.Migration
 
   def change do

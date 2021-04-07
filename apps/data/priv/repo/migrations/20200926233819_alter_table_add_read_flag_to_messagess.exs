@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTableAddRedFlag do
+defmodule Data.Repo.Migrations.AlterTableAddRedFlag do
   use Ecto.Migration
 
   def change do

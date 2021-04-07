@@ -4,8 +4,8 @@ defmodule Data.Query.ConversationDisposition do
   """
 
   alias Data.Schema.ConversationDisposition
-  alias Data.ReadOnly.Repo, as: Read
-  alias Data.WriteOnly.Repo, as: Write
+  alias Data.Repo, as: Read
+  alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL
 
   @cols [

@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterLocationsAddToken do
+defmodule Data.Repo.Migrations.AlterLocationsAddToken do
   use Ecto.Migration
 
   def change do

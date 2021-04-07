@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterUsersAddCommunicationPreferences do
+defmodule Data.Repo.Migrations.AlterUsersAddCommunicationPreferences do
   use Ecto.Migration
 
   def change do

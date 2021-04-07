@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.ModifyMetricsAddSessionsByChannel do
+defmodule Data.Repo.Migrations.ModifyMetricsAddSessionsByChannel do
   use Ecto.Migration
 
   def up do

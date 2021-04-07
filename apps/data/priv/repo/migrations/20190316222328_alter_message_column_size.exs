@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterMessageColumnSize do
+defmodule Data.Repo.Migrations.AlterMessageColumnSize do
   use Ecto.Migration
 
   def change do

@@ -1,12 +1,6 @@
 use Mix.Config
 
-config :data, Data.ReadOnly.Repo,
-  database: "healthdesk_test",
-  pool: Ecto.Adapters.SQL.Sandbox,
-  migration_primary_key: [id: :uuid, type: :binary_id],
-  migration_timestamps: [type: :utc_datetime]
-
-config :data, Data.WriteOnly.Repo,
+config :data, Data.Repo,
   database: "healthdesk_test",
   pool: Ecto.Adapters.SQL.Sandbox,
   migration_primary_key: [id: :uuid, type: :binary_id],

@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateHolidayHours do
+defmodule Data.Repo.Migrations.CreateHolidayHours do
   use Ecto.Migration
 
   def change do

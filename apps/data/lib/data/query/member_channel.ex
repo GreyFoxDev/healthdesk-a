@@ -5,8 +5,8 @@ defmodule Data.Query.MemberChannel do
   import Ecto.Query, only: [from: 2]
 
   alias Data.Schema.MemberChannel
-  alias Data.ReadOnly.Repo, as: Read
-  alias Data.WriteOnly.Repo, as: Write
+  alias Data.Repo, as: Read
+  alias Data.Repo, as: Write
 
   @doc """
   Returns a member channel by id

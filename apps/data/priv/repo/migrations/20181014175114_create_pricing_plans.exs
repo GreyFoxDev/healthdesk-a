@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreatePricingPlans do
+defmodule Data.Repo.Migrations.CreatePricingPlans do
   use Ecto.Migration
 
   def change do

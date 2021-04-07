@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.RenameMessangerIdOnLocations do
+defmodule Data.Repo.Migrations.RenameMessangerIdOnLocations do
   use Ecto.Migration
 
   def change do

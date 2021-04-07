@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTableConversationsMessagesModifySentAt do
+defmodule Data.Repo.Migrations.AlterTableConversationsMessagesModifySentAt do
   use Ecto.Migration
 
   def change do

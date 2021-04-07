@@ -1,4 +1,4 @@
-defmodule Data.WriteOnly.Repo.Migrations.AlterTeamMembersAddAvatar do
+defmodule Data.Repo.Migrations.AlterTeamMembersAddAvatar do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateFunctionForResponseTimes do
+defmodule Data.Repo.Migrations.CreateFunctionForResponseTimes do
   use Ecto.Migration
 
   def down do

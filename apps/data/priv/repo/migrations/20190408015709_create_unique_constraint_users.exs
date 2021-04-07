@@ -1,4 +1,4 @@
-defmodule Data.WriteOnly.Repo.Migrations.CreateUniqueConstraintUsers do
+defmodule Data.Repo.Migrations.CreateUniqueConstraintUsers do
   use Ecto.Migration
 
   def change do

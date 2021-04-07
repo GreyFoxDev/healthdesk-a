@@ -6,8 +6,8 @@ defmodule Data.Query.TeamMember do
   import Data.TimezoneOffset
 
   alias Data.Schema.{TeamMember, Team, User, TeamMemberLocation, Location}
-  alias Data.ReadOnly.Repo, as: Read
-  alias Data.WriteOnly.Repo, as: Write
+  alias Data.Repo, as: Read
+  alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL
 
   @available_function "SELECT * FROM find_available_team_members($1, $2);"

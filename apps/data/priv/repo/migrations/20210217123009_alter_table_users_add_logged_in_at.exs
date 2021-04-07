@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTableUsersAddLoggedInAt do
+defmodule Data.Repo.Migrations.AlterTableUsersAddLoggedInAt do
   use Ecto.Migration
 
   def change do

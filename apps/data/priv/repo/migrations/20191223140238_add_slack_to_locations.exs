@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AddSlackToLocations do
+defmodule Data.Repo.Migrations.AddSlackToLocations do
   use Ecto.Migration
 
   def change do

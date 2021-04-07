@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AddDefaultMessageToLocations do
+defmodule Data.Repo.Migrations.AddDefaultMessageToLocations do
   use Ecto.Migration
 
   def change do

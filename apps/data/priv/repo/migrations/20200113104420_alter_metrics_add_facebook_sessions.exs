@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterMetricsAddFacebookSessions do
+defmodule Data.Repo.Migrations.AlterMetricsAddFacebookSessions do
   use Ecto.Migration
 
   def up do

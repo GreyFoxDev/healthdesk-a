@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTableConversationMessageAlterTimestamp do
+defmodule Data.Repo.Migrations.AlterTableConversationMessageAlterTimestamp do
   use Ecto.Migration
 
   def change do

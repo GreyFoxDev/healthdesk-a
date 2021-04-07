@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTableAppointmentsAddMemberId do
+defmodule Data.Repo.Migrations.AlterTableAppointmentsAddMemberId do
   use Ecto.Migration
 
   def change do

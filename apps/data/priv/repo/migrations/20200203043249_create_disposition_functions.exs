@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateDispositionFunctions do
+defmodule Data.Repo.Migrations.CreateDispositionFunctions do
   use Ecto.Migration
 
   def down do

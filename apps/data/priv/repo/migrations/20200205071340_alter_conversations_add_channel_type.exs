@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterConversationsAddChannelType do
+defmodule Data.Repo.Migrations.AlterConversationsAddChannelType do
   use Ecto.Migration
 
   def change do

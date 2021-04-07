@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterConversationsAddAppointment do
+defmodule Data.Repo.Migrations.AlterConversationsAddAppointment do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTeamMembersAddDeletedAt do
+defmodule Data.Repo.Migrations.AlterTeamMembersAddDeletedAt do
   use Ecto.Migration
 
   def change do

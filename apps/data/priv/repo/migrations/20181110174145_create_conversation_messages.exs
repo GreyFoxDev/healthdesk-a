@@ -1,4 +1,4 @@
-defmodule Data.WriteOnly.Repo.Migrations.CreateConversationMessages do
+defmodule Data.Repo.Migrations.CreateConversationMessages do
   use Ecto.Migration
 
   def change do

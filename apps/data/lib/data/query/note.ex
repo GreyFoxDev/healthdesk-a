@@ -6,8 +6,8 @@ defmodule Data.Query.Note do
   import Ecto.Query, only: [from: 2]
 
   alias Data.Schema.Note
-  alias Data.ReadOnly.Repo, as: Read
-  alias Data.WriteOnly.Repo, as: Write
+  alias Data.Repo, as: Read
+  alias Data.Repo, as: Write
 
   @spec get_by_conversation(conversation_id :: binary(), repo :: Ecto.Repo.t()) :: [Note.t()]
   def get_by_conversation(conversation_id, repo \\ Read) do

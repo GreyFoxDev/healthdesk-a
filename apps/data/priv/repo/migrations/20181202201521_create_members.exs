@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateMembers do
+defmodule Data.Repo.Migrations.CreateMembers do
   use Ecto.Migration
 
   def change do

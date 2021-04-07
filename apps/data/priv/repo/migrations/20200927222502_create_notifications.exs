@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateNotifications do
+defmodule Data.Repo.Migrations.CreateNotifications do
   use Ecto.Migration
 
   def change do

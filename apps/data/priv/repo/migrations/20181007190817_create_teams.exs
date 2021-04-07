@@ -1,4 +1,4 @@
-defmodule Data.WriteOnly.Repo.Migrations.CreateTeams do
+defmodule Data.Repo.Migrations.CreateTeams do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateCampaigns do
+defmodule Data.Repo.Migrations.CreateCampaigns do
   use Ecto.Migration
 
   def change do

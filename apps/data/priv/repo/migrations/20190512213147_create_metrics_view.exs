@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.CreateMetricsView do
+defmodule Data.Repo.Migrations.CreateMetricsView do
   use Ecto.Migration
 
   def up do

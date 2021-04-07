@@ -1,4 +1,4 @@
-defmodule Data.ReadOnly.Repo.Migrations.AlterTeamsAddFlowId do
+defmodule Data.Repo.Migrations.AlterTeamsAddFlowId do
   use Ecto.Migration
 
   def change do
