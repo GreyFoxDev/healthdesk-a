@@ -31,7 +31,7 @@ defmodule MainWeb.Plug.AssignParams do
       |> assign(:location, location)
       |> assign(:memberName, params["memberName"])
       |> assign(:phoneNumber, params["phoneNumber"])
-      |> assign(:email, params["emailAddress"])
+      |> assign(:email, params["email"])
     end
   end
 
