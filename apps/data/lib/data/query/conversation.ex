@@ -107,7 +107,7 @@ defmodule Data.Query.Conversation do
     location_str = Enum.join(location_id, "', '")
     location = "('" <> location_str <> "')"
     query = "SELECT DISTINCT conversations.id FROM conversations JOIN conversation_messages ON conversations.id = conversation_messages.conversation_id LEFT JOIN members ON conversations.original_number = members.phone_number WHERE conversations.status in #{statuses} AND conversations.location_id in #{location} LIMIT #{limit} OFFSET #{0}"
-    case Ecto.Adapters.SQL.query(Data.ReadOnly.Repo, query) do
+    case Ecto.Adapters.SQL.query(Read, query) do
       {:ok, %{rows: data}} ->  List.flatten(data) |> Enum.map(&UUID.binary_to_string!(&1)) |> get_conversations(repo)
       error -> error
     end
@@ -118,7 +118,7 @@ defmodule Data.Query.Conversation do
     location_str = Enum.join(location_id, "', '")
     location = "('" <> location_str <> "')"
     query = "SELECT DISTINCT conversations.id FROM conversations JOIN conversation_messages ON conversations.id = conversation_messages.conversation_id LEFT JOIN members ON conversations.original_number = members.phone_number WHERE conversations.status in #{statuses} AND conversations.location_id in #{location} LIMIT #{10} OFFSET #{offset}"
-    case Ecto.Adapters.SQL.query(Data.ReadOnly.Repo, query) do
+    case Ecto.Adapters.SQL.query(Read, query) do
       {:ok, %{rows: data}} ->  List.flatten(data) |> Enum.map(&UUID.binary_to_string!(&1)) |> get_conversations(repo)
       error -> error
     end
