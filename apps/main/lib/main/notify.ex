@@ -102,10 +102,10 @@ defmodule MainWeb.Notify do
       member = conversation.member
       subject = if member do
         member = [
-          member.first_name,
-          member.last_name,
-          conversation.original_number
-        ] |> Enum.join(" ")
+                   member.first_name,
+                   member.last_name,
+                   conversation.original_number
+                 ] |> Enum.join(" ")
 
         "New message from #{member}"
       else
@@ -175,10 +175,12 @@ defmodule MainWeb.Notify do
         member = conversation.member
         subject = if member do
           member = [
-            member.first_name,
-            member.last_name,
-            conversation.original_number
-          ] |> Enum.join(" ")
+                     member.first_name,
+                     member.last_name,
+                     member.email || "",
+                     location.location_name,
+                     conversation.original_number
+                   ] |> Enum.join(" ")
 
           "New message from #{member}"
         else
@@ -193,6 +195,20 @@ defmodule MainWeb.Notify do
 
     _ = Enum.each(available_admins, fn(admin) ->
       if admin.use_sms do
+        member = conversation.member
+        body = if member do
+          member = [
+                     member.first_name,
+                     member.last_name,
+                     member.email || "",
+                     location.location_name
+                   ] |> Enum.join(" ")
+          body <> " from #{member}"
+          else
+          body
+        end
+
+
         message = %{
           provider: :twilio,
           from: location.phone_number,
@@ -206,7 +222,18 @@ defmodule MainWeb.Notify do
 
     if location.slack_integration && location.slack_integration != "" do
       headers = [{"content-type", "application/json"}]
-
+      member = conversation.member
+      body = if member do
+        member = [
+                   member.first_name,
+                   member.last_name,
+                   member.email || "",
+                   location.location_name
+                 ] |> Enum.join(" ")
+        body <> " from #{member}"
+      else
+        body
+      end
       body = Jason.encode! %{text: String.replace(body, "\n", " ")}
 
       Tesla.post location.slack_integration, body, headers: headers
