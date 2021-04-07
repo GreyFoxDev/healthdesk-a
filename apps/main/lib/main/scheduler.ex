@@ -1,9 +1,10 @@
 defmodule Main.Scheduler do
   use Quantum, otp_app: :main
 
-  alias Data.{Campaign, CampaignRecipient, Location, Conversations}
+  alias Data.{Campaign,Member, CampaignRecipient, Location, Conversations}
   alias Quantum.Job
 
+  @role %{role: "admin"}
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
   def schedule_campaign(id) do
@@ -37,12 +38,12 @@ defmodule Main.Scheduler do
 
   defp send_to_recipients(campaign) do
     location = Location.get(campaign.location_id)
-
     campaign.id
     |> CampaignRecipient.get_by_campaign_id()
     |> Enum.map(
          fn (member) ->
-           if member.consent != false do
+           member_ =  Member.get_by_phone_number(@role, member.phone_number)
+           if member_ && member.consent != false do
 
              %{
                provider: :twilio,
@@ -54,7 +55,20 @@ defmodule Main.Scheduler do
              CampaignRecipient.update(member, %{sent_at: DateTime.utc_now(), sent_successfully: true})
 
            else
-             CampaignRecipient.update(member, %{sent_at: DateTime.utc_now(), sent_successfully: false})
+             if !member_  do
+
+               %{
+                 provider: :twilio,
+                 from: location.phone_number,
+                 to: member.phone_number,
+                 body: campaign.message
+               }
+               |> @chatbot.send()
+               CampaignRecipient.update(member, %{sent_at: DateTime.utc_now(), sent_successfully: true})
+             else
+               false
+
+             end
 
 
            end
