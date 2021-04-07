@@ -262,6 +262,19 @@
     <!-- .media -->
     <div class="media mb-1">
         <div class="media-body">
+            <%= if @open_conversation.member && @open_conversation.member.consent == false && @open_conversation.channel_type == "SMS" do %>
+            <%= text_input f, :message,
+                                     id: "taguser_"<>@open_conversation.id,
+                                     class: "form-control border-0 shadow-none",
+                                     place_holder: "Type a message",
+                                     phx_focus: :focused,
+                                     data_emojiable: true,
+                                     data_tribute: true,
+                                     disabled: true,
+                                     value: "member has unsubscribed",
+                                     phx_blur: :blured  %>
+        </div>
+            <% else %>
             <%= text_input f, :message,
                                      id: "taguser_"<>@open_conversation.id,
                                      class: "form-control border-0 shadow-none",
@@ -270,14 +283,16 @@
                                      data_emojiable: true,
                                      data_tribute: true,
                                      phx_blur: :blured  %>
-
-
         </div>
         <div class="d-flex align-items-center">
             <button type="submit" class="btn btn-light btn-icon">
                 <i class="far fa-paper-plane"></i>
             </button>
         </div>
+            <% end %>
+
+
+
     </div><!-- /.media -->
     </form><!-- /form -->
     <% end %>

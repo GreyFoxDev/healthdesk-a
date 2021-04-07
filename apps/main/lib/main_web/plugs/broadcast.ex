@@ -37,5 +37,6 @@ defmodule MainWeb.Plug.Broadcast do
     end
     conn
   end
+  def call(conn, _opts), do: conn
 
 end

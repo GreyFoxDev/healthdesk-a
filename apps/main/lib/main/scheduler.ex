@@ -42,15 +42,22 @@ defmodule Main.Scheduler do
     |> CampaignRecipient.get_by_campaign_id()
     |> Enum.map(
          fn (member) ->
-           %{
-             provider: :twilio,
-             from: location.phone_number,
-             to: member.phone_number,
-             body: campaign.message
-           }
-           |> @chatbot.send()
+           if member.consent != false do
 
-           CampaignRecipient.update(member, %{sent_at: DateTime.utc_now(), sent_successfully: true})
+             %{
+               provider: :twilio,
+               from: location.phone_number,
+               to: member.phone_number,
+               body: campaign.message
+             }
+             |> @chatbot.send()
+             CampaignRecipient.update(member, %{sent_at: DateTime.utc_now(), sent_successfully: true})
+
+           else
+             CampaignRecipient.update(member, %{sent_at: DateTime.utc_now(), sent_successfully: false})
+
+
+           end
          end
        )
 

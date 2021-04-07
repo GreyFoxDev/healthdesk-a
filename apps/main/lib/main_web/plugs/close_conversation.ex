@@ -6,7 +6,7 @@ defmodule MainWeb.Plug.CloseConversation do
 
   alias Data.Conversations, as: C
   alias Data.ConversationMessages, as: CM
-
+  alias Data.Member
   @spec init(list()) :: list()
   def init(opts), do: opts
 
@@ -47,6 +47,33 @@ defmodule MainWeb.Plug.CloseConversation do
 
   def call(%{assigns: %{convo: id, intent: :unknown_intent}} = conn, _opts) do
     C.pending(id)
+    conn
+  end
+
+  def call(%{assigns: %{convo: id,location: location, intent: {:subscribe, []}}} = conn, _opts) do
+    datetime = DateTime.utc_now()
+    _ = CM.create(%{
+      "conversation_id" => id,
+      "phone_number" => location,
+      "message" => "subscribed",
+      "sent_at" => DateTime.add(datetime, 1)})
+
+    convo = C.get(id)
+    Member.update(convo.member.id, %{consent: true})
+    C.close(id)
+    conn
+  end
+  def call(%{assigns: %{convo: id,location: location, intent: {:unsubscribe, []}}} = conn, _opts) do
+    datetime = DateTime.utc_now()
+    _ = CM.create(%{
+      "conversation_id" => id,
+      "phone_number" => location,
+      "message" => "unsubscribed",
+      "sent_at" => DateTime.add(datetime, 1)})
+
+    convo = C.get(id)
+    Member.update(convo.member.id, %{consent: false})
+    C.close(id)
     conn
   end
 

@@ -46,6 +46,15 @@ defmodule MainWeb.Plug.BuildAnswer do
   @doc """
   If there is a known intent then get the corresponding response.
   """
+  def call(%{assigns: %{convo: id, status: "open", intent: {:subscribe, []}=intent, location: location}} = conn, _opts) do
+      conn
+      |> assign(:status, "closed")
+  end
+  def call(%{assigns: %{convo: id, status: "open", intent: {:unsubscribe, []}=intent, location: location}} = conn, _opts) do
+      conn
+      |> assign(:status, "closed")
+  end
+
   def call(%{assigns: %{convo: id, status: "open", intent: intent, location: location}} = conn, _opts) do
     response = Appointment.get_next_reply(id,intent, location)
 
