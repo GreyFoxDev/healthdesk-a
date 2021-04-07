@@ -11,6 +11,10 @@ defmodule MainWeb.Plug.SaveMemberData do
   def init(opts), do: opts
 
   def call(%{assigns: %{memberName: name, phoneNumber: phone, location: location, email: email} = assigns} = conn, _opts) when phone != nil do
+    IO.inspect("############1#######")
+    IO.inspect(assigns)
+    IO.inspect("###################")
+
     l = Location.get_by_phone(location)
     phone = format_phone(phone)
     [first_name, last_name] =
@@ -33,6 +37,9 @@ defmodule MainWeb.Plug.SaveMemberData do
     conn
   end
   def call(%{assigns: %{memberName: name, phoneNumber: phone, location: location} = assigns} = conn, _opts) when phone != nil do
+    IO.inspect("###########2########")
+    IO.inspect(assigns)
+    IO.inspect("###################")
     l = Location.get_by_phone(location)
     phone = format_phone(phone)
     [first_name, last_name] =
@@ -55,7 +62,10 @@ defmodule MainWeb.Plug.SaveMemberData do
     conn
   end
 
-  def call(%{assigns: %{member: phone, location: location}} = conn, _opts) when phone != nil do
+  def call(%{assigns: %{member: phone, location: location}=assigns} = conn, _opts) when phone != nil do
+    IO.inspect("###########3########")
+    IO.inspect(assigns)
+    IO.inspect("###################")
     l = Location.get_by_phone(location)
     {:ok, member} =
       with nil <- Member.get_by_phone_number(@role, phone) do
