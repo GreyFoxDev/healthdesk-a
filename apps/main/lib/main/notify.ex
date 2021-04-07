@@ -179,8 +179,8 @@ defmodule MainWeb.Notify do
                      member.last_name,
                      member.email || "",
                      location.location_name,
-                     conversation.original_number
-                   ] |> Enum.join(" ")
+                     member.phone_number
+                   ] |> Enum.join(", ")
 
           "New message from #{member}"
         else
@@ -201,8 +201,9 @@ defmodule MainWeb.Notify do
                      member.first_name,
                      member.last_name,
                      member.email || "",
-                     location.location_name
-                   ] |> Enum.join(" ")
+                     location.location_name,
+                     member.phone_number
+                   ] |> Enum.join(", ")
           body <> " from #{member}"
           else
           body
@@ -228,8 +229,9 @@ defmodule MainWeb.Notify do
                    member.first_name,
                    member.last_name,
                    member.email || "",
-                   location.location_name
-                 ] |> Enum.join(" ")
+                   location.location_name,
+                   member.phone_number
+                 ] |> Enum.join(", ")
         body <> " from #{member}"
       else
         body
