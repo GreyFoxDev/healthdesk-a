@@ -89,13 +89,7 @@ defmodule MainWeb.Helper.Formatters  do
   end
 
   def format_date_time_split(datetime, timezone \\ "PST8PDT") do
-    offset =
-      timezone
-      |> Data.TimezoneOffset.calculate()
-      |> abs()
-
-
-    datetime = datetime|> DateTime.add(offset, :second)
+    datetime = Calendar.DateTime.shift_zone!(datetime, timezone)
     Strftime.strftime!(datetime, "%m/%d/%Y | %I:%M %p")
   end
 

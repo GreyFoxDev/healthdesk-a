@@ -940,8 +940,6 @@ defmodule MainWeb.Live.ConversationsView do
 
       end
 
-
-    socket =  socket
     socket =  socket
               |> assign(:conversations, filter_conversations(conversations, search_string))
               |> assign(:search_string, search_string)
