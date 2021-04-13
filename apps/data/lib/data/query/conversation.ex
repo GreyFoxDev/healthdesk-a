@@ -123,14 +123,14 @@ defmodule Data.Query.Conversation do
   @spec get_limited_conversations(location_id :: [binary()], status :: [binary()], limit :: nil, offset :: nil, repo :: Ecto.Repo.t()) :: [
                                                                                                                                             Conversation.t()
                                                                                                                                           ]
-  
-  def get_limited_conversations(location_id, status, offset \\0 , limit \\ 30, repo) when is_list(status) do
+
+  def get_limited_conversations(location_id, status, offset \\ 0, limit \\ 30, repo \\ Read) when is_list(status) do
     status_str = Enum.join(status, "', '")
     statuses = "('" <> status_str <> "')"
     location_str = Enum.join(location_id, "', '")
     location = "('" <> location_str <> "')"
     query = "SELECT DISTINCT conversations.id FROM conversations JOIN conversation_messages ON conversations.id = conversation_messages.conversation_id LEFT JOIN members ON conversations.original_number = members.phone_number WHERE conversations.status in #{statuses} AND conversations.location_id in #{location} LIMIT #{limit} OFFSET #{offset}"
-    case Ecto.Adapters.SQL.query(Read, query) do
+    case Ecto.Adapters.SQL.query(Data.Repo, query) do
       {:ok, %{rows: data}} ->  List.flatten(data) |> Enum.map(&UUID.binary_to_string!(&1)) |> get_conversations(repo)
       error -> error
     end
