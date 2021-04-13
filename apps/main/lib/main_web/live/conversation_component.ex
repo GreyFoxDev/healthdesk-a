@@ -31,9 +31,10 @@ defmodule MainWeb.Live.ConversationComponent do
     socket = if(socket.assigns.loadmore) do
       conversations =
         user
-        |> Conversations.all(socket.assigns.location_ids, status, (socket.assigns.page * 30))
+        |> Conversations.all(socket.assigns.location_ids, status, (socket.assigns.page * 30)+30)
       IO.inspect("=======================START=======================")
       IO.inspect(Enum.count(conversations))
+      IO.inspect(socket.assigns.page)
       IO.inspect(Enum.count(socket.assigns.conversations))
       IO.inspect("=======================END=======================")
 
