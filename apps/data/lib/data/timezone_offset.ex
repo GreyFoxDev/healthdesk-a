@@ -12,7 +12,7 @@ defmodule Data.TimezoneOffset do
   def calculate(<<_::binary-size(3), _hour::binary-size(1), _::binary>> = timezone)
       when timezone in @timezones do
     tz = Timex.timezone timezone , Date.utc_today
-    tz.offset_utc
+    Timex.Timezone.total_offset tz
 
   end
 
