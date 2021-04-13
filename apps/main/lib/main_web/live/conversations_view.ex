@@ -922,6 +922,10 @@ defmodule MainWeb.Live.ConversationsView do
 
   end
   def handle_event("filter_convo",query, socket) do
+    IO.inspect("###################")
+    IO.inspect(query)
+    IO.inspect("###################")
+
     search_string = query["value"]
     user = socket.assigns.user
     conversations = case socket.assigns.tab do

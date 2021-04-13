@@ -278,7 +278,12 @@ defmodule Main.Service.Appointment do
     {res, step}
   end
   defp get_next_step(appointment, step, _, location,fallback) when step in [1,2,3,4,5,6,7] and fallback in [0,1]  do
-      {fallback_intent(step,fallback, location),step,fallback+1}
+    IO.inspect("##########asdsad#########")
+    IO.inspect(step)
+    IO.inspect(fallback)
+    IO.inspect("###################")
+
+    {fallback_intent(step,fallback, location),step,fallback+1}
   end
   defp get_dates() do
     today = Timex.today
