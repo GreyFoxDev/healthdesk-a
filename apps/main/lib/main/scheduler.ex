@@ -10,6 +10,12 @@ defmodule Main.Scheduler do
   def schedule_campaign(id) do
     campaign = Campaign.get(id)
     time= campaign.send_at
+    offset =
+      campaign.location.timezone
+      |> Data.TimezoneOffset.calculate()
+      |> abs()
+    time = time|> DateTime.add(offset, :second)
+
     cron_expr = %Crontab.CronExpression{
     }
     cron_expr =  if time.year != 0 , do: Map.put(cron_expr,:year,[time.year]), else: cron_expr

@@ -38,7 +38,7 @@ defmodule Data.Conversations do
   end
 
   def all(%{role: role}, location_id) when role in @roles and is_list(location_id) do
-    Query.get_by_location_ids(location_id) |> Enum.take(200)
+    Query.get_by_location_ids(location_id)
   end
 
   def all(%{role: role}, location_id) when role in @roles do
@@ -46,7 +46,10 @@ defmodule Data.Conversations do
   end
 
   def all(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do
-    Query.get_by_status(location_id, status) |> Enum.take(200)
+    Query.get_by_status(location_id, status)
+  end
+  def filter(%{role: role}, location_id, status, search_String) when role in @roles and is_list(location_id) do
+    Query.get_by_status(location_id, status,search_String)
   end
 
   def all(%{role: role}, location_id, status, offset) when role in @roles and is_list(location_id) do
@@ -204,7 +207,7 @@ defmodule Data.Conversations do
   def appointment_open(id) do
     with %Schema{id: ^id} = convo <- Query.get(id),
          %Schema{id: ^id} = convo <-
-           Query.update(convo, %{"appointment" => true, "step" => "1", "status" => "open"}) do
+           Query.update(convo, %{"appointment" => true, "step" => "1","fallback" => 0, "status" => "open"}) do
       {:ok, convo}
     else
       _ ->
@@ -215,7 +218,7 @@ defmodule Data.Conversations do
   def appointment_close(id) do
     with %Schema{id: ^id} = convo <- Query.get(id),
          %Schema{id: ^id} = convo <-
-           Query.update(convo, %{"appointment" => false, "step" => "", "status" => "open"}) do
+           Query.update(convo, %{"appointment" => false, "step" => "","fallback" => 0, "status" => "open"}) do
       {:ok, convo}
     else
       _ ->
@@ -223,6 +226,15 @@ defmodule Data.Conversations do
     end
   end
 
+  def appointment_step(id, step, fallback) do
+    with %Schema{id: ^id} = convo <- Query.get(id),
+         %Schema{id: ^id} = convo <- Query.update(convo, %{"step" => step,"fallback" => fallback, "status" => "open"}) do
+      {:ok, convo}
+    else
+      _ ->
+        {:error, "Unable to close conversation."}
+    end
+  end
   def appointment_step(id, step) do
     with %Schema{id: ^id} = convo <- Query.get(id),
          %Schema{id: ^id} = convo <- Query.update(convo, %{"step" => step, "status" => "open"}) do

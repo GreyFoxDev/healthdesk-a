@@ -15,7 +15,8 @@ defmodule Data.Query.Campaign do
   def get(id, repo \\ Read) do
     from(t in Campaign,
       where: is_nil(t.deleted_at),
-      where: t.id == ^id
+      where: t.id == ^id,
+      preload: [:location]
     )
     |> repo.one()
   end

@@ -25,6 +25,7 @@ defmodule Data.Schema.Conversation do
   started_at
   team_member_id
   channel_type
+  fallback
   subject
   appointment
   step
@@ -40,6 +41,7 @@ defmodule Data.Schema.Conversation do
     field(:subject, :string)
     field(:appointment, :boolean)
     field(:step, :integer)
+    field(:fallback, :integer, default: 0)
 
     field(:member, :map, virtual: true, default: %Data.Schema.Member{})
 

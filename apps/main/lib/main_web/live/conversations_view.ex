@@ -10,7 +10,7 @@ defmodule MainWeb.Live.ConversationsView do
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
 
   require Logger
-  @limit 25
+  @limit 30
   @offset 0
   def render(assigns), do: MainWeb.ConversationView.render("index.html", assigns)
 
@@ -466,7 +466,6 @@ defmodule MainWeb.Live.ConversationsView do
 
     conversations = user
                     |> Conversations.all(locations,["open", "pending"], 0)
-                    |> IO.inspect
                     |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
 
     open_conversation = conversations |> List.first() |> fetch_member()
@@ -924,7 +923,25 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def handle_event("filter_convo",query, socket) do
     search_string = query["value"]
-    conversations = socket.assigns[:o_conversations] || socket.assigns.conversations
+    user = socket.assigns.user
+    conversations = case socket.assigns.tab do
+      "active" ->
+        user
+        |> Conversations.all(socket.assigns.location_ids,["open", "pending"])
+        |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
+      "assigned" ->
+        user
+        |> Conversations.all(socket.assigns.location_ids,["open", "pending"])
+        |> Enum.filter(fn (c) -> (c.team_member && c.team_member.user_id != user.id) end)
+      "closed" ->
+        user
+        |> Conversations.all(socket.assigns.location_ids,["closed"])
+        |> Enum.filter(fn (c) -> (!c.team_member)||(c.team_member && c.team_member.user_id == user.id) end)
+
+      end
+
+
+    socket =  socket
     socket =  socket
               |> assign(:conversations, filter_conversations(conversations, search_string))
               |> assign(:search_string, search_string)

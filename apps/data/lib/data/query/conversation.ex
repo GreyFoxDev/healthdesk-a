@@ -63,7 +63,29 @@ defmodule Data.Query.Conversation do
   @spec get_by_status(location_id :: [binary()], status :: [binary()], repo :: Ecto.Repo.t()) :: [
                                                                                                    Conversation.t()
                                                                                                  ]
-  def get_by_status(location_id, status, repo \\ Read) when is_list(status) do
+  def get_by_status(location_id, status,search_string, repo \\ Read) when is_list(status) do
+    time = DateTime.add(DateTime.utc_now(), -1_296_000, :seconds)
+    like = "%#{search_string}%"
+    from(c in Conversation,
+      join: m in assoc(c, :conversation_messages),
+      left_join: member in Member,
+      left_join: location in assoc(c, :location),
+      on: c.original_number == member.phone_number,
+      where: c.location_id in ^location_id,
+      where: c.status in ^status,
+      where: m.sent_at >= ^time,
+      or_where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(location.location_name,^like)
+                 or like(member.first_name,^like) or like(member.phone_number,^like) or like(member.last_name,^like)),
+      # most recent first
+      order_by: [desc: m.sent_at],
+      preload: [conversation_messages: m, team_member: [:user], location: []],
+      select: %{c | member: member}
+    )
+    |> repo.all() |> IO.inspect(limit: :infinity)
+  end
+
+  def get_by_status(location_id, status) when is_list(status) do
+    repo = Read
     time = DateTime.add(DateTime.utc_now(), -1_296_000, :seconds)
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
