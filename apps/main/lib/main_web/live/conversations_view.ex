@@ -367,6 +367,7 @@ defmodule MainWeb.Live.ConversationsView do
       }
 
       Conversations.update(%{"id" => conversation.id, "status" => "closed","appointment" => false, "team_member_id" => nil})
+      ConCache.put(:session_cache, conversation.id, 0)
       ConversationMessages.create(message)
       Main.LiveUpdates.notify_live_view( {conversation.location.id, :updated_open})
       send(self(), {:fetch_c, %{user: user, locations: socket.assigns.location_ids, type: socket.assigns.tab}})

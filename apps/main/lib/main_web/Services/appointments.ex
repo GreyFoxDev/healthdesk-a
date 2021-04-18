@@ -459,6 +459,9 @@ defmodule Main.Service.Appointment do
     case get_next_step(appointment, step, value, location,fallback)do
       {_, step, f} = res ->
         C.appointment_step(id,step,f)
+        if f>1 do
+          C.appointment_close(id)
+        end
         res
       {_, step} = res ->
         C.appointment_step(id,step)

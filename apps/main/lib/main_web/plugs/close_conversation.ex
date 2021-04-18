@@ -40,6 +40,22 @@ defmodule MainWeb.Plug.CloseConversation do
   def call(%{assigns: %{convo: id, intent: nil}} = conn, _opts) do
     conn
   end
+  def call(%{assigns: %{convo: id, location: location, appointment: true} = assigns} = conn, _opts) do
+
+    datetime = DateTime.utc_now()
+    _ = CM.create(%{
+      "conversation_id" => id,
+      "phone_number" => location,
+      "message" => conn.assigns[:response],
+      "sent_at" => DateTime.add(datetime, 1)})
+
+    C.close(id)
+
+    _ = ConCache.delete(:session_cache, id)
+
+    conn
+  end
+
   def call(%{assigns: %{convo: id, intent: {:unknown, []}}} = conn, _opts) do
     C.pending(id)
     conn
