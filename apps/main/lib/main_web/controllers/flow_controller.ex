@@ -42,5 +42,5 @@ defmodule MainWeb.FlowController do
     }
   end
 
-  defp execute(params), do: Twilio.execution(params)
+  defp execute(params), do: Twilio.call(params)
 end
