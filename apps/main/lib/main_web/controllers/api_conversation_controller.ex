@@ -8,6 +8,12 @@ defmodule MainWeb.Api.ConversationController do
   alias MainWeb.{Notify, Intents}
   @role %{role: "admin"}
 
+  def create_(conn,params)do
+    IO.inspect("#########paramas recieved##########")
+    IO.inspect(params)
+    IO.inspect("###################")
+    create(conn,params)
+  end
   def create(conn, %{"location" => << "messenger:", location :: binary>>, "member" => << "messenger:", _ :: binary>> = member}) do
     location = Location.get_by_messenger_id(location)
 

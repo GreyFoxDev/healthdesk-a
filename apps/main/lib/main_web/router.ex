@@ -97,7 +97,7 @@ defmodule MainWeb.Router do
 
     post "/locations/:location_id/start_flow/:flow_name", FlowController, :flow
 
-    post "/twilio/conversations", Api.ConversationController, :create
+    post "/twilio/conversations", Api.ConversationController, :create_
     post "/twilio/conversations/update", Api.ConversationController, :update
     post "/twilio/conversations/close", Api.ConversationController, :close
 
