@@ -90,6 +90,8 @@ defmodule MainWeb.Live.CampaignsView do
              |> assign(:campaigns, campaigns)
              |> assign(:f_campaigns, campaigns)
     if connected?(socket), do: Process.send_after(self(), :reload_table, 1000)
+    if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
+
     {:noreply, socket}
   end
   def handle_info(:init_table, socket) do
@@ -100,6 +102,10 @@ defmodule MainWeb.Live.CampaignsView do
     {:noreply, push_event(socket, "reload", %{})}
 
   end
+  def handle_info(:menu_fix, socket) do
+    {:noreply, push_event(socket, "menu_fix", %{})}
+  end
+
 
   defp sort(c1,c2)do
 
