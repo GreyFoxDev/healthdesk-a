@@ -48,9 +48,9 @@ defmodule Data.Conversations do
   def all(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do
     Query.get_by_status(location_id, status)
   end
-  def filter(%{role: role}, location_id, status, search_String) when role in @roles and is_list(location_id) do
-    Query.get_by_status(location_id, status,search_String)
-  end
+#  def filter(%{role: role}, location_id, status, search_String) when role in @roles and is_list(location_id) do
+#    Query.get_by_status(location_id, status,search_String)
+#  end
 
   def filter(%{role: role}, location_id, status, user_id,check,search_string) when role in @roles and is_list(location_id) do
     Query.get_filtered_conversations(location_id, status, user_id, check,search_string)
