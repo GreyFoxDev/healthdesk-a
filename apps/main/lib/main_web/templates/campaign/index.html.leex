@@ -15,7 +15,7 @@
         <div class="row">
             <!-- grid column -->
             <div class="col-md-12 d-flex">
-                <div class="card card-fluid flex-fill">
+                <div class="card card-fluid flex-fill" phx-hook ="ReloadTable" id="new_capiign">
                     <div class="card-body">
                         <%= f = form_for @changeset, "#", [ phx_submit: :new_msg, multipart: true, novalidate: :novalidate] %>
                             <fieldset>
@@ -82,7 +82,7 @@
     </div>
 </div>
 <% else %>
-<div class="page">
+<div class="page" >
     <div class="page-inner">
 
         <header class="page-title-bar">

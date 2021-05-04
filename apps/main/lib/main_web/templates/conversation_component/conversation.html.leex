@@ -37,7 +37,7 @@ data-page=<%= @page %>
                 </h4>
                 <p class="list-group-item-text"> <%= c.location_name %> </p>
             </div>
-            <%= if !c.team_member || c.status == "closed" do %>
+            <%= if !c.team_member_id || c.status == "closed" do %>
             <div class="list-group-item-figure">
                 <button class="btn btn-sm btn-icon text-white bg-success" phx-click="assign" phx-value-cid="<%= c.id %>"><i class="fas fa-check"></i></button>
             </div>

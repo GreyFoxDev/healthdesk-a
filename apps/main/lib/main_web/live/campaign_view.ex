@@ -37,6 +37,7 @@ defmodule MainWeb.Live.CampaignsView do
     socket = socket
              |> assign(:new, "new")
              |> assign(:changeset, Conversations.get_changeset())
+    if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
 
     {:noreply, socket}
   end
@@ -48,6 +49,7 @@ defmodule MainWeb.Live.CampaignsView do
       assigns: Map.delete(socket.assigns, :new),
       changed: Map.put_new(socket.changed, :key, true)
     }
+    if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
     {:noreply, socket}
   end
   def handle_event("refresh", _, socket)do
@@ -90,7 +92,6 @@ defmodule MainWeb.Live.CampaignsView do
              |> assign(:campaigns, campaigns)
              |> assign(:f_campaigns, campaigns)
     if connected?(socket), do: Process.send_after(self(), :reload_table, 1000)
-    if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
 
     {:noreply, socket}
   end
@@ -99,6 +100,7 @@ defmodule MainWeb.Live.CampaignsView do
 
   end
   def handle_info(:reload_table, socket) do
+    if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
     {:noreply, push_event(socket, "reload", %{})}
 
   end
