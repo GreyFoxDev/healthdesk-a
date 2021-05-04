@@ -18,6 +18,9 @@ defmodule MainWeb.Plug.CloseConversation do
   then no need to do anything. Just return the connection.
   """
   def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
+    IO.inspect("########we are here###########")
+
+
     convo = C.get(id)
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
@@ -41,6 +44,9 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
   def call(%{assigns: %{convo: id, location: location, appointment: true} = assigns} = conn, _opts) do
+    IO.inspect("########we are heres###########")
+    IO.inspect(conn.assigns[:response])
+    IO.inspect("###################")
 
     datetime = DateTime.utc_now()
     _ = CM.create(%{
@@ -97,6 +103,10 @@ defmodule MainWeb.Plug.CloseConversation do
   If the question has been answered then close the conversation
   """
   def call(%{assigns: %{convo: id, location: location} = assigns} = conn, _opts) do
+    IO.inspect("########we are here2###########")
+    IO.inspect(conn.assigns[:response])
+    IO.inspect("###################")
+
     datetime = DateTime.utc_now()
     _ = CM.create(%{
           "conversation_id" => id,

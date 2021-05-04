@@ -28,14 +28,14 @@ data-page=<%= @page %>
             <div class="list-group-item-body">
                 <h4 class="list-group-item-title font-weight-bold">
                     <a href="#">
-                        <%= if c.member && c.member.first_name do %>
-                        <%= Enum.join([c.member.first_name, c.member.last_name], " ") %>
+                        <%= if c.first_name do %>
+                        <%= Enum.join([c.first_name, c.last_name||""], " ") %>
                                 <% else %>
                         <%= format_phone(c.original_number) %>
                                 <% end %>
                     </a>
                 </h4>
-                <p class="list-group-item-text"> <%= c.location.location_name %> </p>
+                <p class="list-group-item-text"> <%= c.location_name %> </p>
             </div>
             <%= if !c.team_member || c.status == "closed" do %>
             <div class="list-group-item-figure">

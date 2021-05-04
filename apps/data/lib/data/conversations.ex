@@ -52,8 +52,24 @@ defmodule Data.Conversations do
     Query.get_by_status(location_id, status,search_String)
   end
 
-  def all(%{role: role}, location_id, status, offset) when role in @roles and is_list(location_id) do
-    Query.get_limited_conversations(location_id, status, offset)
+  def filter(%{role: role}, location_id, status, user_id,check,search_string) when role in @roles and is_list(location_id) do
+    Query.get_filtered_conversations(location_id, status, user_id, check,search_string)
+  end
+  def filter(%{role: role}, location_id, status,user_id,search_string) when role in @roles and is_list(location_id) do
+    Query.get_filtered_conversations(location_id, status, user_id,search_string)
+  end
+  def filter(%{role: role}, location_id, status,search_string) when role in @roles and is_list(location_id) do
+    Query.get_filtered_conversations(location_id, status,search_string)
+  end
+
+  def all(%{role: role}, location_id, status, offset,limit,user_id,check) when role in @roles and is_list(location_id) do
+    Query.get_limited_conversations(location_id, status, offset ,limit, user_id, check)
+  end
+  def all(%{role: role}, location_id, status, offset,limit,user_id) when role in @roles and is_list(location_id) do
+    Query.get_limited_conversations(location_id, status, offset, limit, user_id)
+  end
+  def all(%{role: role}, location_id, status, offset , limit) when role in @roles and is_list(location_id) do
+    Query.get_limited_conversations(location_id, status, offset, limit)
   end
 
   def all_count(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do

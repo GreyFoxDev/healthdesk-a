@@ -1,3 +1,4 @@
+<%= if @open_conversation do %>
 <div class="message-header p-3 bg-white shadow-sm">
     <a href="#" class="btn-account" role="button">
                             <span class="user-avatar user-avatar-md">
@@ -309,3 +310,4 @@
     <p><span><%= x.id %></span><span><%= x.user.first_name <> " " <> x.user.last_name %></span></p>
     <% end %>
 </div>
+<% end %>

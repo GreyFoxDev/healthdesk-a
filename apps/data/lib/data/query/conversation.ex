@@ -4,7 +4,7 @@ defmodule Data.Query.Conversation do
   """
   import Ecto.Query, only: [from: 2]
 
-  alias Data.Schema.{Conversation, ConversationMessage, Member}
+  alias Data.Schema.{Conversation,ConversationList, ConversationMessage, Member}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
 
@@ -87,7 +87,7 @@ defmodule Data.Query.Conversation do
   def get_by_status(location_id, status) when is_list(status) do
     repo = Read
     time = DateTime.add(DateTime.utc_now(), -1_296_000, :seconds)
-    from(c in Conversation,
+    q=from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
       left_join: member in Member,
       on: c.original_number == member.phone_number,
@@ -99,6 +99,10 @@ defmodule Data.Query.Conversation do
       preload: [conversation_messages: m, team_member: [:user], location: []],
       select: %{c | member: member}
     )
+    IO.inspect("########asd###########")
+    IO.inspect(repo.to_sql(:all, q))
+    IO.inspect("###################")
+    q
     |> repo.all()
   end
 
@@ -120,20 +124,71 @@ defmodule Data.Query.Conversation do
   @doc """
   Return a list of limited conversations for a location
   """
-  @spec get_limited_conversations(location_id :: [binary()], status :: [binary()], limit :: nil, offset :: nil, repo :: Ecto.Repo.t()) :: [
-                                                                                                                                            Conversation.t()
-                                                                                                                                          ]
 
-  def get_limited_conversations(location_id, status, offset \\ 0, limit \\ 30, repo \\ Read) when is_list(status) do
-    status_str = Enum.join(status, "', '")
-    statuses = "('" <> status_str <> "')"
-    location_str = Enum.join(location_id, "', '")
-    location = "('" <> location_str <> "')"
-    query = "SELECT DISTINCT conversations.id FROM conversations JOIN conversation_messages ON conversations.id = conversation_messages.conversation_id LEFT JOIN members ON conversations.original_number = members.phone_number WHERE conversations.status in #{statuses} AND conversations.location_id in #{location} LIMIT #{limit} OFFSET #{offset}"
-    case Ecto.Adapters.SQL.query(Data.Repo, query) do
-      {:ok, %{rows: data}} ->  List.flatten(data) |> Enum.map(&UUID.binary_to_string!(&1)) |> get_conversations(repo)
-      error -> error
-    end
+  def get_limited_conversations(location_id, status, offset , limit , user_id , true) when is_list(status) do
+     from(
+        c in ConversationList,
+        where: c.status in ^status,
+        where: c.location_id in ^location_id,
+        where: c.user_id == ^user_id or is_nil(c.user_id),
+        offset: ^offset, limit: ^limit,
+      ) |>Read.all
+
+  end
+  def get_limited_conversations(location_id, status,  offset , limit , user_id ) when is_list(status) do
+
+      from(
+        c in ConversationList,
+        where: c.status in ^status,
+        where: c.location_id in ^location_id,
+        where: c.user_id != ^user_id,
+        offset: ^offset, limit: ^limit,
+      ) |>Read.all
+  end
+  def get_limited_conversations(location_id, status,  offset , limit ) when is_list(status) do
+
+      from(
+        c in ConversationList,
+        where: c.status in ^status,
+        where: c.location_id in ^location_id,
+        offset: ^offset, limit: ^limit,
+      ) |>Read.all
+  end
+
+  def get_filtered_conversations(location_id, status , user_id , true,s ) when is_list(status) do
+    like = "%#{s}%"
+     from(
+        c in ConversationList,
+        where: c.status in ^status,
+        where: c.location_id in ^location_id,
+        where: c.user_id == ^user_id or is_nil(c.user_id),
+        where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
+                  or like(c.first_name,^like)  or like(c.last_name,^like)),
+      ) |>Read.all
+
+  end
+  def get_filtered_conversations(location_id, status,   user_id,s ) when is_list(status) do
+    like = "%#{s}%"
+
+      from(
+        c in ConversationList,
+        where: c.status in ^status,
+        where: c.location_id in ^location_id,
+        where: c.user_id != ^user_id,
+        where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
+                   or like(c.first_name,^like)  or like(c.last_name,^like)),
+      ) |>Read.all
+  end
+  def get_filtered_conversations(location_id, status,s ) when is_list(status) do
+    like = "%#{s}%"
+
+      from(
+        c in ConversationList,
+        where: c.status in ^status,
+        where: c.location_id in ^location_id,
+        where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
+                   or like(c.first_name,^like)  or like(c.last_name,^like)),
+      ) |>Read.all
   end
 
   def get_conversations(ids, repo) do

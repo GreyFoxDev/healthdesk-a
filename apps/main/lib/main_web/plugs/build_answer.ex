@@ -62,6 +62,9 @@ defmodule MainWeb.Plug.BuildAnswer do
     response = Appointment.get_next_reply(id,intent, location)
 
     location = Location.get_by_phone(location)
+    IO.inspect("##########response#########")
+    IO.inspect(response)
+    IO.inspect("###################")
 
     if String.contains?(response,location.default_message)do
       pending_message_count = (ConCache.get(:session_cache, id) || 0)

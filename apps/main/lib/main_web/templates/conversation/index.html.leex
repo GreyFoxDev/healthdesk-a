@@ -8,7 +8,7 @@
 
 <div class="page has-sidebar has-sidebar-fluid has-sidebar-expand-xl" phx-hook ="ReloadTable">
     <!-- Message List -->
-    <%= if assigns[:open_conversation]  do %>
+    <%= if assigns[:open_conversation] || assigns[:searching]  do %>
     <div class="page-inner page-inner-fill position-relative" >
         <div class="">
             <button type="button" class="btn btn-primary btn-floated position-absolute" data-toggle="dropdown" data-target="" title="Add new client"><i class="fa fa-plus"></i></button>
