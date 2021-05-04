@@ -33,13 +33,13 @@ defmodule MainWeb.Live.ConversationComponent do
       conversations =
         case socket.assigns.tab do
           "active" -> user
-                      |> Conversations.all(socket.assigns.location_ids, ["open", "pending"], (socket.assigns.page * 30)+30, user.id,true)
+                      |> Conversations.all(socket.assigns.location_ids, ["open", "pending"], (socket.assigns.page * 30)+30,30, user.id,true)
           "assigned" -> user
-                        |> Conversations.all(socket.assigns.location_ids, ["open", "pending"], (socket.assigns.page * 30)+30, user.id)
+                        |> Conversations.all(socket.assigns.location_ids, ["open", "pending"], (socket.assigns.page * 30)+30,30, user.id)
 
           "closed" ->
                       user
-                      |> Conversations.all(socket.assigns.location_ids, ["closed"], (socket.assigns.page * 30)+30)
+                      |> Conversations.all(socket.assigns.location_ids, ["closed"], (socket.assigns.page * 30)+30,30)
           _-> []
         end
 
