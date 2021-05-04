@@ -29,14 +29,19 @@ defmodule MainWeb.Live.ConversationComponent do
     end
 
     socket = if(socket.assigns.loadmore) do
+
       conversations =
-        user
-        |> Conversations.all(socket.assigns.location_ids, status, (socket.assigns.page * 30)+30)
-      IO.inspect("=======================START=======================")
-      IO.inspect(Enum.count(conversations))
-      IO.inspect(socket.assigns.page)
-      IO.inspect(Enum.count(socket.assigns.conversations))
-      IO.inspect("=======================END=======================")
+        case socket.assigns.tab do
+          "active" -> user
+                      |> Conversations.all(socket.assigns.location_ids, ["open", "pending"], (socket.assigns.page * 30)+30, user.id,true)
+          "assigned" -> user
+                        |> Conversations.all(socket.assigns.location_ids, ["open", "pending"], (socket.assigns.page * 30)+30, user.id)
+
+          "closed" ->
+                      user
+                      |> Conversations.all(socket.assigns.location_ids, ["closed"], (socket.assigns.page * 30)+30)
+          _-> []
+        end
 
       if(conversations == []) do
         socket
