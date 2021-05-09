@@ -636,6 +636,8 @@ defmodule MainWeb.Live.ConversationsView do
   def fetch_member(%{original_number: <<"CH", _rest :: binary>> = channel} = conversation) do
     with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
       Map.put(conversation, :member, channel.member)
+      else
+      _->conversation
     end
   end
   def fetch_member(conversation), do: conversation
