@@ -14,7 +14,7 @@ defmodule Data.Repo.Migrations.CreateFunctionsForConversationAnalytics do
     RETURNS TABLE(
       disposition_count integer,
       disposition_date date,
-      channel_type varchar(20)
+      channel_type citext
     )  AS
     $count_dispositions_by_channel_type$
     BEGIN
@@ -38,7 +38,7 @@ defmodule Data.Repo.Migrations.CreateFunctionsForConversationAnalytics do
     RETURNS TABLE(
       disposition_count integer,
       disposition_date date,
-      channel_type varchar(20)
+      channel_type citext
     )  AS
     $count_team_dispositions_by_channel_type$
     BEGIN
@@ -63,7 +63,7 @@ defmodule Data.Repo.Migrations.CreateFunctionsForConversationAnalytics do
     RETURNS TABLE(
       disposition_count integer,
       disposition_date date,
-      channel_type varchar(20)
+      channel_type citext
     )  AS
     $count_location_dispositions_by_channel_type$
     BEGIN
