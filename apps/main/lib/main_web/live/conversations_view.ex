@@ -238,13 +238,21 @@ defmodule MainWeb.Live.ConversationsView do
     location = socket.assigns.open_conversation.location
     user = socket.assigns.user
     conversation = socket.assigns.open_conversation
-    conversations = socket.assigns.conversations
+    conversations = case socket.assigns.tab do
+      "active" ->
+        page= socket.assigns.page || 0
+          user
+          |> Conversations.all(socket.assigns.location_ids,["open", "pending"],0,30, user.id,true)
+      "assigned" ->
+        page= socket.assigns.page || 0
+          user
+          |> Conversations.all(socket.assigns.location_ids,["open", "pending"],0,30, user.id)
+      "closed" ->
+        page= socket.assigns.page || 0
+          user
+          |> Conversations.all(socket.assigns.location_ids,["closed"],0,30)
 
-
-    conversations =   conversations
-                      |> Enum.filter(&(&1.original_number  != conversation.original_number))
-                      |> List.insert_at(0, conversation)
-
+    end
     send_message(conversation, params, location, user)
     conversation =
       user

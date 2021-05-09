@@ -264,7 +264,7 @@
     <div class="media mb-1">
         <div class="media-body">
             <%= if @open_conversation.member && @open_conversation.member.consent == false && @open_conversation.channel_type == "SMS" do %>
-            <%= text_input f, :message,
+            <%= textarea f, :message,
                                      id: "taguser_"<>@open_conversation.id,
                                      class: "form-control border-0 shadow-none",
                                      place_holder: "Type a message",
@@ -276,7 +276,7 @@
                                      phx_blur: :blured  %>
         </div>
             <% else %>
-            <%= text_input f, :message,
+            <%= textarea f, :message,
                                      id: "taguser_"<>@open_conversation.id,
                                      class: "form-control border-0 shadow-none",
                                      place_holder: "Type a message",
