@@ -17,8 +17,7 @@ defmodule Data.Query.Team do
       where: is_nil(t.deleted_at),
       left_join: l in Location,
       on: t.id == l.team_id and is_nil(l.deleted_at),
-      left_join: m in assoc(t, :team_members),
-      preload: [locations: l, team_members: m],
+      preload: [locations: l],
       order_by: [t.team_name, l.location_name]
     )
     |> repo.all()

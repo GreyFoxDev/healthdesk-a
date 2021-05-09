@@ -19,14 +19,13 @@ defmodule Data.Query.TeamMember do
   def all(repo \\ Read) do
     from(t in TeamMember,
       join: u in User,
-      left_join: l in assoc(t, :team_member_locations),
       join: r in Team,
       where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: is_nil(r.deleted_at),
       order_by: [u.first_name, u.last_name],
-      preload: [locations: l, user: u]
+      preload: [ user: u]
     )
     |> repo.all()
   end
@@ -74,14 +73,13 @@ defmodule Data.Query.TeamMember do
   def get_by_location_id(location_id, repo \\ Read) do
     from(t in TeamMember,
       join: u in User,
-      left_join: l in assoc(t, :team_member_locations),
       join: r in Team,
       where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
-      where: l.location_id == ^location_id or t.location_id == ^location_id,
+      where:  t.location_id == ^location_id,
       order_by: [u.first_name, u.last_name],
-      preload: [:team_member_locations, :user]
+      preload: [ :user]
     )
     |> repo.all()
     |> Enum.dedup_by(& &1.id)
