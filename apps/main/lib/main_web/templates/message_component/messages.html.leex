@@ -276,7 +276,7 @@
                                      phx_blur: :blured  %>
         </div>
             <% else %>
-            <%= textarea f, :message,
+            <%= text_input f, :message,
                                      id: "taguser_"<>@open_conversation.id,
                                      class: "form-control border-0 shadow-none",
                                      place_holder: "Type a message",
