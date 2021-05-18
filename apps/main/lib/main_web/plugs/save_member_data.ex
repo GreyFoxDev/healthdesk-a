@@ -133,7 +133,7 @@ defmodule MainWeb.Plug.SaveMemberData do
     do: format_phone(number)
 
   def format_phone(phone) do
-    "+1#{replace_non_digits(phone)}"
+    "+#{replace_non_digits(phone)}"
   end
 
   defp replace_non_digits(phone), do: String.replace(phone, ~r/[^\d]/, "")

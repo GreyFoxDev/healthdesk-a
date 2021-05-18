@@ -6,6 +6,6 @@ defmodule Data.TestHelper do
   defdelegate phone, to: Faker.Phone.EnUs
 
   def phone_number do
-    "+1#{String.replace(phone(), ~r/[()\s-.\/]/, "")}"
+    "+#{String.replace(phone(), ~r/[()\s-.\/]/, "")}"
   end
 end

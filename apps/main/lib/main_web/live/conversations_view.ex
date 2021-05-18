@@ -665,29 +665,6 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, push_event(socket, "scroll_chat", %{})}
   end
 
-  defp send_message(%{original_number: <<"+1", _ :: binary>>} = conversation, params, location, user) do
-
-    params["conversation_message"]
-    |> Map.merge(
-         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
-       )
-    |> ConversationMessages.create()
-    |> case do
-         {:ok, message_} ->
-           message = %{
-             provider: :twilio,
-             from: location.phone_number,
-             to: conversation.original_number,
-             body: params["conversation_message"]["message"]
-           }
-           @chatbot.send(message)
-
-           Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message_}})
-
-         {:error, _changeset} ->
-           nil
-       end
-  end
   defp send_message(%{original_number: <<"messenger:", _ :: binary>>} = conversation, params, location, user) do
 
     params["conversation_message"]
@@ -763,6 +740,9 @@ defmodule MainWeb.Live.ConversationsView do
 
   end
   defp send_message(%{original_number: email} = conversation, params, location, user) do
+    regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
+
+    if Regex.match?(regex,email) do
 
     from = if conversation.team_member do
       Enum.join(
@@ -786,8 +766,31 @@ defmodule MainWeb.Live.ConversationsView do
            Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message}})
          _ -> nil
        end
+    else
 
+
+    params["conversation_message"]
+    |> Map.merge(
+         %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
+       )
+    |> ConversationMessages.create()
+    |> case do
+         {:ok, message_} ->
+           message = %{
+             provider: :twilio,
+             from: location.phone_number,
+             to: conversation.original_number,
+             body: params["conversation_message"]["message"]
+           }
+           @chatbot.send(message)
+
+           Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message_}})
+         {:error, _changeset} ->
+           nil
+       end
   end
+  end
+
 
   def handle_event("open", %{"cid" => id}, socket)do
 

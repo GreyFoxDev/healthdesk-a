@@ -35,7 +35,7 @@ defmodule MainWeb.ConversationMessageController do
     |> redirect(to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, conversation_id))
   end
 
-  defp send_message(%{original_number: << "+1", _ :: binary >>} = conversation, conn, params, location) do
+  defp send_message(%{original_number: << "+", _ :: binary >>} = conversation, conn, params, location) do
     user = current_user(conn)
 
     params["conversation_message"]

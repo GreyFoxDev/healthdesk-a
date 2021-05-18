@@ -32,6 +32,7 @@ defmodule Data.Schema.User do
     start_do_not_disturb
     end_do_not_disturb
     timezone
+    country
     logged_in_at
     deleted_at
   |a
@@ -40,6 +41,7 @@ defmodule Data.Schema.User do
 
   schema "users" do
     field(:phone_number, :string)
+    field(:country, :string, default: "1")
     field(:role, :string, default: "teammate")
     field(:first_name, :string)
     field(:last_name, :string)

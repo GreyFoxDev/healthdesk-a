@@ -42,8 +42,8 @@ defmodule Chatbot.Client.Twilio do
     )
   end
 
-  def verify(phone_number) do
-    [authy_url(), "via=sms&code_length=6&phone_number=", phone_number, "&country_code=1"]
+  def verify(phone_number,country) do
+    [authy_url(), "via=sms&code_length=6&phone_number=", phone_number, "&country_code=#{country}"]
     |> Enum.join()
     |> HTTPoison.post!("", authy_header())
     |> case do
@@ -56,12 +56,12 @@ defmodule Chatbot.Client.Twilio do
     end
   end
 
-  def check(phone_number, verification_code) do
+  def check(phone_number, country,verification_code) do
     [
       check_url(),
       "phone_number=",
       phone_number,
-      "&country_code=1&verification_code=",
+      "&country_code=#{country}&verification_code=",
       verification_code
     ]
     |> Enum.join()

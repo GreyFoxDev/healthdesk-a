@@ -344,7 +344,7 @@ defmodule MainWeb.ConversationController do
     member = String.replace(member, "-", "")
 
     member = if String.length(member) == 10 do
-      "+1#{member}"
+      "#{member}"
     else
       member
     end

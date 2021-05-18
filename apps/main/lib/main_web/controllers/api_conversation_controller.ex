@@ -213,7 +213,7 @@ defmodule MainWeb.Api.ConversationController do
     :timer.sleep(5000);
     Main.LiveUpdates.notify_live_view({location_id, :updated_open})
   end
-  def close_convo(%{original_number: <<"+1", _ :: binary>>} = convo_)do
+  def close_convo(%{original_number: <<"+", _ :: binary>>} = convo_)do
     :timer.sleep(100000);
     conversation = C.get(convo_.id)
     case conversation do

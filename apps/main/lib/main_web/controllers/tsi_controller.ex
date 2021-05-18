@@ -252,21 +252,14 @@ defmodule MainWeb.TsiController do
   defp build_answer(_) do
     "We've received your request. You may leave a comment below if you'd like."
   end
+  
 
-  defp format_phone(<<"1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
-    "+1#{Enum.join([area_code, prefix, line])}"
+  defp format_phone(<<"+", phone>>) do
+    phone
   end
 
-  defp format_phone(<<" 1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
-    "+1#{Enum.join([area_code, prefix, line])}"
-  end
-
-  defp format_phone(<<"+1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
-    "+1#{Enum.join([area_code, prefix, line])}"
-  end
-
-  defp format_phone(<<area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
-    "+1#{Enum.join([area_code, prefix, line])}"
+  defp format_phone(<<phone>>) do
+    phone
   end
 
   defp format_phone(unique_id) do

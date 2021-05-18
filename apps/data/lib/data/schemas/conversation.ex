@@ -92,7 +92,13 @@ defmodule Data.Schema.Conversation do
     put_change(changeset, :channel_type, "APP")
   end
 
-  defp set_channel_type(_email, changeset) do
-    put_change(changeset, :channel_type, "MAIL")
+  defp set_channel_type(email, changeset) do
+    regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
+
+    if Regex.match?(regex,email) do
+      put_change(changeset, :channel_type, "MAIL")
+    else
+      put_change(changeset, :channel_type, "SMS")
+    end
   end
 end

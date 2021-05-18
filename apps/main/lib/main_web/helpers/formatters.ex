@@ -24,23 +24,11 @@ defmodule MainWeb.Helper.Formatters  do
     end
   end
 
-  def format_phone(<<"1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
-    "+1 #{Enum.join([area_code, prefix, line], "-")}"
+  def format_phone(<<"+", phone>>) do
+    phone
   end
-
-  def format_phone(<<" 1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
-    "+1 #{Enum.join([area_code, prefix, line], "-")}"
-  end
-
-  def format_phone(<<"+1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
-    "+1 #{Enum.join([area_code, prefix, line], "-")}"
-  end
-  def format_phone(<<"APP:+1", area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
-    "+1 #{Enum.join([area_code, prefix, line], "-")}"
-  end
-
-  def format_phone(<<area_code :: binary - size(3), prefix :: binary - size(3), line :: binary - size(4)>>) do
-    "+1 #{Enum.join([area_code, prefix, line], "-")}"
+  def format_phone(<<"APP:+", phone>>) do
+    "#{phone}"
   end
 
   def format_phone(<<"messenger:", _rest :: binary>>), do: "Facebook Visitor"
@@ -60,7 +48,7 @@ defmodule MainWeb.Helper.Formatters  do
     if Regex.match?(regex,phone_number) do
       "Email Bot"
     else
-      "Unknown Visitor"
+      phone_number
     end
   end
 
@@ -74,7 +62,7 @@ defmodule MainWeb.Helper.Formatters  do
     if Regex.match?(regex,phone_number) do
       "Email Bot"
     else
-      "Unknown"
+      "SMS Bot"
     end
   end
 
@@ -82,7 +70,7 @@ defmodule MainWeb.Helper.Formatters  do
     name = Enum.join([team_member.first_name, team_member.last_name], " ")
 
     if name == "" do
-      "+1 #{format_phone(team_member.phone_number)}"
+      "#{format_phone(team_member.phone_number)}"
     else
       name
     end
