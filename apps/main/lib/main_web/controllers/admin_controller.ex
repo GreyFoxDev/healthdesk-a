@@ -2,6 +2,7 @@ defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
   alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages, Appointments}
   def index(conn, %{"team_id" => team_id}) do
+    IO.inspect(team_id)
     current_user = current_user(conn)
     team_members = TeamMember.get_by_team_id(current_user, team_id)
     dispositions = Disposition.count_by_team_id(team_id)
@@ -13,11 +14,11 @@ defmodule MainWeb.AdminController do
       end
     team_admin_count =
       team_members
-      |> Enum.map(&(&1.user.role in ["location-admin", "team-admin"]))
+      |> Enum.filter(&(&1.user.role in ["location-admin", "team-admin"]))
       |> Enum.count()
     teammate_count =
       team_members
-      |> Enum.map(&(&1.user.role == "teammate"))
+      |> Enum.filter(&(&1.user.role == "teammate"))
       |> Enum.count()
     locations = Location.get_by_team_id(current_user, team_id)
     location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
@@ -54,6 +55,7 @@ defmodule MainWeb.AdminController do
       location: nil)
   end
   def index(conn, %{"location_id" => location_id}) do
+    IO.inspect("----------location filter----------")
     current_user = current_user(conn)
     team_members = TeamMember.get_by_location_id(current_user, location_id)
     dispositions = Disposition.count_by_location_id(location_id)
@@ -66,11 +68,11 @@ defmodule MainWeb.AdminController do
       end
     team_admin_count =
       team_members
-      |> Enum.map(&(&1.user.role in ["location-admin", "team-admin"]))
+      |> Enum.filter(&(&1.user.role in ["location-admin", "team-admin"]))
       |> Enum.count()
     teammate_count =
       team_members
-      |> Enum.map(&(&1.user.role == "teammate"))
+      |> Enum.filter(&(&1.user.role == "teammate"))
       |> Enum.count()
     locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
     render(conn, "index.html",
@@ -96,93 +98,98 @@ defmodule MainWeb.AdminController do
       location: nil)
   end
   def index(conn, _params) do
+    IO.inspect("without filter-------")
     current_user = current_user(conn)
-    teams = teams(conn)
-    team_members = TeamMember.all()
-    team_admin_count =
-      team_members
-      |> Enum.map(&(&1.user.role in ["location-admin", "team-admin"]))
-      |> Enum.count()
-    teammate_count =
-      team_members
-      |> Enum.map(&(&1.user.role == "teammate"))
-      |> Enum.count()
-    if current_user.role == "admin" do
-      dispositions = Disposition.count_all()
-      appointments = Appointments.count_all()
-      [dispositions_per_day] = Disposition.average_per_day()
-      locations = Location.all()
-      response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id).median_response_time||0 end)
-      middle_index = response_times |> length() |> div(2)
-      response_time = response_times |> Enum.sort |> Enum.at(middle_index)
-      campaigns = locations
-                  |> Enum.map(fn(location) ->
-        Campaign.get_by_location_id(location.id)
-      end)
-                  |> List.flatten()
-      render(conn, "index.html",
-        metrics: [],
-        campaigns: campaigns,
-        dispositions: dispositions,
-        automated: calculate_percentage("Automated", dispositions),
-        call_deflected: calculate_percentage("Call deflected", dispositions),
-        appointments: appointments,
-        dispositions_per_day: dispositions_per_day,
-        response_time: response_time,
-        web_totals: totals_by_channel("WEB"),
-        sms_totals: totals_by_channel("SMS"),
-        app_totals: totals_by_channel("APP"),
-        facebook_totals: totals_by_channel("FACEBOOK"),
-        email_totals: totals_by_channel("MAIL"),
-        teams: teams,
-        team_admin_count: team_admin_count,
-        teammate_count: teammate_count,
-        location_count: Enum.count(locations),
-        location: nil,
-        location_id: nil,
-        team_id: nil)
+    if current_user.role in ["team-admin", "teammate"] do
+      index(conn, %{"team_id" => current_user.team_member.team_id})
     else
-      dispositions = Disposition.count_by_team_id(current_user.team_member.team_id)
-      appointments = Appointments.count_by_team_id(current_user.team_member.team_id)
-      dispositions_per_day =
-        case Disposition.average_per_day_for_team(current_user.team_member.team_id) do
-          [result] -> result
-          _ -> %{sessions_per_day: 0}
-        end
-      locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
-      response_time=ConversationMessages.count_by_team_id(current_user.team_member.team_id)
-      location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
-      campaigns = if location_id do
-        Campaign.get_by_location_id(location_id)
-      else
-        locations
-        |> Enum.map(fn(location) ->
+      teams = teams(conn)
+      team_members = TeamMember.all()
+      team_admin_count =
+        team_members
+        |> Enum.filter(&(&1.user.role in ["location-admin", "team-admin"]))
+        |> Enum.count()
+      teammate_count =
+        team_members
+        |> Enum.filter(&(&1.user.role == "teammate"))
+        |> Enum.count()
+      if current_user.role == "admin" do
+        dispositions = Disposition.count_all()
+        appointments = Appointments.count_all()
+        [dispositions_per_day] = Disposition.average_per_day()
+        locations = Location.all()
+        response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id).median_response_time||0 end)
+        middle_index = response_times |> length() |> div(2)
+        response_time = response_times |> Enum.sort |> Enum.at(middle_index)
+        campaigns = locations
+                    |> Enum.map(fn(location) ->
           Campaign.get_by_location_id(location.id)
         end)
-        |> List.flatten()
+                    |> List.flatten()
+        render(conn, "index.html",
+          metrics: [],
+          campaigns: campaigns,
+          dispositions: dispositions,
+          automated: calculate_percentage("Automated", dispositions),
+          call_deflected: calculate_percentage("Call deflected", dispositions),
+          appointments: appointments,
+          dispositions_per_day: dispositions_per_day,
+          response_time: response_time,
+          web_totals: totals_by_channel("WEB"),
+          sms_totals: totals_by_channel("SMS"),
+          app_totals: totals_by_channel("APP"),
+          facebook_totals: totals_by_channel("FACEBOOK"),
+          email_totals: totals_by_channel("MAIL"),
+          teams: teams,
+          team_admin_count: team_admin_count,
+          teammate_count: teammate_count,
+          location_count: Enum.count(locations),
+          location: nil,
+          location_id: nil,
+          team_id: nil)
+      else
+        dispositions = Disposition.count_by_team_id(current_user.team_member.team_id)
+        appointments = Appointments.count_by_team_id(current_user.team_member.team_id)
+        dispositions_per_day =
+          case Disposition.average_per_day_for_team(current_user.team_member.team_id) do
+            [result] -> result
+            _ -> %{sessions_per_day: 0}
+          end
+        locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
+        response_time=ConversationMessages.count_by_team_id(current_user.team_member.team_id)
+        location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
+        campaigns = if location_id do
+          Campaign.get_by_location_id(location_id)
+        else
+          locations
+          |> Enum.map(fn(location) ->
+            Campaign.get_by_location_id(location.id)
+          end)
+          |> List.flatten()
+        end
+        render(conn, "index.html",
+          metrics: [],
+          campaigns: campaigns,
+          dispositions: dispositions,
+          appointments: appointments,
+          automated: calculate_percentage("Automated", dispositions),
+          call_deflected: calculate_percentage("Call deflected", dispositions),
+          dispositions_per_day: dispositions_per_day,
+          response_time: response_time.median_response_time||0,
+          web_totals: team_totals_by_channel("WEB", current_user.team_member.team_id),
+          sms_totals: team_totals_by_channel("SMS", current_user.team_member.team_id),
+          app_totals: team_totals_by_channel("APP", current_user.team_member.team_id),
+          facebook_totals: team_totals_by_channel("FACEBOOK", current_user.team_member.team_id),
+          email_totals: team_totals_by_channel("MAIL",current_user.team_member.team_id),
+          teams: teams,
+          team_admin_count: team_admin_count,
+          teammate_count: teammate_count,
+          locations: locations,
+          location_count: Enum.count(locations),
+          location_id: current_user.team_member.location_id,
+          location: nil,
+          team_id: nil)
       end
-      render(conn, "index.html",
-        metrics: [],
-        campaigns: campaigns,
-        dispositions: dispositions,
-        appointments: appointments,
-        automated: calculate_percentage("Automated", dispositions),
-        call_deflected: calculate_percentage("Call deflected", dispositions),
-        dispositions_per_day: dispositions_per_day,
-        response_time: response_time.median_response_time||0,
-        web_totals: team_totals_by_channel("WEB", current_user.team_member.team_id),
-        sms_totals: team_totals_by_channel("SMS", current_user.team_member.team_id),
-        app_totals: team_totals_by_channel("APP", current_user.team_member.team_id),
-        facebook_totals: team_totals_by_channel("FACEBOOK", current_user.team_member.team_id),
-        email_totals: team_totals_by_channel("MAIL",current_user.team_member.team_id),
-        teams: teams,
-        team_admin_count: team_admin_count,
-        teammate_count: teammate_count,
-        locations: locations,
-        location_count: Enum.count(locations),
-        location_id: current_user.team_member.location_id,
-        location: nil,
-        team_id: nil)
     end
   end
   defp totals_by_channel(channel_type) do

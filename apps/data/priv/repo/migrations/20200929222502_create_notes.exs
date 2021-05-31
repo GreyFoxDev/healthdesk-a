@@ -3,7 +3,7 @@ defmodule Data.Repo.Migrations.CreateNotes do
 
   def change do
     create table(:notes) do
-      add(:text, :string)
+      add(:text, :text)
       add(:conversation_id, references(:conversations))
       add(:user_id, references(:users))
 

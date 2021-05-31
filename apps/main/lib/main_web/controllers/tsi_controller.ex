@@ -167,7 +167,7 @@ defmodule MainWeb.TsiController do
 
     with %Schema{} = convo <- C.get(convo_id) do
       message= params["message"]||params["foo"]["message"]
-      <<"APP:+1", phone_number :: binary>> = convo.original_number
+      <<"APP:", phone_number :: binary>> = convo.original_number
 
       res=CM.create(
         %{

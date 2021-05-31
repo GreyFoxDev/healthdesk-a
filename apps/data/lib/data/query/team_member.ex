@@ -61,6 +61,7 @@ defmodule Data.Query.TeamMember do
       where: is_nil(u.deleted_at),
       where: t.team_id == ^team_id,
       order_by: [u.first_name, u.last_name],
+      distinct: t.id,
       preload: [:team_member_locations, :user]
     )
     |> repo.all()
@@ -79,6 +80,7 @@ defmodule Data.Query.TeamMember do
       where: is_nil(u.deleted_at),
       where:  t.location_id == ^location_id,
       order_by: [u.first_name, u.last_name],
+      distinct: u.id,
       preload: [ :user]
     )
     |> repo.all()
