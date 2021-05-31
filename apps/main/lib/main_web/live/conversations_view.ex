@@ -467,8 +467,12 @@ defmodule MainWeb.Live.ConversationsView do
     case Notes.create(params) do
       {:ok, _ } ->
         notes = Notes.get_by_conversation(conversation_id)
+        if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
+
         {:noreply , assign(socket,:notes,notes)}
       {:error , _ } ->
+        if connected?(socket), do: Process.send_after(self(), :menu_fix, 200)
+
         {:noreply , socket}
 
     end
