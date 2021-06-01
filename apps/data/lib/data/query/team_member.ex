@@ -75,16 +75,18 @@ defmodule Data.Query.TeamMember do
     from(t in TeamMember,
       join: u in User,
       join: r in Team,
+      join: l in TeamMemberLocation,
       where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where:  t.location_id == ^location_id,
+      or_where: l.location_id == ^location_id,
       order_by: [u.first_name, u.last_name],
       distinct: u.id,
       preload: [ :user]
     )
     |> repo.all()
-    |> Enum.dedup_by(& &1.id)
+    |> Enum.uniq_by(& &1.id)
   end
 
   @doc """
