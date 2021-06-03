@@ -18,12 +18,12 @@ defmodule Data.Query.TeamMember do
   @spec all(repo :: Ecto.Repo.t()) :: [TeamMember.t()]
   def all(repo \\ Read) do
     from(t in TeamMember,
-      join: u in User,
-      join: r in Team,
+      inner_join: u in User,on: u.id == t.user_id,
+      inner_join: r in Team,on: r.id == t.team_id,
+      where: is_nil(r.deleted_at),
       where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
-      where: is_nil(r.deleted_at),
       order_by: [u.first_name, u.last_name],
       preload: [ user: u]
     )
@@ -36,9 +36,10 @@ defmodule Data.Query.TeamMember do
   @spec get(id :: binary(), repo :: Ecto.Repo.t()) :: TeamMember.t() | nil
   def get(id, repo \\ Read) do
     from(t in TeamMember,
-      join: u in User,
-      join: r in Team,
+      inner_join: u in User,on: u.id == t.user_id,
+      inner_join: r in Team,on: r.id == t.team_id,
       where: is_nil(r.deleted_at),
+      where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: t.id == ^id,
@@ -54,9 +55,10 @@ defmodule Data.Query.TeamMember do
   @spec get_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [TeamMember.t()]
   def get_by_team_id(team_id, repo \\ Read) do
     from(t in TeamMember,
-      join: u in User,
-      join: r in Team,
+      inner_join: u in User,on: u.id == t.user_id,
+      inner_join: r in Team,on: r.id == t.team_id,
       where: is_nil(r.deleted_at),
+      where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: t.team_id == ^team_id,
@@ -72,10 +74,15 @@ defmodule Data.Query.TeamMember do
   """
   @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [TeamMember.t()]
   def get_by_location_id(location_id, repo \\ Read) do
+    IO.inspect("###################")
+    IO.inspect(location_id)
+    IO.inspect("###################")
+
     from(t in TeamMember,
-      inner_join: u in User,
-      inner_join: r in Team,
-      inner_join: l in TeamMemberLocation,
+      inner_join: u in User,on: u.id == t.user_id,
+      inner_join: l in TeamMemberLocation,on: l.team_member_id == t.id,
+      inner_join: r in Team,on: r.id == t.team_id,
+      where: is_nil(r.deleted_at),
       where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
