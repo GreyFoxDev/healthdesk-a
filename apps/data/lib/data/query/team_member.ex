@@ -73,9 +73,9 @@ defmodule Data.Query.TeamMember do
   @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [TeamMember.t()]
   def get_by_location_id(location_id, repo \\ Read) do
     from(t in TeamMember,
-      join: u in User,
-      join: r in Team,
-      join: l in TeamMemberLocation,
+      inner_join: u in User,
+      inner_join: r in Team,
+      inner_join: l in TeamMemberLocation,
       where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
