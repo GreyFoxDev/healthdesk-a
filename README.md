@@ -18,7 +18,7 @@ WIT_ACCESS_TOKEN=
 One way is by creating a .env file that you can get into the environment as follows:
 
 ```bash
-> export $(cat .env | xargs)
+> export $(cat ..env | xargs)
 ```
 
 Next install the dependancies:

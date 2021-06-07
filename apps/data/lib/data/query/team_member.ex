@@ -77,23 +77,22 @@ defmodule Data.Query.TeamMember do
     IO.inspect("###################")
     IO.inspect(location_id)
     IO.inspect("###################")
-
     from(t in TeamMember,
-      inner_join: u in User,on: u.id == t.user_id,
-      inner_join: l in TeamMemberLocation,on: l.team_member_id == t.id,
-      inner_join: r in Team,on: r.id == t.team_id,
-      where: is_nil(r.deleted_at),
+      join: r in Team, on: r.id == t.team_id,
+      join: u in User,
+      join: tml in TeamMemberLocation,
       where: is_nil(t.deleted_at),
       where: t.user_id == u.id,
+      #      where: t.team_id == r.id,
       where: is_nil(u.deleted_at),
-      where:  t.location_id == ^location_id,
-      or_where: l.location_id == ^location_id,
+      where: is_nil(r.deleted_at),
+      where: is_nil(t.deleted_at),
+      where: tml.location_id == ^location_id or t.location_id == ^location_id,
       order_by: [u.first_name, u.last_name],
-      distinct: u.id,
+      distinct: t.id,
       preload: [ :user]
     )
     |> repo.all()
-    |> Enum.uniq_by(& &1.id)
   end
 
   @doc """
