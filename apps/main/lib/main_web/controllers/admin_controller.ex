@@ -1,6 +1,6 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
-  alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages, Appointments}
+  alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
   def index(conn, %{"team_id" => team_id}) do
     IO.inspect(team_id)
     current_user = current_user(conn)
@@ -46,6 +46,7 @@ defmodule MainWeb.AdminController do
       email_totals: team_totals_by_channel("MAIL",team_id),
       response_time: response_time.median_response_time||0,
       team_admin_count: team_admin_count,
+      tickets_count: get_ticket_count(current_user, %{flag: :team_id}),
       teammate_count: teammate_count,
       locations: locations,
       location_count: Enum.count(locations),
@@ -89,6 +90,7 @@ defmodule MainWeb.AdminController do
       facebook_totals: location_totals_by_channel("FACEBOOK", location_id),
       email_totals: location_totals_by_channel("MAIL",location_id),
       team_admin_count: team_admin_count,
+      tickets_count: get_ticket_count(Map.merge(current_user, %{location_id: location_id}), %{flag: :location}),
       teammate_count: teammate_count,
       locations: locations,
       location_count: Enum.count(locations),
@@ -142,6 +144,7 @@ defmodule MainWeb.AdminController do
           email_totals: totals_by_channel("MAIL"),
           teams: teams,
           team_admin_count: team_admin_count,
+          tickets_count: get_ticket_count(current_user, %{flag: :any}),
           teammate_count: teammate_count,
           location_count: Enum.count(locations),
           location: nil,
@@ -183,6 +186,7 @@ defmodule MainWeb.AdminController do
           email_totals: team_totals_by_channel("MAIL",current_user.team_member.team_id),
           teams: teams,
           team_admin_count: team_admin_count,
+          tickets_count: get_ticket_count(current_user, %{flag: :any}),
           teammate_count: teammate_count,
           locations: locations,
           location_count: Enum.count(locations),
@@ -224,5 +228,64 @@ defmodule MainWeb.AdminController do
     results
     |> Enum.map(&(&1.disposition_count))
     |> Enum.sum()
+  end
+  defp get_ticket_count(%{role: role, team_member: %{team_id: team_id}} = _curr_user, %{flag: :any}) when role in ["team-admin"] do
+    tickets = Ticket.get_by_team_id(team_id)
+    tickets =
+      tickets |> Enum.count()
+  end
+  defp get_ticket_count(%{role: role, location_id: location_id, team_member: %{team_id: team_id}} = _curr_user, %{flag: :location}) when role in ["team-admin"] do
+    tickets = Ticket.get_by_team_and_location_id(team_id, location_id)
+    tickets =
+      tickets |> Enum.count()
+  end
+  defp get_ticket_count(%{role: role, team_member: %{team_id: team_id}} = _curr_user, %{flag: :team_id}) when role in ["team-admin"] do
+    tickets = Ticket.get_by_team_id(team_id)
+    tickets =
+      tickets |> Enum.count()
+  end
+  defp get_ticket_count(%{role: role, team_member: %{id: id, location_id: location_id}} = _curr_user, %{flag: :team_id}) when role in ["teammate"] do
+    tickets = Ticket.get_by_team_member_and_location_id(id, location_id)
+    tickets =
+      tickets |> Enum.count()
+  end
+#  defp get_ticket_count(%{role: role, location_id: location_id, team_member: %{id: id}} = _curr_user, %{flag: :location}) when role in ["teammate"] do
+#    tickets = Ticket.get_by_team_member_and_location_id(id, location_id)
+#    tickets =
+#      tickets |> Enum.count()
+#  end
+  defp get_ticket_count(%{role: role} = _curr_user, %{flag: :any}) when role in ["admin"] do
+    tickets = Ticket.all_tickets()
+    tickets =
+      tickets |> Enum.count()
+  end
+  defp get_ticket_count(%{role: role, location_id: location_id} = _curr_user, %{flag: :location}) when role in ["admin"] do
+    tickets = Ticket.get_by_location_id(location_id)
+    tickets =
+      tickets |> Enum.count()
+  end
+  defp get_ticket_count(%{role: role, team_member: %{id: id}} = _curr_user, %{flag: :team_id}) when role in ["admin"] do
+    tickets = Ticket.get_by_team_member_id(id)
+    tickets =
+      tickets |> Enum.count()
+  end
+  defp get_ticket_count(%{role: role, team_member: %{id: id}} = _curr_user, %{flag: :any}) when role in ["location-admin"] do
+    tickets = Ticket.get_by_admin_location(id)
+    tickets =
+      tickets |> Enum.count()
+  end
+  defp get_ticket_count(%{role: role, location_id: location_id} = _curr_user, %{flag: :location}) when role in ["location-admin"] do
+    tickets = Ticket.get_by_location_id(location_id)
+    tickets =
+      tickets |> Enum.count()
+  end
+  defp get_ticket_count(current_user, map) do
+    IO.inspect("===========Case============START=======================")
+    IO.inspect(map)
+    IO.inspect("=======================END=======================")
+    IO.inspect("===========CurrentUser============START=======================")
+    IO.inspect(current_user)
+    IO.inspect("=======================END=======================")
+    "couldn't load tickets"
   end
 end

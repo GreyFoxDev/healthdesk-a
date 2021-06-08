@@ -192,6 +192,19 @@
                         <span>Percentage</span></p>
                 </div>
             </div><!-- /.metric -->
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> TICKETS </h2>
+                    <p class="metric-value h3">
+                    <span class="value">
+                        <%= @tickets_count %>
+                    </span>
+                    </p>
+                </div>
+            </div><!-- /.metric -->
         </div><!-- /metric column -->
     </div>
     <div class="metric-row">
