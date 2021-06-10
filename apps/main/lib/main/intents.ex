@@ -47,19 +47,25 @@ defmodule MainWeb.Intents do
   implemented then a default message is returned.
   """
 
+  def get({:unknown, [{"greetings"=name, _}]} = intent, location) do
+    location = Data.Location.get_by_phone(location)
+    local_intent = Data.Intent.get_by(name, location)
+    if local_intent != nil do
+      local_intent.message
+    else
+      get_(intent, location)
+    end
+  end
   def get({name, _} = intent, location) do
     location = Data.Location.get_by_phone(location)
-    intent = Data.Intent.get_by(name, location)
-    if location.default_message != "" do
-      intent.message
+    local_intent = Data.Intent.get_by(name, location)
+    if local_intent != nil do
+      local_intent.message
     else
       get_(intent, location)
     end
   end
   def get(intent, location) do
-    IO.inspect("=======================START=====================")
-    IO.inspect("get in intents")
-    IO.inspect("=======================END=======================")
       get_(intent, location)
   end
 
@@ -97,7 +103,7 @@ defmodule MainWeb.Intents do
     We'd be happy to share information about our membership plans and pricing. When are you able to stop by for a tour? Or if you'd prefer, when's the best time to give you a call?
     """
   end
-  def get({"routeHousekeeping", _}, location) do
+  def get_({"routeHousekeeping", _}, location) do
     """
     Thank you for your message. We apologize for any inconvenience and are notifying our front desk now. Would you like us to follow-up with you?
     """
@@ -109,7 +115,7 @@ defmodule MainWeb.Intents do
     """
   end
 
-  def get({"routeRetention", _}, location) do
+  def get_({"routeRetention", _}, location) do
     """
     Thank you for your message. May I ask, why are you looking to cancel today?
     """
