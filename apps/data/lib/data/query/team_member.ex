@@ -18,12 +18,12 @@ defmodule Data.Query.TeamMember do
   @spec all(repo :: Ecto.Repo.t()) :: [TeamMember.t()]
   def all(repo \\ Read) do
     from(t in TeamMember,
-      inner_join: u in User,on: u.id == t.user_id,
-      inner_join: r in Team,on: r.id == t.team_id,
+      inner_join: r in assoc(t, :team),
+      inner_join: u in assoc(t,:user),
       where: is_nil(r.deleted_at),
       where: is_nil(t.deleted_at),
-      where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
+      where: t.user_id == u.id,
       order_by: [u.first_name, u.last_name],
       preload: [ user: u]
     )
@@ -36,11 +36,10 @@ defmodule Data.Query.TeamMember do
   @spec get(id :: binary(), repo :: Ecto.Repo.t()) :: TeamMember.t() | nil
   def get(id, repo \\ Read) do
     from(t in TeamMember,
-      inner_join: u in User,on: u.id == t.user_id,
-      inner_join: r in Team,on: r.id == t.team_id,
+      inner_join: r in assoc(t, :team),
+      inner_join: u in assoc(t,:user),
       where: is_nil(r.deleted_at),
       where: is_nil(t.deleted_at),
-      where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: t.id == ^id,
       preload: [:team_member_locations, :user],
@@ -55,11 +54,10 @@ defmodule Data.Query.TeamMember do
   @spec get_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [TeamMember.t()]
   def get_by_team_id(team_id, repo \\ Read) do
     from(t in TeamMember,
-      inner_join: u in User,on: u.id == t.user_id,
-      inner_join: r in Team,on: r.id == t.team_id,
+      inner_join: r in assoc(t, :team),
+      inner_join: u in assoc(t,:user),
       where: is_nil(r.deleted_at),
       where: is_nil(t.deleted_at),
-      where: t.user_id == u.id,
       where: is_nil(u.deleted_at),
       where: t.team_id == ^team_id,
       order_by: [u.first_name, u.last_name],
@@ -74,20 +72,14 @@ defmodule Data.Query.TeamMember do
   """
   @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [TeamMember.t()]
   def get_by_location_id(location_id, repo \\ Read) do
-    IO.inspect("###################")
-    IO.inspect(location_id)
-    IO.inspect("###################")
     from(t in TeamMember,
-      join: r in Team, on: r.id == t.team_id,
-      join: u in User,
-      join: tml in TeamMemberLocation,
+      inner_join: r in assoc(t, :team),
+      inner_join: u in assoc(t,:user),
+      inner_join: tml in assoc(t,:team_member_locations),
       where: is_nil(t.deleted_at),
-      where: t.user_id == u.id,
-      #      where: t.team_id == r.id,
       where: is_nil(u.deleted_at),
       where: is_nil(r.deleted_at),
-      where: is_nil(t.deleted_at),
-      where: tml.location_id == ^location_id or t.location_id == ^location_id,
+      where: tml.location_id == ^location_id or  t.location_id == ^location_id ,
       order_by: [u.first_name, u.last_name],
       distinct: t.id,
       preload: [ :user]

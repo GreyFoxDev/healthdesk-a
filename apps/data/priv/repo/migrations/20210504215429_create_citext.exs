@@ -2,7 +2,7 @@ defmodule Data.Repo.Migrations.CreateCitext do
     use Ecto.Migration
 
     def up do
-      execute "CREATE EXTENSION citext"
+#      execute "CREATE EXTENSION citext"
       execute "DROP VIEW IF EXISTS conversations_list;"
 
       alter table(:conversations) do
