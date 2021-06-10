@@ -46,7 +46,24 @@ defmodule MainWeb.Intents do
   Get the response from the intent module. If the intent hasn't been
   implemented then a default message is returned.
   """
-  def get(:unknown_intent, location) do
+
+  def get({name, _} = intent, location) do
+    location = Data.Location.get_by_phone(location)
+    intent = Data.Intent.get_by(name, location)
+    if location.default_message != "" do
+      intent.message
+    else
+      get_(intent, location)
+    end
+  end
+  def get(intent, location) do
+    IO.inspect("=======================START=====================")
+    IO.inspect("get in intents")
+    IO.inspect("=======================END=======================")
+      get_(intent, location)
+  end
+
+  def get_(:unknown_intent, location) do
     location = Data.Location.get_by_phone(location)
     if location.default_message != "" do
       location.default_message
@@ -55,7 +72,7 @@ defmodule MainWeb.Intents do
     end
   end
 
-  def get(:unknown, location) do
+  def get_(:unknown, location) do
     location = Data.Location.get_by_phone(location)
     if location.default_message != "" do
       location.default_message
@@ -64,10 +81,10 @@ defmodule MainWeb.Intents do
     end
   end
 
-  def get({:unknown, [{"greetings", _}]}, _location),
+  def get_({:unknown, [{"greetings", _}]}, _location),
     do: @default_greeting
 
-  def get({:unknown, _}, location) do
+  def get_({:unknown, _}, location) do
     location = Data.Location.get_by_phone(location)
     if location.default_message != "" do
       location.default_message
@@ -75,7 +92,7 @@ defmodule MainWeb.Intents do
       @default_response
     end
   end
-  def get({"salesQuestion", _}, location) do
+  def get_({"salesQuestion", _}, location) do
     """
     We'd be happy to share information about our membership plans and pricing. When are you able to stop by for a tour? Or if you'd prefer, when's the best time to give you a call?
     """
@@ -86,7 +103,7 @@ defmodule MainWeb.Intents do
     """
   end
 
-  def get({"routeLostFound", _}, location) do
+  def get_({"routeLostFound", _}, location) do
     """
     Thank you for your message. We are notifying our front desk now to check our Lost & Found. Would you like us to follow-up with you?
     """
@@ -98,25 +115,25 @@ defmodule MainWeb.Intents do
     """
   end
 
-  def get({"routeFrontDesk", _}, location) do
+  def get_({"routeFrontDesk", _}, location) do
     """
     Thank you for your message. How can our front desk help you today?
     """
   end
 
-  def get({"routeSupport", _}, location) do
+  def get_({"routeSupport", _}, location) do
     """
     Thank you for your message. Can you please confirm your first and last name?
     """
   end
-  def get({"connectAgent", _}, location) do
+  def get_({"connectAgent", _}, location) do
     get({:unknown, %{}}, location)
   end
-  def get({"startOver", _}, location) do
+  def get_({"startOver", _}, location) do
     get({:unknown, %{}}, location)
   end
 
-  def get({intent, args}, location) do
+  def get_({intent, args}, location) do
     args = remove_intent(args)
     IO.inspect("###################")
     IO.inspect(args)

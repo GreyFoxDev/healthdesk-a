@@ -24,56 +24,56 @@
                         <a href="<%= team_location_wifi_network_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Wifi Network</a>
                         <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Pass Prices</a>
                         <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Class Schedule Upload</a>
-                        <a href="<%= team_location_saved_reply_path(@conn, :new, location.team_id, location.id) %>" class="nav-link active">Saved Replies</a>
-                        <a href="<%= team_location_intent_path(@conn, :new, location.team_id, location.id) %>" class="nav-link ">Intents</a>
+                        <a href="<%= team_location_saved_reply_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Saved Replies</a>
+                        <a href="<%= team_location_intent_path(@conn, :new, location.team_id, location.id) %>" class="nav-link active">Intents</a>
                     </nav>
                 </div>
             </div>
         </div>
         <div class="col-lg-8">
             <div class="card card-fluid">
-                <h6 class="card-header"> Saved Replies</h6><!-- .card-body -->
+                <h6 class="card-header"> Intents</h6><!-- .card-body -->
                 <div class="card-body">
-                    <%= if length(@saved_replies)>0 do %>
+                    <%= if length(@intents)>0 do %>
 
 
                     <div class="row">
-                        <div class="col-lg-5"><b>Title</b></div>
-                        <div class="col-lg-5"><b>Reply</b></div>
+                        <div class="col-lg-5"><b>Intent</b></div>
+                        <div class="col-lg-5"><b>Message</b></div>
                         <div class="col-lg-2"><b>Action</b></div>
                     </div>
                     <br>
-                    <%= for saved_reply <- @saved_replies do %>
-                        <div class="row">
-                            <%= form_for @conn, team_location_saved_reply_path(@conn, :update, @location.team_id, @location.id, saved_reply.id),[class: "col-lg-11",method: "put"], fn f -> %>
-                            <%= text_input f, :title, value: saved_reply.title, class: "form-control col-lg-5", style: "display: unset; margin-right: 15px", maxlength: 240 %>
-                            <%= text_input f, :draft, value: saved_reply.draft, class: "form-control col-lg-5", style: "display: unset", maxlength: 240 %>
-                                <%= submit style: "float: right", class: "btn btn-secondary" do %>
-                                    <span class='fa fa-check'></span>
-                                <% end %>
+                    <%= for intent <- @intents do %>
+                    <div class="row">
+                        <%= form_for @conn, team_location_intent_path(@conn, :update, @location.team_id, @location.id, intent.intent),[class: "col-lg-11",method: "put"], fn f -> %>
+                        <%= text_input f, :intent, value: intent.intent, class: "form-control col-lg-5", style: "display: unset; margin-right: 15px", maxlength: 240 %>
+                        <%= text_input f, :message, value: intent.message, class: "form-control col-lg-5", style: "display: unset", maxlength: 240 %>
+                        <%= submit style: "float: right", class: "btn btn-secondary" do %>
+                        <span class='fa fa-check'></span>
+                        <% end %>
                             <% end %>
-                            <%= form_for @conn, team_location_saved_reply_path(@conn, :delete, @location.team_id, @location.id, saved_reply.id),[method: "delete"] , fn f -> %>
-                                <%= submit class: "btn btn-secondary" do %>
-                                    <span class='fa fa-times'></span>
-                                <% end %>
+                        <%= form_for @conn, team_location_intent_path(@conn, :delete, @location.team_id, @location.id, intent.intent),[method: "delete"] , fn f -> %>
+                        <%= submit class: "btn btn-secondary" do %>
+                        <span class='fa fa-times'></span>
+                        <% end %>
                             <% end %>
-                        </div> <br>
+                    </div> <br>
                     <% end %>
                     <br>
                     <hr>
                     <% end %>
-                    <%= form_for @conn, team_location_saved_reply_path(@conn, :create, @location.team_id, @location.id),[class: "row"], fn f -> %>
-                        <div class="form-group col-lg-5">
-                            <%= text_input f, :title, placeholder: "Title",  class: "form-control" , maxlength: 240 %>
-                            <%#= error_tag @errors, :title %>
-                        </div>
+                    <%= form_for @conn, team_location_intent_path(@conn, :create, @location.team_id, @location.id),[class: "row"], fn f -> %>
                     <div class="form-group col-lg-5">
-                            <%= text_input f, :draft, placeholder: "Reply",  class: "form-control", maxlength: 240 %>
-                            <%#= error_tag @errors, :draft %>
-                        </div>
+                        <%= text_input f, :intent, placeholder: "Intent",  class: "form-control" , maxlength: 240 %>
+                        <%#= error_tag @errors, :intent %>
+                    </div>
+                    <div class="form-group col-lg-5">
+                        <%= text_input f, :message, placeholder: "Message",  class: "form-control", maxlength: 240 %>
+                        <%#= error_tag @errors, :message %>
+                    </div>
                     <div class="form-group col-lg-2">
                         <%= submit class: "btn btn-secondary" do%>
-                            Create
+                        Create
                         <% end %>
                     </div>
                     <% end %>

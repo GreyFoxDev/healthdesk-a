@@ -57,6 +57,9 @@ defmodule Data.Query.Ticket do
     end
   end
 
+  @doc """
+  Get Tickets for location_ids
+  """
   @spec get_by_location_ids(location_id :: [binary()], repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def get_by_location_ids(location_id, repo \\ Read) do
     from(t in Ticket,
@@ -69,6 +72,9 @@ defmodule Data.Query.Ticket do
     |> repo.all()
   end
 
+  @doc """
+  Get opened Tickets for for team-member
+  """
   @spec get_by_team_member_id(team_member_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def get_by_team_member_id(team_member_id, repo \\ Read) do
     from(t in Ticket,
@@ -78,6 +84,9 @@ defmodule Data.Query.Ticket do
     |> repo.all()
   end
 
+  @doc """
+  Get opened Tickets for team-member and location.
+  """
   @spec get_by_team_member_and_location_id(team_member_id :: binary(), location_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def get_by_team_member_and_location_id(team_member_id, location_id, repo \\ Read) do
     from(t in Ticket,
@@ -88,6 +97,9 @@ defmodule Data.Query.Ticket do
     |> repo.all()
   end
 
+  @doc """
+  Get opened Tickets for specific team.
+  """
   @spec get_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def get_by_team_id(team_id, repo \\ Read) do
     from(t in Ticket,
@@ -98,6 +110,9 @@ defmodule Data.Query.Ticket do
     |> repo.all()
   end
 
+  @doc """
+  Get opened Tickets for specific team and location.
+  """
   @spec get_by_team_and_location_id(team_id :: binary(), location_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def get_by_team_and_location_id(team_id, location_id, repo \\ Read) do
     from(t in Ticket,
@@ -109,6 +124,9 @@ defmodule Data.Query.Ticket do
     |> repo.all()
   end
 
+  @doc """
+  Get all opened Tickets.
+  """
   @spec all_tickets(repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def all_tickets(repo \\ Read) do
     from(t in Ticket,
@@ -117,6 +135,9 @@ defmodule Data.Query.Ticket do
     |> repo.all()
   end
 
+  @doc """
+  Get opened Tickets for specific location_id.
+  """
   @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def get_by_location_id(location_id, repo \\ Read) do
     from(t in Ticket,
@@ -126,6 +147,9 @@ defmodule Data.Query.Ticket do
     |> repo.all()
   end
 
+  @doc """
+  Get opened Tickets for admin location.
+  """
   @spec get_by_admin_location(team_member_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def get_by_admin_location(team_member_id, repo \\ Read) do
     from(t in Ticket,

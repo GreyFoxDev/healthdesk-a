@@ -83,6 +83,7 @@ defmodule MainWeb.Router do
         resources "/wifi-network", WifiNetworkController
         resources "/pricing-plans", PricingPlanController
         resources "/saved-replies", SavedReplyController
+        resources "/intent", IntentController
       end
     end
     live "/admin/teams/:location_team_id/locations/:location_id/normal-hours/" , Live.NormalHourForm, :index

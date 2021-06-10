@@ -25,6 +25,7 @@
                         <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link active">Pass Prices</a>
                         <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Class Schedule Upload</a>
                         <a href="<%= team_location_saved_reply_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Saved Replies</a>
+                        <a href="<%= team_location_intent_path(@conn, :new, location.team_id, location.id) %>" class="nav-link ">Intents</a>
                     </nav>
                 </div>
             </div>
