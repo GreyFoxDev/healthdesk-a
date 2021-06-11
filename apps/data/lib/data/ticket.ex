@@ -15,7 +15,7 @@ defmodule Data.Ticket do
   defdelegate get_by_team_member_id(team_member_id), to: Query
   defdelegate get_by_team_member_and_location_id(team_member_id, location_id), to: Query
   defdelegate get_by_location_id(location_id), to: Query
-  defdelegate get_by_location_id(location_id), to: Query
+  defdelegate get_by_location_ids(location_id), to: Query
   defdelegate get_by_admin_location(team_member_id), to: Query
   defdelegate delete(ticket), to: Query
 
