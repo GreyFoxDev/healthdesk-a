@@ -83,6 +83,10 @@ const reload_convo = function (){
     tribute2.collection[0].values = remove_duplicates(availableMembers, "key")
     tribute.collection[0].values = remove_duplicates(availableTags, "key")
 
+    $(document).on("input",'[name="conversation_message[message]"]',function (){
+        this.style.height = "";
+        this.style.height = this.scrollHeight + "px";
+    })
     tribute2.attach($('[id^="tag_user"]')[0]);
     tribute2.attach($('[id^="taguser"]')[0]);
 
