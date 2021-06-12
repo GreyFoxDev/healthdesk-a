@@ -22,7 +22,7 @@ defmodule Data.Schema.Intent do
   schema "intents" do
     field(:intent, :string, primary_key: true)
     field(:message, :string)
-    belongs_to(:location, Data.Schema.Location)
+    belongs_to(:location, Data.Schema.Location, primary_key: true)
     timestamps()
   end
 
