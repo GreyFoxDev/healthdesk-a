@@ -48,8 +48,20 @@ defmodule MainWeb.Intents do
   """
 
   def get({:unknown, [{"greetings"=name, _}]} = intent, location) do
+
     location = Data.Location.get_by_phone(location)
-    local_intent = Data.Intent.get_by(name, location)
+    local_intent = Data.Intent.get_by(name, location.id)
+    if local_intent != nil do
+      local_intent.message
+    else
+      get_(intent, location)
+    end
+  end
+  def get({name, _} = intent, location) when is_atom name do
+
+    location = Data.Location.get_by_phone(location)
+    local_intent = Data.Intent.get_by(to_string(name), location.id)
+
     if local_intent != nil do
       local_intent.message
     else
@@ -57,12 +69,36 @@ defmodule MainWeb.Intents do
     end
   end
   def get({name, _} = intent, location) do
+
     location = Data.Location.get_by_phone(location)
-    local_intent = Data.Intent.get_by(name, location)
+    local_intent = Data.Intent.get_by(name, location.id)
+
     if local_intent != nil do
       local_intent.message
     else
       get_(intent, location)
+    end
+  end
+  def get(:unknown_intent =name, location) do
+
+    location = Data.Location.get_by_phone(location)
+    local_intent = Data.Intent.get_by(to_string(name), location.id)
+
+    if local_intent != nil do
+      local_intent.message
+    else
+      get_(name, location)
+    end
+  end
+  def get(:unknown =name, location) do
+
+    location = Data.Location.get_by_phone(location)
+    local_intent = Data.Intent.get_by(to_string(name), location.id)
+
+    if local_intent != nil do
+      local_intent.message
+    else
+      get_(name, location)
     end
   end
   def get(intent, location) do
