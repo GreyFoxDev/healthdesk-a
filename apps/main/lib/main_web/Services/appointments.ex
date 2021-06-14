@@ -19,7 +19,7 @@ defmodule Main.Service.Appointment do
     appointment = convo.appointment
 
     if location.google_token do
-      get_next_intent(id,step,intent,location,appointment,fallback) |> IO.inspect
+      get_next_intent(id,step,intent,location,appointment,fallback)
     else
       case intent do
         {check,_} when check in ["bookAppointment", "startOver", "connectAgent"]  ->
@@ -32,7 +32,7 @@ defmodule Main.Service.Appointment do
   end
   defp get_next_intent(id, step, intent, location, appointment,fallback) when appointment == false do
     case intent do
-      {check,_} when check in ["bookAppointment", "salesQuestion"]  ->
+      {check,_} when check in ["bookAppointment"]  ->
         C.appointment_open(id)
         AP.create(%{conversation_id: id})
         get(intent, location.phone_number)
@@ -50,7 +50,7 @@ defmodule Main.Service.Appointment do
         appointment ->appointment
       end
     res = case intent do
-      {check,_} when check in ["bookAppointment", "salesQuestion"]  ->
+      {check,_} when check in ["bookAppointment"]  ->
         C.appointment_open(id)
         {get(intent, location.phone_number),1}
       {check,_} when check in ["startOver"]  ->
