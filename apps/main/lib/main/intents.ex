@@ -106,7 +106,6 @@ defmodule MainWeb.Intents do
   end
 
   def get_(:unknown_intent, location) do
-    location = Data.Location.get_by_phone(location)
     if location.default_message != "" do
       location.default_message
     else
@@ -115,7 +114,6 @@ defmodule MainWeb.Intents do
   end
 
   def get_(:unknown, location) do
-    location = Data.Location.get_by_phone(location)
     if location.default_message != "" do
       location.default_message
     else
@@ -127,7 +125,6 @@ defmodule MainWeb.Intents do
     do: @default_greeting
 
   def get_({:unknown, _}, location) do
-    location = Data.Location.get_by_phone(location)
     if location.default_message != "" do
       location.default_message
     else
@@ -184,14 +181,13 @@ defmodule MainWeb.Intents do
     with atom <- String.to_existing_atom(intent)do
       atom
       |> fetch_module()
-      |> apply(:build_response, [args, location])
+      |> apply(:build_response, [args, location.phone_number])
     else
       err ->     MainWeb.Intents |> apply(:build_response, [args, location])
     end
   end
 
   def build_response(_args, location) do
-    location = Data.Location.get_by_phone(location)
     if location.default_message != "" do
       location.default_message
     else
