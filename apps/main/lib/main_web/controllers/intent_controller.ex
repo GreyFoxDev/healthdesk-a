@@ -24,18 +24,18 @@ defmodule MainWeb.IntentController do
       errors: []
     )
   end
+  def new(conn, params) do
+    IO.inspect("=========newINTENT==============START=====================")
+    IO.inspect(params)
+    IO.inspect("=======================END=======================")
+  end
 
-  def create(
-        conn,
-        %{"intent" => intent, "message" => message, "location_id" => location_id, "team_id" => team_id} = params
-      ) do
-
+  def create(conn, %{"intent" => intent, "message" => message, "location_id" => location_id, "team_id" => team_id} = params) do
     with {:ok, _} <- Intent.create(params) do
       conn
       |> put_flash(:success, "Intent created successfully.")
       |> redirect(to: team_location_intent_path(conn, :new, team_id, location_id))
     else
-
       {:error, changeset} ->
         location =
           conn
@@ -51,17 +51,18 @@ defmodule MainWeb.IntentController do
              intents: intents,
              location: location,
              teams: teams(conn),
-             has_sidebar: true,
-             errors: changeset.errors
+             has_sidebar: true
            )
     end
+  end
+  def create(conn, params) do
+    IO.inspect("======CreateINTENT=================START=====================")
+    IO.inspect(params)
+    IO.inspect("=======================END=======================")
   end
 
-  def update(
-        conn,
-        %{"id" => id, "intent" => intent, "message" => message, "location_id" => location_id, "team_id" => team_id} = params
-      ) do
-    with %Data.Schema.Intent{} = intent <- Intent.get(%{role: "admin"}, id),
+  def update(conn, %{"id" => id, "message" => message, "location_id" => location_id, "team_id" => team_id} = params) do
+    with %Data.Schema.Intent{} = intent <- Intent.get_by(%{role: "admin"}, id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
       conn
       |> put_flash(:success, "Intent updated successfully.")
@@ -87,8 +88,8 @@ defmodule MainWeb.IntentController do
            )
     end
   end
-  def update(conn, %{"id" => id, "intent" => intent, "location_id" => location_id, "team_id" => team_id} = params) do
-    with %Data.Schema.Intent{} = intent <- Intent.get(%{role: "admin"}, id),
+  def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
+    with %Data.Schema.Intent{} = intent <- Intent.get_by(%{role: "admin"}, id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
       conn
       |> put_flash(:success, "Intent updated successfully.")
@@ -114,8 +115,8 @@ defmodule MainWeb.IntentController do
            )
     end
   end
-  def update(conn, %{"id" => id, "title" => title, "location_id" => location_id, "team_id" => team_id} = params) do
-    with %Data.Schema.Intent{} = intent <- Intent.get(%{role: "admin"}, id),
+  def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
+    with %Data.Schema.Intent{} = intent <- Intent.get_by(%{role: "admin"}, id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
       conn
       |> put_flash(:success, "Intent updated successfully.")
@@ -141,9 +142,15 @@ defmodule MainWeb.IntentController do
            )
     end
   end
+  def update(conn, params) do
+    IO.inspect("======updateINTENT=================START=====================")
+    IO.inspect(params)
+    IO.inspect("=======================END=======================")
+  end
+
 
   def delete(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id}) do
-    with %Data.Schema.Intent{} = intent <- Intent.get(%{role: "admin"}, id),
+    with %Data.Schema.Intent{} = intent <- Intent.get_by(%{role: "admin"}, id, location_id),
          {:ok, _} <- Intent.delete(intent) do
       conn
       |> put_flash(:success, "Intent deleted successfully.")
@@ -168,5 +175,10 @@ defmodule MainWeb.IntentController do
              errors: []
            )
     end
+  end
+  def delete(conn, params) do
+    IO.inspect("========deleteINTENT===============START=====================")
+    IO.inspect(params)
+    IO.inspect("=======================END=======================")
   end
 end

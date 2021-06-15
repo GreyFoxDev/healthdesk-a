@@ -9,5 +9,7 @@ defmodule Data.Repo.Migrations.CreateIntents do
 
       timestamps()
     end
+
+    create unique_index(:intents, [:intent, :location_id])
   end
 end

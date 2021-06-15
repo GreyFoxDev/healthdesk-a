@@ -30,5 +30,6 @@ defmodule Data.Schema.Intent do
     model
     |> cast(params, @all_fields)
     |> validate_required(@required_fields)
+    |> unique_constraint([:intent, :location_id])
   end
 end

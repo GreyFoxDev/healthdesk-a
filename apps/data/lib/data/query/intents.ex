@@ -63,6 +63,8 @@ defmodule Data.Query.Intents do
       changeset ->
         {:error, changeset}
     end
+    rescue
+    _ -> {:error, []}
   end
 
   @doc """
@@ -87,9 +89,8 @@ defmodule Data.Query.Intents do
   """
   @spec delete(intent :: Intent.t(), repo :: Ecto.Repo.t()) ::
           {:ok, Intent.t()} | {:error, :no_record_found}
-  def delete(%Intent{intent: intent}, repo \\ Write) do
+  def delete(%Intent{} = intent, repo \\ Write) do
     intent
-    |> get(repo)
     |> case do
       %Intent{} = intent ->
         repo.delete(intent)

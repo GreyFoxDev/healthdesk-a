@@ -65,11 +65,9 @@
                     <%= form_for @conn, team_location_intent_path(@conn, :create, @location.team_id, @location.id),[class: "row"], fn f -> %>
                     <div class="form-group col-lg-5">
                         <%= text_input f, :intent, placeholder: "Intent",  class: "form-control" , maxlength: 240 %>
-                        <%#= error_tag @errors, :intent %>
                     </div>
                     <div class="form-group col-lg-5">
                         <%= text_input f, :message, placeholder: "Message",  class: "form-control", maxlength: 240 %>
-                        <%#= error_tag @errors, :message %>
                     </div>
                     <div class="form-group col-lg-2">
                         <%= submit class: "btn btn-secondary" do%>
