@@ -53,8 +53,10 @@ defmodule Data.Query.Disposition do
   @doc """
   Return a list of all dispositions with count of usage. Used by super admin with to and from filters
   """
-  @spec count_all_by(to :: Date.t(), from :: Date.t(), repo :: Ecto.Repo.t()) :: [map()]
+  @spec count_all_by(to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
   def count_all_by(to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
     query = from(d in Disposition,
       join: cd in assoc(d, :conversation_dispositions),
     )
@@ -93,8 +95,10 @@ defmodule Data.Query.Disposition do
   @doc """
   Return a list of dispositions with count of usage by team, with to and from filters
   """
-  @spec count_by_team(team_id :: binary(), to :: Date.t(), from :: Date.t(), repo :: Ecto.Repo.t()) :: [map()]
+  @spec count_by_team(team_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
   def count_by_team(team_id, to, from,repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
     query = from(d in Disposition,
       join: cd in assoc(d, :conversation_dispositions),
     )
@@ -136,8 +140,10 @@ defmodule Data.Query.Disposition do
   @doc """
   Return a list of dispositions with count by location_id and dates
   """
-  @spec get_by(location_id :: binary(), to :: Date.t(), from :: Date.t(), repo :: Ecto.Repo.t()) :: [map()]
+  @spec get_by(location_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
   def get_by(location_id, to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
     query = from(d in Disposition,
       join: cd in assoc(d, :conversation_dispositions),
       join: c in assoc(cd, :conversation)

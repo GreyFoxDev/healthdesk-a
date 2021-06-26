@@ -121,6 +121,7 @@ defmodule MainWeb.AdminController do
         |> Enum.filter(&(&1.user.role == "teammate"))
         |> Enum.count()
       if current_user.role == "admin" do
+        IO.inspect(params)
         dispositions = Disposition.count_all_by(params)
         appointments = Appointments.count_all()
         [dispositions_per_day] = Disposition.average_per_day()
