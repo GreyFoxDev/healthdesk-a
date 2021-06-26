@@ -39,6 +39,15 @@ defmodule Data.Disposition do
 
   def get(_, _), do: {:error, :invalid_permissions}
 
+  def count_by(%{"location_id" => location_id, "to" => to, "from" => from}),
+      do: Query.get_by(location_id, convert_string_to_date(to), convert_string_to_date(from))
+
+  def count_by(%{"team_id" => team_id, "to" => to, "from" => from}),
+      do: Query.count_by_team(team_id, convert_string_to_date(to), convert_string_to_date(from))
+
+  def count_all_by(%{"to" => to, "from" => from}),
+      do: Query.count_all_by(convert_string_to_date(to), convert_string_to_date(from))
+
   def get_by_team_id(%{role: role}, team_id) when role in @roles,
     do: Query.get_by_team_id(team_id)
 
@@ -46,5 +55,12 @@ defmodule Data.Disposition do
     id
     |> Query.get()
     |> Query.update(params)
+  end
+
+  defp convert_string_to_date(date) do
+    case Date.from_iso8601(date) do
+      {:ok, date} -> Timex.to_datetime(date) |> DateTime.to_naive()
+      _-> nil
+    end
   end
 end

@@ -5,6 +5,8 @@ defmodule Data.Query.Disposition do
   import Ecto.Query, only: [from: 2]
 
   alias Data.Schema.Disposition
+  alias Data.Schema.Conversation
+  alias Data.Schema.ConversationDisposition
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL
@@ -49,12 +51,62 @@ defmodule Data.Query.Disposition do
   end
 
   @doc """
+  Return a list of all dispositions with count of usage. Used by super admin with to and from filters
+  """
+  @spec count_all_by(to :: Date.t(), from :: Date.t(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_all_by(to, from, repo \\ Read) do
+    query = from(d in Disposition,
+      join: cd in assoc(d, :conversation_dispositions),
+    )
+    query = Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([d,...] in query, where: d.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([d,...] in query, where: d.inserted_at >= ^from)
+      _, query -> query
+    end)
+    from([d, cd] in query,
+      group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      order_by: d.disposition_name,
+      select: %{name: d.disposition_name, count: count(cd.id)}
+    )
+    |> repo.all()
+  end
+
+  @doc """
   Return a list of dispositions with count of usage by team
   """
   @spec count_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
   def count_by_team_id(team_id, repo \\ Read) do
     from(d in Disposition,
       join: cd in assoc(d, :conversation_dispositions),
+      group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      where: d.team_id == ^team_id,
+      distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      order_by: d.disposition_name,
+      select: %{name: d.disposition_name, count: count(cd.id)}
+    )
+    |> repo.all()
+  end
+
+  @doc """
+  Return a list of dispositions with count of usage by team, with to and from filters
+  """
+  @spec count_by_team(team_id :: binary(), to :: Date.t(), from :: Date.t(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_team(team_id, to, from,repo \\ Read) do
+    query = from(d in Disposition,
+      join: cd in assoc(d, :conversation_dispositions),
+    )
+    query = Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([d,...] in query, where: d.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([d,...] in query, where: d.inserted_at >= ^from)
+      _, query -> query
+    end)
+    from(
+      [d, cd] in query,
       group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
       where: d.team_id == ^team_id,
       distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
@@ -72,6 +124,32 @@ defmodule Data.Query.Disposition do
     from(d in Disposition,
       join: cd in assoc(d, :conversation_dispositions),
       join: c in assoc(cd, :conversation),
+      group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      where: c.location_id == ^location_id,
+      distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
+      order_by: d.disposition_name,
+      select: %{name: d.disposition_name, count: count(cd.id)}
+    )
+    |> repo.all()
+  end
+
+  @doc """
+  Return a list of dispositions with count by location_id and dates
+  """
+  @spec get_by(location_id :: binary(), to :: Date.t(), from :: Date.t(), repo :: Ecto.Repo.t()) :: [map()]
+  def get_by(location_id, to, from, repo \\ Read) do
+    query = from(d in Disposition,
+      join: cd in assoc(d, :conversation_dispositions),
+      join: c in assoc(cd, :conversation)
+    )
+    query = Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([d,...] in query, where: d.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([d,...] in query, where: d.inserted_at >= ^from)
+      _, query -> query
+    end)
+    from([d, cd, c] in query,
       group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
       where: c.location_id == ^location_id,
       distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],

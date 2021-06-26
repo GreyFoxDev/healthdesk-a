@@ -1,11 +1,12 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
   alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
-  def index(conn, %{"team_id" => team_id}) do
-    IO.inspect(team_id)
+
+  def index(conn, %{"team_id" => team_id} = params) do
+    IO.inspect("--------------------------------TEAM MEMBER------------------------------------")
     current_user = current_user(conn)
     team_members = TeamMember.get_by_team_id(current_user, team_id)
-    dispositions = Disposition.count_by_team_id(team_id)
+    dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => team_id}))
     appointments = Appointments.count_by_team_id(team_id)
     dispositions_per_day =
       case Disposition.average_per_day_for_team(team_id) do
@@ -53,13 +54,15 @@ defmodule MainWeb.AdminController do
       teams: teams(conn),
       team_id: team_id,
       location_id: location_id,
+      from: params["from"],
+      to: params["to"],
       location: nil)
   end
-  def index(conn, %{"location_id" => location_id}) do
-    IO.inspect("----------location filter----------")
+  def index(conn, %{"location_id" => location_id} = params) do
+    IO.inspect("-------------------------Location Filter--------------------------------")
     current_user = current_user(conn)
     team_members = TeamMember.get_by_location_id(current_user, location_id)
-    dispositions = Disposition.count_by_location_id(location_id)
+    dispositions = Disposition.count_by(params)
     appointments = Appointments.count_by_location_id(location_id)
     response_time = ConversationMessages.count_by_location_id(location_id)
     dispositions_per_day =
@@ -97,10 +100,12 @@ defmodule MainWeb.AdminController do
       teams: teams(conn),
       team_id: current_user.team_member.team_id,
       location_id: location_id,
+      from: params["from"],
+      to: params["to"],
       location: nil)
   end
-  def index(conn, _params) do
-    IO.inspect("without filter-------")
+  def index(conn, params) do
+    IO.inspect("-------------------------------WITHOUT Filter---------------------------------------")
     current_user = current_user(conn)
     if current_user.role in ["team-admin", "teammate"] do
       index(conn, %{"team_id" => current_user.team_member.team_id})
@@ -116,7 +121,7 @@ defmodule MainWeb.AdminController do
         |> Enum.filter(&(&1.user.role == "teammate"))
         |> Enum.count()
       if current_user.role == "admin" do
-        dispositions = Disposition.count_all()
+        dispositions = Disposition.count_all_by(params)
         appointments = Appointments.count_all()
         [dispositions_per_day] = Disposition.average_per_day()
         locations = Location.all()
@@ -148,10 +153,12 @@ defmodule MainWeb.AdminController do
           teammate_count: teammate_count,
           location_count: Enum.count(locations),
           location: nil,
+          from: params["from"],
+          to: params["to"],
           location_id: nil,
           team_id: nil)
       else
-        dispositions = Disposition.count_by_team_id(current_user.team_member.team_id)
+        dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
         appointments = Appointments.count_by_team_id(current_user.team_member.team_id)
         dispositions_per_day =
           case Disposition.average_per_day_for_team(current_user.team_member.team_id) do
@@ -190,8 +197,10 @@ defmodule MainWeb.AdminController do
           teammate_count: teammate_count,
           locations: locations,
           location_count: Enum.count(locations),
-          location_id: current_user.team_member.location_id,
+          location_id: nil,
           location: nil,
+          from: params["from"],
+          to: params["to"],
           team_id: nil)
       end
     end
