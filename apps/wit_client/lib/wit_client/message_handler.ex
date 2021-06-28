@@ -29,6 +29,9 @@ defmodule WitClient.MessageHandler do
 
   def handle_info(:ask, [from, question]) do
     question = Inflex.parameterize(question, "%20")
+    IO.inspect("###################")
+    IO.inspect(@access_token)
+    IO.inspect("###################")
 
     case System.cmd("curl", [
            "-H",
@@ -37,16 +40,22 @@ defmodule WitClient.MessageHandler do
          ]) do
       {response, 0} ->
         with %{} = response <- Poison.Parser.parse!(response)["entities"],
+        IO.inspect(response),
              intent <- get_intent(response),
              args <- get_args(response) do
           send(from, {:response, {intent, args}})
         else
           error ->
+            IO.inspect("###################")
+            IO.inspect(error)
+            IO.inspect("###################")
+
             Logger.error(inspect(error))
             send(from, {:response, :unknown})
         end
 
       {error, code} ->
+        IO.inspect(error)
         send(from, {:error, error})
     end
 
