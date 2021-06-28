@@ -152,7 +152,7 @@ defmodule MainWeb.Intents.Hours do
     |> get_day_of_week(location)
   end
 
-  defp get_day_of_week({year, month, day} = date, location) do
+  defp get_day_of_week({_year, _month, _day} = date, location) do
     with [holiday] <- find_holiday(location, date) do
       {:holiday, holiday}
     else

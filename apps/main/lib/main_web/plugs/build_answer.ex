@@ -7,10 +7,10 @@ defmodule MainWeb.Plug.BuildAnswer do
 
   import Plug.Conn
 
-  alias MainWeb.{Intents, Notify}
+  alias MainWeb.{Notify}
   alias Data.Location
   alias Data.Conversations, as: C
-  alias Data.ConversationMessages, as: CM
+
   alias Main.Service.Appointment
   @spec init(list()) :: list()
   def init(opts), do: opts
@@ -22,7 +22,7 @@ defmodule MainWeb.Plug.BuildAnswer do
   If the intent is 'unknown' then the super admin for the location needs to be notified that there is a new
   message in the queue.
   """
-  def call(%{assigns: %{convo: id,  status: "open", intent: nil} = assigns} = conn, _opts) do
+  def call(%{assigns: %{convo: _id,  status: "open", intent: nil} = _assigns} = conn, _opts) do
     conn
     |> assign(:status, "open")
   end
@@ -49,11 +49,11 @@ defmodule MainWeb.Plug.BuildAnswer do
   @doc """
   If there is a known intent then get the corresponding response.
   """
-  def call(%{assigns: %{convo: id, status: "open", intent: {:subscribe, []}=intent, location: location}} = conn, _opts) do
+  def call(%{assigns: %{convo: _id, status: "open", intent: {:subscribe, []}=_intent, location: _location}} = conn, _opts) do
       conn
       |> assign(:status, "closed")
   end
-  def call(%{assigns: %{convo: id, status: "open", intent: {:unsubscribe, []}=intent, location: location}} = conn, _opts) do
+  def call(%{assigns: %{convo: _id, status: "open", _intent: {:unsubscribe, []}=_intent, location: _location}} = conn, _opts) do
       conn
       |> assign(:status, "closed")
   end

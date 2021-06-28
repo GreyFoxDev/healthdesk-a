@@ -7,7 +7,6 @@ defmodule Data.Query.Intents do
   alias Data.Schema.Intent
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
-  alias Ecto.Adapters.SQL
 
   @doc """
   Returns a intent by id

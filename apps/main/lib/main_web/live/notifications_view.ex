@@ -2,9 +2,9 @@ defmodule MainWeb.Live.NotificationsView do
   use Phoenix.HTML
   use Phoenix.LiveView
 
-  alias MainWeb.Router.Helpers, as: Routes
+
   alias MainWeb.NotificationsView, as: View
-  alias Data.{Notifications, Conversations}
+  alias Data.{Notifications}
 
   def render(assigns) do
     View.render("index.html", assigns)
@@ -20,7 +20,7 @@ defmodule MainWeb.Live.NotificationsView do
     read = Enum.reduce_while(
       notifications,
       false,
-      fn x, acc ->
+      fn x, _acc ->
         if !x.read, do: {:halt, true}, else: {:cont, false}
       end
     )
@@ -41,7 +41,7 @@ defmodule MainWeb.Live.NotificationsView do
     read = Enum.reduce_while(
       notifications,
       false,
-      fn x, acc ->
+      fn x, _acc ->
         if !x.read, do: {:halt, true}, else: {:cont, false}
       end
     )

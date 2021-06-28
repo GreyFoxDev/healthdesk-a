@@ -7,7 +7,7 @@ defmodule Data.Query.SavedReply do
   alias Data.Schema.SavedReply
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
-  alias Ecto.Adapters.SQL
+
 
   @doc """
   Returns a saved reply by id

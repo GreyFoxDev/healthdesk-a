@@ -1,7 +1,7 @@
 defmodule MainWeb.Plug.Broadcast do
   @moduledoc false
 
-  import Plug.Conn
+
 
   alias Data.{Member, Location}
   alias Data.Schema.Member, as: MemberSchema

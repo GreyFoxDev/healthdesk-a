@@ -5,7 +5,6 @@ defmodule Data.Query.ConversationMessage do
   import Ecto.Query, only: [from: 2]
 
   alias Data.Schema.ConversationMessage
-  alias Data.Schema.Conversation
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL
@@ -101,7 +100,7 @@ defmodule Data.Query.ConversationMessage do
     end
   end
 
-  def mark_read(%{read: true} = msg, repo) do
+  def mark_read(%{read: true} = msg, _repo) do
     {:ok, msg}
   end
 

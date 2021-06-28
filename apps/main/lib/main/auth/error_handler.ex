@@ -1,7 +1,7 @@
 defmodule MainWeb.Auth.AuthErrorHandler do
   @moduledoc false
 
-  import Plug.Conn
+
   import Phoenix.Controller, only: [put_flash: 3, redirect: 2]
 
   def auth_error(conn, {_type, _reason}, _opts) do

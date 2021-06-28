@@ -131,36 +131,36 @@ defmodule MainWeb.Intents do
       @default_response
     end
   end
-  def get_({"salesQuestion", _}, location) do
+  def get_({"salesQuestion", _}, _location) do
     """
     We'd be happy to share information about our membership plans and pricing. When are you able to stop by for a tour? Or if you'd prefer, when's the best time to give you a call?
     """
   end
-  def get_({"routeHousekeeping", _}, location) do
+  def get_({"routeHousekeeping", _}, _location) do
     """
     Thank you for your message. We apologize for any inconvenience and are notifying our front desk now. Would you like us to follow-up with you?
     """
   end
 
-  def get_({"routeLostFound", _}, location) do
+  def get_({"routeLostFound", _}, _location) do
     """
     Thank you for your message. We are notifying our front desk now to check our Lost & Found. Would you like us to follow-up with you?
     """
   end
 
-  def get_({"routeRetention", _}, location) do
+  def get_({"routeRetention", _}, _location) do
     """
     Thank you for your message. May I ask, why are you looking to cancel today?
     """
   end
 
-  def get_({"routeFrontDesk", _}, location) do
+  def get_({"routeFrontDesk", _}, _location) do
     """
     Thank you for your message. How can our front desk help you today?
     """
   end
 
-  def get_({"routeSupport", _}, location) do
+  def get_({"routeSupport", _}, _location) do
     """
     Thank you for your message. Can you please confirm your first and last name?
     """
@@ -183,7 +183,7 @@ defmodule MainWeb.Intents do
       |> fetch_module()
       |> apply(:build_response, [args, location.phone_number])
     else
-      err ->     MainWeb.Intents |> apply(:build_response, [args, location])
+      _err ->     MainWeb.Intents |> apply(:build_response, [args, location])
     end
   end
 

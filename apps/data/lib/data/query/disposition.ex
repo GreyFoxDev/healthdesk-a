@@ -5,8 +5,6 @@ defmodule Data.Query.Disposition do
   import Ecto.Query, only: [from: 2]
 
   alias Data.Schema.Disposition
-  alias Data.Schema.Conversation
-  alias Data.Schema.ConversationDisposition
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL
@@ -58,7 +56,7 @@ defmodule Data.Query.Disposition do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
     query = from(d in Disposition,
-      join: cd in assoc(d, :conversation_dispositions),
+      join: cd in assoc(d, :conversation_dispositions)
     )
     query = Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
@@ -100,7 +98,7 @@ defmodule Data.Query.Disposition do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
     query = from(d in Disposition,
-      join: cd in assoc(d, :conversation_dispositions),
+      join: cd in assoc(d, :conversation_dispositions)
     )
     query = Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->

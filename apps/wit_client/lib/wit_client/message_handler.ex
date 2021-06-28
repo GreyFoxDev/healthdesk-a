@@ -46,7 +46,7 @@ defmodule WitClient.MessageHandler do
             send(from, {:response, :unknown})
         end
 
-      {error, code} ->
+      {error, _code} ->
         send(from, {:error, error})
     end
 
