@@ -18,6 +18,7 @@ defmodule Data.Ticket do
   defdelegate get_by_location_ids(location_id), to: Query
   defdelegate get_by_admin_location(team_member_id), to: Query
   defdelegate delete(ticket), to: Query
+  defdelegate filter(params), to: Query
 
   def get_changeset(),
     do: Ticket.changeset(%Ticket{})

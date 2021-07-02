@@ -192,7 +192,7 @@ defmodule MainWeb.Live.WebChat.Index do
     {:noreply, assign(socket, %{messages: messages})}
   end
 
-  def handle_event(event, params, socket) do
+  def handle_event(_event, _params, socket) do
     {:noreply, socket}
   end
 
@@ -219,7 +219,7 @@ defmodule MainWeb.Live.WebChat.Index do
     message
   end
 
-  defp build_answer(conversation, event, socket) do
+  defp build_answer(_conversation, event, socket) do
     GenServer.call(socket.assigns.event_manager, event)
   end
 

@@ -1,9 +1,9 @@
 defmodule MainWeb.IntentController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Intent, User, Location}
+  alias Data.{Intent, Location}
 
-  def new(conn, %{"location_id" => location_id} = params) do
+  def new(conn, %{"location_id" => location_id} = _params) do
 
     location =
       conn
@@ -24,19 +24,19 @@ defmodule MainWeb.IntentController do
       errors: []
     )
   end
-  def new(conn, params) do
+  def new(_conn, params) do
     IO.inspect("=========newINTENT==============START=====================")
     IO.inspect(params)
     IO.inspect("=======================END=======================")
   end
 
-  def create(conn, %{"intent" => intent, "message" => message, "location_id" => location_id, "team_id" => team_id} = params) do
+  def create(conn, %{"intent" => _intent, "message" => _message, "location_id" => location_id, "team_id" => team_id} = params) do
     with {:ok, _} <- Intent.create(params) do
       conn
       |> put_flash(:success, "Intent created successfully.")
       |> redirect(to: team_location_intent_path(conn, :new, team_id, location_id))
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         location =
           conn
           |> current_user()
@@ -55,7 +55,7 @@ defmodule MainWeb.IntentController do
            )
     end
   end
-  def create(conn, params) do
+  def create(_conn, params) do
     IO.inspect("======CreateINTENT=================START=====================")
     IO.inspect(params)
     IO.inspect("=======================END=======================")

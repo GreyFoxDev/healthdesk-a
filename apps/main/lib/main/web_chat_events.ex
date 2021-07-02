@@ -124,7 +124,7 @@ defmodule Main.WebChat.Events do
     end
   end
 
-  def build_signup_message(club, plan) do
+  def build_signup_message(_club, plan) do
     case plan do
       "basic" ->
         """
@@ -215,7 +215,7 @@ defmodule Main.WebChat.Events do
     {:reply, build_message(time_of_day(), location, "outbound"), %{state | current_event: :tour_time}}
   end
 
-  def handle_call(<< "tour:", time_of_day :: binary >>, _from, %{current_event: :tour_time, assigns: %{location: location}} = state) do
+  def handle_call(<< "tour:", _time_of_day :: binary >>, _from, %{current_event: :tour_time, assigns: %{location: location}} = state) do
     response = """
     Perfect. And can I please get your first and last name?
     <br>
@@ -262,7 +262,7 @@ defmodule Main.WebChat.Events do
       day_of_week()
     end
 
-    message = %{
+    _message = %{
       type: "message",
       user: get_web_handle(location),
       direction: "outbound",

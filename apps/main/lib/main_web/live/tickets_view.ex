@@ -7,9 +7,9 @@ defmodule MainWeb.Live.TicketsView do
 
   def mount(%{"id" => id}, session, socket) do
 
-    {:ok, user, claims} =
+    {:ok, user, _claims} =
       case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
-        {:error, :token_expired} -> socket = socket |> redirect(to: "/")
+        {:error, :token_expired} -> socket |> redirect(to: "/")
         res -> res
       end
     location_ids = user |> teammate_locations(true)
@@ -35,9 +35,9 @@ defmodule MainWeb.Live.TicketsView do
 
   end
   def mount(_params, session, socket) do
-    {:ok, user, claims} =
+    {:ok, user, _claims} =
       case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
-        {:error, :token_expired} -> socket = socket |> redirect(to: "/")
+        {:error, :token_expired} -> socket |> redirect(to: "/")
         res -> res
       end
     location_ids = user |> teammate_locations(true)
@@ -125,7 +125,7 @@ defmodule MainWeb.Live.TicketsView do
     IO.inspect("###################")
     user = socket.assigns.user
     team_members = socket.assigns.team_members
-    {text_,notifications} = if note|>String.contains?("@") do
+    {_text,notifications} = if note|>String.contains?("@") do
       Enum.reduce(team_members,
         {note,[]}, fn m, {t,n} ->
         if String.contains?(t,"@" <> m.user.first_name <> " " <> m.user.last_name) do
@@ -194,9 +194,9 @@ defmodule MainWeb.Live.TicketsView do
     |> Kernel.+(min)
     |> Integer.to_string(36)
   end
-  defp notify(params,team_member \\nil,user \\nil)do
+  defp notify(params,_team_member \\nil,_user \\nil)do
     case Notifications.create(params) do
-      {:ok, notif} ->
+      {:ok, _notif} ->
         Main.LiveUpdates.notify_live_view(params.user_id,{__MODULE__, :new_notif})
       #        MainWeb.Notify.send_to_teammate(params.conversation_id, params.text, team_member,user)
       _ -> nil
@@ -206,7 +206,7 @@ defmodule MainWeb.Live.TicketsView do
   def handle_info(_, socket) do
     {:noreply, socket}
   end
-  def handle_event(_,params, socket) do
+  def handle_event(_,_params, socket) do
     {:noreply, socket}
   end
 end

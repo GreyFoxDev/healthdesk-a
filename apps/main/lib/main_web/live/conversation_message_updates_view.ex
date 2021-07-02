@@ -23,7 +23,7 @@ defmodule MainWeb.Live.ConversationMessageUpdatesView do
       |> Conversations.get(id)
     case conversation.channel_type do
       "APP" -> {:noreply,socket}
-      _ ->  messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
+      _ ->  _messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
             IO.inspect("###################")
             IO.inspect("this is 1")
             IO.inspect("###################")

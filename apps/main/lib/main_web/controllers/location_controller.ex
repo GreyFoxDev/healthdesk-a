@@ -29,7 +29,7 @@ defmodule MainWeb.LocationController do
     render conn, "show.json", data: location
   end
 
-  def request(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = params) do
+  def request(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = _params) do
     # Present an authentication challenge to the user
     provider_config = {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/calendar.events",request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
       callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",callback_methods: ["POST"]] }
@@ -37,7 +37,7 @@ defmodule MainWeb.LocationController do
     |> Ueberauth.run_request(provider, provider_config)
   end
 
-  def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider,"code" => code}=params) do
+  def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider,"code" => code}=_params) do
     res = Ueberauth.Strategy.Google.OAuth.get_access_token [code: code,redirect_uri: "https://staging.healthdesk.ai/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback", prompt: "consent",access_type: "offline" ]
 
     case res do
@@ -81,7 +81,7 @@ defmodule MainWeb.LocationController do
       errors: [])
   end
 
-  def edit(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = params) do
+  def edit(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = _params) do
     provider_config = {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/calendar",request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
       callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",prompt: "consent", access_type: "offline"] }
     conn
@@ -89,7 +89,7 @@ defmodule MainWeb.LocationController do
 
   end
 
-  def edit(conn, %{"id" => id, "team_id" => team_id} = params) do
+  def edit(conn, %{"id" => id, "team_id" => team_id} = _params) do
 
     with %Data.Schema.User{} = user <- current_user(conn),
          {:ok, changeset} <- Location.get_changeset(id, user) do
@@ -123,7 +123,7 @@ defmodule MainWeb.LocationController do
        end
   end
 
-  def update(conn, %{"id" => id, "location" => location, "team_id" => team_id} = params) do
+  def update(conn, %{"id" => id, "location" => location, "team_id" => team_id} = _params) do
 
     location = Map.put(location, "team_id", team_id)
 
@@ -154,10 +154,10 @@ defmodule MainWeb.LocationController do
     end
   end
 
-  def remove_config(conn, %{"location_id" => location_id, "team_id" => team_id} = params) do
-    location = Location.get(location_id)
+  def remove_config(conn, %{"location_id" => location_id, "team_id" => team_id} = _params) do
+    _location = Location.get(location_id)
 
-    case Location.update(location_id, location = %{
+    case Location.update(location_id, _location = %{
       form_url: nil,
       calender_url: nil,
       calender_id: nil,

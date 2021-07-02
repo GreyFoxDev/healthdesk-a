@@ -6,7 +6,7 @@ defmodule MainWeb.Helper.LocationHelper do
     MainWeb.Auth.Guardian.Plug.current_resource(conn)
   end
 
-  def teammate_locations(%Data.Schema.User{role: "admin"}=current_user) do
+  def teammate_locations(%Data.Schema.User{role: "admin"}=_current_user) do
 
     Location.all()
     |> Stream.filter(&(&1.deleted_at == nil))
@@ -22,7 +22,7 @@ defmodule MainWeb.Helper.LocationHelper do
     |> Kernel.++([current_user.team_member.location])
     |> Enum.dedup_by(&(&1.id))
   end
-  def teammate_locations(%Data.Schema.User{role: "admin"}=current_user, true) do
+  def teammate_locations(%Data.Schema.User{role: "admin"}=_current_user, true) do
     Location.all()
     |> Stream.filter(&(&1.deleted_at == nil))
     |> Stream.map(&(&1.id))

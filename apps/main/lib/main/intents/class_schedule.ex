@@ -21,7 +21,7 @@ defmodule MainWeb.Intents.ClassSchedule do
   def build_response(args, location) when is_binary(location),
     do: build_response(args, Location.get_by_phone(location))
 
-  def build_response([datetime: {datetime, _}] = args, location),
+  def build_response([datetime: {datetime, _}] = _args, location),
     do: build_response([datetime: datetime], location)
 
   def build_response([datetime: datetime], %{mindbody_location_id: mb_id} = location) when mb_id not in [nil, ""] do
@@ -138,7 +138,7 @@ defmodule MainWeb.Intents.ClassSchedule do
     "#{start_time} #{class.class_type} (#{class.instructor})"
   end
 
-  defp get_day_of_week({year, month, day} = date, location) do
+  defp get_day_of_week({_year, _month, _day} = date, location) do
     with [holiday] <- find_holiday(location, date) do
       {:holiday, holiday}
     else

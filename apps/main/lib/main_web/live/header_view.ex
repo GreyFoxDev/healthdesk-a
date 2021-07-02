@@ -3,7 +3,7 @@ defmodule MainWeb.Live.HeaderView do
 
   def render(assigns), do: MainWeb.HeaderView.render("header.html", assigns)
 
-  def mount(assigns, session, socket) do
+  def mount(_assigns, session, socket) do
     socket =
     socket
     |> assign(:current_user, session["current_user"])
@@ -12,6 +12,6 @@ defmodule MainWeb.Live.HeaderView do
   end
 
   defp parseTime(time) do
-    time = DateTime.to_iso8601(time)
+    _time = DateTime.to_iso8601(time)
   end
 end

@@ -10,6 +10,7 @@ defmodule Data.Query.Ticket do
   alias Data.Schema.TeamMemberLocation
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
+  alias Data.Disposition
 
   @doc """
   Returns a ticket by id
@@ -158,5 +159,46 @@ defmodule Data.Query.Ticket do
       where: t.status == "open"
     )
     |> repo.all()
+  end
+  @spec filter(params :: map(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
+
+  def filter(params, repo \\ Read) do
+    query = from(t in Ticket,
+      join: tm in TeamMember, on: t.team_member_id == tm.id,
+      join: tl in TeamMemberLocation, on: t.location_id == tl.location_id,
+      where: t.status == "open",
+      distinct: t.id
+    )
+    IO.inspect("============params================")
+    IO.inspect(params)
+    IO.inspect("============params================")
+
+    query = Enum.reduce(params, query, fn {key, value}, query ->
+      case key do
+        "team_id" ->
+          from([t,tm,...] in query, where: tm.team_id == ^value)
+        "team_member_id" ->
+          from(t in query, where: t.team_member_id == ^value)
+        "location_id" ->
+          from(t in  query, where: t.location_id == ^value)
+        "to" ->
+          to = Disposition.convert_string_to_date(value)
+          if is_nil(to), do: query, else: from([t,...] in query, where: t.inserted_at <= ^to)
+        "from" ->
+          from = Disposition.convert_string_to_date(value)
+          if is_nil(from), do: query, else: from([t,...] in query, where: t.inserted_at >= ^from)
+        _ -> query
+      end
+    end)
+    IO.inspect("============query================")
+    IO.inspect(query)
+    IO.inspect("============query================")
+
+    repo.all(query)
+    |> Enum.count()
+
+
+
+
   end
 end

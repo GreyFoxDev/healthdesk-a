@@ -18,10 +18,10 @@ defmodule MainWeb.Live.ConversationComponent do
     {:ok, socket}
   end
 
-  def handle_event("loadmore", %{"page" => page} = params, socket) do
+  def handle_event("loadmore", %{"page" => page} = _params, socket) do
     user = socket.assigns.user
 
-    status = case socket.assigns.tab do
+    _status = case socket.assigns.tab do
       "active" -> ["open", "pending"]
       "assigned" -> ["open", "pending"]
       "closed" -> ["closed"]

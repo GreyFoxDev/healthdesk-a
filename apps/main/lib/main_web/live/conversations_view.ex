@@ -17,9 +17,9 @@ defmodule MainWeb.Live.ConversationsView do
 
   def mount(%{"id" => "active"},session, socket) do
 
-    {:ok, user, claims} =
+    {:ok, user, _claims} =
       case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
-        {:error, :token_expired} -> socket = socket |> redirect(to: "/")
+        {:error, :token_expired} -> socket |> redirect(to: "/")
         res -> res
       end
     location_ids = user |> teammate_locations(true)
@@ -60,9 +60,9 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def mount(%{"id" => "assigned"},session, socket) do
 
-    {:ok, user, claims} =
+    {:ok, user, _claims} =
       case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
-        {:error, :token_expired} -> socket = socket |> redirect(to: "/")
+        {:error, :token_expired} -> socket |> redirect(to: "/")
         res -> res
       end
     location_ids = user |> teammate_locations(true)
@@ -105,9 +105,9 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def mount(%{"id" => "closed"},session, socket) do
 
-    {:ok, user, claims} =
+    {:ok, user, _claims} =
       case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
-        {:error, :token_expired} -> socket = socket |> redirect(to: "/")
+        {:error, :token_expired} -> socket |> redirect(to: "/")
         res -> res
       end
     location_ids = user |> teammate_locations(true)
@@ -153,9 +153,9 @@ defmodule MainWeb.Live.ConversationsView do
       _ -> "notes"
     end
 
-    {:ok, user, claims} =
+    {:ok, user, _claims} =
       case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
-        {:error, :token_expired} -> socket = socket |> redirect(to: "/")
+        {:error, :token_expired} -> socket |> redirect(to: "/")
         res -> res
       end
 
@@ -203,7 +203,7 @@ defmodule MainWeb.Live.ConversationsView do
     {:ok, redirect(socket, to: "/login")}
   end
 
-  def handle_event("openconvo", %{"cid" => conversation_id} = params, socket) do
+  def handle_event("openconvo", %{"cid" => conversation_id} = _params, socket) do
     user = socket.assigns.user
     #    IO.inspect(conversation_id)
     convo =
@@ -233,22 +233,22 @@ defmodule MainWeb.Live.ConversationsView do
     send(self(), {:fetch_d, %{user: user, locations: socket.assigns.location_ids, convo: convo}})
     {:noreply, socket}
   end
-  def handle_event("save", %{"conversation_message" => c_params} = params, socket) do
+  def handle_event("save", %{"conversation_message" => _c_params} = params, socket) do
     IO.inspect(params)
     location = socket.assigns.open_conversation.location
     user = socket.assigns.user
     conversation = socket.assigns.open_conversation
     conversations = case socket.assigns.tab do
       "active" ->
-        page= socket.assigns.page || 0
+        _page= socket.assigns.page || 0
           user
           |> Conversations.all(socket.assigns.location_ids,["open", "pending"],0,30, user.id,true)
       "assigned" ->
-        page= socket.assigns.page || 0
+        _page= socket.assigns.page || 0
           user
           |> Conversations.all(socket.assigns.location_ids,["open", "pending"],0,30, user.id)
       "closed" ->
-        page= socket.assigns.page || 0
+        _page= socket.assigns.page || 0
           user
           |> Conversations.all(socket.assigns.location_ids,["closed"],0,30)
 
@@ -288,7 +288,7 @@ defmodule MainWeb.Live.ConversationsView do
            ) do
         {:ok, _} ->
           if socket.assigns.tab == "active" do
-            conversation =
+            _conversation =
               user
               |> Conversations.get(conversation.id)
               |> fetch_member()
@@ -316,7 +316,7 @@ defmodule MainWeb.Live.ConversationsView do
     end
 
   end
-  def handle_event("assign", %{"cid" => conversation_id} = params, socket)do
+  def handle_event("assign", %{"cid" => conversation_id} = _params, socket)do
     user = socket.assigns.user
     conversation =
       user
@@ -357,11 +357,11 @@ defmodule MainWeb.Live.ConversationsView do
 
 
   end
-  def handle_event("close", %{"did" => disposition_id} = params, socket)do
+  def handle_event("close", %{"did" => disposition_id} = _params, socket)do
 
     user = socket.assigns.user
     conversation = socket.assigns.open_conversation
-    location = socket.assigns.location_ids
+    _location = socket.assigns.location_ids
 
     if conversation.status != "closed" do
       user_info = Formatters.format_team_member(user)
@@ -404,7 +404,7 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
 
-  def handle_event("save_member",  %{"member" => m_params} = params, socket) do
+  def handle_event("save_member",  %{"member" => m_params} = _params, socket) do
     o_c = socket.assigns.open_conversation
 
     socket = case MainWeb.UpdateMemberController.update(m_params) do
@@ -574,19 +574,19 @@ defmodule MainWeb.Live.ConversationsView do
     conversations = case open_conversation.status do
       "closed" ->
         page= socket.assigns.page || 0
-        conversations =
+        _conversations =
           user
           |> Conversations.all(locations,["closed"],page*30,30)
 
       _ ->
         if open_conversation.team_member == nil || open_conversation.team_member.user_id == user.id do
           page= socket.assigns.page || 0
-          conversations =
+          _conversations =
             user
             |> Conversations.all(locations,["open", "pending"],page*30,30, user.id,true)
         else
           page= socket.assigns.page || 0
-          conversations =
+          _conversations =
             user
             |> Conversations.all(locations,["open", "pending"],page*30,30, user.id)
         end
@@ -617,10 +617,10 @@ defmodule MainWeb.Live.ConversationsView do
     |> assign(:open_conversation, open_conversation)
     {:noreply, socket}
   end
-  def handle_info({:fetch_d, %{user: user, locations: locations, convo: nil}},socket)do
+  def handle_info({:fetch_d, %{user: _user, locations: _locations, convo: nil}},socket)do
     {:noreply, socket}
   end
-  def handle_info({:fetch_d, %{user: user, locations: locations, convo: open_conversation}},socket)do
+  def handle_info({:fetch_d, %{user: user, locations: _locations, convo: open_conversation}},socket)do
 
     dispositions =
       user
@@ -691,7 +691,7 @@ defmodule MainWeb.Live.ConversationsView do
   end
   defp send_message(%{original_number: <<"CH", _ :: binary>>} = conversation, params, location, user) do
 
-    from_name = if conversation.team_member do
+    _from_name = if conversation.team_member do
       Enum.join(
         [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
         " "
@@ -721,7 +721,7 @@ defmodule MainWeb.Live.ConversationsView do
   end
   defp send_message(%{original_number: <<"APP", _ :: binary>>} = conversation, params, location, user) do
 
-    from = if conversation.team_member do
+    _from = if conversation.team_member do
       Enum.join(
         [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
         " "
@@ -748,7 +748,7 @@ defmodule MainWeb.Live.ConversationsView do
 
     if Regex.match?(regex,email) do
 
-    from = if conversation.team_member do
+    _from = if conversation.team_member do
       Enum.join(
         [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
         " "
@@ -861,7 +861,7 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
 
   end
-  def handle_event("new_msg", %{"conversation" => c_params, "location_id" => location_id} = params, socket)do
+  def handle_event("new_msg", %{"conversation" => _c_params, "location_id" => location_id} = params, socket)do
 
     user = socket.assigns.user
     location = user
@@ -932,7 +932,7 @@ defmodule MainWeb.Live.ConversationsView do
       {:noreply, socket}
     end
   end
-  def handle_info({convo_id, %Data.Schema.ConversationMessage{}=msg}, socket) do
+  def handle_info({convo_id, %Data.Schema.ConversationMessage{}=_msg}, socket) do
 
     socket = if socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
       user = socket.assigns.user
@@ -975,19 +975,19 @@ defmodule MainWeb.Live.ConversationsView do
       "" ->
         case socket.assigns.tab do
           "active" ->
-            page= socket.assigns.page || 0
+            _page= socket.assigns.page || 0
             conversations =
               user
               |> Conversations.all(locations,["open", "pending"],0,30, user.id,true)
             {conversations, false}
           "assigned" ->
-            page= socket.assigns.page || 0
+            _page= socket.assigns.page || 0
             conversations =
               user
               |> Conversations.all(locations,["open", "pending"],0,30, user.id)
             {conversations, false}
           "closed" ->
-            page= socket.assigns.page || 0
+            _page= socket.assigns.page || 0
             conversations =
               user
               |> Conversations.all(locations,["closed"],0,30)
@@ -1049,13 +1049,13 @@ defmodule MainWeb.Live.ConversationsView do
       ( c.member != nil && (c.member.first_name != nil && filter_conversations((c.member.first_name <> " " <> (c.member.last_name||"")), search_string))) ||
       ( c.member != nil && (c.member.phone_number != nil &&  filter_conversations(c.member.phone_number, search_string)))
   end
-  defp filter_conversations(nil, s) do
+  defp filter_conversations(nil, _s) do
     false
   end
   defp filter_conversations(c, s) when is_binary(c) do
     String.downcase(c) =~ String.downcase(s)
   end
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     if(socket.assigns[:conversation_id]) do
       convo_id = socket.assigns.conversation_id
       Main.LiveUpdates.notify_live_view(convo_id, {__MODULE__, :agent_typing_stop})
@@ -1073,7 +1073,7 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def notify(params)do
     case Notifications.create(params) do
-      {:ok, notif} ->
+      {:ok, _notif} ->
         Main.LiveUpdates.notify_live_view(params.user_id,{__MODULE__, :new_notif})
       _ -> nil
     end
@@ -1081,7 +1081,7 @@ defmodule MainWeb.Live.ConversationsView do
   end
   def notify(params,team_member, location,user)do
     case Notifications.create(params) do
-      {:ok, notif} ->
+      {:ok, _notif} ->
         Main.LiveUpdates.notify_live_view(params.user_id,{__MODULE__, :new_notif})
         MainWeb.Notify.send_to_teammate(params.conversation_id, params.text, location, team_member,user)
       _ -> nil
