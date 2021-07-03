@@ -27,7 +27,7 @@ defmodule Chatbot.MessageHandler do
 
   def handle_info(:send_message, %{provider: provider} = state)
       when provider in @provider_types do
-    @providers[provider].call(state)
+    @providers[provider].call(state) |> IO.inspect
     {:stop, :normal, state}
   end
 

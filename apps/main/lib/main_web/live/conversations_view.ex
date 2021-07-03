@@ -316,7 +316,7 @@ defmodule MainWeb.Live.ConversationsView do
     end
 
   end
-  def handle_event("assign", %{"cid" => conversation_id} = _params, socket)do
+  def handle_event("assign", %{"cid" => conversation_id}, socket)do
     user = socket.assigns.user
     conversation =
       user
@@ -783,7 +783,7 @@ defmodule MainWeb.Live.ConversationsView do
            message = %{
              provider: :twilio,
              from: location.phone_number,
-             to: conversation.original_number,
+             to: MainWeb.Notify.validate_phone_number(conversation.original_number),
              body: params["conversation_message"]["message"]
            }
            @chatbot.send(message)

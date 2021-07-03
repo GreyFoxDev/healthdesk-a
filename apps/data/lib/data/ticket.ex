@@ -20,6 +20,12 @@ defmodule Data.Ticket do
   defdelegate delete(ticket), to: Query
   defdelegate filter(params), to: Query
 
+  def count_by(params),
+      do: Query.count_by(params)
+
+  def count_by(params),
+      do: Query.count_by(params)
+
   def get_changeset(),
     do: Ticket.changeset(%Ticket{})
 end

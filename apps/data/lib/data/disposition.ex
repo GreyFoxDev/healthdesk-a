@@ -41,19 +41,16 @@ defmodule Data.Disposition do
 
   def count_by(%{"location_id" => location_id, "to" => to, "from" => from}),
       do: Query.get_by(location_id, to, from)
-
   def count_by(%{"location_id" => location_id}),
       do: Query.count_by_location_id(location_id)
 
   def count_by(%{"team_id" => team_id, "to" => to, "from" => from}),
       do: Query.count_by_team(team_id, to, from)
-
   def count_by(%{"team_id" => team_id}),
       do: Query.count_by_team_id(team_id)
 
   def count_all_by(%{"to" => to, "from" => from}),
       do: Query.count_all_by(to, from)
-
   def count_all_by(%{}),
       do: Query.count_all()
 

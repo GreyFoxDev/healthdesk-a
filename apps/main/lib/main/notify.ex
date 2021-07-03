@@ -61,7 +61,7 @@ defmodule MainWeb.Notify do
       message = %{
         provider: :twilio,
         from: location.phone_number,
-        to: available.phone_number,
+        to: validate_phone_number(available.phone_number),
         body: body
       }
 
@@ -121,7 +121,7 @@ defmodule MainWeb.Notify do
       message = %{
         provider: :twilio,
         from: location.phone_number,
-        to: available.phone_number,
+        to: validate_phone_number(available.phone_number),
         body: body
       }
 
@@ -208,12 +208,10 @@ defmodule MainWeb.Notify do
           else
           body
         end
-
-
         message = %{
           provider: :twilio,
           from: location.phone_number,
-          to: admin.phone_number,
+          to: validate_phone_number(admin.phone_number),
           body: body
         }
 
@@ -254,4 +252,7 @@ defmodule MainWeb.Notify do
   end
   def fetch_member(conversation), do: conversation
 
+  def validate_phone_number(phone_number) do
+    if String.starts_with?(phone_number, "+"), do: phone_number, else: "+" <> phone_number
+end
 end

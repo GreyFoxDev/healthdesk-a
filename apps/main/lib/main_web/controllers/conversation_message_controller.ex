@@ -43,7 +43,11 @@ defmodule MainWeb.ConversationMessageController do
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-           message = %{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
+           message = %{
+             provider: :twilio, from: location.phone_number,
+             to: MainWeb.Notify.validate_phone_number(conversation.original_number),
+             body: params["conversation_message"]["message"]
+           }
            @chatbot.send(message)
            put_flash(conn, :success, "Sending message was successful")
          {:error, _changeset} ->
