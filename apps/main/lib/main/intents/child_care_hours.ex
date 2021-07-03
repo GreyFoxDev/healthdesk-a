@@ -65,7 +65,7 @@ defmodule MainWeb.Intents.ChildCareHours do
     end
   end
 
-  def build_response(intent, location) do
+  def build_response(_intent, location) do
     location = Location.get_by_phone(location)
 
     with [] <- get_hours(location.id) do
@@ -81,7 +81,7 @@ defmodule MainWeb.Intents.ChildCareHours do
     end
   end
 
-  defp get_day_of_week({year, month, day} = date,location) do
+  defp get_day_of_week({_year, _month, _day} = date,location) do
     with [holiday] <- find_holiday(location, date) do
       {:holiday, holiday}
     else
@@ -94,7 +94,7 @@ defmodule MainWeb.Intents.ChildCareHours do
     "#{day.day_of_week}: #{day.morning_open_at} to #{day.morning_close_at}"
   end
 
-  defp format_schedule(%{times: []}=day) do
+  defp format_schedule(%{times: []}=_day) do
     ""
   end
   defp format_schedule(%{times: times}=day) do

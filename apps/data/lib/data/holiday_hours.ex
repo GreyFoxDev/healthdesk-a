@@ -48,7 +48,7 @@ defmodule Data.HolidayHours do
     |> Query.update(params)
   end
 
-  def delete(%{"id" => id} = params) do
+  def delete(%{"id" => _id} = params) do
     Query.delete(params)
   end
 end

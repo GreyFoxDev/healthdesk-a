@@ -2,7 +2,7 @@ defmodule MainWeb.Live.ConversationAlertsView do
   use Phoenix.HTML
   use Phoenix.LiveView
 
-  alias MainWeb.Router.Helpers, as: Routes
+
   alias MainWeb.ConversationAlertsView, as: View
   
   def render(assigns) do

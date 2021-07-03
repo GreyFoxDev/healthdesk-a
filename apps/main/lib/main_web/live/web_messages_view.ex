@@ -1,7 +1,7 @@
 defmodule MainWeb.Live.WebMessagesView do
   use Phoenix.LiveView
 
-  alias Data.Schema.{Location, Conversation}
+  alias Data.Schema.{Location}
   alias Data.{ConversationMessages}
   alias Data.Schema.MemberChannel, as: Channel
   alias Data.Schema.MemberChannel
@@ -43,7 +43,7 @@ defmodule MainWeb.Live.WebMessagesView do
     Main.LiveUpdates.notify_live_view({convo_id, :online})
     {:noreply, socket}
   end
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     convo_id = socket.assigns.convo_id
     Main.LiveUpdates.notify_live_view({convo_id, :offline})
 
@@ -79,7 +79,7 @@ defmodule MainWeb.Live.WebMessagesView do
   def handle_info(_, socket) do
     {:noreply, socket}
   end
-  def handle_event(_,params, socket) do
+  def handle_event(_,_params, socket) do
     {:noreply, socket}
   end
   def fetch_member(%{original_number: <<"CH", _rest :: binary>> = channel} = conversation) do
