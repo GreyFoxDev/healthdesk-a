@@ -9,7 +9,7 @@ defmodule MainWeb.AdminController do
     dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => team_id}))
     appointments = Appointments.count_by_team_id(team_id)
     dispositions_per_day =
-      case Disposition.average_per_day_for_team(team_id) do
+      case Disposition.average_per_day_for_team(params) do
         [result] -> result
         _ -> %{sessions_per_day: 0}
       end
@@ -74,7 +74,7 @@ defmodule MainWeb.AdminController do
     appointments = Appointments.count_by_location_id(location_id)
     response_time = ConversationMessages.count_by_location_id(location_id)
     dispositions_per_day =
-      case Disposition.average_per_day_for_location(location_id) do
+      case Disposition.average_per_day_for_location(params) do
         [result] -> result
         _ -> %{sessions_per_day: 0}
       end
@@ -147,7 +147,7 @@ defmodule MainWeb.AdminController do
         IO.inspect(params)
         dispositions = Disposition.count_all_by(params)
         appointments = Appointments.count_all()
-        [dispositions_per_day] = Disposition.average_per_day()
+        [dispositions_per_day] = Disposition.average_per_day(params)
         locations = Location.all()
         response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id).median_response_time||0 end)
         middle_index = response_times |> length() |> div(2)
@@ -184,8 +184,9 @@ defmodule MainWeb.AdminController do
       else
         dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
         appointments = Appointments.count_by_team_id(current_user.team_member.team_id)
+        params = Map.merge(params, %{"team_id" => current_user.team_member.team_id})
         dispositions_per_day =
-          case Disposition.average_per_day_for_team(current_user.team_member.team_id) do
+          case Disposition.average_per_day_for_team(params) do
             [result] -> result
             _ -> %{sessions_per_day: 0}
           end

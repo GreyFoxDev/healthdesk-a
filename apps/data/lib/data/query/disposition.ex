@@ -176,16 +176,27 @@ defmodule Data.Query.Disposition do
     |> repo.one()
   end
 
-#  def average_per_day(repo \\ Read)
-  def average_per_day(repo \\ Read) do
-   query =  from(d in ConversationDisposition,
-      group_by: fragment("date_trunc('day',?)", d.inserted_at),
-      select: %{count: count(d.id)})
-   avg = from(f in subquery(query),
-     select: avg(f.count))
-    |> repo.one
-   sessions = trunc(avg.coef * (:math.pow(10, avg.exp)))
-   [%{sessions_per_day: sessions}]
+  def average_per_day(params, repo \\ Read) do
+   query =  from(cd in ConversationDisposition,
+      group_by: fragment("date_trunc('day',?)", cd.inserted_at),
+      select: %{count: count(cd.id)})
+   query = Enum.reduce(params, query, fn {key, value}, query ->
+     case key do
+       "to" ->
+         to = Data.Disposition.convert_string_to_date(value)
+         if is_nil(to), do: query, else: from([cd,...] in query,
+           where: cd.inserted_at <= ^to)
+       "from" ->
+         from = Data.Disposition.convert_string_to_date(value)
+         if is_nil(from), do: query, else: from([cd,...] in query,
+           where: cd.inserted_at >= ^from)
+       _ -> query
+     end
+   end)
+   from(f in subquery(query), select: avg(f.count))
+   |> repo.one
+   |> format_avg()
+
   end
 
 #  def average_per_day(repo\\ Read) do
@@ -195,17 +206,28 @@ defmodule Data.Query.Disposition do
 #  end
 
 
-  def average_per_day_for_team(team_id, repo \\ Read) do
+  def average_per_day_for_team(%{"team_id" => team_id}=params, repo \\ Read) do
     query =  from(cd in ConversationDisposition,
       join: d in Disposition, on: d.id == cd.disposition_id,
       where: d.team_id == ^team_id,
       group_by: [d.team_id, fragment("date_trunc('day',?)", cd.inserted_at)],
       select: %{count: count(cd.id)})
-    avg = from(d in subquery(query),
-            select: avg(d.count))
-          |> repo.one
-    sessions = trunc(avg.coef * (:math.pow(10, avg.exp)))
-    [%{sessions_per_day: sessions}]
+    query = Enum.reduce(params, query, fn {key, value}, query ->
+      case key do
+        "to" ->
+          to = Data.Disposition.convert_string_to_date(value)
+          if is_nil(to), do: query, else: from([cd,...] in query,
+            where: cd.inserted_at <= ^to)
+        "from" ->
+          from = Data.Disposition.convert_string_to_date(value)
+          if is_nil(from), do: query, else: from([cd,...] in query,
+            where: cd.inserted_at >= ^from)
+        _ -> query
+      end
+    end)
+    from(d in subquery(query), select: avg(d.count))
+    |> repo.one
+    |> format_avg()
   end
 
 #  def average_per_day_for_team(team_id, repo \\ Read) do #5, 7
@@ -215,17 +237,28 @@ defmodule Data.Query.Disposition do
 #    |> Enum.filter(&(&1.team_id == team_id))
 #  end
 
-  def average_per_day_for_location(location_id, repo \\ Read) do
+  def average_per_day_for_location(%{"location_id" => location_id}=params, repo \\ Read) do
     query =  from(cd in ConversationDisposition,
       join: c in Conversation, on: c.id == cd.conversation_id,
       where: c.location_id == ^location_id,
       group_by: fragment("date_trunc('day',?)", cd.inserted_at),
       select: %{count: count(cd.id)})
-    avg = from(c in subquery(query),
-            select: avg(c.count))
-          |> repo.one
-    sessions = trunc(avg.coef * (:math.pow(10, avg.exp)))
-    [%{sessions_per_day: sessions}]
+    query = Enum.reduce(params, query, fn {key, value}, query ->
+      case key do
+        "to" ->
+          to = Data.Disposition.convert_string_to_date(value)
+          if is_nil(to), do: query, else: from([cd,...] in query,
+            where: cd.inserted_at <= ^to)
+        "from" ->
+          from = Data.Disposition.convert_string_to_date(value)
+          if is_nil(from), do: query, else: from([cd,...] in query,
+            where: cd.inserted_at >= ^from)
+        _ -> query
+      end
+    end)
+    from(c in subquery(query), select: avg(c.count))
+    |> repo.one
+    |> format_avg()
   end
 
 #  def average_per_day_for_location(location_id, repo \\ Read) do
@@ -289,5 +322,14 @@ defmodule Data.Query.Disposition do
   defp build_results(results) do
     cols = Enum.map(results.columns, &String.to_existing_atom/1)
     Enum.map(results.rows, fn row -> Map.new(Enum.zip(cols, row)) end)
+  end
+
+  defp format_avg(avg) do
+    if is_nil(avg) do
+      [%{sessions_per_day: 0}]
+    else
+      sessions = trunc(avg.coef * (:math.pow(10, avg.exp)))
+      [%{sessions_per_day: sessions}]
+    end
   end
 end

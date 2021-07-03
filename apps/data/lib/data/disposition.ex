@@ -18,9 +18,9 @@ defmodule Data.Disposition do
   defdelegate count_all(), to: Query
   defdelegate count_by_team_id(team_id), to: Query
   defdelegate count_by_location_id(location_id), to: Query
-  defdelegate average_per_day(), to: Query
-  defdelegate average_per_day_for_team(team_id), to: Query
-  defdelegate average_per_day_for_location(location_id), to: Query
+  defdelegate average_per_day(params), to: Query
+  defdelegate average_per_day_for_team(params), to: Query
+  defdelegate average_per_day_for_location(params), to: Query
 
   def get_changeset(),
     do: Schema.changeset(%Schema{})
