@@ -36,7 +36,7 @@ defmodule MainWeb.AdminController do
     filter =
       case current_user do
         %{role: "team-admin"} -> %{"team_id" => current_user.team_member.team_id}
-        %{role: "admin"} -> %{"team_member_id" => current_user.team_member.id}
+        %{role: "admin"} -> %{"team_member_id" => current_user.team_member && current_user.team_member.id}
         %{role: "teammate"} -> %{"tem_member_id" => current_user.team_member.id, location_id: current_user.team_member.location_id}
         _ -> %{}
       end
@@ -137,8 +137,8 @@ defmodule MainWeb.AdminController do
         |> Enum.filter(&(&1.user.role == "teammate"))
         |> Enum.count()
       filter = case current_user do
-        %{role: "team-admin"} -> %{"team_id" => current_user.team_member.team_id}
-        %{role: "location-admin"} -> %{"team_member_id" => current_user.team_member.id}
+        %{role: "team-admin"} -> %{"team_id" => current_user.team_member && current_user.team_member.team_id}
+        %{role: "location-admin"} -> %{"team_member_id" => current_user.team_member && current_user.team_member.id}
         _ -> %{}
       end
       params= Map.merge(params, filter)
