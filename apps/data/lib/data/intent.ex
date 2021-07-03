@@ -30,7 +30,11 @@ defmodule Data.Intent do
     {:ok, changeset}
   end
 
+<<<<<<< HEAD
+  def get_by( intent, location_id),
+=======
   def get_by(%{role: _role}, intent, location_id),
+>>>>>>> dad6e83e9fe5cc61f6744cab79fc43482511043c
     do: Query.get_by_name_and_location_id(intent, location_id)
 
   def get_by(_), do: {:error, :invalid_permissions}

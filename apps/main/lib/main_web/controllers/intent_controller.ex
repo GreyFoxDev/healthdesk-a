@@ -24,11 +24,7 @@ defmodule MainWeb.IntentController do
       errors: []
     )
   end
-  def new(_conn, params) do
-    IO.inspect("=========newINTENT==============START=====================")
-    IO.inspect(params)
-    IO.inspect("=======================END=======================")
-  end
+
 
   def create(conn, %{"intent" => _intent, "message" => _message, "location_id" => location_id, "team_id" => team_id} = params) do
     with {:ok, _} <- Intent.create(params) do
@@ -55,14 +51,9 @@ defmodule MainWeb.IntentController do
            )
     end
   end
-  def create(_conn, params) do
-    IO.inspect("======CreateINTENT=================START=====================")
-    IO.inspect(params)
-    IO.inspect("=======================END=======================")
-  end
 
   def update(conn, %{"id" => id, "message" => message, "location_id" => location_id, "team_id" => team_id} = params) do
-    with %Data.Schema.Intent{} = intent <- Intent.get_by(%{role: "admin"}, id, location_id),
+    with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
       conn
       |> put_flash(:success, "Intent updated successfully.")
@@ -89,7 +80,7 @@ defmodule MainWeb.IntentController do
     end
   end
   def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
-    with %Data.Schema.Intent{} = intent <- Intent.get_by(%{role: "admin"}, id, location_id),
+    with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
       conn
       |> put_flash(:success, "Intent updated successfully.")
@@ -116,7 +107,7 @@ defmodule MainWeb.IntentController do
     end
   end
   def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
-    with %Data.Schema.Intent{} = intent <- Intent.get_by(%{role: "admin"}, id, location_id),
+    with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
       conn
       |> put_flash(:success, "Intent updated successfully.")
@@ -141,16 +132,11 @@ defmodule MainWeb.IntentController do
              errors: changeset.errors
            )
     end
-  end
-  def update(conn, params) do
-    IO.inspect("======updateINTENT=================START=====================")
-    IO.inspect(params)
-    IO.inspect("=======================END=======================")
   end
 
 
   def delete(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id}) do
-    with %Data.Schema.Intent{} = intent <- Intent.get_by(%{role: "admin"}, id, location_id),
+    with %Data.Schema.Intent{} = intent <- Intent.get_by(id, location_id),
          {:ok, _} <- Intent.delete(intent) do
       conn
       |> put_flash(:success, "Intent deleted successfully.")
