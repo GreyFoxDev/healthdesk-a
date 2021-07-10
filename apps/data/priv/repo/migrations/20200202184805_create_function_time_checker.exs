@@ -15,7 +15,9 @@ defmodule Data.Repo.Migrations.CreateFunctionTimeChecker do
       phone_number varchar,
       role varchar,
       use_email boolean,
-      use_sms boolean
+      use_sms boolean,
+      logged_in_at timestamp
+
     ) AS
     $find_available_team_members$
     DECLARE
@@ -37,7 +39,7 @@ defmodule Data.Repo.Migrations.CreateFunctionTimeChecker do
       END IF;
 
       RETURN QUERY
-        SELECT u.email, u.phone_number, u.role, u.use_email, u.use_sms
+        SELECT u.email, u.phone_number, u.role, u.use_email, u.use_sms, u.logged_in_at
         FROM users u
         INNER JOIN team_members t ON t.user_id = u.id
         WHERE t.location_id = location::uuid

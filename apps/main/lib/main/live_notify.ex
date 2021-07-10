@@ -1,9 +1,21 @@
 defmodule Main.LiveUpdates do
+  alias MainWeb.Presence
   @topic inspect(__MODULE__)
 
   @doc "subscribe for all users"
   def subscribe_live_view do
     Phoenix.PubSub.subscribe(Main.PubSub, topic(), link: true)
+  end
+
+  @doc "subscribe for specific user"
+  def subscribe_live_view_and_track(user_id) do
+    socket = Phoenix.PubSub.subscribe(Main.PubSub, topic(user_id), link: true)
+    Presence.track(self(), "online_users", user_id, %{})
+    socket
+#  rescue
+#    error ->
+#      IO.inspect("============rescue================")
+#      IO.inspect(error)
   end
 
   @doc "subscribe for specific user"
@@ -24,6 +36,6 @@ defmodule Main.LiveUpdates do
   end
 
 
-  defp topic, do: @topic
-  defp topic(user_id), do: topic() <> to_string(user_id)
+  def topic, do: @topic
+  def topic(user_id), do: topic() <> to_string(user_id)
 end

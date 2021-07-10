@@ -10,7 +10,6 @@ defmodule Data.Query.Disposition do
   alias Data.Schema.ConversationDisposition
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
-  alias Ecto.Adapters.SQL
 
   @doc """
   Returns a disposition by id

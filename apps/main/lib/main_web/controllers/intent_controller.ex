@@ -52,7 +52,7 @@ defmodule MainWeb.IntentController do
     end
   end
 
-  def update(conn, %{"id" => id, "message" => message, "location_id" => location_id, "team_id" => team_id} = params) do
+  def update(conn, %{"id" => id, "message" => _message, "location_id" => location_id, "team_id" => team_id} = params) do
     with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
       conn
@@ -162,7 +162,7 @@ defmodule MainWeb.IntentController do
            )
     end
   end
-  def delete(conn, params) do
+  def delete(_conn, params) do
     IO.inspect("========deleteINTENT===============START=====================")
     IO.inspect(params)
     IO.inspect("=======================END=======================")

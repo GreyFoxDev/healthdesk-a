@@ -1,7 +1,7 @@
 defmodule MainWeb.Live.TicketsView do
   use Phoenix.LiveView, layout: {MainWeb.LayoutView, "live.html"}
   import MainWeb.Helper.LocationHelper
-  alias Data.{Location,Ticket,TicketNote, Notifications, TeamMember}
+  alias Data.{Ticket,TicketNote, Notifications, TeamMember}
 
   def render(assigns), do: MainWeb.TicketView.render("index.html", assigns)
 

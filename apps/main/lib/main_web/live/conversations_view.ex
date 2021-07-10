@@ -436,6 +436,7 @@ defmodule MainWeb.Live.ConversationsView do
       |> Conversations.get(conversation_id)
       |> fetch_member()
     location = conversation.location
+
     team_members = socket.assigns.team_members
     text= params["text"]
     {text_,notifications} = if text|>String.contains?("@") do

@@ -21,7 +21,7 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
-    body = Enum.join([user.first_name,user.last_name ,message, link[:url]], " ")
+    body = Enum.join([user.first_name,user.last_name, "sent you a message" ,message, link[:url]], " ")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =
@@ -64,6 +64,7 @@ defmodule MainWeb.Notify do
         to: validate_phone_number(available.phone_number),
         body: body
       }
+
 
       @chatbot.send(message)
     end
@@ -134,41 +135,60 @@ defmodule MainWeb.Notify do
   @doc """
   Send a notification to the super admin defined in the config. It will create a short URL.
   """
-  def send_to_admin(conversation_id, message, location, _member \\ @super_admin) do
+  def send_to_admin(conversation_id, message, location, member_role \\ @super_admin) do
     location = Location.get_by_phone(location)
-
     %{data: link} =
       @url
       |> String.replace("[url]", @endpoint)
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
+    
+    template =
+      case member_role do
+        "location-admin" -> "You've a new message"
+        _ -> "You've been assigned to this conversation:"
+        end
 
     body =
       [
-        "You've been assigned to this conversation:",
+        template,
         message,
         link[:url]
       ] |> Enum.join(" ")
+
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =
       Time.utc_now()
       |> Time.add(timezone_offset)
       |> to_string()
-
     available_admins =
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
       |> IO.inspect(label: "AVAILABLE ADMINS")
-
+    available_admins = if member_role == "location-admin" do
+      Enum.filter(available_admins, &(is_nil(&1.logged_in_at)))
+    else
+      available_admins
+    end
     all_admins =
       %{role: "system"}
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin"))
       |> IO.inspect(label: "ALL ADMINS")
+    all_admins = if member_role == "location-admin" do
+      Enum.filter(all_admins, &(is_nil(&1.user.logged_in_at)))
+    else
+      all_admins
+    end
+    role =
+      case member_role do
+        "location-admin" -> "location-admin"
+        _ -> "admin"
+      end
 
-    conversation = Conversations.get(%{role: "admin"},conversation_id,false) |> fetch_member()
+    conversation = Conversations.get(%{role: role},conversation_id,false) |> fetch_member()
 
     _ = Enum.each(all_admins, fn(admin) ->
       if admin.user.use_email do
@@ -186,7 +206,6 @@ defmodule MainWeb.Notify do
         else
           "New message from #{conversation.original_number}"
         end
-
         admin.user.email
         |> Main.Email.generate_email(body, subject)
         |> Main.Mailer.deliver_now()
@@ -205,7 +224,7 @@ defmodule MainWeb.Notify do
                      member.phone_number
                    ] |> Enum.join(", ")
           body <> " from #{member}"
-          else
+        else
           body
         end
         message = %{
@@ -214,7 +233,6 @@ defmodule MainWeb.Notify do
           to: validate_phone_number(admin.phone_number),
           body: body
         }
-
         @chatbot.send(message)
       end
     end)
@@ -235,16 +253,16 @@ defmodule MainWeb.Notify do
         body
       end
       body = Jason.encode! %{text: String.replace(body, "\n", " ")}
-
       Tesla.post location.slack_integration, body, headers: headers
-    end
 
+    end
+    
     alert_info = %{location: location, convo: conversation_id}
     MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)
     MainWeb.Endpoint.broadcast("alert:#{location.id}", "broadcast", alert_info)
-
     :ok
   end
+
   def fetch_member(%{original_number: << "CH", _rest :: binary >> = channel} = conversation) do
     with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
       Map.put(conversation, :member, channel.member)
@@ -256,3 +274,6 @@ defmodule MainWeb.Notify do
     if String.starts_with?(phone_number, "+"), do: phone_number, else: "+" <> phone_number
 end
 end
+#Enum.filter(available_admins, fn admin ->
+#  Enum.any?(online_users, fn {key, _} ->  key == admin.id end)
+#end)

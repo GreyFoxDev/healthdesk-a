@@ -6,6 +6,8 @@ defmodule Main.Application do
 
     children = [
       supervisor(MainWeb.Endpoint, []),
+#      {Phoenix.PubSub, name: Main.PubSub},
+      MainWeb.Presence,
       {Main.WebChat.Supervisor, []},
       {Main.Scheduler, []},
       {Registry, [keys: :unique, name: Registry.WebChat]},

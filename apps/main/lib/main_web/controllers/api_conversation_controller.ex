@@ -36,7 +36,7 @@ defmodule MainWeb.Api.ConversationController do
       |> json(%{conversation_id: convo.id})
     end
   end
-  def create(conn, %{"location" => location, "member" => member, "preEngagementData" => %{"memberName" => name, "phoneNumber" => number}}) do
+  def create(conn, %{"location" => location, "member" => member, "preEngagementData" => %{"memberName" => _name, "phoneNumber" => _number}}) do
     with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
       Task.start(fn ->  notify_open(convo.location_id) end)
       conn
@@ -54,7 +54,7 @@ defmodule MainWeb.Api.ConversationController do
       |> json(%{conversation_id: convo.id})
     end
   end
-  def create(conn, %{"from" => from, "subject" => subj, "text" => message,"to" => to} = params) do
+  def create(conn, %{"from" => from, "subject" => subj, "text" => message,"to" => to} = _params) do
 
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
     name = List.first(Regex.split(regex,from))
@@ -261,7 +261,7 @@ defmodule MainWeb.Api.ConversationController do
           {:unknown, location.default_message}
       end
     else
-      {:error, error} ->
+      {:error, _error} ->
         {:unknown, location.default_message}
     end
   end
