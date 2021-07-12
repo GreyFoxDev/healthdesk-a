@@ -164,9 +164,6 @@ defmodule MainWeb.Notify do
       |> to_string()
     online_users=MainWeb.Presence.list("online_users")
     online_users=Enum.map(online_users, fn {user_id, _} -> User.get_phone_by_id(user_id) end)
-    IO.inspect("============online_users================")
-    IO.inspect(online_users)
-    IO.inspect("============online_users================")
 
     available_admins =
       location
@@ -180,26 +177,19 @@ defmodule MainWeb.Notify do
     else
       available_admins
     end
-#    Enum.any?(online_users, fn phone_number ->  !(phone_number == admin.phone_number) end)
-    IO.inspect("============available_admins================")
-    IO.inspect(available_admins)
-    IO.inspect("============available_admins================")
 
     all_admins =
       %{role: "location-admin"}
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin"))
       |> IO.inspect(label: "ALL ADMINS")
-      
+
     all_admins = if member_role == "location-admin" do
       Enum.filter(all_admins, fn admin -> !(admin.user.phone_number in online_users)
       end)
     else
       all_admins
     end
-    IO.inspect("============all_admins================")
-    IO.inspect(all_admins)
-    IO.inspect("============all_admins================")
 
 
     role =
