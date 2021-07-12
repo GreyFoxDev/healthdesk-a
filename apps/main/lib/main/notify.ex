@@ -5,7 +5,7 @@ defmodule MainWeb.Notify do
 
   require Logger
 
-  alias Data.{Location, Conversations, TeamMember, TimezoneOffset, MemberChannel}
+  alias Data.{Location, Conversations, TeamMember, TimezoneOffset, MemberChannel, User}
   alias Data.Schema.MemberChannel, as: Channel
 
   @url "[url]/admin/conversations/[conversation_id]/"
@@ -162,26 +162,48 @@ defmodule MainWeb.Notify do
       Time.utc_now()
       |> Time.add(timezone_offset)
       |> to_string()
+    online_users=MainWeb.Presence.list("online_users")
+    online_users=Enum.map(online_users, fn {user_id, _} ->
+    User.get_phone_by_id(user_id)
+    end)
+    IO.inspect("============online_users================")
+    IO.inspect(online_users)
+    IO.inspect("============online_users================")
+
     available_admins =
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
       |> IO.inspect(label: "AVAILABLE ADMINS")
     available_admins = if member_role == "location-admin" do
-      Enum.filter(available_admins, &(is_nil(&1.logged_in_at)))
+      Enum.filter(available_admins, fn admin ->
+        Enum.any?(online_users, fn key ->  !(key == admin.phone_number) end)
+      end)
     else
       available_admins
     end
+    IO.inspect("============available_admins================")
+    IO.inspect(available_admins)
+    IO.inspect("============available_admins================")
+
+    online_users=MainWeb.Presence.list("online_users")
     all_admins =
-      %{role: "system"}
+      %{role: "location-admin"}
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin"))
       |> IO.inspect(label: "ALL ADMINS")
     all_admins = if member_role == "location-admin" do
-      Enum.filter(all_admins, &(is_nil(&1.user.logged_in_at)))
+      Enum.filter(all_admins, fn admin ->
+        Enum.any?(online_users, fn {key, _} ->  !(key == admin.user.id) end)
+      end)
     else
       all_admins
     end
+    IO.inspect("============all_admins================")
+    IO.inspect(all_admins)
+    IO.inspect("============all_admins================")
+
+
     role =
       case member_role do
         "location-admin" -> "location-admin"
@@ -274,6 +296,3 @@ defmodule MainWeb.Notify do
     if String.starts_with?(phone_number, "+"), do: phone_number, else: "+" <> phone_number
 end
 end
-#Enum.filter(available_admins, fn admin ->
-#  Enum.any?(online_users, fn {key, _} ->  key == admin.id end)
-#end)

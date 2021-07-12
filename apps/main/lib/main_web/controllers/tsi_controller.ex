@@ -121,7 +121,7 @@ defmodule MainWeb.TsiController do
         end)
       end
 
-            case convo.status do
+      case convo.status do
         "open" ->
           if(!current_status) do
             Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
