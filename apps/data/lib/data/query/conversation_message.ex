@@ -80,7 +80,7 @@ defmodule Data.Query.ConversationMessage do
   @doc """
   mark a message as read
   """
-  @spec get_by_conversation_id(msg :: ConversationMessage.t(), repo :: Ecto.Repo.t()) :: [
+  @spec mark_read(msg :: ConversationMessage.t(), repo :: Ecto.Repo.t()) :: [
           ConversationMessage.t()
         ]
   def mark_read(msg, repo \\ Write)

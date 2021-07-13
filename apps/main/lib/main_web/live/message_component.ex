@@ -8,7 +8,6 @@ defmodule MainWeb.Live.MessageComponent do
 
 
   def update(assigns, socket) do
-#    IO.inspect("message component update fun-------------")
     socket = socket
              |> assign(:open_conversation, assigns.open_conversation)
              |> assign(:user, assigns.user)

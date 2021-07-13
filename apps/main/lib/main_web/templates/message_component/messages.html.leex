@@ -103,8 +103,11 @@
                                             <% end %>
                                         </strong> ·&nbsp;
                                             <%= format_date(@open_conversation.started_at) %> </span>
+
                 </li><!-- /.conversation-divider -->
+
                 <%= for {message, index} <- Enum.with_index(@open_conversation.conversation_messages)|>Enum.reverse() do %>
+
                                         <% previous_message = Enum.at(@open_conversation.conversation_messages, index-1) %>
                                         <% next_message = Enum.at(@open_conversation.conversation_messages, index+1) %>
                                         <% member_name = if @open_conversation.member, do: [@open_conversation.member.first_name, @open_conversation.member.last_name] |> Enum.join(" "), else: " " %>

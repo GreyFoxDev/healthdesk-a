@@ -35,7 +35,6 @@ defmodule MainWeb.Notify do
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
       |> List.first
 
-    IO.inspect(team_member.user, label: "SEND TO TEAMMATE")
 
     if team_member.user.use_email do
       conversation = Conversations.get(conversation_id) |> fetch_member()
@@ -96,7 +95,6 @@ defmodule MainWeb.Notify do
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
       |> List.first
 
-    IO.inspect(team_member.user, label: "SEND TO TEAMMATE")
 
     if team_member.user.use_email do
       conversation=  Conversations.get(conversation_id) |> fetch_member()
@@ -169,7 +167,6 @@ defmodule MainWeb.Notify do
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
-      |> IO.inspect(label: "AVAILABLE ADMINS")
     available_admins = if member_role == "location-admin" do
       Enum.filter(available_admins, fn %{phone_number: phone_number} ->
         !(phone_number in online_users)
@@ -182,7 +179,6 @@ defmodule MainWeb.Notify do
       %{role: "location-admin"}
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin"))
-      |> IO.inspect(label: "ALL ADMINS")
 
     all_admins = if member_role == "location-admin" do
       Enum.filter(all_admins, fn admin -> !(admin.user.phone_number in online_users)
@@ -190,7 +186,6 @@ defmodule MainWeb.Notify do
     else
       all_admins
     end
-
 
     role =
       case member_role do

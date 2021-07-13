@@ -54,7 +54,7 @@
                             <script>
                              $("#assign_team_member").click(function(e) {
                                  e.preventDefault(); // prevent default action of link
-                                 val = $("#assigned_id").val();
+                                 let val = $("#assigned_id").val();
 
                                  if (val === "") {
                                      alert("Please select a team member before trying to assign.");

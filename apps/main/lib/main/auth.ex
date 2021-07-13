@@ -14,7 +14,6 @@ defmodule MainWeb.Auth do
 
   def logout(conn) do
     user = MainWeb.Auth.Guardian.Plug.current_resource(conn)
-    User.update(user.id, %{logged_in_at: nil})
     Guardian.Plug.sign_out(conn)
     end
 

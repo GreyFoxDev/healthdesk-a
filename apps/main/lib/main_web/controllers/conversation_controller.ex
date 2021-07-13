@@ -41,6 +41,7 @@ defmodule MainWeb.ConversationController do
   end
 
   def edit(conn, %{"location_id" => location_id, "id" => id}) do
+
     location =
       conn
       |> current_user()
@@ -76,6 +77,7 @@ defmodule MainWeb.ConversationController do
   end
 
   def open(conn, %{"conversation_id" => id, "location_id" => location_id}) do
+
     conversation = Conversations.get(id)
     location =
       conn
@@ -127,6 +129,7 @@ defmodule MainWeb.ConversationController do
   end
 
   def close(conn, %{"conversation_id" => id, "location_id" => location_id} = params) do
+
     location =
       conn
       |> current_user()

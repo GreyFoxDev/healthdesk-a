@@ -297,10 +297,9 @@ defmodule MainWeb.Live.ConversationsView do
             conversations =
               user
               |> Conversations.all(locations,["open", "pending"],page*30,30, user.id,true)
-
             socket =
               socket
-              |> assign(:open_conversation, conversations |> List.first() |> fetch_member())
+#              |> assign(:open_conversation, open_conversation |> List.first() |> fetch_member())
               |> assign(:conversations, conversations)
               |> assign(:changeset, Conversations.get_changeset())
             if connected?(socket), do: Process.send_after(self(), :menu_fix, 100)
@@ -482,8 +481,8 @@ defmodule MainWeb.Live.ConversationsView do
   def handle_info({:fetch_c, %{user: user, locations: locations, type: "active"}}, socket) do
     page= socket.assigns.page || 0
     conversations =
-      user
-      |> Conversations.all(locations,["open", "pending"],page*30,30, user.id,true)
+    user
+    |> Conversations.all(locations,["open", "pending"],page*30,30, user.id,true)
 
     open_conversation =  case List.first(conversations) do
       nil -> nil

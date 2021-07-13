@@ -377,12 +377,11 @@ defmodule MainWeb.TsiController do
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
-      |> IO.inspect(label: "AVAILABLE ADMINS")
+
     all_admins =
       %{role: "system"}
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin" && is_nil(&1.user.logged_in_at)))
-      |> IO.inspect(label: "ALL Location ADMINS")
 
     conversation = Conversations.get(%{role: "location-admin"},conversation_id,false) |> fetch_member()
 

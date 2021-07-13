@@ -19,6 +19,12 @@ defmodule MainWeb.AssignTeamMemberController do
 
   end
   def assign(%{"id" => id, "location_id" => location_id, "team_member_id" => team_member_id}) do
+    IO.inspect("============aaa================")
+    IO.inspect(id)
+    IO.inspect(team_member_id)
+    IO.inspect("============aaa================")
+
+
     location =
       Location.get(%{role: "admin"}, location_id)
 
