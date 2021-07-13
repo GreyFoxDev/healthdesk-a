@@ -933,18 +933,20 @@ defmodule MainWeb.Live.ConversationsView do
     end
   end
   def handle_info({convo_id, %Data.Schema.ConversationMessage{}=_msg}, socket) do
-
     socket = if socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
       user = socket.assigns.user
       conversation = socket.assigns.open_conversation
+
       messages =
         user
         |> ConversationMessages.all(conversation.id) |> Enum.reverse()
-      socket
-      |> assign(:open_conversation, Map.merge(conversation,%{conversation_messages: messages}))
-      |> assign(:child_id, (List.first(messages)).id)
-      |> assign(:changeset, Conversations.get_changeset())
+      socket =
+        socket
+        |> assign(:open_conversation, Map.merge(conversation,%{conversation_messages: messages}))
+        |> assign(:child_id, (List.first(messages)).id)
+        |> assign(:changeset, Conversations.get_changeset())
       if connected?(socket), do: Process.send_after(self(), :scroll_chat, 200)
+      socket
     else
       socket
     end

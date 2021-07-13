@@ -85,7 +85,8 @@ defmodule Data.Query.ConversationMessage do
         ]
   def mark_read(msg, repo \\ Write)
 
-  def mark_read(%{read: false} = msg, repo) do
+
+    def mark_read(%{read: false} = msg, repo) do
     cs =
       msg
       |> ConversationMessage.changeset(%{read: true})
@@ -103,6 +104,12 @@ defmodule Data.Query.ConversationMessage do
   def mark_read(%{read: true} = msg, _repo) do
     {:ok, msg}
   end
+
+  def mark_read(msg, _repo) do
+    {:ok, msg}
+  end
+
+
 
   defp build_results(results) do
     cols = Enum.map(results.columns, &String.to_existing_atom/1)
