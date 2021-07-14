@@ -26,6 +26,8 @@
                         <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Class Schedule Upload</a>
                         <a href="<%= team_location_saved_reply_path(@conn, :new, location.team_id, location.id) %>" class="nav-link active">Saved Replies</a>
                         <a href="<%= team_location_intent_path(@conn, :new, location.team_id, location.id) %>" class="nav-link ">Intents</a>
+                        <a href="<%=team_location_automation_path(@conn, :new, location.team_id, location.id)%>" class="nav-link">Automations</a>
+
                     </nav>
                 </div>
             </div>

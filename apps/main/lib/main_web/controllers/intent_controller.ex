@@ -53,9 +53,13 @@ defmodule MainWeb.IntentController do
   end
 
   def update(conn, %{"id" => id, "message" => _message, "location_id" => location_id, "team_id" => team_id} = params) do
-    with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
+   with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
-      conn
+     IO.inspect("============params================")
+     IO.inspect(params)
+     IO.inspect("============params================")
+
+     conn
       |> put_flash(:success, "Intent updated successfully.")
       |> redirect(to: team_location_intent_path(conn, :new, team_id, location_id))
     else
@@ -79,33 +83,7 @@ defmodule MainWeb.IntentController do
            )
     end
   end
-  def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
-    with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
-         {:ok, _} <- Intent.update(intent, params) do
-      conn
-      |> put_flash(:success, "Intent updated successfully.")
-      |> redirect(to: team_location_intent_path(conn, :new, team_id, location_id))
-    else
-      {:error, changeset} ->
-        location =
-          conn
-          |> current_user()
-          |> Location.get(location_id)
-        intents = Intent.get_by_location_id(location_id)
-        conn
-        |> put_flash(:error, "Intent failed to update")
-        |> render(
-             "new.html",
-             changeset: Intent.get_changeset(),
-             location_id: location_id,
-             intents: intents,
-             location: location,
-             teams: teams(conn),
-             has_sidebar: true,
-             errors: changeset.errors
-           )
-    end
-  end
+ 
   def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
     with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
          {:ok, _} <- Intent.update(intent, params) do

@@ -27,34 +27,35 @@
                         <a href="<%= team_location_saved_reply_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Saved Replies</a>
                         <a href="<%= team_location_intent_path(@conn, :new, location.team_id, location.id) %>" class="nav-link active">Intents</a>
                         <a href="<%=team_location_automation_path(@conn, :new, location.team_id, location.id)%>" class="nav-link">Automations</a>
-
                     </nav>
                 </div>
             </div>
         </div>
         <div class="col-lg-8">
             <div class="card card-fluid">
-                <h6 class="card-header"> Intents</h6><!-- .card-body -->
+                <h6 class="card-header"> Automations</h6><!-- .card-body -->
                 <div class="card-body">
-                    <%= if length(@intents)>0 do %>
+                    <%= if length(@automations)>0 do %>
 
 
                     <div class="row">
-                        <div class="col-lg-5"><b>Intent</b></div>
-                        <div class="col-lg-5"><b>Message</b></div>
+                        <div class="col-lg-5"><b>Question</b></div>
+                        <div class="col-lg-5"><b>Answer</b></div>
                         <div class="col-lg-2"><b>Action</b></div>
                     </div>
                     <br>
-                    <%= for intent <- @intents do %>
+
+                    <%= for automation <- @automations do %>
+
                     <div class="row">
-                        <%= form_for @conn, team_location_intent_path(@conn, :update, @location.team_id, @location.id, intent.intent),[class: "col-lg-11",method: "put"], fn f -> %>
-                        <%= text_input f, :intent, value: intent.intent, class: "form-control col-lg-5", style: "display: unset; margin-right: 15px", maxlength: 240 %>
-                        <%= text_input f, :message, value: intent.message, class: "form-control col-lg-5", style: "display: unset", maxlength: 240 %>
+                        <%= form_for @conn, team_location_automation_path(@conn, :update, @location.team_id, @location.id, automation.id),[class: "col-lg-11",method: "put"], fn f -> %>
+                        <%= text_input f, :question, value: automation.question, class: "form-control col-lg-5", style: "display: unset; margin-right: 15px", maxlength: 240 %>
+                        <%= text_input f, :answer, value: automation.answer, class: "form-control col-lg-5", style: "display: unset", maxlength: 240 %>
                         <%= submit style: "float: right", class: "btn btn-secondary" do %>
                         <span class='fa fa-check'></span>
                         <% end %>
                             <% end %>
-                        <%= form_for @conn, team_location_intent_path(@conn, :delete, @location.team_id, @location.id, intent.intent),[method: "delete"] , fn f -> %>
+                        <%= form_for @conn, team_location_automation_path(@conn, :delete, @location.team_id, @location.id, automation.id),[method: "delete"] , fn f -> %>
                         <%= submit class: "btn btn-secondary" do %>
                         <span class='fa fa-times'></span>
                         <% end %>
@@ -64,18 +65,27 @@
                     <br>
                     <hr>
                     <% end %>
-                    <%= form_for @conn, team_location_intent_path(@conn, :create, @location.team_id, @location.id),[class: "row"], fn f -> %>
+                    <%= form_for @conn, team_location_automation_path(@conn, :create, @location.team_id, @location.id),[class: "row"], fn f -> %>
                     <div class="form-group col-lg-5">
-                        <%= text_input f, :intent, placeholder: "Intent",  class: "form-control" , maxlength: 240 %>
+                        <%= text_input f, :question, placeholder: "Question",  class: "form-control" , maxlength: 240 %>
                     </div>
                     <div class="form-group col-lg-5">
-                        <%= text_input f, :message, placeholder: "Message",  class: "form-control", maxlength: 240 %>
+                        <%= text_input f, :answer, placeholder: "answer",  class: "form-control", maxlength: 240 %>
                     </div>
+                    <%= if length(@automations)< @automation_limit do %>
                     <div class="form-group col-lg-2">
                         <%= submit class: "btn btn-secondary" do%>
                         Create
                         <% end %>
                     </div>
+                    <% else %>
+                    <div class="form-group col-lg-2">
+                        <%= submit class: "btn btn-secondary", disabled: true do%>
+                        Create
+                        <% end %>
+                    </div>
+
+                    <% end %>
                     <% end %>
 
                 </div><!-- /.card-body -->
