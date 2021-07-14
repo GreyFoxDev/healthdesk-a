@@ -34,6 +34,18 @@ defmodule Data.Query.User do
   end
 
   @doc """
+  Returns a list of Super Admins
+  """
+  @spec get_admin_emails( repo :: Ecto.Repo.t()) :: User.t() | nil
+  def get_admin_emails(repo \\ Read) do
+    from(u in User,
+      where: is_nil(u.deleted_at),
+      where: u.role=="admin",
+      select: u.email)
+    |> repo.all()
+  end
+
+  @doc """
   Returns a user phone no by id
   """
   @spec get_phone_by_id(id :: binary(), repo :: Ecto.Repo.t()) :: User.t() | nil

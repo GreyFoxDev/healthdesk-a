@@ -1,7 +1,7 @@
 defmodule MainWeb.AutomationController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Location, Automation}
+  alias Data.{Location, Automation, User}
 
 
   def new(conn, %{"location_id" => location_id} = _params) do
@@ -28,11 +28,20 @@ defmodule MainWeb.AutomationController do
   end
 
   def create(conn, %{"question" => question, "answer" => answer, "location_id" => location_id, "team_id" => team_id}=params) do
+
     location =
       conn
       |> current_user()
       |> Location.get(location_id)
     with {:ok, _} <- Automation.create(params) do
+      body = "A new automation has been added as \n Question: #{question} \n Answer: #{answer} \n at Location: #{location.location_name}"
+      subject="Automation Added"
+      email_list= User.get_admin_emails
+      Enum.each(email_list, fn email ->
+        email
+        |> Main.Email.generate_email(body, subject)
+        |> Main.Mailer.deliver_now()
+      end)
       conn
       |> put_flash(:success, "Automation created successfully.")
       |> redirect(to: team_location_automation_path(conn, :new, location.team_id, location.id))
