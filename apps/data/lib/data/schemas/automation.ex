@@ -13,12 +13,12 @@ defmodule Data.Schema.Automation do
 
   @required_fields ~w|
   location_id
-  |a
-
-  @optional_fields ~w|
   question
   answer
   |a
+
+  @optional_fields ~w|
+|a
 
   @all_fields @required_fields ++ @optional_fields
 

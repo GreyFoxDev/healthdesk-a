@@ -2,6 +2,7 @@
     <section id="base-style" class="card">
         <div class="card-body">
             <%= form_for @data, @action, fn f -> %>
+
                 <fieldset>
                     <div class="form-group">
                         <label>Location Name</label>
@@ -140,8 +141,10 @@
                         <%= text_input f, :calender_url, class: "form-control" %>
                         <label>Google Form URL</label>
                         <%= text_input f, :form_url, class: "form-control" %>
+                        <%= if (MainWeb.Auth.Guardian.Plug.current_resource(@conn).role=="admin") do %>
                         <label>Maximum Automation Limit</label>
-                        <%= text_input f, :automation_limit, class: "form-control" %>
+                        <%= text_input f, :automation_limit, class: "form-control", placeholder: 3 %>
+                        <%end%>
                     </div>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>

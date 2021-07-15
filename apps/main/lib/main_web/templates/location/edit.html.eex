@@ -35,7 +35,7 @@
             <div class="card card-fluid">
                 <h6 class="card-header"> Pass Prices </h6><!-- .card-body -->
                 <div class="card-body">
-                    <%= render "_form.html", data: @changeset, action: team_location_path(@conn, :update, @team_id, @changeset.data),callback_url: @callback_url, conn: @conn, errors: @errors %>
+                    <%= render "_form.html", data: @changeset, action: team_location_path(@conn, :update, @team_id, @changeset.data),callback_url: @callback_url, conn: @conn, errors: @errors%>
                 </div><!-- /.card-body -->
             </div>
         </div>

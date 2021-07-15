@@ -34,14 +34,7 @@ defmodule MainWeb.AutomationController do
       |> current_user()
       |> Location.get(location_id)
     with {:ok, _} <- Automation.create(params) do
-      body = "A new automation has been added as \n Question: #{question} \n Answer: #{answer} \n at Location: #{location.location_name}"
-      subject="Automation Added"
-      email_list= User.get_admin_emails
-      Enum.each(email_list, fn email ->
-        email
-        |> Main.Email.generate_email(body, subject)
-        |> Main.Mailer.deliver_now()
-      end)
+      send_email_to_admins(question, answer, location)
       conn
       |> put_flash(:success, "Automation created successfully.")
       |> redirect(to: team_location_automation_path(conn, :new, location.team_id, location.id))
@@ -132,6 +125,16 @@ defmodule MainWeb.AutomationController do
 
            )
     end
+  end
+  defp send_email_to_admins(question, answer, location) do
+    body = "A new automation has been added as \n Question: #{question} \n Answer: #{answer} \n at Location: #{location.location_name}"
+    subject="Automation Added"
+    email_list= User.get_admin_emails
+    Enum.each(email_list, fn email ->
+      email
+      |> Main.Email.generate_email(body, subject)
+      |> Main.Mailer.deliver_now()
+    end)
   end
 
 end
