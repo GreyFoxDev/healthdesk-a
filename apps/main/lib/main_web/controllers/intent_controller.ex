@@ -1,9 +1,9 @@
 defmodule MainWeb.IntentController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Intent, User, Location}
+  alias Data.{Intent, Location}
 
-  def new(conn, %{"location_id" => location_id} = params) do
+  def new(conn, %{"location_id" => location_id} = _params) do
 
     location =
       conn
@@ -26,13 +26,13 @@ defmodule MainWeb.IntentController do
   end
 
 
-  def create(conn, %{"intent" => intent, "message" => message, "location_id" => location_id, "team_id" => team_id} = params) do
+  def create(conn, %{"intent" => _intent, "message" => _message, "location_id" => location_id, "team_id" => team_id} = params) do
     with {:ok, _} <- Intent.create(params) do
       conn
       |> put_flash(:success, "Intent created successfully.")
       |> redirect(to: team_location_intent_path(conn, :new, team_id, location_id))
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         location =
           conn
           |> current_user()
@@ -51,10 +51,15 @@ defmodule MainWeb.IntentController do
            )
     end
   end
-  def update(conn, %{"id" => id, "message" => message, "location_id" => location_id, "team_id" => team_id} = params) do
-    with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
+
+  def update(conn, %{"id" => id, "message" => _message, "location_id" => location_id, "team_id" => team_id} = params) do
+   with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
-      conn
+     IO.inspect("============params================")
+     IO.inspect(params)
+     IO.inspect("============params================")
+
+     conn
       |> put_flash(:success, "Intent updated successfully.")
       |> redirect(to: team_location_intent_path(conn, :new, team_id, location_id))
     else
@@ -78,33 +83,7 @@ defmodule MainWeb.IntentController do
            )
     end
   end
-  def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
-    with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
-         {:ok, _} <- Intent.update(intent, params) do
-      conn
-      |> put_flash(:success, "Intent updated successfully.")
-      |> redirect(to: team_location_intent_path(conn, :new, team_id, location_id))
-    else
-      {:error, changeset} ->
-        location =
-          conn
-          |> current_user()
-          |> Location.get(location_id)
-        intents = Intent.get_by_location_id(location_id)
-        conn
-        |> put_flash(:error, "Intent failed to update")
-        |> render(
-             "new.html",
-             changeset: Intent.get_changeset(),
-             location_id: location_id,
-             intents: intents,
-             location: location,
-             teams: teams(conn),
-             has_sidebar: true,
-             errors: changeset.errors
-           )
-    end
-  end
+ 
   def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
     with %Data.Schema.Intent{} = intent <- Intent.get_by( id, location_id),
          {:ok, _} <- Intent.update(intent, params) do
@@ -161,7 +140,7 @@ defmodule MainWeb.IntentController do
            )
     end
   end
-  def delete(conn, params) do
+  def delete(_conn, params) do
     IO.inspect("========deleteINTENT===============START=====================")
     IO.inspect(params)
     IO.inspect("=======================END=======================")

@@ -16,6 +16,7 @@ defmodule Data.Repo.Migrations.CreateFunctionTimeChecker do
       role varchar,
       use_email boolean,
       use_sms boolean
+
     ) AS
     $find_available_team_members$
     DECLARE

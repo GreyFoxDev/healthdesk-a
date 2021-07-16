@@ -1,9 +1,9 @@
 defmodule MainWeb.SavedReplyController do
   use MainWeb.SecuredContoller
 
-  alias Data.{SavedReply, User, Location}
+  alias Data.{SavedReply, Location}
 
-  def new(conn, %{"location_id" => location_id} = params) do
+  def new(conn, %{"location_id" => location_id} = _params) do
 
     location =
       conn
@@ -27,7 +27,7 @@ defmodule MainWeb.SavedReplyController do
 
   def create(
         conn,
-        %{"draft" => draft, "title" => title, "location_id" => location_id, "team_id" => team_id} = params
+        %{"draft" => _draft, "title" => _title, "location_id" => location_id, "team_id" => team_id} = params
       ) do
 
     with {:ok, _} <- SavedReply.create(params) do
@@ -59,7 +59,7 @@ defmodule MainWeb.SavedReplyController do
 
   def update(
         conn,
-        %{"id" => id, "draft" => draft, "title" => title, "location_id" => location_id, "team_id" => team_id} = params
+        %{"id" => id, "draft" => _draft, "title" => _title, "location_id" => location_id, "team_id" => team_id} = params
       ) do
     with %Data.Schema.SavedReply{} = saved_reply <- SavedReply.get(%{role: "admin"}, id),
          {:ok, _} <- SavedReply.update(saved_reply, params) do
@@ -87,7 +87,7 @@ defmodule MainWeb.SavedReplyController do
            )
     end
   end
-  def update(conn, %{"id" => id, "draft" => draft, "location_id" => location_id, "team_id" => team_id} = params) do
+  def update(conn, %{"id" => id, "draft" => _draft, "location_id" => location_id, "team_id" => team_id} = params) do
     with %Data.Schema.SavedReply{} = saved_reply <- SavedReply.get(%{role: "admin"}, id),
          {:ok, _} <- SavedReply.update(saved_reply, params) do
       conn
@@ -114,7 +114,7 @@ defmodule MainWeb.SavedReplyController do
            )
     end
   end
-  def update(conn, %{"id" => id, "title" => title, "location_id" => location_id, "team_id" => team_id} = params) do
+  def update(conn, %{"id" => id, "title" => _title, "location_id" => location_id, "team_id" => team_id} = params) do
     with %Data.Schema.SavedReply{} = saved_reply <- SavedReply.get(%{role: "admin"}, id),
          {:ok, _} <- SavedReply.update(saved_reply, params) do
       conn

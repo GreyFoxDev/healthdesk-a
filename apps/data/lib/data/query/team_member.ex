@@ -3,9 +3,8 @@ defmodule Data.Query.TeamMember do
   Module for the Team Member queries
   """
   import Ecto.Query, only: [from: 2]
-  import Data.TimezoneOffset
 
-  alias Data.Schema.{TeamMember, Team, User, TeamMemberLocation, Location}
+  alias Data.Schema.{TeamMember, TeamMemberLocation, Location}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL

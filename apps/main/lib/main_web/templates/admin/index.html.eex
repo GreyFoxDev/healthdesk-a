@@ -18,15 +18,28 @@
                 <% end %>
             </select>
         </div><!-- /metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <h2 class="metric-label"> From </h2>
+            <input id="from" type="date" class="form-control" value="<%= @from %>" onchange="filterTeam(this)" />
+        </div><!-- /metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <h2 class="metric-label"> To </h2>
+            <input id="to" type="date" class="form-control" value="<%= @to %>" onchange="filterTeam(this)" />
+        </div><!-- /metric column -->
     </div>
     <script>
         function filterTeam(e) {
-            if (e.value == "-99") {
-                window.location.href = window.location.origin + '/admin';
-            }
-            else
-            {
-                window.location.href = window.location.origin + '/admin?team_id=' + e.value ;
+            console.log(document.getElementById("team_id").value)
+            console.log(document.getElementById("to").value)
+            if (document.getElementById("team_id").value === "-99") {
+                window.location.href = window.location.origin + '/admin' +
+                    '?from=' + document.getElementById("from").value +
+                    '&to=' + document.getElementById("to").value;
+            } else {
+                window.location.href = window.location.origin + '/admin' +
+                    '?from=' + document.getElementById("from").value +
+                    '&to=' + document.getElementById("to").value +
+                    '&team_id=' + document.getElementById("team_id").value ;
             }
         }
     </script>
@@ -81,7 +94,7 @@
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> LOCATIONS </h2>
-            <select class="form-control" id="team_id" name="team[id]" onchange="filterLocation(this)">
+            <select class="form-control" id="team_id" name="team[id]" onchange="filterParams(this)">
                 <%= unless @team_id do %>
                 <option selected value="-99">All Locations</option>
                 <% else %>
@@ -96,15 +109,26 @@
                 <% end %>
             </select>
         </div><!-- /metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <h2 class="metric-label"> From </h2>
+            <input id="from" type="date" class="form-control" value="<%= @from %>" onchange="filterParams(this)" />
+        </div><!-- /metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <h2 class="metric-label"> To </h2>
+            <input id="to" type="date" class="form-control" value="<%= @to %>" onchange="filterParams(this)" />
+        </div><!-- /metric column -->
     </div>
     <script>
-        function filterLocation(e) {
-            if (e.value == "-99") {
-                window.location.href = window.location.origin + '/admin';
-            }
-            else
-            {
-                window.location.href = window.location.origin + '/admin?location_id=' + e.value ;
+        function filterParams(e) {
+            if (document.getElementById("team_id").value === "-99") {
+                window.location.href = window.location.origin + '/admin' +
+                    '?from=' + document.getElementById("from").value +
+                    '&to=' + document.getElementById("to").value;
+            } else {
+                window.location.href = window.location.origin + '/admin' +
+                    '?from=' + document.getElementById("from").value +
+                    '&to=' + document.getElementById("to").value +
+                    '&location_id=' + document.getElementById("team_id").value ;
             }
         }
     </script>

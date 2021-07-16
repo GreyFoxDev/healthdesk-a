@@ -4,7 +4,6 @@ defmodule MainWeb.Plug.AskWit do
   """
 
   require Logger
-  alias Data.Conversations
   import Plug.Conn
 
   @spec init(list()) :: list()
@@ -42,7 +41,7 @@ defmodule MainWeb.Plug.AskWit do
           {:unknown_intent, []}
       end
     else
-      {:error, error} ->
+      {:error, _error} ->
         {:unknown_intent, []}
     end
   end

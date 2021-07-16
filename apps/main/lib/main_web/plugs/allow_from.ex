@@ -3,7 +3,7 @@ defmodule MainWeb.Plug.AllowFrom do
 
   def init(opts), do: opts
 
-  def call(conn, opts \\ []) do
+  def call(conn, _opts \\ []) do
     delete_resp_header(conn, "x-frame-options")
   end
 end

@@ -1,9 +1,9 @@
 defmodule MainWeb.Plug.SaveMemberData do
   require Logger
 
-  import Plug.Conn
 
-  alias Data.{Member, MemberChannel, Team, Location}
+
+  alias Data.{Member, MemberChannel, Location}
 
   @role %{role: "admin"}
 
@@ -67,7 +67,7 @@ defmodule MainWeb.Plug.SaveMemberData do
     IO.inspect(assigns)
     IO.inspect("###################")
     l = Location.get_by_phone(location)
-    {:ok, member} =
+    {:ok, _member} =
       with nil <- Member.get_by_phone_number(@role, phone) do
         create_member_data(l.team_id, "", "", phone)
       else
@@ -125,11 +125,11 @@ defmodule MainWeb.Plug.SaveMemberData do
     Member.update(member_id, %{first_name: first_name, last_name: last_name})
   end
 
-  def format_name([first, last] = name), do: name
+  def format_name([_first, _last] = name), do: name
   def format_name([first]), do: [first, nil]
   def format_name([first | rest]), do: [first, Enum.join(rest, " ")]
 
-  def format_phone(<< "+1", number :: binary >> = phone),
+  def format_phone(<< "+1", number :: binary >> = _phone),
     do: format_phone(number)
 
   def format_phone(phone) do

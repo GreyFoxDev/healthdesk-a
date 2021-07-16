@@ -33,7 +33,7 @@ defmodule MainWeb.Intents.ClassNext do
       |> Calendar.Date.add!(7)
       |> to_string()
 
-    class =
+    _class =
       location
       |> Mindbody.get_classes(start_date, end_date)
       |> Enum.find(&find_classes(&1, date, time, class_type))
@@ -70,7 +70,7 @@ defmodule MainWeb.Intents.ClassNext do
       |> Calendar.Date.add!(7)
       |> to_string()
 
-    class =
+    _class =
       location
       |> Mindbody.get_classes(start_date, end_date)
       |> Enum.find(&find_classes(&1, date, time, class_category))

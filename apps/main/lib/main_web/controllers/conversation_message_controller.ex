@@ -1,7 +1,7 @@
 defmodule MainWeb.ConversationMessageController do
   use MainWeb.SecuredContoller
 
-  alias Data.{ConversationMessages, Conversations, Location, MemberChannel, TeamMember, SavedReply}
+  alias Data.{ConversationMessages, Conversations, Location, MemberChannel}
   alias Data.Schema.MemberChannel, as: Channel
 
   require Logger
@@ -43,7 +43,11 @@ defmodule MainWeb.ConversationMessageController do
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
-           message = %{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
+           message = %{
+             provider: :twilio, from: location.phone_number,
+             to: MainWeb.Notify.validate_phone_number(conversation.original_number),
+             body: params["conversation_message"]["message"]
+           }
            @chatbot.send(message)
            put_flash(conn, :success, "Sending message was successful")
          {:error, _changeset} ->
@@ -70,7 +74,7 @@ defmodule MainWeb.ConversationMessageController do
   defp send_message(%{original_number: << "CH", _ :: binary >>} = conversation, conn, params, location) do
     user = current_user(conn)
 
-    from_name = if conversation.team_member do
+    _from_name = if conversation.team_member do
       Enum.join([conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."], " ")
     else
       location.location_name
@@ -92,7 +96,7 @@ defmodule MainWeb.ConversationMessageController do
   defp send_message(%{original_number: << "APP", _ :: binary >>} = conversation, conn, params, location) do
     user = current_user(conn)
 
-    from = if conversation.team_member do
+    _from = if conversation.team_member do
       Enum.join([conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."], " ")
     else
       location.location_name
@@ -102,7 +106,7 @@ defmodule MainWeb.ConversationMessageController do
     |> Map.merge(%{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()})
     |> ConversationMessages.create()
     |> case do
-         {:ok, message} ->
+         {:ok, _message} ->
            put_flash(conn, :success, "Sending message was successful")
          {:error, _changeset} ->
            put_flash(conn, :error, "Sending message failed")

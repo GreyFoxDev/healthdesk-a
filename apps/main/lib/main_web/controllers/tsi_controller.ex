@@ -3,6 +3,7 @@ defmodule MainWeb.TsiController do
 
   import Plug.Conn, only: [send_resp: 3, assign: 3]
 
+
   plug MainWeb.Plug.AllowFrom
   plug MainWeb.Plug.ValidateApiKey
 
@@ -11,11 +12,15 @@ defmodule MainWeb.TsiController do
   alias Data.Schema.Conversation, as: Schema
   alias Main.Service.Appointment
 
-  alias MainWeb.{Notify, Intents}
+  alias MainWeb.{Notify}
 
-  alias Data.{Location, Member, Conversation}
+  alias Data.{Member, TimezoneOffset, TeamMember, Conversations}
 
   @role %{role: "admin"}
+  @url "[url]/location_admin/conversations/[conversation_id]/"
+  #@super_admin Application.get_env(:main, :super_admin)
+  @chatbot Application.get_env(:session, :chatbot, Chatbot)
+  @endpoint Application.get_env(:main, :endpoint)
 
   def new(conn, %{"phone-number" => phone_number, "api_key" => api_key, "ticket" => "new"} = params) do
     location = conn.assigns.location
@@ -24,7 +29,7 @@ defmodule MainWeb.TsiController do
     first_name = params["member-first"]
     last_name = params["member-last"]
 
-    {:ok, member} =
+    {:ok, _member} =
       with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
         update_member_data(member.id, first_name, last_name)
       else
@@ -39,12 +44,13 @@ defmodule MainWeb.TsiController do
   def new(conn, %{"phone-number" => phone_number, "api_key" => api_key, "ticket" => "open"} = params) do
 
     location = conn.assigns.location
+
     phone = "APP:#{format_phone(phone_number)}"
 
     first_name = params["member-first"]
     last_name = params["member-last"]
 
-    {:ok, member} =
+    {:ok, _member} =
       with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
         update_member_data(member.id, first_name, last_name)
       else
@@ -56,7 +62,7 @@ defmodule MainWeb.TsiController do
       |> assign(:title, location.team.team_name)
       |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
     else
-      err ->
+      _err ->
 
         conn
         |> assign(:title, location.team.team_name)
@@ -73,7 +79,7 @@ defmodule MainWeb.TsiController do
     first_name = params["member-first"]
     last_name = params["member-last"]
 
-    {:ok, member} =
+    {:ok, _member} =
       with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, phone) do
         update_member_data(member.id, first_name, last_name)
       else
@@ -88,26 +94,41 @@ defmodule MainWeb.TsiController do
       {:ok, %Schema{status: "pending"} = convo} -> conn
                                                 |> assign(:title, location.team.team_name)
                                                 |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
-      err ->
+      _err ->
         conn
         |> assign(:title, location.team.team_name)
         |> render_new(phone_number, api_key)
     end
   end
 
-  def new(conn, %{"unique-id" => unique_id, "api_key" => api_key} = params),
+  def new(conn, %{"unique-id" => unique_id, "api_key" => api_key} = _params),
       do: render_new(conn, unique_id, api_key)
 
   def new(conn, _params),
       do: send_resp(conn, 400, "Bad request")
 
-  def edit(conn, %{"id" => convo_id, "api_key" => api_key} = params) do
+  def edit(conn, %{"api_key" => api_key,"id" => convo_id}=params) do
     location = conn.assigns.location
 
     with %Schema{} = convo <- C.get(convo_id) do
       <<"APP:", phone_number :: binary>> = convo.original_number
-
       layout = get_edit_layout_for_team(conn)
+      online_users=MainWeb.Presence.list("online_users")
+      current_status =
+      if(!is_nil(convo.team_member)) do
+        Enum.any?(online_users, fn {key, _} ->
+          key == convo.team_member.user.id
+        end)
+      end
+
+      case convo.status do
+        "open" ->
+          if(!current_status) do
+            Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
+          end
+        _ ->
+          Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
+      end
 
       conn
       |> put_layout({MainWeb.LayoutView, layout})
@@ -122,8 +143,8 @@ defmodule MainWeb.TsiController do
     end
   end
 
-  def edit(conn, _params),
-      do: send_resp(conn, 400, "Bad request")
+  def edit(conn, params), do:
+    send_resp(conn, 400, "Bad request")
 
   def create(conn, %{"phone_number" => phone_number, "api_key" => api_key} = params) do
     phone_number = "APP:#{format_phone(phone_number)}"
@@ -150,7 +171,6 @@ defmodule MainWeb.TsiController do
       )
 
       close_conversation(convo.id, location)
-
       conn
       |> assign(:title, location.team.team_name)
       |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
@@ -167,9 +187,8 @@ defmodule MainWeb.TsiController do
 
     with %Schema{} = convo <- C.get(convo_id) do
       message= params["message"]||params["foo"]["message"]
-      <<"APP:", phone_number :: binary>> = convo.original_number
-
-      res=CM.create(
+      <<"APP:", _phone_number :: binary>> = convo.original_number
+      _res=CM.create(
         %{
           "conversation_id" => convo.id,
           "phone_number" => convo.original_number,
@@ -178,7 +197,7 @@ defmodule MainWeb.TsiController do
         }
       )
 
-      member = Member.get_by_phone_number(@role, convo.original_number)
+      _member = Member.get_by_phone_number(@role, convo.original_number)
 #
 #      if member do
 #        name = Enum.join([member.first_name, member.last_name], " ")
@@ -230,10 +249,10 @@ defmodule MainWeb.TsiController do
                  )
            end
       end
-
+      params = %{"api_key" => api_key, "id" => convo.id, "message" => message}
       conn
       |> assign(:title, location.team.team_name)
-      |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
+      |> redirect(to: tsi_path(conn, :edit, api_key, convo.id, params))
     end
   end
 
@@ -248,24 +267,18 @@ defmodule MainWeb.TsiController do
     – 5:30 pm ET M-F.
     """
   end
-
   defp build_answer(_) do
     "We've received your request. You may leave a comment below if you'd like."
   end
-  
-
   defp format_phone(<<"+", phone>>) do
     phone
   end
-
   defp format_phone(<<phone>>) do
     phone
   end
-
   defp format_phone(unique_id) do
     String.replace(unique_id, " ", "")
   end
-
   defp render_new(conn, unique_id, api_key) do
     if String.length(unique_id) >= 10 do
       location = conn.assigns.location
@@ -284,7 +297,6 @@ defmodule MainWeb.TsiController do
       send_resp(conn, 400, "Bad request")
     end
   end
-
   defp ask_wit_ai(question, convo_id, location) do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
       receive do
@@ -300,12 +312,11 @@ defmodule MainWeb.TsiController do
           {:unknown, location.default_message}
       end
     else
-      {:error, error} ->
+      {:error, _error} ->
 
         {:unknown, location.default_message}
     end
   end
-
   defp close_conversation(convo_id, location) do
     disposition =
       %{role: "system"}
@@ -341,7 +352,115 @@ defmodule MainWeb.TsiController do
 
     C.close(convo_id)
   end
+  def send_to_location_admin(conversation_id, message, location) do
+    #location = Location.get_by_phone(location)
+    %{data: link} =
+      @url
+      |> String.replace("[url]", @endpoint)
+      |> String.replace("[conversation_id]", conversation_id)
+      |> Bitly.Link.shorten()
 
+    body =
+      [
+        "You've a new message",
+        message,
+        link[:url]
+      ] |> Enum.join(" ")
+
+
+    timezone_offset = TimezoneOffset.calculate(location.timezone)
+    current_time_string =
+      Time.utc_now()
+      |> Time.add(timezone_offset)
+      |> to_string()
+    available_admins =
+      location
+      |> TeamMember.get_available_by_location(current_time_string)
+      |> Enum.filter(&(&1.role == "location-admin"))
+
+    all_admins =
+      %{role: "system"}
+      |> TeamMember.get_by_location_id(location.id)
+      |> Enum.filter(&(&1.user.role == "location-admin" && is_nil(&1.user.logged_in_at)))
+
+    conversation = Conversations.get(%{role: "location-admin"},conversation_id,false) |> fetch_member()
+
+    _ = Enum.each(all_admins, fn(admin) ->
+      if admin.user.use_email do
+        member = conversation.member
+        subject = if member do
+          member = [
+                     member.first_name,
+                     member.last_name,
+                     member.email || "",
+                     location.location_name,
+                     member.phone_number
+                   ] |> Enum.join(", ")
+
+          "New message from #{member}"
+        else
+          "New message from #{conversation.original_number}"
+        end
+        admin.user.email
+        |> Main.Email.generate_email(body, subject)
+        |> Main.Mailer.deliver_now()
+
+      end
+
+    end)
+
+    _ = Enum.each(available_admins, fn(admin) ->
+      if admin.use_sms do
+        member = conversation.member
+        body = if member do
+          member = [
+                     member.first_name,
+                     member.last_name,
+                     member.email || "",
+                     location.location_name,
+                     member.phone_number
+                   ] |> Enum.join(", ")
+          body <> " from #{member}"
+        else
+          body
+        end
+        message = %{
+          provider: :twilio,
+          from: location.phone_number,
+          to: validate_phone_number(admin.phone_number),
+          body: body
+        }
+
+        @chatbot.send(message)
+      end
+    end)
+
+    if location.slack_integration && location.slack_integration != "" do
+      headers = [{"content-type", "application/json"}]
+      member = conversation.member
+      body = if member do
+        member = [
+                   member.first_name,
+                   member.last_name,
+                   member.email || "",
+                   location.location_name,
+                   member.phone_number
+                 ] |> Enum.join(", ")
+        body <> " from #{member}"
+      else
+        body
+      end
+      body = Jason.encode! %{text: String.replace(body, "\n", " ")}
+
+      Tesla.post location.slack_integration, body, headers: headers
+    end
+
+    alert_info = %{location: location, convo: conversation_id}
+    MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)
+    MainWeb.Endpoint.broadcast("alert:#{location.id}", "broadcast", alert_info)
+
+    :ok
+  end
   defp create_member_data(team_id, first_name, nil, phone) do
     Member.create(
       %{
@@ -380,6 +499,13 @@ defmodule MainWeb.TsiController do
       <<"TW - ", _rest :: binary>> -> :total_woman_conversation
       _ -> :tsi_conversation
     end
+  end
+
+
+  def fetch_member(conversation), do: conversation
+
+  def validate_phone_number(phone_number) do
+    if String.starts_with?(phone_number, "+"), do: phone_number, else: "+" <> phone_number
   end
 
 end

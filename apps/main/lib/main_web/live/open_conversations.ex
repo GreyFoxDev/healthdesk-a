@@ -36,7 +36,7 @@ defmodule MainWeb.Live.OpenConverationsView do
     ~L[<%= count %>]
   end
 
-  def handle_info(broadcast = %{topic: << "alert:", location_id :: binary >>}, socket) do
+  def handle_info(_broadcast = %{topic: << "alert:", _location_id :: binary >>}, socket) do
     count =
       try do
         open_convos(socket.assigns.location_ids)

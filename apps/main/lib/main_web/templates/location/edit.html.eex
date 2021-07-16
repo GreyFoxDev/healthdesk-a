@@ -26,6 +26,7 @@
                         <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Class Schedule Upload</a>
                         <a href="<%= team_location_saved_reply_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Saved Replies</a>
                         <a href="<%= team_location_intent_path(@conn, :new, location.team_id, location.id) %>" class="nav-link ">Intents</a>
+                        <a href="<%=team_location_automation_path(@conn, :new, location.team_id, location.id)%>" class="nav-link">Automations</a>
                     </nav>
                 </div>
             </div>
@@ -34,7 +35,7 @@
             <div class="card card-fluid">
                 <h6 class="card-header"> Pass Prices </h6><!-- .card-body -->
                 <div class="card-body">
-                    <%= render "_form.html", data: @changeset, action: team_location_path(@conn, :update, @team_id, @changeset.data),callback_url: @callback_url, conn: @conn, errors: @errors %>
+                    <%= render "_form.html", data: @changeset, action: team_location_path(@conn, :update, @team_id, @changeset.data),callback_url: @callback_url, conn: @conn, errors: @errors%>
                 </div><!-- /.card-body -->
             </div>
         </div>

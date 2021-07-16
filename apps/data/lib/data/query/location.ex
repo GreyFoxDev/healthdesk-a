@@ -31,6 +31,15 @@ defmodule Data.Query.Location do
   end
 
   @doc """
+  Returns a Automation Limit by id
+  """
+  @spec get_automation_limit(id :: binary(), repo :: Ecto.Repo.t()) :: Location.t() | nil
+  def get_automation_limit(id, repo \\ Read) do
+    from(l in Location, where: is_nil(l.deleted_at), where: l.id == ^id, select: l.automation_limit)
+    |> repo.one()
+  end
+
+  @doc """
   Return a single active location by a unique phone number
   """
   def get_by_phone(phone_number, repo \\ Read) when is_binary(phone_number) do

@@ -3,12 +3,9 @@ defmodule Data.Query.Intents do
   Module for the intent queries
   """
   import Ecto.Query, only: [from: 2]
-
   alias Data.Schema.Intent
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
-  alias Ecto.Adapters.SQL
-
   @doc """
   Returns a intent by id
   """
@@ -20,7 +17,6 @@ defmodule Data.Query.Intents do
     )
     |> repo.one()
   end
-
   @doc """
   Return a list of intents for a location
   """
@@ -33,7 +29,6 @@ defmodule Data.Query.Intents do
     )
     |> repo.all()
   end
-
   @doc """
   Return a intent for a location and name
   """
@@ -47,7 +42,6 @@ defmodule Data.Query.Intents do
     )
     |> repo.one()
   end
-
   @doc """
   Creates a new intent
   """
@@ -57,16 +51,14 @@ defmodule Data.Query.Intents do
     %Intent{}
     |> Intent.changeset(params)
     |> case do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        repo.insert(changeset)
-
-      changeset ->
-        {:error, changeset}
-    end
-    rescue
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.insert(changeset)
+         changeset ->
+           {:error, changeset}
+       end
+  rescue
     _ -> {:error, []}
   end
-
   @doc """
   Updates an existing intent
   """
@@ -76,14 +68,12 @@ defmodule Data.Query.Intents do
     original
     |> Intent.changeset(params)
     |> case do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        repo.update(changeset)
-
-      changeset ->
-        {:error, changeset}
-    end
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.update(changeset)
+         changeset ->
+           {:error, changeset}
+       end
   end
-
   @doc """
   Deletes a intent. This is a logical delete
   """
@@ -92,11 +82,10 @@ defmodule Data.Query.Intents do
   def delete(%Intent{} = intent, repo \\ Write) do
     intent
     |> case do
-      %Intent{} = intent ->
-        repo.delete(intent)
-
-      nil ->
-        {:error, :no_record_found}
-    end
+         %Intent{} = intent ->
+           repo.delete(intent)
+         nil ->
+           {:error, :no_record_found}
+       end
   end
 end

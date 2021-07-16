@@ -17,6 +17,7 @@ defmodule Data.Location do
   defdelegate get_by_messenger_id(messenger_id), to: Query
   defdelegate create(params), to: Query
   defdelegate get(location_id), to: Query
+  defdelegate get_automation_limit(location_id), to: Query
   defdelegate all(), to: Query
 
   def get_changeset(),

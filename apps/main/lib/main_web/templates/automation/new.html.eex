@@ -1,0 +1,96 @@
+<% location = @location %>
+
+<header class="page-title-bar">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active">
+                <a href="<%= team_location_path(@conn, :index, location.team_id) %>"><i class="breadcrumb-icon fa fa-angle-left mr-2"></i>Locations</a>
+            </li>
+        </ol>
+    </nav>
+    <h6 class="page-title">Edit <%= location.location_name %></h6>
+</header>
+
+<div class="page-section">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card card-fluid">
+                <div class="card-header">
+                    <nav class="nav nav-tabs flex-column border-0">
+                        <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link">Details</a>
+                        <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Normal Hours</a>
+                        <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Special Hours</a>
+                        <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hours</a>
+                        <a href="<%= team_location_wifi_network_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Wifi Network</a>
+                        <a href="<%= team_location_pricing_plan_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Pass Prices</a>
+                        <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Class Schedule Upload</a>
+                        <a href="<%= team_location_saved_reply_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Saved Replies</a>
+                        <a href="<%= team_location_intent_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Intents</a>
+                        <a href="<%=team_location_automation_path(@conn, :new, location.team_id, location.id)%>" class="nav-link active">Automations</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card card-fluid">
+                <h6 class="card-header"> Automations</h6><!-- .card-body -->
+                <div class="card-body">
+                    <%= if length(@automations)>0 do %>
+
+
+                    <div class="row">
+                        <div class="col-lg-5"><b>Question</b></div>
+                        <div class="col-lg-5"><b>Answer</b></div>
+                        <div class="col-lg-2"><b>Action</b></div>
+                    </div>
+                    <br>
+
+                    <%= for automation <- @automations do %>
+
+                    <div class="row">
+                        <%= form_for @conn, team_location_automation_path(@conn, :update, @location.team_id, @location.id, automation.id),[class: "col-lg-11",method: "put"], fn f -> %>
+                        <%= text_input f, :question, value: automation.question, class: "form-control col-lg-5", style: "display: unset; margin-right: 15px", maxlength: 240 %>
+                        <%= text_input f, :answer, value: automation.answer, class: "form-control col-lg-5", style: "display: unset", maxlength: 240 %>
+                        <%= submit style: "float: right", class: "btn btn-secondary" do %>
+                        <span class='fa fa-check'></span>
+                        <% end %>
+                            <% end %>
+                        <%= form_for @conn, team_location_automation_path(@conn, :delete, @location.team_id, @location.id, automation.id),[method: "delete"] , fn f -> %>
+                        <%= submit class: "btn btn-secondary" do %>
+                        <span class='fa fa-times'></span>
+                        <% end %>
+                            <% end %>
+                    </div> <br>
+                    <% end %>
+                    <br>
+                    <hr>
+                    <% end %>
+                    <%= form_for @conn, team_location_automation_path(@conn, :create, @location.team_id, @location.id),[class: "row"], fn f -> %>
+                    <div class="form-group col-lg-5">
+                        <%= text_input f, :question, placeholder: "Question",  class: "form-control" %>
+                    </div>
+                    <div class="form-group col-lg-5">
+                        <%= text_input f, :answer, placeholder: "answer",  class: "form-control"%>
+                    </div>
+                    <%= if length(@automations)< @automation_limit do %>
+                    <div class="form-group col-lg-2">
+                        <%= submit class: "btn btn-secondary" do%>
+                        Create
+                        <% end %>
+                    </div>
+                    <% else %>
+                    <div class="form-group col-lg-2">
+                        <%= submit class: "btn btn-secondary", disabled: true do%>
+                        Create
+                        <% end %>
+                    </div>
+
+                    <% end %>
+                    <% end %>
+
+                </div><!-- /.card-body -->
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -75,7 +75,7 @@ defmodule MainWeb.WebBotChannel do
     {:noreply, socket}
   end
 
-  def terminate(reason, socket) do
+  def terminate(reason, _socket) do
     Logger.warn("CONNECTION CLOSED: #{inspect reason}")
     :ok
   end

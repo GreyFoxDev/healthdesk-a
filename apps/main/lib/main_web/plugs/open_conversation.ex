@@ -34,7 +34,7 @@ defmodule MainWeb.Plug.OpenConversation do
       |> assign(:status, convo.status)
       |> assign(:team_member_id, convo.team_member_id)
     else
-      {:error, message} ->
+      {:error, _message} ->
         Logger.error("MEMBER: #{member}\nLOCATION: #{location}\n - Error finding or starting a conversation")
         assign(conn, :error, true)
     end

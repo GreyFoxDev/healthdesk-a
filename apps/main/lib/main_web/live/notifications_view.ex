@@ -2,16 +2,16 @@ defmodule MainWeb.Live.NotificationsView do
   use Phoenix.HTML
   use Phoenix.LiveView
 
-  alias MainWeb.Router.Helpers, as: Routes
+
   alias MainWeb.NotificationsView, as: View
-  alias Data.{Notifications, Conversations}
+  alias Data.{Notifications}
 
   def render(assigns) do
     View.render("index.html", assigns)
   end
 
   def mount(_params, session, socket) do
-    Main.LiveUpdates.subscribe_live_view(session["current_user"].id)
+    Main.LiveUpdates.subscribe_live_view_and_track(session["current_user"].id)
     notifications = Notifications.get_by_user(session["current_user"].id)
     socket = socket
              |> assign(:session, session)
@@ -20,7 +20,7 @@ defmodule MainWeb.Live.NotificationsView do
     read = Enum.reduce_while(
       notifications,
       false,
-      fn x, acc ->
+      fn x, _acc ->
         if !x.read, do: {:halt, true}, else: {:cont, false}
       end
     )
@@ -28,7 +28,16 @@ defmodule MainWeb.Live.NotificationsView do
              |> assign(:read, read)
     {:ok, socket}
   end
+
   def handle_info({_requesting_module, :new_notif}, socket) do
+    notifications = Notifications.get_by_user(socket.assigns.current_user.id)
+    socket = socket
+             |> assign(:notifications, notifications)
+    {:noreply, socket}
+  end
+
+#  calling just for presence flow
+  def handle_info(_rest_socket, socket) do
     notifications = Notifications.get_by_user(socket.assigns.current_user.id)
     socket = socket
              |> assign(:notifications, notifications)
@@ -41,7 +50,7 @@ defmodule MainWeb.Live.NotificationsView do
     read = Enum.reduce_while(
       notifications,
       false,
-      fn x, acc ->
+      fn x, _acc ->
         if !x.read, do: {:halt, true}, else: {:cont, false}
       end
     )

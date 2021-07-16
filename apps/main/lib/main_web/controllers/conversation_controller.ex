@@ -41,6 +41,7 @@ defmodule MainWeb.ConversationController do
   end
 
   def edit(conn, %{"location_id" => location_id, "id" => id}) do
+
     location =
       conn
       |> current_user()
@@ -76,6 +77,7 @@ defmodule MainWeb.ConversationController do
   end
 
   def open(conn, %{"conversation_id" => id, "location_id" => location_id}) do
+
     conversation = Conversations.get(id)
     location =
       conn
@@ -127,6 +129,7 @@ defmodule MainWeb.ConversationController do
   end
 
   def close(conn, %{"conversation_id" => id, "location_id" => location_id} = params) do
+
     location =
       conn
       |> current_user()
@@ -195,7 +198,7 @@ defmodule MainWeb.ConversationController do
         conn
         |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location.id))
         conn
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Unable to create campaign")
         |> redirect(to: team_location_conversation_path(conn, :index, location.team_id, location_id))
@@ -208,7 +211,7 @@ defmodule MainWeb.ConversationController do
 
   end
 
-  def create_convo(%{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name, "csv_data" => csv_data} = params},location,current_user) when campaign_name != "" do
+  def create_convo(%{"location_id" => _location_id, "conversation" => %{"campaign_name" => campaign_name, "csv_data" => _csv_data} = params},location,_current_user) when campaign_name != "" do
     send_at_utc = if params["scheduled"] && params["send_at"] do
       offset =
         location.timezone
@@ -257,7 +260,7 @@ defmodule MainWeb.ConversationController do
     end
   end
 
-  def create_convo(%{"location_id" => location_id, "conversation" => %{"campaign_name" => campaign_name} = params},location,current_user) when campaign_name != "" do
+  def create_convo(%{"location_id" => _location_id, "conversation" => %{"campaign_name" => campaign_name} = params},location,_current_user) when campaign_name != "" do
     send_at_utc = if params["scheduled"] && params["send_at"] do
       offset =
         location.timezone
@@ -312,7 +315,7 @@ defmodule MainWeb.ConversationController do
     )
       do
 
-      res = {:ok, conversation, params}
+      _res = {:ok, conversation, params}
             |> handle_sending_message()
       if(current_user.team_member != nil) do
         AssignTeamMemberController.assign(
@@ -336,7 +339,7 @@ defmodule MainWeb.ConversationController do
       conversation
 
     else
-      err -> {:error,:error}
+      _err -> {:error,:error}
     end
   end
 

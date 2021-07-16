@@ -4,7 +4,7 @@ defmodule Data.Query.Conversation do
   """
   import Ecto.Query, only: [from: 2]
 
-  alias Data.Schema.{Conversation,ConversationList, ConversationMessage, Member}
+  alias Data.Schema.{Conversation,ConversationList, Member}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
 
@@ -45,7 +45,7 @@ defmodule Data.Query.Conversation do
   def update_conversation(repo \\ Read) do
     time = DateTime.add(DateTime.utc_now(), -24 * 3600)
 
-    query =
+    _query =
       from(
         c in Conversation,
         where: c.appointment == true and c.updated_at > ^time,
@@ -131,7 +131,7 @@ defmodule Data.Query.Conversation do
         where: c.status in ^status,
         where: c.location_id in ^location_id,
         where: c.user_id == ^user_id or is_nil(c.user_id),
-        offset: ^offset, limit: ^limit,
+        offset: ^offset, limit: ^limit
       ) |>Read.all
 
   end
@@ -142,7 +142,7 @@ defmodule Data.Query.Conversation do
         where: c.status in ^status,
         where: c.location_id in ^location_id,
         where: c.user_id != ^user_id,
-        offset: ^offset, limit: ^limit,
+        offset: ^offset, limit: ^limit
       ) |>Read.all
   end
   def get_limited_conversations(location_id, status,  offset , limit ) when is_list(status) do
@@ -151,7 +151,7 @@ defmodule Data.Query.Conversation do
         c in ConversationList,
         where: c.status in ^status,
         where: c.location_id in ^location_id,
-        offset: ^offset, limit: ^limit,
+        offset: ^offset, limit: ^limit
       ) |>Read.all
   end
 
@@ -163,7 +163,7 @@ defmodule Data.Query.Conversation do
         where: c.location_id in ^location_id,
         where: c.user_id == ^user_id or is_nil(c.user_id),
         where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
-                  or like(c.first_name,^like)  or like(c.last_name,^like)),
+                  or like(c.first_name,^like)  or like(c.last_name,^like))
       ) |>Read.all
 
   end
@@ -176,7 +176,7 @@ defmodule Data.Query.Conversation do
         where: c.location_id in ^location_id,
         where: c.user_id != ^user_id,
         where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
-                   or like(c.first_name,^like)  or like(c.last_name,^like)),
+                   or like(c.first_name,^like)  or like(c.last_name,^like))
       ) |>Read.all
   end
   def get_filtered_conversations(location_id, status,s ) when is_list(status) do
@@ -187,7 +187,7 @@ defmodule Data.Query.Conversation do
         where: c.status in ^status,
         where: c.location_id in ^location_id,
         where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
-                   or like(c.first_name,^like)  or like(c.last_name,^like)),
+                   or like(c.first_name,^like)  or like(c.last_name,^like))
       ) |>Read.all
   end
 

@@ -3,6 +3,4 @@ defmodule MainWeb.AdminView do
 
   import MainWeb.Helper.Formatters
 
-  alias Data.ConversationDisposition, as: Query
-
 end

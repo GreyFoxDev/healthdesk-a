@@ -2,7 +2,7 @@ defmodule MainWeb.Plug.CloseConversation do
   @moduledoc """
   Module for the close conversation plug
   """
-  import Plug.Conn
+
 
   alias Data.Conversations, as: C
   alias Data.ConversationMessages, as: CM
@@ -21,7 +21,7 @@ defmodule MainWeb.Plug.CloseConversation do
     IO.inspect("########we are here###########")
 
 
-    convo = C.get(id)
+    _convo = C.get(id)
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
     if pending_message_count <= 1 do
@@ -40,10 +40,10 @@ defmodule MainWeb.Plug.CloseConversation do
   If the intent isn't found then set the conversation status to pending while
   an admin addresses the member.
   """
-  def call(%{assigns: %{convo: id, intent: nil}} = conn, _opts) do
+  def call(%{assigns: %{convo: _id, intent: nil}} = conn, _opts) do
     conn
   end
-  def call(%{assigns: %{convo: id, location: location, appointment: true} = assigns} = conn, _opts) do
+  def call(%{assigns: %{convo: id, location: location, appointment: true} = _assigns} = conn, _opts) do
     IO.inspect("########we are heres###########")
     IO.inspect(conn.assigns[:response])
     IO.inspect("###################")
@@ -102,7 +102,7 @@ defmodule MainWeb.Plug.CloseConversation do
   @doc """
   If the question has been answered then close the conversation
   """
-  def call(%{assigns: %{convo: id, location: location} = assigns} = conn, _opts) do
+  def call(%{assigns: %{convo: id, location: location} = _assigns} = conn, _opts) do
     IO.inspect("########we are here2###########")
     IO.inspect(conn.assigns[:response])
     IO.inspect("###################")

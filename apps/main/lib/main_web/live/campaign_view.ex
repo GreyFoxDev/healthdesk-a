@@ -5,10 +5,11 @@ defmodule MainWeb.Live.CampaignsView do
 
   def render(assigns), do: MainWeb.CampaignView.render("index.html", assigns)
 
-  def mount(params, session, socket) do
-    {:ok, user, claims} =
+  def mount(_params, session, socket) do
+    {:ok, user, _claims} =
       case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
-        {:error, :token_expired} -> socket = socket |> redirect(to: "/")
+        {:error, :token_expired} -> socket |> redirect(to: "/")
+
         res -> res
       end
     locations = user
@@ -69,7 +70,7 @@ defmodule MainWeb.Live.CampaignsView do
     {:noreply, socket}
   end
 
-  def handle_event("new_msg", %{"conversation" => c_params, "location_id" => location_id} = params, socket)do
+  def handle_event("new_msg", %{"conversation" => _c_params, "location_id" => location_id} = params, socket)do
 
     user = socket.assigns.user
     location = user

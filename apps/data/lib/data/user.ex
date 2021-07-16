@@ -15,6 +15,8 @@ defmodule Data.User do
 
   defdelegate create(params), to: Query
   defdelegate get_by_phone(phone_number), to: Query
+  defdelegate get_phone_by_id(id), to: Query
+  defdelegate get_admin_emails(), to: Query
 
   def get_changeset(),
     do: Schema.changeset(%Schema{})
@@ -32,6 +34,8 @@ defmodule Data.User do
     do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
+
+
 
   def update(id, params) do
     id
