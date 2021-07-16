@@ -34,7 +34,9 @@ defmodule MainWeb.AutomationController do
       |> current_user()
       |> Location.get(location_id)
     with {:ok, _} <- Automation.create(params) do
-      send_email_to_admins(question, answer, location)
+      body = "A new automation has been added as \n Question: #{question} \n Answer: #{answer} \n at Location: #{location.location_name}"
+      subject="Automation Added"
+      send_email_to_admins(body, subject)
       conn
       |> put_flash(:success, "Automation created successfully.")
       |> redirect(to: team_location_automation_path(conn, :new, location.team_id, location.id))
@@ -62,11 +64,14 @@ defmodule MainWeb.AutomationController do
 
   def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
     with %Data.Schema.Automation{} = automation <- Automation.get_by( id),
-         {:ok, _} <- Automation.update(automation, params) do
+         {:ok, result} <- Automation.update(automation, params) do
       location =
         conn
         |> current_user()
         |> Location.get(location_id)
+      body = "An automation has been edited \n Question: #{result.question} \n Answer: #{result.answer} \n at Location: #{location.location_name}"
+      subject="Automation Edited"
+      send_email_to_admins(body, subject)
       conn
       |> put_flash(:success, "Automation updated successfully.")
       |> redirect(to: team_location_automation_path(conn, :new, location.team_id, location.id))    else
@@ -92,13 +97,16 @@ defmodule MainWeb.AutomationController do
     end
   end
 
-  def delete(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id}) do
+  def delete(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id}= params) do
     with %Data.Schema.Automation{} = automation <- Automation.get_by(id),
-         {:ok, _} <- Automation.delete(automation) do
+         {:ok, result} <- Automation.delete(automation) do
       location =
         conn
         |> current_user()
         |> Location.get(location_id)
+      body = "An automation has been deleted \n Question: #{result.question} \n Answer: #{result.answer} \n at Location: #{location.location_name}"
+      subject="Automation deleted"
+      send_email_to_admins(body, subject)
       conn
       |> put_flash(:success, "Automation deleted successfully.")
       |> redirect(to: team_location_automation_path(conn, :new, location.team_id, location.id))
@@ -126,9 +134,7 @@ defmodule MainWeb.AutomationController do
            )
     end
   end
-  defp send_email_to_admins(question, answer, location) do
-    body = "A new automation has been added as \n Question: #{question} \n Answer: #{answer} \n at Location: #{location.location_name}"
-    subject="Automation Added"
+  defp send_email_to_admins(body, subject) do
     email_list= User.get_admin_emails
     Enum.each(email_list, fn email ->
       email
