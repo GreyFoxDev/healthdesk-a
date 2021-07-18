@@ -276,6 +276,7 @@
                                      data_tribute: true,
                                      disabled: true,
                                      rows: 1,
+                                     phx_hook: :LineSpaceHook,
                                      value: "member has unsubscribed",
                                      phx_blur: :blured  %>
         </div>
@@ -287,11 +288,12 @@
                                      phx_focus: :focused,
                                      data_emojiable: true,
                                      data_tribute: true,
-                                     rows: 1,
+                                     rows: 1    ,
+                                     phx_hook: :LineSpaceHook,
                                      phx_blur: :blured  %>
         </div>
         <div class="d-flex align-items-center">
-            <button type="submit" class="btn btn-light btn-icon">
+            <button id="paper-plane" type="submit" class="btn btn-light btn-icon">
                 <i class="far fa-paper-plane"></i>
             </button>
         </div>

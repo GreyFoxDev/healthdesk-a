@@ -234,7 +234,6 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
   def handle_event("save", %{"conversation_message" => _c_params} = params, socket) do
-    IO.inspect(params)
     location = socket.assigns.open_conversation.location
     user = socket.assigns.user
     conversation = socket.assigns.open_conversation
