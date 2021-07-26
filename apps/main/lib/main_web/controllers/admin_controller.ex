@@ -141,7 +141,7 @@ defmodule MainWeb.AdminController do
       params= Map.merge(params, filter)
       params = Map.merge(params, filter)
       if current_user.role == "admin" do
-        dispositions = Disposition.count_alcount_by_location_idl_by(params)
+        dispositions = Disposition.count_all_by(params)
         appointments = Appointments.count_all()
         [dispositions_per_day] = Disposition.average_per_day(params)
         locations = Location.all()
