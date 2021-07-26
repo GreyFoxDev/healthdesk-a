@@ -62,9 +62,9 @@ defmodule Data.Query.Disposition do
     )
     query = Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
-        if is_nil(to), do: query, else: from([d,...] in query, where: d.inserted_at <= ^to)
+        if is_nil(to), do: query, else: from([..., cd] in query, where: cd.inserted_at <= ^to)
       {:from, from}, query ->
-        if is_nil(from), do: query, else: from([d,...] in query, where: d.inserted_at >= ^from)
+        if is_nil(from), do: query, else: from([..., cd] in query, where: cd.inserted_at >= ^from)
       _, query -> query
     end)
     from([d, cd] in query,
@@ -104,9 +104,9 @@ defmodule Data.Query.Disposition do
     )
     query = Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
-        if is_nil(to), do: query, else: from([d,...] in query, where: d.inserted_at <= ^to)
+        if is_nil(to), do: query, else: from([..., cd] in query, where: cd.inserted_at <= ^to)
       {:from, from}, query ->
-        if is_nil(from), do: query, else: from([d,...] in query, where: d.inserted_at >= ^from)
+        if is_nil(from), do: query, else: from([... , cd] in query, where: cd.inserted_at >= ^from)
       _, query -> query
     end)
     from(
@@ -123,11 +123,22 @@ defmodule Data.Query.Disposition do
   @doc """
   Return a list of dispositions with count of usage by location
   """
-  @spec count_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
-  def count_by_location_id(location_id, repo \\ Read) do
-    from(d in Disposition,
+  @spec count_by_location_id(location_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_location_id(location_id, to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+    query = from(d in Disposition,
       join: cd in assoc(d, :conversation_dispositions),
-      join: c in assoc(cd, :conversation),
+      join: c in assoc(cd, :conversation)
+    )
+    query = Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([d, cd, c] in query, where: cd.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([d, cd, c] in query, where: cd.inserted_at >= ^from)
+      _, query -> query
+    end)
+    from([d, cd, c] in query,
       group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
       where: c.location_id == ^location_id,
       distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
@@ -150,9 +161,9 @@ defmodule Data.Query.Disposition do
     )
     query = Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
-        if is_nil(to), do: query, else: from([d,...] in query, where: d.inserted_at <= ^to)
+        if is_nil(to), do: query, else: from([d, cd, c] in query, where: cd.inserted_at <= ^to)
       {:from, from}, query ->
-        if is_nil(from), do: query, else: from([d,...] in query, where: d.inserted_at >= ^from)
+        if is_nil(from), do: query, else: from([d, cd, c] in query, where: cd.inserted_at >= ^from)
       _, query -> query
     end)
     from([d, cd, c] in query,
