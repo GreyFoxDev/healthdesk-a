@@ -62,9 +62,9 @@ defmodule Data.Query.Disposition do
     )
     query = Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
-        if is_nil(to), do: query, else: from([..., cd] in query, where: cd.inserted_at <= ^to)
+        if is_nil(to), do: query, else: from([_,cd,...] in query, where: cd.inserted_at <= ^to)
       {:from, from}, query ->
-        if is_nil(from), do: query, else: from([..., cd] in query, where: cd.inserted_at >= ^from)
+        if is_nil(from), do: query, else: from([_,cd,...] in query, where: cd.inserted_at >= ^from)
       _, query -> query
     end)
     from([d, cd] in query,
@@ -73,7 +73,7 @@ defmodule Data.Query.Disposition do
       order_by: d.disposition_name,
       select: %{name: d.disposition_name, count: count(cd.id)}
     )
-    |> repo.all()
+    |> repo.all() |> IO.inspect
   end
 
   @doc """
@@ -104,9 +104,9 @@ defmodule Data.Query.Disposition do
     )
     query = Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
-        if is_nil(to), do: query, else: from([..., cd] in query, where: cd.inserted_at <= ^to)
+        if is_nil(to), do: query, else: from([_,cd,...] in query, where: cd.inserted_at <= ^to)
       {:from, from}, query ->
-        if is_nil(from), do: query, else: from([... , cd] in query, where: cd.inserted_at >= ^from)
+        if is_nil(from), do: query, else: from([_,cd,...] in query, where: cd.inserted_at >= ^from)
       _, query -> query
     end)
     from(
@@ -161,9 +161,9 @@ defmodule Data.Query.Disposition do
     )
     query = Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
-        if is_nil(to), do: query, else: from([d, cd, c] in query, where: cd.inserted_at <= ^to)
+        if is_nil(to), do: query, else: from([_,cd,...] in query, where: cd.inserted_at <= ^to)
       {:from, from}, query ->
-        if is_nil(from), do: query, else: from([d, cd, c] in query, where: cd.inserted_at >= ^from)
+        if is_nil(from), do: query, else: from([_,cd,...] in query, where: cd.inserted_at >= ^from)
       _, query -> query
     end)
     from([d, cd, c] in query,

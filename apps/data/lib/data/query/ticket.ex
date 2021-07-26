@@ -33,12 +33,12 @@ defmodule Data.Query.Ticket do
     %Ticket{}
     |> Ticket.changeset(params)
     |> case do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        repo.insert(changeset)
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.insert(changeset)
 
-      changeset ->
-        {:error, changeset}
-    end
+         changeset ->
+           {:error, changeset}
+       end
   end
 
   @doc """
@@ -50,12 +50,12 @@ defmodule Data.Query.Ticket do
     original
     |> Ticket.changeset(params)
     |> case do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        repo.update(changeset)
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.update(changeset)
 
-      changeset ->
-        {:error, changeset}
-    end
+         changeset ->
+           {:error, changeset}
+       end
   end
 
   @doc """
@@ -98,36 +98,36 @@ defmodule Data.Query.Ticket do
     |> repo.all()
   end
 
-#  @doc """
-#  Return a list of tickets with count by location and date-time.
-#  """
-#  @spec count_by(params :: map(), repo :: Ecto.Repo.t()) :: [map()]
-#  def count_by(params, repo \\ Read) do
-#    to = Data.Disposition.convert_string_to_date(params["to"])
-#    from = Data.Disposition.convert_string_to_date(params["from"])
-#
-#    query = from(t in Ticket,
-#      join: tm in TeamMember, on: t.team_member_id == tm.id,
-#      join: tl in TeamMemberLocation, on: t.location_id == tl.location_id,
-#    )
-#    query = Enum.reduce(params, query, fn
-#      %{"to" => to}, query ->
-#        if is_nil(to), do: query, else: from([t,...] in query, where: t.inserted_at <= ^to)
-#      %{"from" => from}, query ->
-#        if is_nil(from), do: query, else: from([t,...] in query, where: t.inserted_at >= ^from)
-#      %{"team_id" => team_id}, query ->
-#        if is_nil(team_id), do: query, else: from([...,tm,tl] in query, where: tm.team_id == ^team_id)
-#      %{"location_id" => location_id}, query ->
-#        if is_nil(location_id), do: query, else: from([t,...] in query, where: t.location_id == ^location_id)
-#      %{"team_member_id" => team_member_id}, query ->
-#        if is_nil(team_member_id), do: query, else: from([...,tl] in query, where: tl.team_member_id == ^team_member_id)
-#      _, query -> query
-#    end)
-#    from([t, tm, tl] in query,
-#      where: t.status == "open"
-#    )
-#    |> repo.all()
-#  end
+  #  @doc """
+  #  Return a list of tickets with count by location and date-time.
+  #  """
+  #  @spec count_by(params :: map(), repo :: Ecto.Repo.t()) :: [map()]
+  #  def count_by(params, repo \\ Read) do
+  #    to = Data.Disposition.convert_string_to_date(params["to"])
+  #    from = Data.Disposition.convert_string_to_date(params["from"])
+  #
+  #    query = from(t in Ticket,
+  #      join: tm in TeamMember, on: t.team_member_id == tm.id,
+  #      join: tl in TeamMemberLocation, on: t.location_id == tl.location_id,
+  #    )
+  #    query = Enum.reduce(params, query, fn
+  #      %{"to" => to}, query ->
+  #        if is_nil(to), do: query, else: from([t,...] in query, where: t.inserted_at <= ^to)
+  #      %{"from" => from}, query ->
+  #        if is_nil(from), do: query, else: from([t,...] in query, where: t.inserted_at >= ^from)
+  #      %{"team_id" => team_id}, query ->
+  #        if is_nil(team_id), do: query, else: from([...,tm,tl] in query, where: tm.team_id == ^team_id)
+  #      %{"location_id" => location_id}, query ->
+  #        if is_nil(location_id), do: query, else: from([t,...] in query, where: t.location_id == ^location_id)
+  #      %{"team_member_id" => team_member_id}, query ->
+  #        if is_nil(team_member_id), do: query, else: from([...,tl] in query, where: tl.team_member_id == ^team_member_id)
+  #      _, query -> query
+  #    end)
+  #    from([t, tm, tl] in query,
+  #      where: t.status == "open"
+  #    )
+  #    |> repo.all()
+  #  end
 
   @doc """
   Get opened Tickets for specific team.
@@ -197,32 +197,35 @@ defmodule Data.Query.Ticket do
     query = from(t in Ticket,
       where: t.status == "open",
       distinct: t.id
-#      group_by: t.id,
-#      select: count(t.id)
+      #      group_by: t.id,
+      #      select: count(t.id)
 
     )
     query = Enum.reduce(params, query, fn {key, value}, query ->
       case key do
-        "team_id" ->
+        "team_id" when is_nil(value) == false and value != "" ->
           from(t in query,join: tm in TeamMember,
             on: t.team_member_id == tm.id,
             where: tm.team_id == ^value
           )
-        "team_member_id" ->
+        "team_member_id" when is_nil(value) == false and value != "" ->
           from(t in query,join: tl in TeamMemberLocation,
             on: t.location_id == tl.location_id,
             where: tl.team_member_id == ^value
           )
-        "location_id" ->
+        "location_id" when is_nil(value) == false and value != "" ->
           from(t in  query, where: t.location_id == ^value)
-        "to" ->
+
+        "to" when is_nil(value) == false or value != "" ->
           to = Disposition.convert_string_to_date(value)
           if is_nil(to), do: query, else: from([t,...] in query,
             where: t.inserted_at <= ^to)
-        "from" ->
+
+        "from" when is_nil(value) == false and value != "" ->
           from = Disposition.convert_string_to_date(value)
           if is_nil(from), do: query, else: from([t,...] in query,
             where: t.inserted_at >= ^from)
+
         _ -> query
       end
     end)

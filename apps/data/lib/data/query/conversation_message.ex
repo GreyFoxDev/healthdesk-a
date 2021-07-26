@@ -24,22 +24,48 @@ defmodule Data.Query.ConversationMessage do
   @doc """
   Return median response time based on location
   """
-  @spec count_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
-  def count_by_location_id(location_id, repo \\ Read) do
+  def count_by_location_id(location_id,nil,nil, repo \\ Read) do
     repo
-    |> SQL.query!(
-      "SELECT count_messages_by_location_id('#{location_id}') AS #{:median_response_time}"
-    )
+    |> SQL.query!("SELECT count_messages_by_location_id('#{location_id}') AS #{:median_response_time}")
+    |> build_results()
+  end
+  def count_by_location_id(location_id,from,nil, repo) do
+    repo
+    |> SQL.query!("SELECT count_messages_by_location_id_from('#{location_id}','#{from}') AS #{:median_response_time}")
+    |> build_results()
+  end
+  def count_by_location_id(location_id,nil,to, repo) do
+    repo
+    |> SQL.query!("SELECT count_messages_by_location_id('#{location_id}','#{to}') AS #{:median_response_time}")
+    |> build_results()
+  end
+  def count_by_location_id(location_id,from,to, repo) do
+    repo
+    |> SQL.query!("SELECT count_messages_by_location_id('#{location_id}','#{to}','#{from}') AS #{:median_response_time}")
     |> build_results()
   end
 
   @doc """
   Return median response time based on team
   """
-  @spec count_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
-  def count_by_team_id(team_id, repo \\ Read) do
+  def count_by_team_id(team_id,nil,nil, repo \\ Read) do
     repo
     |> SQL.query!("SELECT count_messages_by_team_id('#{team_id}') AS #{:median_response_time}")
+    |> build_results()
+  end
+  def count_by_team_id(team_id,to,nil, repo) do
+    repo
+    |> SQL.query!("SELECT count_messages_by_team_id_from('#{team_id}','#{to}') AS #{:median_response_time}")
+    |> build_results()
+  end
+  def count_by_team_id(team_id,nil,from, repo) do
+    repo
+    |> SQL.query!("SELECT count_messages_by_team_id('#{team_id}','#{from}') AS #{:median_response_time}")
+    |> build_results()
+  end
+  def count_by_team_id(team_id,from,to, repo) do
+    repo
+    |> SQL.query!("SELECT count_messages_by_team_id('#{team_id}','#{to}','#{from}') AS #{:median_response_time}")
     |> build_results()
   end
 
