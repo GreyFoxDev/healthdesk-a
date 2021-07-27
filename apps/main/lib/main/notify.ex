@@ -32,6 +32,7 @@ defmodule MainWeb.Notify do
     available=
       location
       |> TeamMember.get_available_by_location(current_time_string)
+      |> Enum.map(&TeamMember.fetch_admins/1)
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
       |> List.first
 
@@ -60,7 +61,7 @@ defmodule MainWeb.Notify do
       message = %{
         provider: :twilio,
         from: location.phone_number,
-        to: validate_phone_number(available.phone_number),
+        to: validate_phone_number(available.country <> available.phone_number),
         body: body
       }
 
@@ -92,6 +93,7 @@ defmodule MainWeb.Notify do
     available=
       location
       |> TeamMember.get_available_by_location(current_time_string)
+      |> Enum.map(&TeamMember.fetch_admins/1)
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
       |> List.first
 
@@ -120,7 +122,7 @@ defmodule MainWeb.Notify do
       message = %{
         provider: :twilio,
         from: location.phone_number,
-        to: validate_phone_number(available.phone_number),
+        to: validate_phone_number(available.country <> available.phone_number),
         body: body
       }
 
@@ -160,32 +162,19 @@ defmodule MainWeb.Notify do
       Time.utc_now()
       |> Time.add(timezone_offset)
       |> to_string()
-    online_users=MainWeb.Presence.list("online_users")
-    online_users=Enum.map(online_users, fn {user_id, _} -> User.get_phone_by_id(user_id) end)
 
     available_admins =
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
-    available_admins = if member_role == "location-admin" do
-      Enum.filter(available_admins, fn %{phone_number: phone_number} ->
-        !(phone_number in online_users)
-      end)
-    else
-      available_admins
-    end
+      |> Enum.map(&TeamMember.fetch_admins/1)
+      |> IO.inspect(label: "Available Admins")
 
     all_admins =
       %{role: "location-admin"}
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin"))
-
-    all_admins = if member_role == "location-admin" do
-      Enum.filter(all_admins, fn admin -> !(admin.user.phone_number in online_users)
-      end)
-    else
-      all_admins
-    end
+      |> IO.inspect(label: "All Admins")
 
     role =
       case member_role do
@@ -235,7 +224,7 @@ defmodule MainWeb.Notify do
         message = %{
           provider: :twilio,
           from: location.phone_number,
-          to: validate_phone_number(admin.phone_number),
+          to: validate_phone_number(admin.country<>admin.phone_number),
           body: body
         }
         @chatbot.send(message)

@@ -99,6 +99,15 @@ defmodule Data.Query.TeamMember do
     |> SQL.query!(@available_function, [location.id, current_time])
     |> build_results()
   end
+  def fetch_admins(%{email: email,phone_number: phone_number,role: role,use_email: use_email,use_sms: use_sms})do
+    from(u in Data.Schema.User,
+      where: u.email == ^email,
+      where: u.phone_number == ^phone_number,
+      where: u.role == ^role,
+      where: u.use_email == ^use_email,
+      where: u.use_sms == ^use_sms
+    )|> Read.one
+  end
 
   @doc """
   Creates a new team member
