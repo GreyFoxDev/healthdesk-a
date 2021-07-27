@@ -17,7 +17,7 @@ defmodule Data.Disposition do
   defdelegate count(disposition_id), to: Query
   defdelegate count_all(), to: Query
   defdelegate count_by_team_id(team_id), to: Query
-  defdelegate count_by_location_id(location_id), to: Query
+#  defdelegate count_by_location_id(location_id), to: Query
   defdelegate average_per_day(params), to: Query
   defdelegate average_per_day_for_team(params), to: Query
   defdelegate average_per_day_for_location(params), to: Query
@@ -41,8 +41,8 @@ defmodule Data.Disposition do
 
   def count_by(%{"location_id" => location_id, "to" => to, "from" => from}),
       do: Query.get_by(location_id, to, from)
-  def count_by(%{"location_id" => location_id, "to" => to, "from" => from}),
-      do: Query.count_by_location_id(location_id, to, from)
+#  def count_by(%{"location_id" => location_id, "to" => to, "from" => from}),
+#      do: Query.count_by_location_id(location_id, to, from)
 
   def count_by(%{"team_id" => team_id, "to" => to, "from" => from}),
       do: Query.count_by_team(team_id, to, from)
