@@ -113,19 +113,11 @@ defmodule MainWeb.TsiController do
     with %Schema{} = convo <- C.get(convo_id) do
       <<"APP:", phone_number :: binary>> = convo.original_number
       layout = get_edit_layout_for_team(conn)
-      online_users=MainWeb.Presence.list("online_users")
-      current_status =
-      if(!is_nil(convo.team_member)) do
-        Enum.any?(online_users, fn {key, _} ->
-          key == convo.team_member.user.id
-        end)
-      end
+
 
       case convo.status do
         "open" ->
-          if(!current_status) do
             Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
-          end
         _ ->
           Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
       end

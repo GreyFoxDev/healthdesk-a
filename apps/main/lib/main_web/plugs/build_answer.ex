@@ -22,7 +22,13 @@ defmodule MainWeb.Plug.BuildAnswer do
   If the intent is 'unknown' then the super admin for the location needs to be notified that there is a new
   message in the queue.
   """
-  def call(%{assigns: %{convo: _id,  status: "open", intent: nil} = _assigns} = conn, _opts) do
+  def call(%{assigns: %{convo: id,  status: "open",message: message, member: member, intent: nil,location: location} = assigns} = conn, _opts) do
+    if (assigns[:team_member_id] == nil) do
+      notify_admin_user(conn.assigns)
+      else
+      team_member =
+        team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
+      Notify.send_to_teammate(id, message, location, team_member, member)    end
     conn
     |> assign(:status, "open")
   end
