@@ -119,6 +119,11 @@ defmodule MainWeb.AdminController do
       location: nil)
   end
   def index(conn, params) do
+    params=change_params(params)
+    IO.inspect("============params================")
+    IO.inspect(params)
+    IO.inspect("============params================")
+
     current_user = current_user(conn)
     if current_user.role in ["team-admin", "teammate"] do
       index(conn, %{"team_id" => current_user.team_member.team_id})
@@ -173,7 +178,7 @@ defmodule MainWeb.AdminController do
           teammate_count: teammate_count,
           location_count: Enum.count(locations),
           location: nil,
-          from: params["from"],
+          from: params.filters["from"],
           to: params["to"],
           location_id: nil,
           team_id: nil)
@@ -317,5 +322,9 @@ defmodule MainWeb.AdminController do
     IO.inspect(current_user)
     IO.inspect("=======================END=======================")
     "couldn't load tickets"
+  end
+  defp change_params(params) do
+    params=Map.merge(params, params["filters"])
+    params=Map.delete(params, "filters")
   end
 end

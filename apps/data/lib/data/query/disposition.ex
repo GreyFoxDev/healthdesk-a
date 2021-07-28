@@ -168,7 +168,7 @@ defmodule Data.Query.Disposition do
     end)
     from([d, cd, c] in query,
       group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
-      where: c.location_id == ^location_id,
+      where: c.location_id in ^location_id,
       distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
       select: %{name: d.disposition_name, count: count(cd.id)}

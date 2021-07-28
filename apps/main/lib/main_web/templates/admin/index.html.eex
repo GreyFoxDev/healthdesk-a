@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <div class="page"><div class="page-inner">
     <%= if @current_user.role == "admin" do %>
     <div class="metric-row">
@@ -89,50 +92,42 @@
             </div><!-- /.metric -->
         </div><!-- /metric column -->
     </div>
-
+    <%=form_for :filters, admin_path(@conn, :index), fn f -> %>
     <%= if @current_user.role in ["team-admin", "location-admin"] do %>
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> LOCATIONS </h2>
-            <select class="form-control" id="team_id" name="team[id]" onchange="filterParams(this)">
-                <%= unless @team_id do %>
-                <option selected value="-99">All Locations</option>
-                <% else %>
-                <option value="-99">All Locations</option>
-                <% end %>
-                <%= for location <- @locations do %>
-                <%= if location.id == @location_id do %>
-                <option selected value="<%= location.id %>"><%= location.location_name %></option>
-                <% else %>
-                <option value="<%= location.id %>"><%= location.location_name %></option>
-                <% end %>
-                <% end %>
-            </select>
+            <%=
+               multiple_select f,
+               :location_id,
+               Enum.map(@locations, &{&1.location_name, &1.id}),
+               class: "selectpicker form-control"
+             %>
+
         </div><!-- /metric column -->
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> From </h2>
-            <input id="from" type="date" class="form-control" value="<%= @from %>" onchange="filterParams(this)" />
+            <%=
+            date_input f,
+            :from,
+            class: "form-control",
+            value: @from
+            %>
+
         </div><!-- /metric column -->
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> To </h2>
-            <input id="to" type="date" class="form-control" value="<%= @to %>" onchange="filterParams(this)" />
+            <%=
+            date_input f,
+            :to,
+            class: "form-control",
+            value: @to
+            %>
         </div><!-- /metric column -->
     </div>
-    <script>
-        function filterParams(e) {
-            if (document.getElementById("team_id").value === "-99") {
-                window.location.href = window.location.origin + '/admin' +
-                    '?from=' + document.getElementById("from").value +
-                    '&to=' + document.getElementById("to").value;
-            } else {
-                window.location.href = window.location.origin + '/admin' +
-                    '?from=' + document.getElementById("from").value +
-                    '&to=' + document.getElementById("to").value +
-                    '&location_id=' + document.getElementById("team_id").value ;
-            }
-        }
-    </script>
 
+    <%= submit "Apply", class: "btn btn-primary" %>
+    <% end %>
     <% end %>
     <div class="metric-row">
         <!-- metric column -->

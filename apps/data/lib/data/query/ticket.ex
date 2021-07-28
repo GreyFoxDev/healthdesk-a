@@ -214,7 +214,7 @@ defmodule Data.Query.Ticket do
             where: tl.team_member_id == ^value
           )
         "location_id" when is_nil(value) == false and value != "" ->
-          from(t in  query, where: t.location_id == ^value)
+          from(t in  query, where: t.location_id in ^value)
 
         "to" when is_nil(value) == false or value != "" ->
           to = Disposition.convert_string_to_date(value)

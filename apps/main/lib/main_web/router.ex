@@ -53,6 +53,7 @@ defmodule MainWeb.Router do
   scope "/admin", MainWeb do
     pipe_through [:browser, :auth, :not_live]
 
+    post "/", AdminController, :index
     get "/", AdminController, :index
     get "/export/campaign-recipients/:campaign_id", CampaignController, :export
     delete "/campaign/:campaign_id", CampaignController, :delete
