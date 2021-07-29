@@ -14,7 +14,9 @@ defmodule MainWeb.Notify do
   @endpoint Application.get_env(:main, :endpoint)
 
   def send_to_teammate(conversation_id, message, location, team_member,user) do
-
+    IO.inspect("#########")
+    IO.inspect(1)
+    IO.inspect("#########")
     %{data: link} =
       @url
       |> String.replace("[url]", @endpoint)
@@ -75,6 +77,9 @@ defmodule MainWeb.Notify do
 
 
   def send_to_teammate(conversation_id, message, location, team_member) do
+    IO.inspect("#########")
+    IO.inspect(2)
+    IO.inspect("#########")
     location = Location.get_by_phone(location)
 
     %{data: link} =
