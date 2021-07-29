@@ -119,10 +119,16 @@ defmodule MainWeb.AdminController do
       location: nil)
   end
   def index(conn, params) do
-    params=change_params(params)
     IO.inspect("============params================")
     IO.inspect(params)
     IO.inspect("============params================")
+
+    params=if(!is_nil(params["filters"])) do
+      change_params(params)
+    else
+      params
+    end
+
 
     current_user = current_user(conn)
     if current_user.role in ["team-admin", "teammate"] do
