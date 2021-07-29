@@ -192,7 +192,7 @@ defmodule MainWeb.AdminController do
           teammate_count: teammate_count,
           location_count: Enum.count(locations),
           location: nil,
-          from: params.filters["from"],
+          from: params["from"],
           to: params["to"],
           location_id: nil,
           team_id: nil)
