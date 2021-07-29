@@ -47,6 +47,9 @@ defmodule Data.TeamMember do
   def get_by_location_id(%{role: role}, location_id) when role in @roles,
     do: Query.get_by_location_id(location_id)
 
+  def get_by_location_ids(%{role: role}, location_id) when role in @roles,
+    do: Query.get_by_location_ids(location_id)
+
   def create(params) do
     {:ok, team_member} = result = Query.create(params)
 

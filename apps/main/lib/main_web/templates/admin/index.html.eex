@@ -99,7 +99,7 @@
             <h2 class="metric-label"> LOCATIONS </h2>
             <%=
                multiple_select f,
-               :team_id,
+               :location_ids,
                Enum.map(@locations, &{&1.location_name, &1.id}),
                class: "selectpicker form-control"
              %>

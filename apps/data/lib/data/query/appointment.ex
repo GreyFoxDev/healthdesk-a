@@ -107,4 +107,21 @@ defmodule Data.Query.Appointment do
     )
     |> repo.all()
   end
+
+  @doc """
+  Return a list of dispositions with count of usage by locations
+  """
+  @spec count_by_location_ids(location_ids :: binary(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_location_ids(location_ids, repo \\ Read) do
+    from(a in Data.Schema.Appointment,
+      join: c in assoc(a, :conversation),
+      join: l in assoc(c, :location),
+      group_by: [a.confirmed],
+      where: l.id in ^location_ids,
+      distinct: [a.confirmed],
+      order_by: [a.confirmed],
+      select: %{confirmed: a.confirmed, count: count(a.id)}
+    )
+    |> repo.all()
+  end
 end

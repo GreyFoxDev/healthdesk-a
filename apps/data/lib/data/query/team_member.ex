@@ -87,6 +87,26 @@ defmodule Data.Query.TeamMember do
   end
 
   @doc """
+  Return a list of active team members for a location
+  """
+  @spec get_by_location_ids(location_ids :: binary(), repo :: Ecto.Repo.t()) :: [TeamMember.t()]
+  def get_by_location_ids(location_ids, repo \\ Read) do
+    from(t in TeamMember,
+      inner_join: r in assoc(t, :team),
+      inner_join: u in assoc(t,:user),
+      inner_join: tml in assoc(t,:team_member_locations),
+      where: is_nil(t.deleted_at),
+      where: is_nil(u.deleted_at),
+      where: is_nil(r.deleted_at),
+      where: tml.location_id in ^location_ids or  t.location_id in ^location_ids ,
+      order_by: [u.first_name, u.last_name],
+      distinct: t.id,
+      preload: [ :user]
+    )
+    |> repo.all()
+  end
+
+  @doc """
   Returns a list of available team members for a location
   """
   @spec get_available_by_location(

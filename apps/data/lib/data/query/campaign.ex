@@ -35,6 +35,20 @@ defmodule Data.Query.Campaign do
     |> repo.all()
   end
 
+  @doc """
+  Return a list of active campaign for locations
+  """
+  @spec get_by_location_ids(location_ids :: binary(), repo :: Ecto.Repo.t()) :: [Campaign.t()]
+  def get_by_location_ids(location_ids, repo \\ Read) do
+    from(t in Campaign,
+      where: is_nil(t.deleted_at),
+      where: t.location_id in ^location_ids,
+      order_by: [desc: :send_at],
+      preload: [:location, :campaign_recipients]
+    )
+    |> repo.all()
+  end
+
   def active_campaigns(repo \\ Read) do
     from(t in Campaign,
       where: is_nil(t.deleted_at),

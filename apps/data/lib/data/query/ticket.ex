@@ -213,7 +213,7 @@ defmodule Data.Query.Ticket do
             on: t.location_id == tl.location_id,
             where: tl.team_member_id == ^value
           )
-        "location_id" when is_nil(value) == false and value != "" ->
+        "location_ids" when is_nil(value) == false and value != "" ->
           from(t in  query, where: t.location_id in ^value)
 
         "to" when is_nil(value) == false or value != "" ->

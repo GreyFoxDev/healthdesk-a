@@ -152,7 +152,7 @@ defmodule Data.Query.Disposition do
   Return a list of dispositions with count by location_id and dates
   """
   @spec get_by(location_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
-  def get_by(location_id, to, from, repo \\ Read) do
+  def get_by(location_ids, to, from, repo \\ Read) do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
     query = from(d in Disposition,
@@ -168,7 +168,7 @@ defmodule Data.Query.Disposition do
     end)
     from([d, cd, c] in query,
       group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
-      where: c.location_id in ^location_id,
+      where: c.location_id in ^location_ids,
       distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
       select: %{name: d.disposition_name, count: count(cd.id)}
@@ -251,6 +251,30 @@ defmodule Data.Query.Disposition do
     query =  from(cd in ConversationDisposition,
       join: c in Conversation, on: c.id == cd.conversation_id,
       where: c.location_id == ^location_id,
+      group_by: fragment("date_trunc('day',?)", cd.inserted_at),
+      select: %{count: count(cd.id)})
+    query = Enum.reduce(params, query, fn {key, value}, query ->
+      case key do
+        "to" ->
+          to = Data.Disposition.convert_string_to_date(value)
+          if is_nil(to), do: query, else: from([cd,...] in query,
+            where: cd.inserted_at <= ^to)
+        "from" ->
+          from = Data.Disposition.convert_string_to_date(value)
+          if is_nil(from), do: query, else: from([cd,...] in query,
+            where: cd.inserted_at >= ^from)
+        _ -> query
+      end
+    end)
+    from(c in subquery(query), select: avg(c.count))
+    |> repo.one
+    |> format_avg()
+  end
+
+  def average_per_day_for_locations(%{"location_ids" => location_ids}=params, repo \\ Read) do
+    query =  from(cd in ConversationDisposition,
+      join: c in Conversation, on: c.id == cd.conversation_id,
+      where: c.location_id in ^location_ids,
       group_by: fragment("date_trunc('day',?)", cd.inserted_at),
       select: %{count: count(cd.id)})
     query = Enum.reduce(params, query, fn {key, value}, query ->

@@ -65,14 +65,19 @@ defmodule MainWeb.AdminController do
       to: params["to"],
       location: nil)
   end
-  def index(conn, %{"location_id" => location_id} = params) do
+  def index(conn, %{"filters" => %{"location_ids" => location_ids}} = params) do
+    params=if(!is_nil(params["filters"])) do
+      change_params(params)
+    else
+      params
+    end
     current_user = current_user(conn)
-    team_members = TeamMember.get_by_location_id(current_user, location_id)
+    team_members = TeamMember.get_by_location_ids(current_user, location_ids)
     dispositions = Disposition.count_by(params)
-    appointments = Appointments.count_by_location_id(location_id)
-    response_time = ConversationMessages.count_by_location_id(location_id,params["to"] != "" && params["to"] || nil,params["from"] != "" && params["from"] || nil)
+    appointments = Appointments.count_by_location_ids(location_ids)
+    response_time = count_total_response_time(params)
     dispositions_per_day =
-      case Disposition.average_per_day_for_location(params) do
+      case Disposition.average_per_day_for_locations(params) do
         [result] -> result
         _ -> %{sessions_per_day: 0}
       end
@@ -87,9 +92,9 @@ defmodule MainWeb.AdminController do
     locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
     filter =
       case current_user do
-        %{role: "team-admin"} -> %{"team_id" => current_user.team_member.team_id, location_id: location_id}
-        %{role: "admin"} -> %{"location_id" => location_id}
-        %{role: "location-admin"} -> %{"location_id" => location_id}
+        %{role: "team-admin"} -> %{"team_id" => current_user.team_member.team_id, location_ids: location_ids}
+        %{role: "admin"} -> %{"location_ids" => location_ids}
+        %{role: "location-admin"} -> %{"location_ids" => location_ids}
         _ -> %{}
       end
     params=Map.merge(params, filter)
@@ -98,14 +103,14 @@ defmodule MainWeb.AdminController do
       automated: calculate_percentage("Automated", dispositions),
       call_deflected: calculate_percentage("Call deflected", dispositions),
       appointments: appointments,
-      campaigns: Campaign.get_by_location_id(location_id),
+      campaigns: Campaign.get_by_location_ids(location_ids),
       dispositions_per_day: dispositions_per_day,
-      response_time: response_time.median_response_time||0,
-      web_totals: location_totals_by_channel("WEB", location_id),
-      sms_totals: location_totals_by_channel("SMS", location_id),
-      app_totals: location_totals_by_channel("APP", location_id),
-      facebook_totals: location_totals_by_channel("FACEBOOK", location_id),
-      email_totals: location_totals_by_channel("MAIL",location_id),
+      response_time: response_time,
+      web_totals: locations_totals_by_channel("WEB", location_ids),
+      sms_totals: locations_totals_by_channel("SMS", location_ids),
+      app_totals: locations_totals_by_channel("APP", location_ids),
+      facebook_totals: locations_totals_by_channel("FACEBOOK", location_ids),
+      email_totals: locations_totals_by_channel("MAIL",location_ids),
       team_admin_count: team_admin_count,
       tickets_count: Ticket.filter(params),
       teammate_count: teammate_count,
@@ -113,7 +118,7 @@ defmodule MainWeb.AdminController do
       location_count: Enum.count(locations),
       teams: teams(conn),
       team_id: current_user.team_member.team_id,
-      location_id: location_id,
+      location_ids: location_ids,
       from: params["from"],
       to: params["to"],
       location: nil)
@@ -156,9 +161,12 @@ defmodule MainWeb.AdminController do
         appointments = Appointments.count_all()
         [dispositions_per_day] = Disposition.average_per_day(params)
         locations = Location.all()
-        response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id,params["to"] != "" && params["to"] || nil,params["from"] != "" && params["from"] || nil).median_response_time||0 end)
-        middle_index = response_times |> length() |> div(2)
-        response_time = response_times |> Enum.sort |> Enum.at(middle_index)
+        location_ids=Enum.map(locations, & &1.id)
+#        response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id,params["to"] != "" && params["to"] || nil,params["from"] != "" && params["from"] || nil).median_response_time||0 end)
+#        middle_index = response_times |> length() |> div(2)
+#        response_time = response_times |> Enum.sort |> Enum.at(middle_index)
+
+        response_time=count_total_response_time(%{"location_ids" => location_ids})
         campaigns = locations
                     |> Enum.map(fn(location) ->
           Campaign.get_by_location_id(location.id)
@@ -246,6 +254,7 @@ defmodule MainWeb.AdminController do
     sum(results)
   end
   defp location_totals_by_channel(channel_type, location_id) do
+    IO.inspect("=============================================")
     results = ConversationDisposition.count_channel_type_by_location_id(channel_type, location_id)
     sum(results)
   end
@@ -332,5 +341,13 @@ defmodule MainWeb.AdminController do
   defp change_params(params) do
     params=Map.merge(params, params["filters"])
     params=Map.delete(params, "filters")
+  end
+  defp count_total_response_time(%{"location_ids" => location_ids}= params) do
+    response_times = Enum.map(location_ids, fn location_id -> ConversationMessages.count_by_location_id(location_id, params["to"] != "" && params["to"] || nil,params["from"] != "" && params["from"] || nil).median_response_time||0 end)
+    middle_index = response_times |> length() |> div(2)
+    response_time = response_times |> Enum.sort |> Enum.at(middle_index)
+  end
+  defp locations_totals_by_channel(channel_type, location_ids) do
+    Enum.reduce(location_ids,0, & location_totals_by_channel(channel_type, &1) + &2 )
   end
 end
