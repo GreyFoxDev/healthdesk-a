@@ -96,9 +96,8 @@
     <%= if @current_user.role in ["team-admin", "location-admin"] do %>
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-3">
-            <h2 class="metric-label"> LOCATIONS </h2>
-
-            <select class="selectpicker form-control" multiple data-actions-box="true" class="" name="filters[location_ids][]">
+            <h2 class="metric-label"> Locations </h2>
+            <select data-selected-text-format="count" data-count-selected-text="({0}) Locations" title="All Locations" class="selectpicker form-control" style="" multiple data-actions-box="true" data-live-search="true" class="" name="filters[location_ids][]">
                 <%= for location <- @locations do %>
                 <option
                         <%=
@@ -109,20 +108,18 @@
                           if (location.id in @location_ids)do
                             "selected"
                           end
-
-                        end
-                   %>
+                        end%>
                         value="<%= location.id %>"><%= location.location_name %></option>
                 <% end %>
             </select>
 
         </div><!-- /metric column -->
-        <div class="col-12 col-sm-6 col-lg-3">
+        <div class="col-12 col-sm-6 col-lg-3" >
             <h2 class="metric-label"> From </h2>
             <%=
             date_input f,
             :from,
-            class: "form-control",
+            class: "date-field",
             value: @from
             %>
 
@@ -132,14 +129,11 @@
             <%=
             date_input f,
             :to,
-            class: "form-control",
+            class: "date-field",
             value: @to
             %>
-            <button type="submit" class= "btn btn-primary" style= "float: right; margin-top: 7px;"> <i class="fa fa-search"></i> </button>
+            <button type="submit" class= "d btn btn-default" style= "" > <i style="color: black;" class="fa fa-search"></i> </button>
         </div><!-- /metric column -->
-
-
-
     </div>
 
     <% end %>

@@ -202,3 +202,17 @@ a.dropdown-item.unread {
 a.dropdown-item.unread:hover {
     background: #6657cc;
 }
+.date-field{
+    width: 80%;
+    height: 58%;
+}
+.d{
+    height: 35px;
+    width: 40px;
+    background-color: white;
+    border-color: black;
+    float: right;
+}
+.d:hover{
+background-color: #3c3f40;
+}
