@@ -287,7 +287,7 @@ defmodule MainWeb.Live.ConversationsView do
            ) do
         {:ok, _} ->
           if socket.assigns.tab == "active" do
-            _conversation =
+            conversation =
               user
               |> Conversations.get(conversation.id)
               |> fetch_member()
@@ -298,7 +298,7 @@ defmodule MainWeb.Live.ConversationsView do
               |> Conversations.all(locations,["open", "pending"],page*30,30, user.id,true)
             socket =
               socket
-#              |> assign(:open_conversation, open_conversation |> List.first() |> fetch_member())
+              |> assign(:open_conversation, conversation)
               |> assign(:conversations, conversations)
               |> assign(:changeset, Conversations.get_changeset())
             if connected?(socket), do: Process.send_after(self(), :menu_fix, 100)
