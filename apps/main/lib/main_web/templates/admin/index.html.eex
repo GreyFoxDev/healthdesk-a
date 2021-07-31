@@ -94,10 +94,13 @@
     </div>
     <%=form_for :filters, admin_path(@conn, :index), fn f -> %>
     <%= if @current_user.role in ["team-admin", "location-admin"] do %>
-    <div class="metric-row">
+
+    <div class="row">
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> Locations </h2>
-            <select data-selected-text-format="count" data-count-selected-text="({0}) Locations" title="All Locations" class="selectpicker form-control" style="" multiple data-actions-box="true" data-live-search="true" class="" name="filters[location_ids][]">
+            <select data-selected-text-format="count" data-count-selected-text="({0}) Locations" title="All Locations"
+                    class="selectpicker form-control border border-dark" style="" multiple data-actions-box="true"
+                    data-live-search="true" class="" name="filters[location_ids][]">
                 <%= for location <- @locations do %>
                 <option
                         <%=
@@ -108,32 +111,26 @@
                           if (location.id in @location_ids)do
                             "selected"
                           end
-                        end%>
-                        value="<%= location.id %>"><%= location.location_name %></option>
+                        end %>
+                        value="<%= location.id %>"><%= location.location_name %>
+                </option>
                 <% end %>
             </select>
-
         </div><!-- /metric column -->
-        <div class="col-12 col-sm-6 col-lg-3" >
+        <div class="col-12 col-sm-6 col-lg-2">
             <h2 class="metric-label"> From </h2>
-            <%=
-            date_input f,
-            :from,
-            class: "date-field",
-            value: @from
-            %>
-
+            <%= date_input f, :from, class: "form-control border border-dark", value: @from %>
         </div><!-- /metric column -->
-        <div class="col-12 col-sm-6 col-lg-3">
+        <div class="col-1"></div>
+        <div class="col-12 col-sm-6 col-lg-2 mr-5">
             <h2 class="metric-label"> To </h2>
-            <%=
-            date_input f,
-            :to,
-            class: "date-field",
-            value: @to
-            %>
-            <button type="submit" class= "d btn btn-default" style= "" > <i style="color: black;" class="fa fa-search"></i> </button>
+            <%= date_input f, :to, class: "form-control border border-dark", value: @to %>
         </div><!-- /metric column -->
+        <div class="col-12 col-sm-6 col-lg-3 mt-4">
+            <button type="submit" class="btn btn-light border border-dark">
+                <i style="color: black" class="fa fa-search"></i>
+            </button>
+        </div>
     </div>
 
     <% end %>
