@@ -3,6 +3,12 @@ defmodule MainWeb.AdminController do
   alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
 
   def index(conn, %{"team_id" => team_id} = params) do
+    IO.inspect(params)
+    params=if(!is_nil(params["filters"])) do
+      change_params(params)
+    else
+      params
+    end
     current_user = current_user(conn)
     team_members = TeamMember.get_by_team_id(current_user, team_id)
     dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => team_id}))
@@ -63,7 +69,9 @@ defmodule MainWeb.AdminController do
       location_id: location_id,
       from: params["from"],
       to: params["to"],
-      location: nil)
+      location: nil,
+
+      location_ids: [])
   end
   def index(conn, %{"filters" => %{"location_ids" => location_ids}} = params) do
     params=if(!is_nil(params["filters"])) do
@@ -124,9 +132,6 @@ defmodule MainWeb.AdminController do
       location: nil)
   end
   def index(conn, params) do
-    IO.inspect("============params================")
-    IO.inspect(params)
-    IO.inspect("============params================")
 
     params=if(!is_nil(params["filters"])) do
       change_params(params)
@@ -155,7 +160,6 @@ defmodule MainWeb.AdminController do
         _ -> %{}
       end
       params= Map.merge(params, filter)
-      params = Map.merge(params, filter)
       if current_user.role == "admin" do
         dispositions = Disposition.count_all_by(params)
         appointments = Appointments.count_all()
@@ -194,7 +198,7 @@ defmodule MainWeb.AdminController do
           location: nil,
           from: params["from"],
           to: params["to"],
-          location_id: nil,
+          location_ids: [],
           team_id: nil)
       else
         dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
@@ -237,7 +241,7 @@ defmodule MainWeb.AdminController do
           teammate_count: teammate_count,
           locations: locations,
           location_count: Enum.count(locations),
-          location_id: nil,
+          location_ids: [],
           location: nil,
           from: params["from"],
           to: params["to"],
@@ -254,7 +258,6 @@ defmodule MainWeb.AdminController do
     sum(results)
   end
   defp location_totals_by_channel(channel_type, location_id) do
-    IO.inspect("=============================================")
     results = ConversationDisposition.count_channel_type_by_location_id(channel_type, location_id)
     sum(results)
   end

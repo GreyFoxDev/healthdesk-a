@@ -97,12 +97,24 @@
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> LOCATIONS </h2>
-            <%=
-               multiple_select f,
-               :location_ids,
-               Enum.map(@locations, &{&1.location_name, &1.id}),
-               class: "selectpicker form-control"
-             %>
+
+            <select class="selectpicker form-control" multiple data-actions-box="true" class="" name="filters[location_ids][]">
+                <%= for location <- @locations do %>
+                <option
+                        <%=
+                        case @location_ids do
+                          [] ->
+                          "selected"
+                          _ ->
+                          if (location.id in @location_ids)do
+                            "selected"
+                          end
+
+                        end
+                   %>
+                        value="<%= location.id %>"><%= location.location_name %></option>
+                <% end %>
+            </select>
 
         </div><!-- /metric column -->
         <div class="col-12 col-sm-6 col-lg-3">
@@ -123,10 +135,13 @@
             class: "form-control",
             value: @to
             %>
+            <button type="submit" class= "btn btn-primary" style= "float: right; margin-top: 7px;"> <i class="fa fa-search"></i> </button>
         </div><!-- /metric column -->
+
+
+
     </div>
 
-    <%= submit "Apply", class: "btn btn-primary" %>
     <% end %>
     <% end %>
     <div class="metric-row">
