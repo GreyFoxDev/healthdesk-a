@@ -125,8 +125,9 @@ defmodule Data.Query.TeamMember do
       where: u.phone_number == ^phone_number,
       where: u.role == ^role,
       where: u.use_email == ^use_email,
-      where: u.use_sms == ^use_sms
-    )|> Read.one
+      where: u.use_sms == ^use_sms,
+      where:  is_nil(u.deleted_at)
+    ) |> Read.one
   end
 
   @doc """

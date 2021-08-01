@@ -22,8 +22,10 @@ defmodule MainWeb.Notify do
       |> String.replace("[url]", @endpoint)
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
-
-    body = Enum.join([user.first_name,user.last_name, "sent you a message" ,message, link[:url]], " ")
+    body =case is_binary(user) do
+      true ->      Enum.join([user, "sent you a message" ,message, link[:url]], " ")
+      _ ->      Enum.join([user.first_name,user.last_name, "sent you a message" ,message, link[:url]], " ")
+    end
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =
@@ -35,6 +37,7 @@ defmodule MainWeb.Notify do
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.map(&TeamMember.fetch_admins/1)
+      |> Enum.filter(&(&1))
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
       |> List.first
 
@@ -91,15 +94,13 @@ defmodule MainWeb.Notify do
     body = Enum.join(["You've been assigned to this conversation:", message, link[:url]], " ")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
-    current_time_string =
-      Time.utc_now()
-      |> Time.add(timezone_offset)
-      |> to_string()
+    current_time_string = Time.utc_now() |> Time.add(timezone_offset) |> to_string()
 
     available=
       location
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.map(&TeamMember.fetch_admins/1)
+      |> Enum.filter(&(&1))
       |> Enum.filter(&(&1.phone_number == team_member.user.phone_number))
       |> List.first
 
@@ -174,12 +175,15 @@ defmodule MainWeb.Notify do
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
       |> Enum.map(&TeamMember.fetch_admins/1)
+      |> Enum.uniq_by(fn x -> x.id end)
       |> IO.inspect(label: "Available Admins")
 
     all_admins =
       %{role: "location-admin"}
       |> TeamMember.get_by_location_id(location.id)
       |> Enum.filter(&(&1.user.role == "location-admin"))
+      |> Enum.filter(&(&1))
+      |> Enum.uniq_by(fn x -> x.id end)
       |> IO.inspect(label: "All Admins")
 
     role =

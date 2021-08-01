@@ -91,7 +91,8 @@ defmodule MainWeb.TsiController do
       |> assign(:title, location.team.team_name)
       |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
     else
-      {:ok, %Schema{status: "pending"} = convo} -> conn
+      {:ok, %Schema{status: "pending"} = convo} ->
+        conn
                                                 |> assign(:title, location.team.team_name)
                                                 |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
       _err ->
@@ -115,12 +116,12 @@ defmodule MainWeb.TsiController do
       layout = get_edit_layout_for_team(conn)
 
 
-      case convo.status do
-        "open" ->
-            Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
-        _ ->
-          Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
-      end
+#      case convo.status do
+#        "open" ->
+#            Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
+#        _ ->
+#          Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
+#      end
 
       conn
       |> put_layout({MainWeb.LayoutView, layout})
@@ -233,18 +234,20 @@ defmodule MainWeb.TsiController do
 
                C.pending(convo_id)
                Main.LiveUpdates.notify_live_view({location.id, :updated_open})
-               :ok =
-                 Notify.send_to_admin(
-                   convo.id,
-                   "Message From: #{convo.original_number}\n#{message}",
-                   location.phone_number
-                 )
+           
+                       case convo.status do
+                         "open" ->
+                             Notify.send_to_teammate(convo_id, "Message From: #{convo.original_number}\n#{message}", location, convo.team_member, convo.member )
+                         _ ->
+                           Notify.send_to_admin(convo_id, "Message From: #{convo.original_number}\n#{message}", location.phone_number, "location-admin")
+                       end
            end
       end
       params = %{"api_key" => api_key, "id" => convo.id, "message" => message}
       conn
       |> assign(:title, location.team.team_name)
       |> redirect(to: tsi_path(conn, :edit, api_key, convo.id, params))
+
     end
   end
 
@@ -274,15 +277,16 @@ defmodule MainWeb.TsiController do
   defp render_new(conn, unique_id, api_key) do
     if String.length(unique_id) >= 10 do
       location = conn.assigns.location
-      template_name =
+      {template_name,title} =
         case location.location_name do
-          <<"ATC - ", _rest :: binary>> -> "around_the_clock_fitness_new.html"
-          <<"PB - ", _rest :: binary>> -> "palm_beach_sports_club_new.html"
-          <<"TW - ", _rest :: binary>> -> "total_woman_new.html"
-          _ -> "new.html"
+          <<"ATC - ", _rest :: binary>> -> {"around_the_clock_fitness_new.html", "around the clock fitness new"}
+          <<"PB - ", _rest :: binary>> -> {"palm_beach_sports_club_new.html","palm beach sports club new"}
+          <<"TW - ", _rest :: binary>> -> {"total_woman_new.html","total woman new"}
+          _ -> {"new.html","In-App Messaging"}
         end
 
       conn
+      |> assign(:title, title)
       |> put_layout({MainWeb.LayoutView, :tsi})
       |> render(template_name, api_key: api_key, phone_number: unique_id)
     else

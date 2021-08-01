@@ -10,7 +10,7 @@ $('body').on("click","#close_side_toggle", function () {
 
 $(document).ready(function() {
 
-    Looper.stackedMenu.init()
+    Looper.stackedMenu != undefined && Looper.stackedMenu.init()
 
     var url = window.location;
 

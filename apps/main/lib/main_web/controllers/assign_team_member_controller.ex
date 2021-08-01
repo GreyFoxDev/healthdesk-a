@@ -6,7 +6,8 @@ defmodule MainWeb.AssignTeamMemberController do
 
   require Logger
 
-  @assign_message "Message From: [phone_number]\n[message]"
+  @assign_message "Message From: [phone_number]"
+#  @assign_message "Message From: [phone_number]\n[message]"
 
   def assign(conn, %{"id" => _id, "location_id" => _location_id, "team_member_id" => _team_member_id}=params) do
     with {:ok, _} <- assign(params) do
@@ -43,7 +44,7 @@ defmodule MainWeb.AssignTeamMemberController do
         message =
           @assign_message
           |> String.replace("[phone_number]", original_message.phone_number)
-          |> String.replace("[message]", original_message.message)
+#          |> String.replace("[message]", original_message.message)
 
         Notify.send_to_teammate(id, message, location.phone_number, team_member)
         Main.LiveUpdates.notify_live_view(id, {__MODULE__, {:new_msg, message}})

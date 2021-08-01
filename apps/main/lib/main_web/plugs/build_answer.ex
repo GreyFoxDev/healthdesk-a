@@ -34,11 +34,15 @@ defmodule MainWeb.Plug.BuildAnswer do
       if (assigns[:team_member_id] == nil && convo.channel_type != "App") do
         notify_admin_user(conn.assigns)
       else
-
         if (convo.channel_type != "App" ) do
           team_member =
             team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
-          Notify.send_to_teammate(id, message, location, team_member, convo.member)
+          location = Location.get_by_phone(location)
+          case convo.member do
+            nil ->  Notify.send_to_teammate(id, message, location, team_member, assigns.memberName)
+            member -> Notify.send_to_teammate(id, message, location, team_member, member)
+
+          end
         end
       end
     end
@@ -114,7 +118,12 @@ defmodule MainWeb.Plug.BuildAnswer do
       if (convo.channel_type != "App" ) do
         team_member =
           team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
-        Notify.send_to_teammate(id, message, location, team_member, convo.member)
+        location = Location.get_by_phone(location)
+        case convo.member do
+          nil ->  Notify.send_to_teammate(id, message, location, team_member, assigns.memberName)
+          member -> Notify.send_to_teammate(id, message, location, team_member, member)
+
+        end
       end
     end
     conn

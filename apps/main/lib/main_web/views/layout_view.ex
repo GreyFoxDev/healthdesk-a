@@ -47,7 +47,10 @@ defmodule MainWeb.LayoutView do
       "none"    -> "Healthdesk.ai"
       "knowledge"    -> "Healthdesk.ai -  Knowledge Base"
 
-      _ -> "Healthdesk.ai - Analytics"
+      _ -> case assigns[:title] do
+            nil -> "Healthdesk.ai - Analytics"
+            t-> t
+           end
     end
   end
 end
