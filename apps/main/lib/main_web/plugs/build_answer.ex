@@ -38,7 +38,7 @@ defmodule MainWeb.Plug.BuildAnswer do
         if (convo.channel_type != "App" ) do
           team_member =
             team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
-          Notify.send_to_teammate(id, message, location, team_member, member)
+          Notify.send_to_teammate(id, message, location, team_member, convo.member)
         end
       end
     end
@@ -114,7 +114,7 @@ defmodule MainWeb.Plug.BuildAnswer do
       if (convo.channel_type != "App" ) do
         team_member =
           team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
-        Notify.send_to_teammate(id, message, location, team_member, member)
+        Notify.send_to_teammate(id, message, location, team_member, convo.member)
       end
     end
     conn

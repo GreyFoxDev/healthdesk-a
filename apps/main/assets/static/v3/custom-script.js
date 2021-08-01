@@ -9,8 +9,9 @@ $('body').on("click","#close_side_toggle", function () {
 });
 
 $(document).ready(function() {
-    
-    
+
+    Looper.stackedMenu.init()
+
     var url = window.location;
 
 

@@ -117,16 +117,15 @@
                 <% end %>
             </select>
         </div><!-- /metric column -->
-        <div class="col-12 col-sm-6 col-lg-2">
+        <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> From </h2>
             <%= date_input f, :from, class: "form-control border border-dark", value: @from %>
         </div><!-- /metric column -->
-        <div class="col-1"></div>
-        <div class="col-12 col-sm-6 col-lg-2 mr-5">
+        <div class="col-12 col-sm-6 col-lg-2">
             <h2 class="metric-label"> To </h2>
             <%= date_input f, :to, class: "form-control border border-dark", value: @to %>
         </div><!-- /metric column -->
-        <div class="col-12 col-sm-6 col-lg-3 mt-4">
+        <div class="col-12 col-sm-6 col-lg-1 mt-4">
             <button type="submit" class="btn btn-light border border-dark">
                 <i style="color: black" class="fa fa-search"></i>
             </button>
@@ -377,3 +376,4 @@
         </div>
     </div>
 </div>
+

@@ -857,6 +857,8 @@ defmodule MainWeb.Live.ConversationsView do
     socket =
       socket
       |> assign(:tab1, tab)
+    if connected?(socket), do: Process.send_after(self(), :menu_fix, 1000)
+
     {:noreply, socket}
 
   end
