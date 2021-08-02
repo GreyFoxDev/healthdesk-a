@@ -116,12 +116,12 @@ defmodule MainWeb.TsiController do
       layout = get_edit_layout_for_team(conn)
 
 
-#      case convo.status do
-#        "open" ->
-#            Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
-#        _ ->
-#          Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
-#      end
+      case convo.status do
+        "open" ->
+            Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
+        _ ->
+          Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
+      end
 
       conn
       |> put_layout({MainWeb.LayoutView, layout})
@@ -175,7 +175,6 @@ defmodule MainWeb.TsiController do
   end
 
   def update(conn, %{"id" => convo_id, "api_key" => api_key} = params) do
-
     location = conn.assigns.location
 
     with %Schema{} = convo <- C.get(convo_id) do
@@ -234,13 +233,12 @@ defmodule MainWeb.TsiController do
 
                C.pending(convo_id)
                Main.LiveUpdates.notify_live_view({location.id, :updated_open})
-           
-                       case convo.status do
-                         "open" ->
-                             Notify.send_to_teammate(convo_id, "Message From: #{convo.original_number}\n#{message}", location, convo.team_member, convo.member )
-                         _ ->
-                           Notify.send_to_admin(convo_id, "Message From: #{convo.original_number}\n#{message}", location.phone_number, "location-admin")
-                       end
+#               :ok =
+#                 Notify.send_to_admin(
+#                   convo.id,
+#                   "Message From: #{convo.original_number}\n#{message}",
+#                   location.phone_number
+#                 )
            end
       end
       params = %{"api_key" => api_key, "id" => convo.id, "message" => message}
