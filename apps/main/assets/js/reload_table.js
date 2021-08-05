@@ -54,7 +54,7 @@ const reload_convo = function (){
         let span = $(elem).find('span');
         if (span.length) {
             var tag = "@" + span[1].innerText;
-            availableMembers.push({value: tag, key: span[1].innerText})
+            availableMembers.push({id: span[0].innerText, value: tag, key: span[1].innerText})
 
         }
     });
@@ -62,7 +62,6 @@ const reload_convo = function (){
         let span = $(elem).find('span');
         if (span.length) {
             availableTags.push({value: span[0].innerText, key: span[1].innerText})
-
         }
     });
     var tribute = new Tribute({
@@ -80,8 +79,9 @@ const reload_convo = function (){
         values: []
     });
 
-    tribute2.collection[0].values = remove_duplicates(availableMembers, "key")
+    tribute2.collection[0].values = remove_duplicates(availableMembers, "id")
     tribute.collection[0].values = remove_duplicates(availableTags, "key")
+
 
     $(document).on("input",'[name="conversation_message[message]"]',function (){
         this.style.height = "";
@@ -127,6 +127,8 @@ const init_ticket = function (){
         if (span.length) {
             var tag = "@" + span[1].innerText;
             availableMembers.push({value: tag, key: span[1].innerText})
+
+
 
         }
     });
