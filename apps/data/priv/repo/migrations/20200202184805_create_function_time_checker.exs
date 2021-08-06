@@ -41,7 +41,7 @@ defmodule Data.Repo.Migrations.CreateFunctionTimeChecker do
         SELECT u.email, u.phone_number, u.role, u.use_email, u.use_sms
         FROM users u
         INNER JOIN team_members t ON t.user_id = u.id
-        INNER JOIN team_member_locations tl ON tl.team_member_id = t.id
+        LEFT JOIN team_member_locations tl ON tl.team_member_id = t.id
         WHERE t.location_id = location::uuid or tl.location_id = location::uuid
         AND u.deleted_at IS NULL
         AND (u.use_do_not_disturb = false
