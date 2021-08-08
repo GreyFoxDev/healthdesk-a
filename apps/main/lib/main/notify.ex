@@ -23,8 +23,8 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
     body =case is_binary(user) do
-      true ->      Enum.join([user, "sent you a message" ,message, link[:url]], " ")
-      _ ->      Enum.join([user.first_name,user.last_name, "sent you a message" ,message, link[:url]], " ")
+      true ->      Enum.join([user, "sent you a message" ,message, "<a href=\"#{link[:url]}\">Click here to respond</a>"], " ")
+      _ ->      Enum.join([user.first_name,user.last_name, "sent you a message" ,message, "<a href=\"#{link[:url]}\">Click here to respond</a>"], " ")
     end
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
@@ -49,8 +49,10 @@ defmodule MainWeb.Notify do
         member = [
                    member.first_name,
                    member.last_name,
-                   conversation.original_number
-                 ] |> Enum.join(" ")
+                   member.email||"",
+                   conversation.original_number,
+                   location.location_name
+                 ] |> Enum.join(", ")
 
         "New message from #{member}"
       else
@@ -91,7 +93,7 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
-    body = Enum.join(["You've been assigned to this conversation:", message, link[:url]], " ")
+    body = Enum.join(["You've been assigned to this conversation:", message, "<a href=\"#{link[:url]}\">Click here to respond</a>"], " ")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string = Time.utc_now() |> Time.add(timezone_offset) |> to_string()
@@ -110,10 +112,11 @@ defmodule MainWeb.Notify do
       member = conversation.member
       subject = if member do
         member = [
-                   member.first_name,
-                   member.last_name,
-                   conversation.original_number
-                 ] |> Enum.join(" ")
+                   member.first_name <>" "<>member.last_name,
+                   member.email||"",
+                   conversation.original_number,
+                   location.location_name,
+                 ] |> Enum.join(",")
 
         "New message from #{member}"
       else
@@ -160,7 +163,7 @@ defmodule MainWeb.Notify do
       [
         template,
         message,
-        link[:url]
+        "<a href=\"#{link[:url]}\">Click here to respond</a>"
       ] |> Enum.join(" ")
 
 
@@ -199,11 +202,10 @@ defmodule MainWeb.Notify do
         member = conversation.member
         subject = if member do
           member = [
-                     member.first_name,
-                     member.last_name,
+                     member.first_name <>" "<>member.last_name,
                      member.email || "",
+                     member.phone_number,
                      location.location_name,
-                     member.phone_number
                    ] |> Enum.join(", ")
 
           "New message from #{member}"
@@ -222,8 +224,7 @@ defmodule MainWeb.Notify do
         member = conversation.member
         body = if member do
           member = [
-                     member.first_name,
-                     member.last_name,
+                     member.first_name <>" "<>member.last_name,
                      member.email || "",
                      location.location_name,
                      member.phone_number
@@ -247,8 +248,7 @@ defmodule MainWeb.Notify do
       member = conversation.member
       body = if member do
         member = [
-                   member.first_name,
-                   member.last_name,
+                   member.first_name <>" "<>member.last_name,
                    member.email || "",
                    location.location_name,
                    member.phone_number
