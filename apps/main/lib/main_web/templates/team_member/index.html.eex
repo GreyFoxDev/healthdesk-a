@@ -87,7 +87,7 @@
                                 <%= if @current_user.role in ["admin", "team-admin"] do %>
                                     <%= render("_team_member_row.html", conn: @conn, current_user: @current_user, member: member) %>
                                 <% end %>
-                                <%= if @current_user.role == "location-admin" && @current_user.team_member.location_id == member.location_id do %>
+                                <%= if @current_user.role == "location-admin" && (@current_user.team_member.location_id == member.location_id || Enum.any?(member.team_member_locations,fn tml -> tml.id == member.location_id end) )do %>
                                     <%= render("_team_member_row.html", conn: @conn, current_user: @current_user, member: member) %>
                                 <% end %>
                             <% end %>
