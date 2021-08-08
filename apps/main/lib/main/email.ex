@@ -10,6 +10,7 @@ defmodule Main.Email do
       to: to,
       from: @from,
       subject: subject,
+      html_body: message,
       text_body: message
     )
   end
@@ -18,6 +19,7 @@ defmodule Main.Email do
       to: to,
       from: @from1,
       subject: "RE: "<> subject,
+      html_body: message,
       text_body: message
     )
   end
