@@ -112,7 +112,7 @@ defmodule MainWeb.Notify do
       member = conversation.member
       subject = if member do
         member = [
-                   member.first_name <>" "<>member.last_name,
+                   (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                    member.email||"",
                    conversation.original_number,
                    location.location_name,
@@ -202,7 +202,7 @@ defmodule MainWeb.Notify do
         member = conversation.member
         subject = if member do
           member = [
-                     member.first_name <>" "<>member.last_name,
+                     (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                      member.email || "",
                      member.phone_number,
                      location.location_name,
@@ -224,7 +224,7 @@ defmodule MainWeb.Notify do
         member = conversation.member
         body = if member do
           member = [
-                     member.first_name <>" "<>member.last_name,
+                     (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                      member.email || "",
                      location.location_name,
                      member.phone_number
@@ -248,7 +248,7 @@ defmodule MainWeb.Notify do
       member = conversation.member
       body = if member do
         member = [
-                   member.first_name <>" "<>member.last_name,
+                   (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                    member.email || "",
                    location.location_name,
                    member.phone_number
