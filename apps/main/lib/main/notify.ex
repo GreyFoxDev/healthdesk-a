@@ -178,6 +178,7 @@ defmodule MainWeb.Notify do
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
       |> Enum.map(&TeamMember.fetch_admins/1)
+      |> Enum.filter(&(&1))
       |> Enum.uniq_by(fn x -> x.id end)
       |> IO.inspect(label: "Available Admins")
 
