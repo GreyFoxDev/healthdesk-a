@@ -32,7 +32,8 @@ defmodule Data.Schema.Location do
           conversations: List.t() | nil,
           mindbody_location_id: String.t() | nil,
           deleted_at: :utc_datetime | nil,
-          automation_limit: integer() | 3
+          automation_limit: integer() | 3,
+          bot_id: String.t() | nil
         }
 
   @required_fields ~w|
@@ -63,6 +64,7 @@ defmodule Data.Schema.Location do
   mindbody_location_id
   deleted_at
   automation_limit
+  bot_id
   |a
 
   @all_fields @required_fields ++ @optional_fields
@@ -90,7 +92,7 @@ defmodule Data.Schema.Location do
     field(:default_message, :string)
     field(:mindbody_location_id, :string)
     field(:automation_limit, :integer)
-
+    field(:bot_id, :string)
     field(:deleted_at, :utc_datetime)
 
     belongs_to(:team, Data.Schema.Team)

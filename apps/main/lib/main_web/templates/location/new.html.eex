@@ -9,4 +9,4 @@
     <h1 class="page-title">New Location</h1>
 </header>
 
-<%= render "_form.html", data: @changeset, action: team_location_path(@conn, :create, @team_id), conn: @conn, errors: @errors %>
+<%= render "_form.html", data: @changeset, action: team_location_path(@conn, :create, @team_id), conn: @conn, errors: @errors, bot_id: @bot_id %>

@@ -144,6 +144,8 @@
                         <%= if (MainWeb.Auth.Guardian.Plug.current_resource(@conn).role=="admin") do %>
                         <label>Maximum Automation Limit</label>
                         <%= text_input f, :automation_limit, class: "form-control", placeholder: 3 %>
+                        <label>Bot Id</label>
+                        <%= text_input f, :bot_id, class: "form-control", value: @bot_id%>
                         <%end%>
                     </div>
                     <div class="form-actions">
