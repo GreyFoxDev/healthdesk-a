@@ -13,8 +13,10 @@ defmodule Data.Schema.Team do
           team_members: List.t() | nil,
           use_mindbody: :boolean | nil,
           mindbody_site_id: String.t() | nil,
-          deleted_at: :utc_datetime | nil
-        }
+          deleted_at: :utc_datetime | nil,
+          bot_id: String.t() | nil,
+
+             }
 
   @required_fields ~w|
     team_name
@@ -27,6 +29,7 @@ defmodule Data.Schema.Team do
     use_mindbody
     mindbody_site_id
     deleted_at
+    bot_id
   |a
 
   @all_fields @required_fields ++ @optional_fields
@@ -38,8 +41,9 @@ defmodule Data.Schema.Team do
     field(:twilio_flow_id, :string)
     field(:use_mindbody, :boolean)
     field(:mindbody_site_id, :string)
-
     field(:deleted_at, :utc_datetime)
+    field(:bot_id, :string)
+
 
     has_many(:locations, Data.Schema.Location)
     has_many(:team_members, Data.Schema.TeamMember)

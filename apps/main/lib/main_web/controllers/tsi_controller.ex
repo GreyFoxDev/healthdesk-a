@@ -93,8 +93,8 @@ defmodule MainWeb.TsiController do
     else
       {:ok, %Schema{status: "pending"} = convo} ->
         conn
-                                                |> assign(:title, location.team.team_name)
-                                                |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
+        |> assign(:title, location.team.team_name)
+        |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
       _err ->
         conn
         |> assign(:title, location.team.team_name)
@@ -318,12 +318,7 @@ defmodule MainWeb.TsiController do
       |> Enum.find(&(&1.disposition_name == "Automated"))
 
     if disposition do
-      Data.ConversationDisposition.create(
-        %{
-          "conversation_id" => convo_id,
-          "disposition_id" => disposition.id
-        }
-      )
+      Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})
 
       _ =  %{
         "conversation_id" => convo_id,

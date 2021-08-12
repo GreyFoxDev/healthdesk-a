@@ -11,7 +11,7 @@ defmodule MainWeb.LocationController do
     locations = if current_user.role in ["admin", "team-admin"] do
       team.locations
     else
-      teammate_locations(conn)
+      Location.get_by_team_id(%{role: current_user.role},team_id)
     end
     render conn, "index.html",
            location: nil,
