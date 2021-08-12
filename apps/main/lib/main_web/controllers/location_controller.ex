@@ -78,7 +78,6 @@ defmodule MainWeb.LocationController do
       team: team,
       location: nil,
       teams: teams(conn),
-      bot_id: Application.get_env(:wit_client, :access_token),
       errors: [])
   end
 
