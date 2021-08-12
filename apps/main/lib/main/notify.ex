@@ -14,17 +14,15 @@ defmodule MainWeb.Notify do
   @endpoint Application.get_env(:main, :endpoint)
 
   def send_to_teammate(conversation_id, message, location, team_member,user) do
-    IO.inspect("#########")
-    IO.inspect(1)
-    IO.inspect("#########")
+   
     %{data: link} =
       @url
       |> String.replace("[url]", @endpoint)
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
     body =case is_binary(user) do
-      true ->      Enum.join([user, "sent you a message" ,message, link[:url]], " ")
-      _ ->      Enum.join([user.first_name,user.last_name, "sent you a message" ,message, link[:url]], " ")
+      true ->      Enum.join(["New message from ", user ,location.location_name, ": #{message}.", "<a href=\"#{link[:url]}\">Click here to respond</a>"], ", ")
+      _ ->      Enum.join(["New message from #{user.first_name} #{user.last_name}", user.email, location.location_name ,"#{user.phone_number}: #{message}.", "<a href=\"#{link[:url]}\">Click here to respond</a>"], ", ")
     end
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
@@ -49,8 +47,10 @@ defmodule MainWeb.Notify do
         member = [
                    member.first_name,
                    member.last_name,
-                   conversation.original_number
-                 ] |> Enum.join(" ")
+                   member.email||"",
+                   conversation.original_number,
+                   location.location_name
+                 ] |> Enum.join(", ")
 
         "New message from #{member}"
       else
@@ -80,9 +80,6 @@ defmodule MainWeb.Notify do
 
 
   def send_to_teammate(conversation_id, message, location, team_member) do
-    IO.inspect("#########")
-    IO.inspect(2)
-    IO.inspect("#########")
     location = Location.get_by_phone(location)
 
     %{data: link} =
@@ -91,7 +88,7 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
-    body = Enum.join(["You've been assigned to this conversation:", message, link[:url]], " ")
+    body = Enum.join(["You've been assigned to this conversation:", message, "<a href=\"#{link[:url]}\">Click here to respond</a>"], " ")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string = Time.utc_now() |> Time.add(timezone_offset) |> to_string()
@@ -110,10 +107,11 @@ defmodule MainWeb.Notify do
       member = conversation.member
       subject = if member do
         member = [
-                   member.first_name,
-                   member.last_name,
-                   conversation.original_number
-                 ] |> Enum.join(" ")
+                   (member.first_name || "" ) <>" "<>(member.last_name || ""),
+                   member.email||"",
+                   conversation.original_number,
+                   location.location_name,
+                 ] |> Enum.join(",")
 
         "New message from #{member}"
       else
@@ -149,20 +147,24 @@ defmodule MainWeb.Notify do
       |> String.replace("[url]", @endpoint)
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
-    
+
     template =
       case member_role do
-        "location-admin" -> "You've a new message"
-        _ -> "You've been assigned to this conversation:"
+        "location-admin" -> "New message from "
+        _ -> "You've been assigned to this conversation: "
         end
 
     body =
       [
-        template,
-        message,
-        link[:url]
+        ": #{message}.",
+        "<a href=\"#{link[:url]}\">Click here to respond</a>"
       ] |> Enum.join(" ")
 
+    slack_body =
+      [
+        ": #{message}.",
+        "Click here to respond: #{link[:url]}"
+      ] |> Enum.join(" ")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string =
@@ -176,7 +178,6 @@ defmodule MainWeb.Notify do
       |> Enum.filter(&(&1.role == "location-admin"))
       |> Enum.map(&TeamMember.fetch_admins/1)
       |> Enum.uniq_by(fn x -> x.id end)
-      |> IO.inspect(label: "Available Admins")
 
     all_admins =
       %{role: "location-admin"}
@@ -184,7 +185,6 @@ defmodule MainWeb.Notify do
       |> Enum.filter(&(&1.user.role == "location-admin"))
       |> Enum.filter(&(&1))
       |> Enum.uniq_by(fn x -> x.id end)
-      |> IO.inspect(label: "All Admins")
 
     role =
       case member_role do
@@ -199,21 +199,20 @@ defmodule MainWeb.Notify do
         member = conversation.member
         subject = if member do
           member = [
-                     member.first_name,
-                     member.last_name,
+                     (member.first_name || "") <>" "<>(member.last_name || ""),
                      member.email || "",
+                     member.phone_number,
                      location.location_name,
-                     member.phone_number
                    ] |> Enum.join(", ")
 
           "New message from #{member}"
         else
           "New message from #{conversation.original_number}"
         end
+        body=subject <> "#{body}"
         admin.user.email
         |> Main.Email.generate_email(body, subject)
         |> Main.Mailer.deliver_now()
-        |> IO.inspect()
       end
     end)
 
@@ -222,15 +221,14 @@ defmodule MainWeb.Notify do
         member = conversation.member
         body = if member do
           member = [
-                     member.first_name,
-                     member.last_name,
+                     (member.first_name || "") <>" "<>(member.last_name || ""),
                      member.email || "",
                      location.location_name,
                      member.phone_number
                    ] |> Enum.join(", ")
-          body <> " from #{member}"
+          template <> "#{member}" <> body
         else
-          body
+          template <> body
         end
         message = %{
           provider: :twilio,
@@ -247,16 +245,16 @@ defmodule MainWeb.Notify do
       member = conversation.member
       body = if member do
         member = [
-                   member.first_name,
-                   member.last_name,
+                   (member.first_name || "") <>" "<> (member.last_name || ""),
                    member.email || "",
                    location.location_name,
                    member.phone_number
                  ] |> Enum.join(", ")
-        body <> " from #{member}"
+        template <> "#{member}" <> slack_body
       else
-        body
+        template <> slack_body
       end
+      
       body = Jason.encode! %{text: String.replace(body, "\n", " ")}
       Tesla.post location.slack_integration, body, headers: headers
 

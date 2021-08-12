@@ -22,6 +22,7 @@ defmodule MainWeb.TeamController do
       changeset: Team.get_changeset(),
       location: nil,
       teams: teams(conn),
+      bot_id: Application.get_env(:wit_client, :access_token),
       errors: [])
   end
 
