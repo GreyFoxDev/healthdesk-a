@@ -25,7 +25,7 @@
             <div class="card card-fluid">
                 <h6 class="card-header"> Details </h6><!-- .card-body -->
                 <div class="card-body">
-                    <%= render "_form.html", data: @changeset, action: team_path(@conn, :update, @changeset.data), conn: @conn, errors: @errors %>
+                    <%= render "_form.html", data: @changeset, action: team_path(@conn, :update, @changeset.data), conn: @conn, errors: @errors, bot_id: @changeset.data.bot_id %>
                 </div><!-- /.card-body -->
             </div>
         </div>
