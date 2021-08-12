@@ -37,6 +37,15 @@ defmodule MainWeb.Plug.CloseConversation do
   end
 
   @doc """
+  If the conversation is in a pending state or closed and conversation is being hit by outbound_api,
+  we will keep conversation closed.
+  """
+  def call(%{assigns: %{location_id: location_id, member: phone_number, barcode: _barcode, status: status}} = conn, _opts) when status in ["pending", "closed"] do
+    C.close(C.get_by_phone(phone_number, location_id).id)
+    conn
+  end
+
+  @doc """
   If the intent isn't found then set the conversation status to pending while
   an admin addresses the member.
   """
