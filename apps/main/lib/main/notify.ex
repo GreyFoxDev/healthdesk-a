@@ -107,7 +107,7 @@ defmodule MainWeb.Notify do
       member = conversation.member
       subject = if member do
         member = [
-                   (member.first_name || "" ) <>" "<>(member.last_name || ""),
+                   (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                    member.email||"",
                    conversation.original_number,
                    location.location_name,
@@ -177,6 +177,7 @@ defmodule MainWeb.Notify do
       |> TeamMember.get_available_by_location(current_time_string)
       |> Enum.filter(&(&1.role == "location-admin"))
       |> Enum.map(&TeamMember.fetch_admins/1)
+      |> Enum.filter(&(&1))
       |> Enum.uniq_by(fn x -> x.id end)
 
     all_admins =
@@ -199,7 +200,7 @@ defmodule MainWeb.Notify do
         member = conversation.member
         subject = if member do
           member = [
-                     (member.first_name || "") <>" "<>(member.last_name || ""),
+                     (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                      member.email || "",
                      member.phone_number,
                      location.location_name,
@@ -221,7 +222,7 @@ defmodule MainWeb.Notify do
         member = conversation.member
         body = if member do
           member = [
-                     (member.first_name || "") <>" "<>(member.last_name || ""),
+                     (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                      member.email || "",
                      location.location_name,
                      member.phone_number
@@ -245,7 +246,7 @@ defmodule MainWeb.Notify do
       member = conversation.member
       body = if member do
         member = [
-                   (member.first_name || "") <>" "<> (member.last_name || ""),
+                   (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                    member.email || "",
                    location.location_name,
                    member.phone_number
