@@ -24,6 +24,11 @@
                         <%= text_input f, :bot_id, class: "form-control", value: @bot_id%>
                         <%#= error_tag @errors, :website %>
                     </div>
+                    <div class="form-group">
+                        <label>Account Id</label>
+                        <%= text_input f, :sub_account_id, class: "form-control"%>
+                        <%#= error_tag @errors, :website %>
+                    </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <span>Use Mindbody for Classes? &nbsp;</span>
                         <label class="switcher-control switcher-control-success">

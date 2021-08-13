@@ -115,7 +115,7 @@ defmodule MainWeb.Live.WebChat.Index do
       else
         conversation =
           conversation
-          |> P.AskWit.call([])
+          |> P.AskWit.call([],location)
           |> P.BuildAnswer.call([])
 
         assigns = Map.put(conversation.assigns, :response, conversation.assigns.response)

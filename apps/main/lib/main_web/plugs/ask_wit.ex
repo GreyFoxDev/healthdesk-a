@@ -15,12 +15,12 @@ defmodule MainWeb.Plug.AskWit do
   @doc """
   Only once the member has opted in will the question be sent to Wit
   """
-  def call(%{assigns: %{convo: id,  status: "open", message: message}} = conn, _opts) do
+  def call(%{assigns: %{convo: id,  status: "open", message: message}} = conn, _opts,location) do
 
 
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
     if pending_message_count == 0 && conn.assigns[:team_member_id] == nil  do
-      assign(conn, :intent, ask_wit_ai(message))
+      assign(conn, :intent, ask_wit_ai(message, location))
     else
       assign(conn, :intent, nil)
     end
@@ -28,8 +28,9 @@ defmodule MainWeb.Plug.AskWit do
 
   def call(conn, _opts), do: conn
 
-  defp ask_wit_ai(question) do
-    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
+  defp ask_wit_ai(question, location) do
+    bot_id=Team.get_bot_id_by_location_id()
+    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
           IO.inspect("###################")

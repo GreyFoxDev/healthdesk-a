@@ -15,6 +15,7 @@ defmodule Data.Schema.Team do
           mindbody_site_id: String.t() | nil,
           deleted_at: :utc_datetime | nil,
           bot_id: String.t() | nil,
+          sub_account_id: String.t() | nil
 
              }
 
@@ -30,6 +31,7 @@ defmodule Data.Schema.Team do
     mindbody_site_id
     deleted_at
     bot_id
+    sub_account_id
   |a
 
   @all_fields @required_fields ++ @optional_fields
@@ -43,6 +45,7 @@ defmodule Data.Schema.Team do
     field(:mindbody_site_id, :string)
     field(:deleted_at, :utc_datetime)
     field(:bot_id, :string)
+    field(:sub_account_id, :string)
 
 
     has_many(:locations, Data.Schema.Location)

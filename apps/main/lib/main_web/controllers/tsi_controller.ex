@@ -292,7 +292,8 @@ defmodule MainWeb.TsiController do
     end
   end
   defp ask_wit_ai(question, convo_id, location) do
-    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
+    bot_id=Team.get_bot_id_by_location_id()
+    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
 
