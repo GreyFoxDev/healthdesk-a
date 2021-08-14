@@ -40,6 +40,9 @@ defmodule Data.Team do
   def get_bot_id_by_location_id(id),
       do: Query.get_bot_id_by_location_id(id)
 
+  def get_sub_account_id_by_location_id(id),
+      do: Query.get_sub_account_id_by_location_id(id)
+
   def get(_, _), do: {:error, :invalid_permissions}
 
   def create(params),

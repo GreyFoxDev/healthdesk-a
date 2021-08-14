@@ -238,7 +238,7 @@ defmodule MainWeb.Api.ConversationController do
   end
   def close_convo(_), do: nil
   defp ask_wit_ai(question, location) do
-    bot_id=Team.get_bot_id_by_location_id()
+    bot_id=Team.get_bot_id_by_location_id(location.id)
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
