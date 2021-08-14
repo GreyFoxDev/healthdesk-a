@@ -3,7 +3,7 @@ defmodule Data.Repo.Migrations.AlterTeamsRemoveAccountId do
 
   def change do
     alter table(:teams) do
-      remove(:twilio_sub_account_id, :string)
+      remove(:sub_account_id, :string)
     end
   end
 end
