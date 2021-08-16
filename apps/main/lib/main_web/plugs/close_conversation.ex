@@ -17,7 +17,7 @@ defmodule MainWeb.Plug.CloseConversation do
   If the conversation is in a pending state or closed and conversation is being hit by outbound_api,
   we will keep conversation closed.
   """
-  def call(%{assigns: %{convo: id, barcode: barcode}} = conn, _opts) when (barcode != nil) do
+  def call(%{assigns: %{convo: id, barcode: barcode, status: "closed"}} = conn, _opts) when (barcode != nil) do
     C.close(id)
     conn
   end
@@ -150,6 +150,11 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
 
-  def call(conn, _opts), do: conn
+  def call(conn, _opts) do
+    IO.inspect("=======================default Clause=====================")
+    IO.inspect("default Clause")
+    IO.inspect("=======================default Clause=====================")
+    conn
+  end
 
 end
