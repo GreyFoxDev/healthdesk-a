@@ -27,8 +27,8 @@ defmodule Chatbot.Client.Twilio do
     )
   end
 
-  def channel(%Chatbot.Params{provider: :twilio} = params) do
-    account = Application.get_env(:ex_twilio, :flex_account_sid)
+  def channel(%Chatbot.Params{provider: :twilio} = params, account) do
+    #account = Application.get_env(:ex_twilio, :flex_account_sid)
     token = Application.get_env(:ex_twilio, :flex_auth_token)
     service_id = Application.get_env(:ex_twilio, :flex_service_id)
 

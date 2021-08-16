@@ -724,7 +724,8 @@ defmodule MainWeb.Live.ConversationsView do
              to: conversation.original_number,
              body: params["conversation_message"]["message"]
            }
-           Chatbot.Client.Twilio.channel(message)
+           account_id= Team.get_sub_account_id_by_location_id(location.id)
+           Chatbot.Client.Twilio.channel(message, account_id)
          {:error, _changeset} -> nil
        end
   end

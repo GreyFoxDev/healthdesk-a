@@ -21,8 +21,8 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
     body =case is_binary(user) do
-      true ->      Enum.join(["New message from ", user ,location.location_name, ": #{message}.", "<a href=\"#{link[:url]}\">Click here to respond</a>"], ", ")
-      _ ->      Enum.join(["New message from #{user.first_name} #{user.last_name}", user.email, location.location_name ,"#{user.phone_number}: #{message}.", "<a href=\"#{link[:url]}\">Click here to respond</a>"], ", ")
+      true ->      Enum.join(["New message from ", user ,location.location_name, ": #{message}. Click here to respond: #{link[:url]}"], ", ")
+      _ ->      Enum.join(["New message from #{user.first_name} #{user.last_name}", user.email, location.location_name ,"#{user.phone_number}: #{message}. Click here to respond: #{link[:url]}"], ", ")
     end
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
@@ -64,6 +64,10 @@ defmodule MainWeb.Notify do
     end
 
     if available && available.use_sms do
+      IO.inspect("============assign sms================")
+      IO.inspect(body)
+      IO.inspect("============assign sms================")
+
       message = %{
         provider: :twilio,
         from: location.phone_number,
@@ -154,13 +158,13 @@ defmodule MainWeb.Notify do
         _ -> "You've been assigned to this conversation: "
         end
 
-    body =
-      [
-        ": #{message}.",
-        "<a href=\"#{link[:url]}\">Click here to respond</a>"
-      ] |> Enum.join(" ")
+#    body =
+#      [
+#        ": #{message}.",
+#        "<a href=\"#{link[:url]}\">Click here to respond</a>"
+#      ] |> Enum.join(" ")
 
-    slack_body =
+    body =
       [
         ": #{message}.",
         "Click here to respond: #{link[:url]}"
@@ -211,6 +215,7 @@ defmodule MainWeb.Notify do
           "New message from #{conversation.original_number}"
         end
         body=subject <> "#{body}"
+
         admin.user.email
         |> Main.Email.generate_email(body, subject)
         |> Main.Mailer.deliver_now()
@@ -231,6 +236,9 @@ defmodule MainWeb.Notify do
         else
           template <> body
         end
+        IO.inspect("============SMS================")
+        IO.inspect(body)
+        IO.inspect("============SMS================")
         message = %{
           provider: :twilio,
           from: location.phone_number,
@@ -251,11 +259,14 @@ defmodule MainWeb.Notify do
                    location.location_name,
                    member.phone_number
                  ] |> Enum.join(", ")
-        template <> "#{member}" <> slack_body
+        template <> "#{member}" <> body
       else
-        template <> slack_body
+        template <> body
       end
-      
+      IO.inspect("============slack message================")
+      IO.inspect(body)
+      IO.inspect("============slack message================")
+
       body = Jason.encode! %{text: String.replace(body, "\n", " ")}
       Tesla.post location.slack_integration, body, headers: headers
 

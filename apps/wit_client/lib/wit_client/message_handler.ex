@@ -2,6 +2,7 @@ defmodule WitClient.MessageHandler do
   use GenServer,
     start: {WitClient.MessageHandler, :start_link, []},
     restart: :transient
+    alias Data.Team
 
   @moduledoc """
 
@@ -12,7 +13,8 @@ defmodule WitClient.MessageHandler do
 
   require Logger
 
-  @access_token Application.get_env(:wit_client, :access_token)
+  #@access_token Application.get_env(:wit_client, :access_token)
+
 
   def start_link(from, question),
     do: GenServer.start_link(__MODULE__, [from, question])
@@ -27,15 +29,12 @@ defmodule WitClient.MessageHandler do
     {:stop, :normal, []}
   end
 
-  def handle_info(:ask, [from, question]) do
+  def handle_info(:ask, [from, question,bot_id]) do
     question = Inflex.parameterize(question, "%20")
-    IO.inspect("###################")
-    IO.inspect(@access_token)
-    IO.inspect("###################")
 
     case System.cmd("curl", [
            "-H",
-           "Authorization: Bearer #{@access_token}",
+           "Authorization: Bearer #{bot_id}",
            "https://api.wit.ai/message?v=20181028&q=#{question}"
          ]) do
       {response, 0} ->
