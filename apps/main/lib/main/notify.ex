@@ -64,10 +64,6 @@ defmodule MainWeb.Notify do
     end
 
     if available && available.use_sms do
-      IO.inspect("============assign sms================")
-      IO.inspect(body)
-      IO.inspect("============assign sms================")
-
       message = %{
         provider: :twilio,
         from: location.phone_number,
@@ -236,9 +232,7 @@ defmodule MainWeb.Notify do
         else
           template <> body
         end
-        IO.inspect("============SMS================")
-        IO.inspect(body)
-        IO.inspect("============SMS================")
+
         message = %{
           provider: :twilio,
           from: location.phone_number,
@@ -263,9 +257,6 @@ defmodule MainWeb.Notify do
       else
         template <> body
       end
-      IO.inspect("============slack message================")
-      IO.inspect(body)
-      IO.inspect("============slack message================")
 
       body = Jason.encode! %{text: String.replace(body, "\n", " ")}
       Tesla.post location.slack_integration, body, headers: headers

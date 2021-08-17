@@ -86,8 +86,8 @@ defmodule MainWeb.ConversationMessageController do
     |> case do
          {:ok, _message} ->
            message = %Chatbot.Params{provider: :twilio, from: location.phone_number, to: conversation.original_number, body: params["conversation_message"]["message"]}
-           account_id= Team.get_sub_account_id_by_location_id(location.id)
-           Chatbot.Client.Twilio.channel(message, account_id)
+           #account_id= Team.get_sub_account_id_by_location_id(location.id)
+           Chatbot.Client.Twilio.channel(message)
            put_flash(conn, :success, "Sending message was successful")
          {:error, _changeset} ->
            put_flash(conn, :error, "Sending message failed")
