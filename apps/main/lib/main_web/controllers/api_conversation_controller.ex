@@ -128,7 +128,7 @@ defmodule MainWeb.Api.ConversationController do
                  :ok =
                    Notify.send_to_admin(
                      convo.id,
-                     "#{convo.original_number}\n#{message}",
+                     "#{message}",
                      location.phone_number,
                      "location-admin"
                    )
