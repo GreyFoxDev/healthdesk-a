@@ -14,15 +14,15 @@ defmodule MainWeb.Notify do
   @endpoint Application.get_env(:main, :endpoint)
 
   def send_to_teammate(conversation_id, message, location, team_member,user) do
-   
+
     %{data: link} =
       @url
       |> String.replace("[url]", @endpoint)
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
     body =case is_binary(user) do
-      true ->      Enum.join(["New message from ", user ,location.location_name, ": #{message}. Click here to respond: #{link[:url]}"], ", ")
-      _ ->      Enum.join(["New message from #{user.first_name} #{user.last_name}", user.email, location.location_name ,"#{user.phone_number}: #{message}. Click here to respond: #{link[:url]}"], ", ")
+      true ->      Enum.join(["New message from ", user ,location.location_name, ": #{message} Click here to respond: #{link[:url]}"], ", ")
+      _ ->      Enum.join(["New message from #{user.first_name} #{user.last_name}", user.email, user.phone_number ,"#{location.location_name}: #{message} Click here to respond: #{link[:url]}"], ", ")
     end
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
@@ -45,8 +45,7 @@ defmodule MainWeb.Notify do
       member = conversation.member
       subject = if member do
         member = [
-                   member.first_name,
-                   member.last_name,
+                   (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                    member.email||"",
                    conversation.original_number,
                    location.location_name
@@ -60,7 +59,6 @@ defmodule MainWeb.Notify do
       team_member.user.email
       |> Main.Email.generate_email(body, subject)
       |> Main.Mailer.deliver_now()
-      |> IO.inspect()
     end
 
     if available && available.use_sms do
@@ -88,7 +86,7 @@ defmodule MainWeb.Notify do
       |> String.replace("[conversation_id]", conversation_id)
       |> Bitly.Link.shorten()
 
-    body = Enum.join(["You've been assigned to this conversation:", message, "<a href=\"#{link[:url]}\">Click here to respond</a>"], " ")
+    body = Enum.join(["You've been assigned to this conversation:", message, " Click here to respond: #{link[:url]}"], " ")
 
     timezone_offset = TimezoneOffset.calculate(location.timezone)
     current_time_string = Time.utc_now() |> Time.add(timezone_offset) |> to_string()
@@ -134,7 +132,7 @@ defmodule MainWeb.Notify do
       @chatbot.send(message)
     end
 
-    :ok
+      :ok
   end
 
   @doc """
@@ -162,7 +160,7 @@ defmodule MainWeb.Notify do
 
     body =
       [
-        ": #{message}.",
+        ": #{message} ",
         "Click here to respond: #{link[:url]}"
       ] |> Enum.join(" ")
 
@@ -225,8 +223,8 @@ defmodule MainWeb.Notify do
           member = [
                      (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                      member.email || "",
-                     location.location_name,
-                     member.phone_number
+                     member.phone_number,
+                     location.location_name
                    ] |> Enum.join(", ")
           template <> "#{member}" <> body
         else
@@ -250,8 +248,8 @@ defmodule MainWeb.Notify do
         member = [
                    (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||""),
                    member.email || "",
-                   location.location_name,
-                   member.phone_number
+                   member.phone_number,
+                   location.location_name
                  ] |> Enum.join(", ")
         template <> "#{member}" <> body
       else
