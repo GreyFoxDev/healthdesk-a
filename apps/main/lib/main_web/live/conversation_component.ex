@@ -6,6 +6,9 @@ defmodule MainWeb.Live.ConversationComponent do
   def render(assigns), do: MainWeb.ConversationComponentView.render("conversation.html", assigns)
 
   def update(assigns, socket) do
+    IO.inspect("#########")
+    IO.inspect(assigns.open_conversation.id)
+    IO.inspect("#########")
     socket = socket
              |> assign(:conversations, assigns.conversations)
              |> assign(:open_conversation, assigns.open_conversation)
