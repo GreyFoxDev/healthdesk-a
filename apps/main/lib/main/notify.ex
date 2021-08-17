@@ -55,6 +55,9 @@ defmodule MainWeb.Notify do
       else
         "New message from #{conversation.original_number}"
       end
+      IO.inspect("============temate email body================")
+      IO.inspect(body)
+      IO.inspect("============temate email body================")
 
       team_member.user.email
       |> Main.Email.generate_email(body, subject)
@@ -68,6 +71,10 @@ defmodule MainWeb.Notify do
         to: validate_phone_number(available.country <> available.phone_number),
         body: body
       }
+
+      IO.inspect("============temmate sms body================")
+      IO.inspect(body)
+      IO.inspect("============temmate sms body================")
 
 
       @chatbot.send(message)
@@ -115,6 +122,10 @@ defmodule MainWeb.Notify do
       else
         "New message from #{conversation.original_number}"
       end
+      IO.inspect("============assigned email body================")
+      IO.inspect(body)
+      IO.inspect("============assigned email body================")
+
 
       team_member.user.email
       |> Main.Email.generate_email(body, subject)
@@ -128,6 +139,10 @@ defmodule MainWeb.Notify do
         to: validate_phone_number(available.country <> available.phone_number),
         body: body
       }
+      IO.inspect("============assigned sms body================")
+      IO.inspect(body)
+      IO.inspect("============assigned sms body================")
+
 
       @chatbot.send(message)
     end
@@ -210,6 +225,10 @@ defmodule MainWeb.Notify do
         end
         body=subject <> "#{body}"
 
+        IO.inspect("============admin email body================")
+        IO.inspect(body)
+        IO.inspect("============admin email body================")
+
         admin.user.email
         |> Main.Email.generate_email(body, subject)
         |> Main.Mailer.deliver_now()
@@ -237,6 +256,10 @@ defmodule MainWeb.Notify do
           to: validate_phone_number(admin.country<>admin.phone_number),
           body: body
         }
+        IO.inspect("============admin sms body================")
+        IO.inspect(body)
+        IO.inspect("============admin sms body================")
+
         @chatbot.send(message)
       end
     end)
@@ -255,6 +278,9 @@ defmodule MainWeb.Notify do
       else
         template <> body
       end
+      IO.inspect("============admin slack body================")
+      IO.inspect(body)
+      IO.inspect("============slack body================")
 
       body = Jason.encode! %{text: String.replace(body, "\n", " ")}
       Tesla.post location.slack_integration, body, headers: headers
