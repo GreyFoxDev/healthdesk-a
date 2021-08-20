@@ -16,15 +16,21 @@ defmodule WitClient.MessageHandler do
   #@access_token Application.get_env(:wit_client, :access_token)
 
 
-  def start_link(from, question),
-    do: GenServer.start_link(__MODULE__, [from, question])
+  def start_link(from, question,bot_id),
+    do: GenServer.start_link(__MODULE__, [from, question,bot_id])
+  def start_link(default) when is_list(default) do
+    IO.inspect("###default######")
+    IO.inspect(default)
+    IO.inspect("#########")
+     GenServer.start_link(__MODULE__, default)
+  end
 
   def init(args) do
     send(self(), :ask)
     {:ok, args}
   end
 
-  def handle_info(:ask, [from, nil]) do
+  def handle_info(:ask, [from, nil,bot_id]) do
     send(from, {:error, :unknown})
     {:stop, :normal, []}
   end
