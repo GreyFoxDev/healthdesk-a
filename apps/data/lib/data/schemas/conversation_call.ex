@@ -33,7 +33,7 @@ defmodule Data.Schema.ConversationCall do
 
   @all_fields @required_fields ++ @optional_fields
 
-  schema "conversations" do
+  schema "conversation_calls" do
     field(:original_number, :string)
     field(:status, :string)
     field(:started_at, :utc_datetime)
@@ -48,7 +48,7 @@ defmodule Data.Schema.ConversationCall do
     belongs_to(:location, Data.Schema.Location)
     belongs_to(:team_member, Data.Schema.TeamMember)
 
-    has_many(:conversation_messages, Data.Schema.ConversationMessage)
+    has_many(:conversation_messages, Data.Schema.ConversationMessage, foreign_key: :conversations_id)
 
     timestamps([type: :naive_datetime_usec])
   end
