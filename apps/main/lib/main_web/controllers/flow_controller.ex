@@ -13,12 +13,12 @@ defmodule MainWeb.FlowController do
   plug P.AssignParams
 
   def flow(%{assigns: %{flow_name: flow_name} = attrs} = conn, _params) do
-    params = build_chat_params(flow_name, attrs)
+#    params = build_chat_params(flow_name, attrs)
     _ = execute(%Chatbot.Params{
           provider: :twilio,
           to: attrs.member,
           from: attrs.location,
-          body: params})
+          body:  attrs.message})
 
     conn
     |> put_status(200)

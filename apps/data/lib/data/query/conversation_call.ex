@@ -16,24 +16,24 @@ defmodule Data.Query.ConversationCall do
 
   def get(id, false, repo) do
     from(c in ConversationCall,
-      left_join: member in Member,
-      on: c.original_number == member.phone_number,
+#      left_join: member in Member,
+#      on: c.original_number == member.phone_number,
       where: c.id == ^id,
       preload: [:location, team_member: [:user]],
-      select: %{c | member: member}
+      select: c
     )
     |> repo.one()
   end
 
   def get(id, true, repo) do
     from(c in ConversationCall,
-      join: m in assoc(c, :conversation_messages),
-      left_join: member in Member,
-      on: c.original_number == member.phone_number,
+#      join: m in assoc(c, :conversation_messages),
+#      left_join: member in Member,
+#      on: c.original_number == member.phone_number,
       where: c.id == ^id,
-      order_by: [desc: m.sent_at],
-      preload: [:location, conversation_messages: m, team_member: [:user]],
-      select: %{c | member: member}
+#      order_by: [desc: m.sent_at],
+      preload: [:location,team_member: [:user]],
+      select: c
     )
     |> repo.one()
   end

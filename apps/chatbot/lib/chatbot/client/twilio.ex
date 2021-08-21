@@ -12,14 +12,14 @@ defmodule Chatbot.Client.Twilio do
   require Logger
 
   def call(%Chatbot.Params{provider: :twilio} = params) do
-    body = Poison.encode!(params.body)
+#    body = Poison.encode!(params.body)
     location_id = Location.get_by_phone(params.from).id
     account = Team.get_sub_account_id_by_location_id(location_id)
 
     ExTwilio.Message.create(
       [from: params.from,
       to: params.to,
-      body: body],
+      body: params.body],
       [flow_sid: params.twilio_flow_id, account_sid: account]
     ) |> IO.inspect
   end
