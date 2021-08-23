@@ -134,9 +134,9 @@ defmodule MainWeb.Plug.BuildAnswer do
 
     :ok = case convo.status do
       "open" ->
-        Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
+        Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )
       _ ->
-        Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
+        Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin")
     end
 
   end
