@@ -264,11 +264,11 @@ defmodule MainWeb.Live.WebChat.Index do
   end
 
   defp notify_admin_user(%{message: message, member: member, convo: convo, location: location}) do
-    message = """
-    Message From: #{member}\n
-    #{message}
-    """
-
-    :ok = Notify.send_to_admin(convo, message, location)
+    case convo.status do
+      "open" ->
+        Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
+      _ ->
+        Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
+    end
   end
 end
