@@ -132,6 +132,7 @@ defmodule MainWeb.Plug.BuildAnswer do
 
   defp notify_admin_user(%{message: message, member: member, convo: convo_id, location: location}) do
     convo = C.get(convo_id)
+    location=Location.get_by_phone(location)
     case convo.status do
       "open" ->
         Notify.send_to_teammate(convo_id, message, location, convo.team_member, convo.member )
