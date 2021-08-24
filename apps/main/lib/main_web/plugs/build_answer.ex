@@ -39,7 +39,7 @@ defmodule MainWeb.Plug.BuildAnswer do
             team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
           location = Location.get_by_phone(location)
           case convo.member do
-            nil ->  Notify.send_to_teammate(id, message, location, team_member, assigns.memberName)
+            nil ->  Notify.send_to_teammate(id, message, location, team_member, build_member(conn))
             member -> Notify.send_to_teammate(id, message, location, team_member, member)
 
           end
@@ -120,7 +120,7 @@ defmodule MainWeb.Plug.BuildAnswer do
           team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
         location = Location.get_by_phone(location)
         case convo.member do
-          nil ->  Notify.send_to_teammate(id, message, location, team_member, assigns.memberName)
+          nil ->  Notify.send_to_teammate(id, message, location, team_member, build_member(conn))
           member -> Notify.send_to_teammate(id, message, location, team_member, member)
 
         end
@@ -131,14 +131,17 @@ defmodule MainWeb.Plug.BuildAnswer do
 
 
   defp notify_admin_user(%{message: message, member: member, convo: convo_id, location: location}) do
-    convo = C.get(convo_id)
-    location=Location.get_by_phone(location)
-    case convo.status do
-      "open" ->
-        Notify.send_to_teammate(convo_id, message, location, convo.team_member, convo.member )
-      _ ->
-        Notify.send_to_admin(convo_id, message, location.phone_number, "location-admin")
+        Notify.send_to_admin(convo_id, message, location, "location-admin")
+
+  end
+  defp build_member(%{assigns: %{memberName: memberName, phoneNumber: phoneNumber, email: email}} = conn) do
+    name=String.split(memberName, " ", parts: 2)
+    name = if(length(name)==1) do
+      %{first_name: List.first(name), last_name: ""}
+    else
+      %{first_name: List.first(name), last_name: List.last(name)}
     end
+    Map.merge(name, %{email: email, phone_number: phoneNumber})
 
   end
 end
