@@ -130,13 +130,13 @@ defmodule MainWeb.Plug.BuildAnswer do
   end
 
 
-  defp notify_admin_user(%{message: message, member: member, convo: convo, location: location}) do
-
-    :ok = case convo.status do
+  defp notify_admin_user(%{message: message, member: member, convo: convo_id, location: location}) do
+    convo = C.get(convo_id)
+    case convo.status do
       "open" ->
-        Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )
+        Notify.send_to_teammate(convo_id, message, location, convo.team_member, convo.member )
       _ ->
-        Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin")
+        Notify.send_to_admin(convo_id, message, location.phone_number, "location-admin")
     end
 
   end
