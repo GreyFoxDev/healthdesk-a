@@ -16,7 +16,7 @@
                 {"Class Scheduling", "Facilities: Class Scheduling"},
                 {"Personal Training", "Facilities: Personal Training"},
                 {"Other", "Facilities: Other"}
-            ], class: "selectpicker mt-4", title: "Facilities" %>
+            ], class: "form-control mt-4", title: "Facilities" %>
             <%= select f, :personnel, [
                 {"Personnel", nil},
                 {"Unable to find manager", "Personnel: Unable to find manager"},
@@ -24,13 +24,13 @@
                 {"Rude employee", "Personnel: Rude employee"},
                 {"Rude member", "Personnel: Rude member"},
                 {"Other", "Personnel: Other"}
-            ], class: "selectpicker mt-4", title: "Personnel" %>
+            ], class: "form-control mt-4", title: "Personnel" %>
             <%= select f, :member_services, [
                 {"Member Services", nil},
                 {"Billing Issue", "Member Services: Billing Issue"},
                 {"Canceling Membership", "Member Services: Canceling Membership"},
                 {"Other", "Member Services: Other"}
-            ], class: "selectpicker mt-4", title: "Member Services" %>
+            ], class: "form-control mt-4", title: "Member Services" %>
         </fieldset>
         <%= submit "SUBMIT REQUEST", [class: "submit", data_toggle: "modal", data_target: "#exampleModalCenter"] %>
         <a class="reset">Reset Form</a>
