@@ -2,8 +2,9 @@ defmodule MainWeb.Api.ConversationController do
   use MainWeb, :controller
 
   alias Data.Conversations, as: C
+  alias Data.ConversationCall
   alias Data.ConversationMessages, as: CM
-  alias Data.Location
+  alias Data.{Location, Team}
   alias Data.Member
   alias MainWeb.{Notify, Intents}
   @role %{role: "admin"}
@@ -25,10 +26,8 @@ defmodule MainWeb.Api.ConversationController do
       |> json(%{conversation_id: convo.id})
     end
   end
-
   def create(conn, %{"location" => location, "member" => member, "type" => "call"}) do
-    with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
-      Task.start(fn ->  notify_open(convo.location_id) end)
+    with {:ok, convo} <- ConversationCall.find_or_start_conversation({member, location}) do
       Task.start(fn ->  close_convo(convo) end)
       conn
       |> put_status(200)
@@ -47,6 +46,9 @@ defmodule MainWeb.Api.ConversationController do
   end
   def create(conn, %{"location" => location, "member" => member}) do
     with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
+      IO.inspect("####open#####")
+      IO.inspect(convo)
+      IO.inspect("#########")
       Task.start(fn ->  notify_open(convo.location_id) end)
       conn
       |> put_status(200)
@@ -55,7 +57,6 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
   def create(conn, %{"from" => from, "subject" => subj, "text" => message,"to" => to} = _params) do
-
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
     name = List.first(Regex.split(regex,from))
     from = List.first(Regex.run(regex,from))
@@ -129,23 +130,32 @@ defmodule MainWeb.Api.ConversationController do
                  :ok =
                    Notify.send_to_admin(
                      convo.id,
-                     "Message From: #{convo.original_number}\n#{message}",
-                     location.phone_number
+                     "#{message}",
+                     location.phone_number,
+                     "location-admin"
                    )
              end
         else
           :ok =
-            Notify.send_to_admin(
-              convo.id,
-              "Message From: #{convo.original_number}\n#{message}",
-              location.phone_number
-            )
+            case convo.status do
+              "open" ->
+                Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )
+              _ ->
+                Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin")
+            end
         end
       else
         _ -> nil
       end
     end
     conn |> send_resp(200, "ok")
+  end
+
+  def update(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type" =>"call"}) do
+    conn
+    |> put_status(200)
+    |> put_resp_content_type("application/json")
+    |> json(%{conversation_id: id, updated: true})
   end
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message}) do
     _ = CM.create(%{
@@ -159,7 +169,6 @@ defmodule MainWeb.Api.ConversationController do
     |> put_resp_content_type("application/json")
     |> json(%{conversation_id: id, updated: true})
   end
-
   def update(conn, _params) do
     conn
     |> put_status(200)
@@ -167,6 +176,24 @@ defmodule MainWeb.Api.ConversationController do
     |> json(%{success: false})
   end
 
+  def close(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type"=>"call"} = params) do
+    if params["disposition"] do
+      convo = ConversationCall.get(id)
+      location = Location.get(convo.location_id)
+      dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
+      disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
+
+#      Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
+      ConversationCall.close(id)
+    else
+      ConversationCall.close(id)
+    end
+
+    conn
+    |> put_status(200)
+    |> put_resp_content_type("application/json")
+    |> json(%{conversation_id: id})
+  end
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message} = params) do
     if message == "Sent to Slack" do
       _ =  CM.create(%{
@@ -198,7 +225,7 @@ defmodule MainWeb.Api.ConversationController do
         "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
       |> CM.create()
       C.close(id)
-      Main.LiveUpdates.notify_live_view({convo.location_id, :updated_open})
+#      Main.LiveUpdates.notify_live_view({convo.location_id, :updated_open})
     else
       C.close(id)
     end
@@ -213,42 +240,28 @@ defmodule MainWeb.Api.ConversationController do
     :timer.sleep(5000);
     Main.LiveUpdates.notify_live_view({location_id, :updated_open})
   end
-  def close_convo(%{original_number: <<"+", _ :: binary>>} = convo_)do
+  def close_convo(%{original_number: <<"+", _ :: binary>>} = convo_) do
     :timer.sleep(100000);
-    conversation = C.get(convo_.id)
+    conversation = ConversationCall.get(convo_.id)
     case conversation do
       nil -> nil
       convo ->
         if convo.status != "closed" do
-          is_call = if convo.conversation_messages  do
-            (convo.conversation_messages |> List.first).message |> String.match?(~r/calling/)
-          else
-            false
-          end
-          if is_call do
 
             location = Location.get(convo.location_id)
             dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
             disposition = Enum.find(dispositions, &(&1.disposition_name == "Call Hang Up"))
 
-            Data.ConversationDisposition.create(%{"conversation_id" => convo.id, "disposition_id" => disposition.id})
-
-            _ =  %{"conversation_id" => convo.id,
-              "phone_number" => location.phone_number,
-              "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
-              "sent_at" => DateTime.add(DateTime.utc_now(), 3)}
-            |> CM.create()
-            C.close(convo.id)
-            Main.LiveUpdates.notify_live_view({location.id, :updated_open})
-          end
-
+#            Data.ConversationDisposition.create(%{"conversation_id" => convo.id, "disposition_id" => disposition.id})
+            ConversationCall.close(convo.id)
+#            notify && Main.LiveUpdates.notify_live_view({location.id, :updated_open})
         end
-
     end
   end
   def close_convo(_), do: nil
   defp ask_wit_ai(question, location) do
-    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
+    bot_id=Team.get_bot_id_by_location_id(location.id)
+    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
           message = Intents.get(response, location.phone_number)

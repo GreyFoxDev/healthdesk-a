@@ -13,7 +13,7 @@ defmodule MainWeb.Notify do
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
   @endpoint Application.get_env(:main, :endpoint)
 
-  def send_to_teammate(conversation_id, message, location, team_member,member) do
+  def send_to_teammate(conversation_id, message, location, team_member,   member) do
 
     %{data: link} =
       @url
@@ -31,15 +31,7 @@ defmodule MainWeb.Notify do
       true -> Enum.join(["New message from ", member ,location.location_name, ": #{message} Click here to respond: #{link[:url]}"], ", ")
       _ ->
         if member do
-          member =
-            [
-              (member.first_name && member.first_name || "") <> " " <> (member.last_name && member.last_name || "")
-              |> String.trim(),
-              member.email || "",
-              member.phone_number,
-              location.location_name
-            ]
-            |> Enum.join(", ")
+          member = build_member_string(member, location)
           member="New message from " <> "#{member}" |> String.replace(" ,", "")
           member <> body
         else
@@ -75,6 +67,7 @@ defmodule MainWeb.Notify do
             location.location_name
           ]
           |> Enum.join(", ")
+
 
         "New message from #{member}"|> String.replace(" ,", "")
       else
@@ -249,13 +242,7 @@ defmodule MainWeb.Notify do
       if admin.user.use_email do
         member = conversation.member
         subject = if member do
-          member = [
-                     (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||"")|> String.trim(),
-                     member.email || "",
-                     member.phone_number,
-                     location.location_name,
-                   ]
-                   |> Enum.join(", ")
+          member = build_member_string(member, location)
 
 
           "New message from #{member}"|> String.replace(" ,","")
@@ -282,13 +269,7 @@ defmodule MainWeb.Notify do
       if admin.use_sms do
         member = conversation.member
         body = if member do
-          member = [
-                     (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||"")|> String.trim(),
-                     member.email || "",
-                     member.phone_number,
-                     location.location_name
-                   ]
-                   |> Enum.join(", ")
+          member = build_member_string(member, location)
 
           member=template <> "#{member}"|> String.replace(" ,","")
           member<> body
@@ -314,13 +295,10 @@ defmodule MainWeb.Notify do
       headers = [{"content-type", "application/json"}]
       member = conversation.member
       body = if member do
-        member = [
-                   (member.first_name&&member.first_name||"") <>" "<>(member.last_name&&member.last_name||"")|> String.trim(),
-                   member.email || "",
-                   member.phone_number,
-                   location.location_name
-                 ]
-                 |> Enum.join(", ")
+        member = build_member_string(member, location)
+        IO.inspect("============member================")
+        IO.inspect(member)
+        IO.inspect("============member================")
 
         member=template <> "#{member}"|> String.replace(" ,","")
         member<> body
@@ -335,7 +313,7 @@ defmodule MainWeb.Notify do
       Tesla.post location.slack_integration, body, headers: headers
 
     end
-    
+
     alert_info = %{location: location, convo: conversation_id}
     MainWeb.Endpoint.broadcast("alert:admin", "broadcast", alert_info)
     MainWeb.Endpoint.broadcast("alert:#{location.id}", "broadcast", alert_info)
@@ -352,4 +330,14 @@ defmodule MainWeb.Notify do
   def validate_phone_number(phone_number) do
     if String.starts_with?(phone_number, "+"), do: phone_number, else: "+" <> phone_number
 end
+defp build_member_string(member,location) do
+    [
+      (member.first_name && member.first_name || "") <> " " <> (member.last_name && member.last_name || "")
+      |> String.trim(),
+      member.email || "",
+      member.phone_number,
+      location.location_name,
+    ]
+    |> Enum.join(", ")
+  end
 end

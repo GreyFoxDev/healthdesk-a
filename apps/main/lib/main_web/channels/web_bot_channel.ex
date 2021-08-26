@@ -45,7 +45,7 @@ defmodule MainWeb.WebBotChannel do
         }
       }
       |> P.OpenConversation.call([])
-      |> P.AskWit.call([])
+      |> P.AskWit.call([],location)
       |> P.BuildAnswer.call([])
       |> P.CloseConversation.call([])
       |> P.Broadcast.call([])

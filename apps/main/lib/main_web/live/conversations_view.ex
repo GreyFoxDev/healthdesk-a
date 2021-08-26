@@ -382,16 +382,26 @@ defmodule MainWeb.Live.ConversationsView do
       open_convo = List.first(socket.assigns.conversations)
       Main.LiveUpdates.notify_live_view( {conversation.location.id, :updated_open})
       send(self(), {:fetch_c, %{user: user, locations: socket.assigns.location_ids, type: socket.assigns.tab}})
+
+      conversation =
+        user
+        |> Conversations.get(open_convo.id)
+        |> fetch_member()
+
+      messages =
+        user
+        |> ConversationMessages.all(conversation.id) |> Enum.reverse()
+      socket =
+        socket
+        |> assign(:open_conversation, Map.merge(conversation, %{conversation_messages: messages}))
       {:noreply,
         socket
-        |> assign(:open_convoersation,open_convo)
       }
     else
       {:noreply, socket}
     end
   end
   def handle_event("focused", _, socket)do
-    IO.inspect("focused")
     convo_id = socket.assigns.open_conversation.id
     Main.LiveUpdates.notify_live_view(convo_id, {__MODULE__, :agent_typing_start})
     {:noreply, socket}
@@ -714,6 +724,7 @@ defmodule MainWeb.Live.ConversationsView do
              to: conversation.original_number,
              body: params["conversation_message"]["message"]
            }
+           #account_id= Team.get_sub_account_id_by_location_id(location.id)
            Chatbot.Client.Twilio.channel(message)
          {:error, _changeset} -> nil
        end

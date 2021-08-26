@@ -1,19 +1,19 @@
-defmodule Data.Schema.Conversation do
+defmodule Data.Schema.ConversationCall do
   @moduledoc """
-  The schema for a location's conversations
+  The schema for a location's conversations Call
   """
   use Data.Schema
 
   @type t :: %__MODULE__{
-          id: binary(),
-          location_id: binary(),
-          team_member_id: binary() | nil,
-          original_number: String.t(),
-          channel_type: String.t() | nil,
-          status: String.t() | nil,
-          subject: String.t() | nil,
-          started_at: :utc_datetime | nil
-        }
+               id: binary(),
+               location_id: binary(),
+               team_member_id: binary() | nil,
+               original_number: String.t(),
+               channel_type: String.t() | nil,
+               status: String.t() | nil,
+               subject: String.t() | nil,
+               started_at: :utc_datetime | nil
+             }
 
   @required_fields ~w|
   location_id
@@ -33,7 +33,7 @@ defmodule Data.Schema.Conversation do
 
   @all_fields @required_fields ++ @optional_fields
 
-  schema "conversations" do
+  schema "conversation_calls" do
     field(:original_number, :string)
     field(:status, :string)
     field(:started_at, :utc_datetime)
@@ -48,7 +48,7 @@ defmodule Data.Schema.Conversation do
     belongs_to(:location, Data.Schema.Location)
     belongs_to(:team_member, Data.Schema.TeamMember)
 
-    has_many(:conversation_messages, Data.Schema.ConversationMessage)
+    has_many(:conversation_messages, Data.Schema.ConversationMessage, foreign_key: :conversations_id)
 
     timestamps([type: :naive_datetime_usec])
   end
@@ -64,14 +64,14 @@ defmodule Data.Schema.Conversation do
     changeset
     |> get_field(:channel_type)
     |> case do
-      nil ->
-        changeset
-        |> get_field(:original_number)
-        |> set_channel_type(changeset)
+         nil ->
+           changeset
+           |> get_field(:original_number)
+           |> set_channel_type(changeset)
 
-      _channel_type ->
-        changeset
-    end
+         _channel_type ->
+           changeset
+       end
   end
 
   defp set_channel_type(nil, changeset), do: changeset
@@ -94,11 +94,7 @@ defmodule Data.Schema.Conversation do
 
   defp set_channel_type(email, changeset) do
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
-    IO.inspect("#########")
-    IO.inspect(email)
-    IO.inspect(changeset)
-    IO.inspect(Regex.match?(regex,email))
-    IO.inspect("#########")
+
     if Regex.match?(regex,email) do
       put_change(changeset, :channel_type, "MAIL")
     else

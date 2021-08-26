@@ -11,6 +11,7 @@ defmodule MainWeb.TsiController do
   alias Data.ConversationMessages, as: CM
   alias Data.Schema.Conversation, as: Schema
   alias Main.Service.Appointment
+  alias Data.Team
 
   alias MainWeb.{Notify}
 
@@ -93,8 +94,8 @@ defmodule MainWeb.TsiController do
     else
       {:ok, %Schema{status: "pending"} = convo} ->
         conn
-                                                |> assign(:title, location.team.team_name)
-                                                |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
+        |> assign(:title, location.team.team_name)
+        |> redirect(to: tsi_path(conn, :edit, api_key, convo.id))
       _err ->
         conn
         |> assign(:title, location.team.team_name)
@@ -116,12 +117,12 @@ defmodule MainWeb.TsiController do
       layout = get_edit_layout_for_team(conn)
 
 
-#      case convo.status do
-#        "open" ->
-#            Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
-#        _ ->
-#          Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
-#      end
+      case convo.status do
+        "open" ->
+            Notify.send_to_teammate(convo_id, params["message"], location, convo.team_member, convo.member )
+        _ ->
+          Notify.send_to_admin(convo_id, params["message"], location.phone_number, "location-admin")
+      end
 
       conn
       |> put_layout({MainWeb.LayoutView, layout})
@@ -175,7 +176,6 @@ defmodule MainWeb.TsiController do
   end
 
   def update(conn, %{"id" => convo_id, "api_key" => api_key} = params) do
-
     location = conn.assigns.location
 
     with %Schema{} = convo <- C.get(convo_id) do
@@ -234,13 +234,12 @@ defmodule MainWeb.TsiController do
 
                C.pending(convo_id)
                Main.LiveUpdates.notify_live_view({location.id, :updated_open})
-           
-                       case convo.status do
-                         "open" ->
-                             Notify.send_to_teammate(convo_id, "Message From: #{convo.original_number}\n#{message}", location, convo.team_member, convo.member )
-                         _ ->
-                           Notify.send_to_admin(convo_id, "Message From: #{convo.original_number}\n#{message}", location.phone_number, "location-admin")
-                       end
+#               :ok =
+#                 Notify.send_to_admin(
+#                   convo.id,
+#                   "Message From: #{convo.original_number}\n#{message}",
+#                   location.phone_number
+#                 )
            end
       end
       params = %{"api_key" => api_key, "id" => convo.id, "message" => message}
@@ -294,7 +293,8 @@ defmodule MainWeb.TsiController do
     end
   end
   defp ask_wit_ai(question, convo_id, location) do
-    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
+    bot_id = Team.get_bot_id_by_location_id(location.id)
+    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
 
@@ -320,12 +320,7 @@ defmodule MainWeb.TsiController do
       |> Enum.find(&(&1.disposition_name == "Automated"))
 
     if disposition do
-      Data.ConversationDisposition.create(
-        %{
-          "conversation_id" => convo_id,
-          "disposition_id" => disposition.id
-        }
-      )
+      Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})
 
       _ =  %{
         "conversation_id" => convo_id,

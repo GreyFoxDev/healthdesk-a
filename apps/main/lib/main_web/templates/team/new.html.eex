@@ -9,4 +9,4 @@
     <h1 class="page-title">New Team</h1>
 </header>
 
-<%= render "_form.html", data: @changeset, action: team_path(@conn, :create), conn: @conn, errors: @errors %>
+<%= render "_form.html", data: @changeset, action: team_path(@conn, :create), conn: @conn, errors: @errors, bot_id: @bot_id %>

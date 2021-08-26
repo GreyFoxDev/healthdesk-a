@@ -115,7 +115,7 @@ defmodule MainWeb.Live.WebChat.Index do
       else
         conversation =
           conversation
-          |> P.AskWit.call([])
+          |> P.AskWit.call([],location)
           |> P.BuildAnswer.call([])
 
         assigns = Map.put(conversation.assigns, :response, conversation.assigns.response)
@@ -264,11 +264,11 @@ defmodule MainWeb.Live.WebChat.Index do
   end
 
   defp notify_admin_user(%{message: message, member: member, convo: convo, location: location}) do
-    message = """
-    Message From: #{member}\n
-    #{message}
-    """
-
-    :ok = Notify.send_to_admin(convo, message, location)
+    case convo.status do
+      "open" ->
+        Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )
+      _ ->
+        Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin")
+    end
   end
 end

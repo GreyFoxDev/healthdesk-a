@@ -5,6 +5,8 @@ defmodule MainWeb.Plug.AskWit do
 
   require Logger
   import Plug.Conn
+  alias Data.Conversations, as: C
+  alias Data.{Location,Team}
 
   @spec init(list()) :: list()
   def init(opts), do: opts
@@ -16,20 +18,37 @@ defmodule MainWeb.Plug.AskWit do
   Only once the member has opted in will the question be sent to Wit
   """
   def call(%{assigns: %{convo: id,  status: "open", message: message}} = conn, _opts) do
-
-
+    convo = C.get(id)
+#    location = Location.get(convo.location_id)
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
+    IO.inspect("#####pending_message_count####")
+    IO.inspect(pending_message_count)
+    IO.inspect(conn.assigns[:team_member_id])
+    IO.inspect("####pending_message_count#####")
     if pending_message_count == 0 && conn.assigns[:team_member_id] == nil  do
-      assign(conn, :intent, ask_wit_ai(message))
+      assign(conn, :intent, ask_wit_ai(message, convo.location_id))
     else
       assign(conn, :intent, nil)
     end
+
+
+
+
   end
 
-  def call(conn, _opts), do: conn
+  def call(conn, _opts) do
+    IO.inspect("####wit assigns#####")
+    IO.inspect(conn.assigns, limit: :infinity)
+    IO.inspect("#########")
+    conn
+    end
 
-  defp ask_wit_ai(question) do
-    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question) do
+  defp ask_wit_ai(question, location) do
+    IO.inspect("#########")
+    IO.inspect("here")
+    IO.inspect("#########")
+    bot_id=Team.get_bot_id_by_location_id(location) |> IO.inspect
+    with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
           IO.inspect("###################")

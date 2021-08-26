@@ -14,6 +14,15 @@ defmodule MainWeb.Plug.CloseConversation do
   def call(conn, opts)
 
   @doc """
+  If the conversation is in a pending state or closed and conversation is being hit by outbound_api,
+  we will keep conversation closed.
+  """
+  def call(%{assigns: %{convo: id, barcode: barcode, status: "closed"}} = conn, _opts) when (barcode != nil) do
+    C.close(id)
+    conn
+  end
+
+  @doc """
   If the conversation is in a pending state, or the member has not opted in,
   then no need to do anything. Just return the connection.
   """
@@ -40,9 +49,7 @@ defmodule MainWeb.Plug.CloseConversation do
   If the intent isn't found then set the conversation status to pending while
   an admin addresses the member.
   """
-  def call(%{assigns: %{convo: _id, intent: nil}} = conn, _opts) do
-    conn
-  end
+  def call(%{assigns: %{convo: _id, intent: nil}} = conn, _opts), do: conn
   def call(%{assigns: %{convo: id, location: location, appointment: true} = _assigns} = conn, _opts) do
     IO.inspect("########we are heres###########")
     IO.inspect(conn.assigns[:response])
@@ -143,6 +150,11 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
 
-  def call(conn, _opts), do: conn
+  def call(conn, _opts) do
+    IO.inspect("=======================default Clause=====================")
+    IO.inspect("default Clause")
+    IO.inspect("=======================default Clause=====================")
+    conn
+  end
 
 end

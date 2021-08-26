@@ -46,7 +46,7 @@
 </div>
 <!-- Typing area -->
 
-<%= form_for :foo, tsi_path(@socket, :update, @api_key, @convo_id), [method: "put", class: "bg-light fixed-bottom shadow-lg"], fn f -> %>
+<%= form_for :foo, tsi_path(@socket, :update, @api_key, @convo_id), [method: "put", class: "bg-light fixed-bottom shadow-lg", id: "123"], fn f -> %>
 <div class="input-group">
     <%= text_input f, :message, class: "form-control bg-i rounded-0 border-0 py-4 bg-s", placeholder: "Type a message", phx_focus: :focused, phx_blur: :blured, phx_click: :focused%>
     <div class="input-group-append">
@@ -54,6 +54,18 @@
     </div>
 </div>
 <% end %>
+<script>
+    $('#123').on('submit', function() {
+        $(this).on('submit', function() {
+            return false;
+        });
+
+        $('#submit_button_id').hide();
+        $('#hidden_div_id').show();
+        return true;
+    });
+
+</script>
 <script>
 
     $('#scroll-message').bind('DOMNodeInserted', function(e) {

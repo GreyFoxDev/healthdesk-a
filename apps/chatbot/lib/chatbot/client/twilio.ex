@@ -1,4 +1,6 @@
 defmodule Chatbot.Client.Twilio do
+  alias Data.{Location, Team}
+
   @moduledoc """
 
   This module is the twilio client. Using the `call/1` function and
@@ -10,20 +12,26 @@ defmodule Chatbot.Client.Twilio do
   require Logger
 
   def call(%Chatbot.Params{provider: :twilio} = params) do
+#    body = Poison.encode!(params.body)
+    location_id = Location.get_by_phone(params.from).id
+    account = Team.get_sub_account_id_by_location_id(location_id)
+
     ExTwilio.Message.create(
-      from: params.from,
+      [from: params.from,
       to: params.to,
-      body: params.body
-    )
+      body: params.body],
+      [flow_sid: params.twilio_flow_id, account_sid: account]
+    ) |> IO.inspect
   end
 
   def execution(%Chatbot.Params{provider: :twilio} = params) do
     body = Poison.encode!(params.body)
-
+    location_id = Location.get_by_phone(params.from).id
+    account = Team.get_sub_account_id_by_location_id(location_id)
     ExTwilio.Api.create(
       ExTwilio.Studio.Execution,
       [to: params.to, from: params.from, parameters: body],
-      flow_sid: params.body.twilio_flow_id
+      [flow_sid: params.body.twilio_flow_id, account_sid: account]
     )
   end
 
@@ -31,13 +39,12 @@ defmodule Chatbot.Client.Twilio do
     account = Application.get_env(:ex_twilio, :flex_account_sid)
     token = Application.get_env(:ex_twilio, :flex_auth_token)
     service_id = Application.get_env(:ex_twilio, :flex_service_id)
-
     ExTwilio.Api.create(
       ExTwilio.ProgrammableChat.Channel,
       [to: params.to, from: params.from, body: params.body, friendly_name: "Nick"],
       service_id: service_id,
       to: params.to,
-      account: account,
+      account_sid: account,
       token: token
     )
   end

@@ -1,4 +1,4 @@
-defmodule Data.Repo.Migrations.CreateFunctionTimeChecker do
+defmodule Data.Repo.Migrations.FixFucntionTimeChecker do
   use Ecto.Migration
 
   def down do
@@ -54,4 +54,4 @@ defmodule Data.Repo.Migrations.CreateFunctionTimeChecker do
     $find_available_team_members$ LANGUAGE plpgsql;
     """
   end
-end
+  end
