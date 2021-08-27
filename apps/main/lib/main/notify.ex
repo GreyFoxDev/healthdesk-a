@@ -73,12 +73,6 @@ defmodule MainWeb.Notify do
       else
         "New message from #{conversation.original_number}"
       end
-      IO.inspect("============temate email body================")
-      IO.inspect(body)
-      IO.inspect("============temate email body================")
-      IO.inspect("============subject================")
-      IO.inspect(subject)
-      IO.inspect("============subject================")
 
 
       team_member.user.email
@@ -93,11 +87,6 @@ defmodule MainWeb.Notify do
         to: validate_phone_number(available.country <> available.phone_number),
         body: body
       }
-
-      IO.inspect("============temmate sms body================")
-      IO.inspect(body)
-      IO.inspect("============temmate sms body================")
-
 
       @chatbot.send(message)
     end
@@ -146,14 +135,6 @@ defmodule MainWeb.Notify do
       else
         "New message from #{conversation.original_number}"
       end
-      IO.inspect("============assigned email body================")
-      IO.inspect(body)
-      IO.inspect("============assigned email body================")
-      IO.inspect("============subject================")
-      IO.inspect(subject)
-      IO.inspect("============subject================")
-
-
 
       team_member.user.email
       |> Main.Email.generate_email(body, subject)
@@ -167,11 +148,6 @@ defmodule MainWeb.Notify do
         to: validate_phone_number(available.country <> available.phone_number),
         body: body
       }
-      IO.inspect("============assigned sms body================")
-      IO.inspect(body)
-      IO.inspect("============assigned sms body================")
-
-
 
       @chatbot.send(message)
     end
@@ -183,7 +159,6 @@ defmodule MainWeb.Notify do
   Send a notification to the super admin defined in the config. It will create a short URL.
   """
   def send_to_admin(conversation_id, message, location, member_role \\ @super_admin) do
-    IO.inspect("#######################ADMIN#####################")
     location = Location.get_by_phone(location)
     %{data: link} =
       @url
@@ -251,14 +226,6 @@ defmodule MainWeb.Notify do
         end
         body=subject <> "#{body}"
 
-        IO.inspect("============admin email body================")
-        IO.inspect(body)
-        IO.inspect("============admin email body================")
-        IO.inspect("============subject================")
-        IO.inspect(subject)
-        IO.inspect("============subject================")
-
-
         admin.user.email
         |> Main.Email.generate_email(body, subject)
         |> Main.Mailer.deliver_now()
@@ -270,7 +237,6 @@ defmodule MainWeb.Notify do
         member = conversation.member
         body = if member do
           member = build_member_string(member, location)
-
           member=template <> "#{member}"|> String.replace(" ,","")
           member<> body
         else
@@ -283,9 +249,6 @@ defmodule MainWeb.Notify do
           to: validate_phone_number(admin.country<>admin.phone_number),
           body: body
         }
-        IO.inspect("============admin sms body================")
-        IO.inspect(body)
-        IO.inspect("============admin sms body================")
 
         @chatbot.send(message)
       end
@@ -296,18 +259,11 @@ defmodule MainWeb.Notify do
       member = conversation.member
       body = if member do
         member = build_member_string(member, location)
-        IO.inspect("============member================")
-        IO.inspect(member)
-        IO.inspect("============member================")
-
         member=template <> "#{member}"|> String.replace(" ,","")
         member<> body
       else
         template <> body
       end
-      IO.inspect("============admin slack body================")
-      IO.inspect(body)
-      IO.inspect("============slack body================")
 
       body = Jason.encode! %{text: String.replace(body, "\n", " ")}
       Tesla.post location.slack_integration, body, headers: headers
