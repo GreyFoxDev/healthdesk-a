@@ -1,4 +1,5 @@
 defmodule MainWeb.Intents do
+  alias Data.Schema.Location
   @moduledoc """
   This module receives the intent and args from Wit and then routes
   the information to the correct intent handler. To add a new intent
@@ -6,7 +7,7 @@ defmodule MainWeb.Intents do
   module to the @intents map.
   """
 
-  @callback build_response(List.t, location :: binary) :: String.t
+  @callback build_response(List.t, location :: Location.t()) :: String.t
   @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
   @default_greeting "Hello! How can I help you?"
 
@@ -178,10 +179,10 @@ defmodule MainWeb.Intents do
     IO.inspect(args)
     IO.inspect("###################")
 
-    with atom <- String.to_existing_atom(intent)do
+    with atom <- String.to_atom(intent)do
       atom
       |> fetch_module()
-      |> apply(:build_response, [args, location.phone_number])
+      |> apply(:build_response, [args, location])
     else
       _err ->     MainWeb.Intents |> apply(:build_response, [args, location])
     end
