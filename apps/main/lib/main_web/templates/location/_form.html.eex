@@ -135,7 +135,7 @@
                         <%= text_input f, :google_token, class: "form-control", disabled: true %>
                         <label>Google Refresh Token</label>
                         <%= text_input f, :google_refresh_token, class: "form-control",disabled: true %>
-                        <label>calender_id</label>
+                        <label>Calender ID</label>
                         <%= text_input f, :calender_id, class: "form-control" %>
                         <label>Google Calender URL</label>
                         <%= text_input f, :calender_url, class: "form-control" %>
@@ -145,6 +145,10 @@
                         <label>Maximum Automation Limit</label>
                         <%= text_input f, :automation_limit, class: "form-control", placeholder: 3 %>
                         <%end%>
+                        <label>Facebook Page ID</label>
+                        <%= text_input f, :facebook_page_id, class: "form-control", disabled: true %>
+                        <label>Facebook Token</label>
+                        <%= text_input f, :facebook_token, class: "form-control", disabled: true %>
                     </div>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>
@@ -155,6 +159,9 @@
             <br/>
             <a class="btn btn-primary btn-lg" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location && @conn.assigns.location.id %>/edit/google">
                 Sign in with Google
+            </a>
+            <a class="btn btn-primary btn-lg" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location && @conn.assigns.location.id %>/edit/facebook">
+                Sign in with Facebook
             </a>
         </div>
     </section>

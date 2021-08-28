@@ -23,7 +23,20 @@ defmodule Main.Mixfile do
   def application do
     [
       mod: {Main.Application, []},
-      extra_applications: [:logger, :runtime_tools, :con_cache, :data, :chatbot, :nimble_csv, :honeybadger, :elixir_email_reply_parser, :timex, :ueberauth, :ueberauth_google]
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        :con_cache,
+        :data,
+        :chatbot,
+        :nimble_csv,
+        :honeybadger,
+        :elixir_email_reply_parser,
+        :timex,
+        :ueberauth,
+        :ueberauth_google,
+        :ueberauth_facebook
+      ]
     ]
   end
 
@@ -71,7 +84,8 @@ defmodule Main.Mixfile do
       {:google_api_calendar, "~> 0.19"},
       {:ueberauth, "~> 0.6"},
       {:ueberauth_google, "~> 0.10"},
-      {:google_api_o_auth2, "~> 0.13.0"}
+      {:google_api_o_auth2, "~> 0.13.0"},
+      {:ueberauth_facebook, "~> 0.8"}
     ]
   end
 end

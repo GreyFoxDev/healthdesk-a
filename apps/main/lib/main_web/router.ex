@@ -8,6 +8,7 @@ defmodule MainWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+
   end
 
   pipeline :api do
@@ -94,7 +95,11 @@ defmodule MainWeb.Router do
 
     # resources "/messages", MessageController, except: [:delete, :new, :create]
   end
-
+  scope "/admin", MainWeb do
+    pipe_through [:api, :not_live]
+    get "/teams/:team_id/locations/:location_id/:provider/hook", FacebookController, :hook
+    post "/teams/:team_id/locations/:location_id/:provider/hook", FacebookController, :event
+  end
   scope "/api", MainWeb do
     pipe_through :api
 

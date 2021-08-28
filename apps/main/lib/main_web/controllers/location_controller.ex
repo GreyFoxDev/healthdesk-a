@@ -29,15 +29,24 @@ defmodule MainWeb.LocationController do
     render conn, "show.json", data: location
   end
 
-  def request(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = _params) do
+  def request(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = _params) when provider == "google" do
     # Present an authentication challenge to the user
     provider_config = {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/calendar.events",request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
       callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",callback_methods: ["POST"]] }
     conn
     |> Ueberauth.run_request(provider, provider_config)
   end
+  def request(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = _params) when provider == "facebook" do
+    # Present an authentication challenge to the user
+    provider_config = {Ueberauth.Strategy.Facebook, [
+      default_scope: "https://graph.facebook.com/auth",
+      request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
+      callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",callback_methods: ["POST"]] }
+    conn
+    |> Ueberauth.run_request(provider, provider_config)
+  end
 
-  def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider,"code" => code}=_params) do
+  def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider,"code" => code}=_params) when provider == "google"   do
     res = Ueberauth.Strategy.Google.OAuth.get_access_token [code: code,redirect_uri: "https://staging.healthdesk.ai/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback", prompt: "consent",access_type: "offline" ]
 
     case res do
@@ -67,6 +76,55 @@ defmodule MainWeb.LocationController do
     end
 
   end
+  def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider, "code" => code} = _params) when provider == "facebook" do
+    res = Ueberauth.Strategy.Facebook.OAuth.get_token! [code: code, redirect_uri: "https://1c5b-72-255-34-241.ngrok.io/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback"]
+    IO.inspect("=======================res=====================")
+    IO.inspect(res)
+    IO.inspect("=======================res=====================")
+    case res do
+      %OAuth2.Client{token: token} ->
+        case get_user_id(token.access_token) do
+          :error -> conn
+          %{"id" => user_id} ->
+            case get_user_pages(user_id, token.access_token) do
+              :error -> conn
+              res ->
+                case res["data"] do
+                  [] -> conn
+                  [%{"id" => page_id, "access_token" => access_token} | _] ->
+                    location_params = %{facebook_page_id: page_id, facebook_token: access_token}
+                    case Location.update(id, location_params) do
+                      {:ok, %Data.Schema.Location{}} ->
+                        with %Data.Schema.User{} = user <- current_user(conn),
+                             {:ok, changeset} <- Location.get_changeset(id, user) do
+
+                          team = Team.get(user, team_id)
+
+                          render(
+                            conn,
+                            "edit.html",
+                            changeset: changeset,
+                            team_id: team_id,
+                            teams: teams(conn),
+                            team: team,
+                            callback_url: Helpers.callback_url(conn),
+                            location: changeset.data,
+                            errors: []
+                          )
+                        end
+                    end
+                end
+            end
+        end
+      _ -> conn
+    end
+  end
+  def callback(conn, params) do
+    IO.inspect("=======================location callback default=====================")
+    IO.inspect(params)
+    IO.inspect("=======================callback default=====================")
+    conn
+  end
 
   def new(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
@@ -81,12 +139,21 @@ defmodule MainWeb.LocationController do
       errors: [])
   end
 
-  def edit(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = _params) do
+  def edit(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = _params) when provider == "google" do
     provider_config = {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/calendar",request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
       callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback",prompt: "consent", access_type: "offline"] }
     conn
     |> Ueberauth.run_request(provider, provider_config)
 
+  end
+  def edit(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider} = _params) when provider == "facebook" do
+    provider_config = {Ueberauth.Strategy.Facebook, [
+      default_scope: "email,public_profile",
+      request_path: "/admin/teams/#{team_id}/locations/#{id}/edit/:provider",
+      callback_path: "/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback"
+    ]}
+    conn
+    |> Ueberauth.run_request(provider, provider_config)
   end
 
   def edit(conn, %{"id" => id, "team_id" => team_id} = _params) do
@@ -162,7 +229,9 @@ defmodule MainWeb.LocationController do
       calender_url: nil,
       calender_id: nil,
       google_refresh_token: nil,
-      google_token: nil
+      google_token: nil,
+      facebook_page_id: nil,
+      facebook_token: nil
     }) do
 
       {:ok, %Data.Schema.Location{}} ->
@@ -191,6 +260,22 @@ defmodule MainWeb.LocationController do
         conn
         |> put_flash(:error, "Location failed to update")
         |> render_page("edit.html", changeset, changeset.errors)
+    end
+  end
+
+  defp get_user_id(access_token)do
+    url = "https://graph.facebook.com/me?access_token=#{access_token}"
+    case HTTPoison.get(url) do
+      {:ok, res} -> Poison.decode!(res.body)
+      _ -> :error
+    end
+  end
+
+  defp get_user_pages(user_id, access_token)do
+    url = "https://graph.facebook.com/#{user_id}/accounts?access_token=#{access_token}"
+    case HTTPoison.get(url) do
+      {:ok, res} -> Poison.decode!(res.body)
+      _ -> :error
     end
   end
 

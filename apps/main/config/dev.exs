@@ -1,12 +1,18 @@
 use Mix.Config
 
 config :main, MainWeb.Endpoint,
-  http: [port: 4000],
+       http: [port: 4000],
+       https: [
+         port: 4001,
+         cipher_suite: :strong,
+         certfile: "priv/cert/selfsigned.pem",
+         keyfile: "priv/cert/selfsigned_key.pem"
+       ],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
   watchers: [node: ["node_modules/brunch/bin/brunch", "watch", "--stdin",
-                    cd: Path.expand("../assets", __DIR__)]]
+    cd: Path.expand("../assets", __DIR__)]]
 
 config :main, Main.Mailer,
   adapter: Bamboo.LocalAdapter
