@@ -48,8 +48,6 @@ defmodule Data.Schema.ConversationCall do
     belongs_to(:location, Data.Schema.Location)
     belongs_to(:team_member, Data.Schema.TeamMember)
 
-    has_many(:conversation_messages, Data.Schema.ConversationMessage, foreign_key: :conversations_id)
-
     timestamps([type: :naive_datetime_usec])
   end
 

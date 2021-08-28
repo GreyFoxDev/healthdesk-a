@@ -105,7 +105,7 @@ defmodule Data.ConversationCall do
   and return it. Conversations are unique to locations.
   """
   @spec find_or_start_conversation({member :: binary, location :: binary}) ::
-          Conversation.t() | nil
+          ConversationCall.t() | nil
   def find_or_start_conversation({member, location}) do
     with %Location{} = location <- Data.Query.Location.get_by_phone(location),
          nil <- get_by_phone(member, location.id) do
@@ -195,7 +195,7 @@ defmodule Data.ConversationCall do
   @doc """
   Sets the status to pending for an existing conversation
   """
-  @spec pending(id :: binary) :: {:ok, Conversation.t()} | {:error, String.t()}
+  @spec pending(id :: binary) :: {:ok, ConversationCall.t()} | {:error, String.t()}
   def pending(id) do
     with %Schema{id: ^id} = convo <- Query.get(id),
          %Schema{id: ^id} = convo <- Query.update(convo, @pending) do

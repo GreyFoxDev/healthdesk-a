@@ -21,6 +21,12 @@ config :phoenix,
 # Configures the endpoint
 config :main, MainWeb.Endpoint,
   url: [scheme: "http", host: "localhost", port: 4000],
+  https: [
+    port: 4001,
+    cipher_suite: :strong,
+    certfile: "priv/cert/selfsigned.pem",
+    keyfile: "priv/cert/selfsigned_key.pem"
+  ],
   check_origin: false,
   secret_key_base: "z0HlXKVQRJoAEUI1h6E/u5b0uuQOQucLm2gG7PdJGQbQW4UO/B3eaaTu3OsW+Bpp",
   render_errors: [view: MainWeb.ErrorView, accepts: ~w(html json)],
@@ -39,12 +45,21 @@ config :main, Main.Scheduler,
 
 config :ueberauth, Ueberauth,
        providers: [
-         google: {Ueberauth.Strategy.Google, [request_path: "/admin/teams/:team_id/locations/:location_id/:provider",
-           callback_path: "/admin/teams/:team_id/locations/:location_id/:provider/callback"] }
+         facebook: {Ueberauth.Strategy.Facebook, [
+           request_path: "/admin/teams/:team_id/locations/:location_id/:provider",
+           callback_path: "/admin/teams/:team_id/locations/:location_id/:provider/callback"
+         ]},
+         google: {Ueberauth.Strategy.Google, [
+           request_path: "/admin/teams/:team_id/locations/:location_id/:provider",
+           callback_path: "/admin/teams/:team_id/locations/:location_id/:provider/callback"]}
        ]
 config :ueberauth, Ueberauth.Strategy.Google.OAuth,
        client_id: System.get_env("GOOGLE_CLIENT_ID"),
        client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+
+config :ueberauth, Ueberauth.Strategy.Facebook.OAuth,
+       client_id: System.get_env("FACEBOOK_CLIENT_ID"),
+       client_secret: System.get_env("FACEBOOK_CLIENT_SECRET")
 
 # Configures Elixir's Logger
 config :logger, :console,
