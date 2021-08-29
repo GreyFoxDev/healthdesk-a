@@ -1,7 +1,7 @@
 defmodule MainWeb.LocationController do
   use MainWeb.SecuredContoller
   plug Ueberauth
-
+  alias Data.Location
   alias Ueberauth.Strategy.Helpers
 
   @app_id System.get_env("FACEBOOK_CLIENT_ID")
