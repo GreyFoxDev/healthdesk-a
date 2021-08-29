@@ -687,8 +687,11 @@ defmodule MainWeb.Live.ConversationsView do
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
+           IO.inspect("#########")
+           IO.inspect(location.facebook_token)
+           IO.inspect("#########")
          if(location.facebook_token) do
-           MainWeb.FacebookController.reply_to_facebook(params["conversation_message"],location,String.replace(original_number,"messenger:",""))
+           MainWeb.FacebookController.reply_to_facebook(params["conversation_message"]["message"],location,String.replace(original_number,"messenger:","")) |> IO.inspect
          else
            message = %Chatbot.Params{
              provider: :twilio,

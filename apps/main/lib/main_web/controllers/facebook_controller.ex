@@ -154,8 +154,12 @@ defmodule MainWeb.FacebookController do
         text: msg
       }} |> Jason.encode!
     case HTTPoison.post(url,body,[{"Content-Type", "application/json"}])do
-      {:ok, res} -> Poison.decode!(res.body)
-      _ -> :error
+      {:ok, res} -> Poison.decode!(res.body) |> IO.inspect
+      error ->
+        IO.inspect("#########")
+        IO.inspect(error)
+        IO.inspect("#########")
+        :error
     end
   end
 end
