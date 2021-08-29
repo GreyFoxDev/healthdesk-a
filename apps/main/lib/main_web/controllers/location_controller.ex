@@ -79,7 +79,7 @@ defmodule MainWeb.LocationController do
   end
   def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider, "code" => code} = _params) when provider == "facebook" do
     location = Location.get(id)
-    res = Ueberauth.Strategy.Facebook.OAuth.get_token! [code: code, redirect_uri: "https://2e83-39-45-196-127.ngrok.io/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback"]
+    res = Ueberauth.Strategy.Facebook.OAuth.get_token! [code: code, redirect_uri: "https://staging.healthdesk.ai/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback"]
     case res do
       %OAuth2.Client{token: token} ->
         case get_long_token(token.access_token) do

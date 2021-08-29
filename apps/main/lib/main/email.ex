@@ -14,10 +14,10 @@ defmodule Main.Email do
       text_body: message
     )
   end
-  def generate_reply_email(to, message, subject \\ @default_subject) do
+  def generate_reply_email(to, message, subject \\ @default_subject, from \\nil) do
     new_email(
       to: to,
-      from: @from1,
+      from: from || @from1,
       subject: "RE: "<> subject,
       html_body: message,
       text_body: message

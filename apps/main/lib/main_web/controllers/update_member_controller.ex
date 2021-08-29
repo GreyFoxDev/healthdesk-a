@@ -53,7 +53,7 @@ defmodule MainWeb.UpdateMemberController do
 
   def format_phone(<< "+1", number :: binary >>),
       do: format_phone(number)
-
+  def format_phone(<<"messenger:", _rest :: binary>> = phone), do: phone
   def format_phone("") do
     nil
   end
@@ -61,6 +61,7 @@ defmodule MainWeb.UpdateMemberController do
   def format_phone(phone) do
     "+#{replace_non_digits(phone)}"
   end
+
 
   defp replace_non_digits(phone), do: String.replace(phone, ~r/[^\d]/, "")
 end

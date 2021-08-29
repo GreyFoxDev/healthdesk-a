@@ -26,17 +26,14 @@ defmodule MainWeb.FacebookController do
   end
 
   def event(conn, %{"entry" => [%{"messaging" => [%{"message" => %{"text" =>msg}, "sender" => %{"id" => sid},"recipient" => %{"id" => pid}}|_]}|_]}) do
-    IO.inspect("=======================params=====================")
-    IO.inspect(sid)
-    IO.inspect(pid)
-    IO.inspect(msg)
-    IO.inspect("=======================params=====================")
     location = Location.get_by_page_id(pid)
     with %Schema{} = convo <- C.get_by_phone("messenger:#{sid}", location.id) do
+      get_user_details(location,sid)
       update_convo(msg,convo,location)
     else
       nil ->
         with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({"messenger:#{sid}", location.phone_number}) do
+          get_user_details(location,sid)
           update_convo(msg,convo,location)
         end
     end
@@ -94,9 +91,6 @@ defmodule MainWeb.FacebookController do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
-          IO.inspect("#########")
-          IO.inspect(response)
-          IO.inspect("#########")
           message =  Appointment.get_next_reply(convo_id, response, location.phone_number)
           if String.contains?(message,location.default_message) do
             {:unknown, message}
@@ -146,17 +140,37 @@ defmodule MainWeb.FacebookController do
   def reply_to_facebook(msg,location,recipient)do
     url = "https://graph.facebook.com/v11.0/me/messages?access_token=#{location.facebook_token}"
     body =%{
-      messaging_type: "RESPONSE",
-      recipient: %{
-        id: recipient
-      },
-      message: %{
-        text: msg
-      }} |> Jason.encode!
+            messaging_type: "RESPONSE",
+            recipient: %{
+              id: recipient
+            },
+            message: %{
+              text: msg
+            }} |> Jason.encode!
     case HTTPoison.post(url,body,[{"Content-Type", "application/json"}])do
       {:ok, res} -> Poison.decode!(res.body)
-      _ -> :error
+      error ->
+        :error
     end
+  end
+  def get_user_details(location,recipient)do
+    "https://graph.facebook.com/#{recipient}?fields=first_name,last_name,profile_pic&access_token=#{location.facebook_token}"
+    |> HTTPoison.get()
+    |> case do
+         {:ok, %HTTPoison.Response{status_code: 200,body: body}} ->
+           data = Jason.decode!(body)
+           member =%{
+           "phone_number" => "messenger:#{recipient}",
+           "first_name" => data["first_name"],
+           "last_name" => data["last_name"],
+           "team_id" => location.team_id
+
+           }
+           MainWeb.UpdateMemberController.update(member)
+           :ok
+         error ->
+           {:error, :unauthorized}
+       end
   end
 end
 
