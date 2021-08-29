@@ -97,8 +97,8 @@ defmodule MainWeb.Router do
   end
   scope "/admin", MainWeb do
     pipe_through [:api, :not_live]
-    get "/teams/:team_id/locations/:location_id/:provider/hook", FacebookController, :hook
-    post "/teams/:team_id/locations/:location_id/:provider/hook", FacebookController, :event
+    get "/facebook/hook", FacebookController, :hook
+    post "/facebook/hook", FacebookController, :event
   end
   scope "/api", MainWeb do
     pipe_through :api

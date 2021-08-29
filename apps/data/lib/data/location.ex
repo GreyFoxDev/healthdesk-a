@@ -14,6 +14,7 @@ defmodule Data.Location do
 
   defdelegate get_by_phone(phone_number), to: Query
   defdelegate get_by_api_key(api_key), to: Query
+  defdelegate get_by_page_id(page_id), to: Query
   defdelegate get_by_messenger_id(messenger_id), to: Query
   defdelegate create(params), to: Query
   defdelegate get(location_id), to: Query
@@ -46,6 +47,7 @@ defmodule Data.Location do
     do: Query.get(id)
 
   def get(_, _), do: {:error, :invalid_permissions}
+  def get(id), do: Query.get(id)
 
   def get_by_team_id(%{role: role}, team_id) when role in @roles,
     do: Query.get_by_team_id(team_id)

@@ -146,7 +146,7 @@
                         <%= text_input f, :automation_limit, class: "form-control", placeholder: 3 %>
                         <%end%>
                         <label>Facebook Page ID</label>
-                        <%= text_input f, :facebook_page_id, class: "form-control", disabled: true %>
+                        <%= text_input f, :facebook_page_id, class: "form-control", disabled: false %>
                         <label>Facebook Token</label>
                         <%= text_input f, :facebook_token, class: "form-control", disabled: true %>
                     </div>

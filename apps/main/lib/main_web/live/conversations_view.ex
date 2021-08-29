@@ -678,7 +678,7 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, push_event(socket, "scroll_chat", %{})}
   end
 
-  defp send_message(%{original_number: <<"messenger:", _ :: binary>>} = conversation, params, location, user) do
+  defp send_message(%{original_number: <<"messenger:", _ :: binary>>=original_number} = conversation, params, location, user) do
 
     params["conversation_message"]
     |> Map.merge(
@@ -687,6 +687,9 @@ defmodule MainWeb.Live.ConversationsView do
     |> ConversationMessages.create()
     |> case do
          {:ok, _message} ->
+         if(location.facebook_token) do
+           MainWeb.FacebookController.reply_to_facebook(params["conversation_message"],location,String.replace(original_number,"messenger:",""))
+         else
            message = %Chatbot.Params{
              provider: :twilio,
              from: "messenger:#{location.messenger_id}",
@@ -694,6 +697,7 @@ defmodule MainWeb.Live.ConversationsView do
              body: params["conversation_message"]["message"]
            }
            Chatbot.Client.Twilio.call(message)
+         end
          {:error, _changeset} ->
            nil
        end

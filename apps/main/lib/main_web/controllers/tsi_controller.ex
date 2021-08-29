@@ -191,21 +191,6 @@ defmodule MainWeb.TsiController do
       )
 
       _member = Member.get_by_phone_number(@role, convo.original_number)
-#
-#      if member do
-#        name = Enum.join([member.first_name, member.last_name], " ")
-#        MainWeb.Endpoint.broadcast(
-#          "convo:#{convo_id}",
-#          "broadcast",
-#          %{message: message, name: name, phone_number: phone_number}
-#        )
-#      else
-#        MainWeb.Endpoint.broadcast(
-#          "convo:#{convo_id}",
-#          "broadcast",
-#          %{message: message, phone_number: phone_number}
-#        )
-#      end
 
       if convo.status == "closed" do
         message

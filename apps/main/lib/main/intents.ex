@@ -175,14 +175,11 @@ defmodule MainWeb.Intents do
 
   def get_({intent, args}, location) do
     args = remove_intent(args)
-    IO.inspect("###################")
-    IO.inspect(args)
-    IO.inspect("###################")
 
     with atom <- String.to_atom(intent)do
       atom
       |> fetch_module()
-      |> apply(:build_response, [args, location])
+      |> apply(:build_response, [args, location.phone_number])
     else
       _err ->     MainWeb.Intents |> apply(:build_response, [args, location])
     end

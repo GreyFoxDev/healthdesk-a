@@ -3,8 +3,9 @@ defmodule MainWeb.LocationController do
   plug Ueberauth
 
   alias Ueberauth.Strategy.Helpers
-  alias Data.{Location, Team}
 
+  @app_id System.get_env("FACEBOOK_CLIENT_ID")
+  @app_secret System.get_env("FACEBOOK_CLIENT_SECRET")
   def index(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
     team = Team.get(current_user, team_id)
@@ -77,22 +78,17 @@ defmodule MainWeb.LocationController do
 
   end
   def callback(conn, %{"location_id" => id, "team_id" => team_id, "provider" => provider, "code" => code} = _params) when provider == "facebook" do
-    res = Ueberauth.Strategy.Facebook.OAuth.get_token! [code: code, redirect_uri: "https://1c5b-72-255-34-241.ngrok.io/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback"]
-    IO.inspect("=======================res=====================")
-    IO.inspect(res)
-    IO.inspect("=======================res=====================")
+    location = Location.get(id)
+    res = Ueberauth.Strategy.Facebook.OAuth.get_token! [code: code, redirect_uri: "https://2e83-39-45-196-127.ngrok.io/admin/teams/#{team_id}/locations/#{id}/#{provider}/callback"]
     case res do
       %OAuth2.Client{token: token} ->
-        case get_user_id(token.access_token) do
+        case get_long_token(token.access_token) do
           :error -> conn
-          %{"id" => user_id} ->
-            case get_user_pages(user_id, token.access_token) do
+          %{"access_token" => access_token} = _res ->
+            case get_user_pages(access_token,location.facebook_page_id) do
               :error -> conn
-              res ->
-                case res["data"] do
-                  [] -> conn
-                  [%{"id" => page_id, "access_token" => access_token} | _] ->
-                    location_params = %{facebook_page_id: page_id, facebook_token: access_token}
+              %{"access_token" => access_token} = _res ->
+                    location_params = %{facebook_token: access_token}
                     case Location.update(id, location_params) do
                       {:ok, %Data.Schema.Location{}} ->
                         with %Data.Schema.User{} = user <- current_user(conn),
@@ -112,7 +108,6 @@ defmodule MainWeb.LocationController do
                             errors: []
                           )
                         end
-                    end
                 end
             end
         end
@@ -263,16 +258,16 @@ defmodule MainWeb.LocationController do
     end
   end
 
-  defp get_user_id(access_token)do
-    url = "https://graph.facebook.com/me?access_token=#{access_token}"
+  defp get_long_token(access_token)do
+    url = "https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=#{@app_id}&client_secret=#{@app_secret}&fb_exchange_token=#{access_token}"
     case HTTPoison.get(url) do
       {:ok, res} -> Poison.decode!(res.body)
       _ -> :error
     end
   end
 
-  defp get_user_pages(user_id, access_token)do
-    url = "https://graph.facebook.com/#{user_id}/accounts?access_token=#{access_token}"
+  defp get_user_pages( access_token,page_id)do
+    url = "https://graph.facebook.com/#{page_id}?fields=access_token&access_token=#{access_token}"
     case HTTPoison.get(url) do
       {:ok, res} -> Poison.decode!(res.body)
       _ -> :error
