@@ -1,5 +1,5 @@
 defmodule MainWeb.Intents do
-  alias Data.Schema.Location
+  alias Data.{Location, Intent}
   @moduledoc """
   This module receives the intent and args from Wit and then routes
   the information to the correct intent handler. To add a new intent
@@ -7,7 +7,7 @@ defmodule MainWeb.Intents do
   module to the @intents map.
   """
 
-  @callback build_response(List.t, location :: Location.t()) :: String.t
+  @callback build_response(List.t, location :: Data.Schema.Location.t()) :: String.t
   @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
   @default_greeting "Hello! How can I help you?"
 
@@ -50,8 +50,8 @@ defmodule MainWeb.Intents do
 
   def get({:unknown, [{"greetings"=name, _}]} = intent, location) do
 
-    location = Data.Location.get_by_phone(location)
-    local_intent = Data.Intent.get_by(name, location.id)
+    location = Location.get_by_phone(location)
+    local_intent = Intent.get_by(name, location.id)
     if local_intent != nil do
       local_intent.message
     else
@@ -60,8 +60,8 @@ defmodule MainWeb.Intents do
   end
   def get({name, _} = intent, location) when is_atom name do
 
-    location = Data.Location.get_by_phone(location)
-    local_intent = Data.Intent.get_by(to_string(name), location.id)
+    location = Location.get_by_phone(location)
+    local_intent = Intent.get_by(to_string(name), location.id)
 
     if local_intent != nil do
       local_intent.message
@@ -71,8 +71,8 @@ defmodule MainWeb.Intents do
   end
   def get({name, _} = intent, location) do
 
-    location = Data.Location.get_by_phone(location)
-    local_intent = Data.Intent.get_by(name, location.id)
+    location = Location.get_by_phone(location)
+    local_intent = Intent.get_by(name, location.id)
 
     if local_intent != nil do
       local_intent.message
@@ -82,8 +82,8 @@ defmodule MainWeb.Intents do
   end
   def get(:unknown_intent =name, location) do
 
-    location = Data.Location.get_by_phone(location)
-    local_intent = Data.Intent.get_by(to_string(name), location.id)
+    location = Location.get_by_phone(location)
+    local_intent = Intent.get_by(to_string(name), location.id)
 
     if local_intent != nil do
       local_intent.message
@@ -93,8 +93,8 @@ defmodule MainWeb.Intents do
   end
   def get(:unknown =name, location) do
 
-    location = Data.Location.get_by_phone(location)
-    local_intent = Data.Intent.get_by(to_string(name), location.id)
+    location = Location.get_by_phone(location)
+    local_intent = Intent.get_by(to_string(name), location.id)
 
     if local_intent != nil do
       local_intent.message
@@ -189,6 +189,7 @@ defmodule MainWeb.Intents do
   end
 
   def build_response(_args, location) do
+    location=Location.get_by_phone(location)
     if location.default_message != "" do
       location.default_message
     else
