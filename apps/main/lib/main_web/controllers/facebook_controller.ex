@@ -34,6 +34,7 @@ defmodule MainWeb.FacebookController do
       nil ->
         with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({"messenger:#{sid}", location.phone_number}) do
           get_user_details(location,sid)
+          close_conversation(convo.id, location)
           update_convo(msg,convo,location)
         end
     end
@@ -42,7 +43,7 @@ defmodule MainWeb.FacebookController do
     |> Plug.Conn.send_resp()
   end
   def update_convo(message,convo,location)do
-    _ = CM.create(
+    {:ok, struct} = CM.create(
       %{
         "conversation_id" => convo.id,
         "phone_number" => convo.original_number,
@@ -54,7 +55,7 @@ defmodule MainWeb.FacebookController do
       |> ask_wit_ai(convo.id, location)
       |> case do
            {:ok, response} ->
-             _ = CM.create(
+              CM.create(
                %{
                  "conversation_id" => convo.id,
                  "phone_number" => location.phone_number,
@@ -63,9 +64,10 @@ defmodule MainWeb.FacebookController do
                }
              )
              reply_to_facebook(response,location,String.replace(convo.original_number,"messenger:",""))
+             Main.LiveUpdates.notify_live_view({convo.id, struct})
              close_conversation(convo.id, location)
            {:unknown, response} ->
-             _ = CM.create(
+             CM.create(
                %{
                  "conversation_id" => convo.id,
                  "phone_number" => location.phone_number,
@@ -76,6 +78,8 @@ defmodule MainWeb.FacebookController do
              reply_to_facebook(response,location,String.replace(convo.original_number,"messenger:",""))
              C.pending(convo.id)
              Main.LiveUpdates.notify_live_view({location.id, :updated_open})
+             Main.LiveUpdates.notify_live_view({convo.id, struct})
+             MainWeb.Endpoint.broadcast("alert:#{location.phone_number}", "broadcast", %{location: location, convo: convo.id})
              :ok =
                Notify.send_to_admin(
                  convo.id,
@@ -83,6 +87,9 @@ defmodule MainWeb.FacebookController do
                  location.phone_number
                )
          end
+         else
+      Main.LiveUpdates.notify_live_view({convo.id, struct})
+      MainWeb.Endpoint.broadcast("alert:#{location.phone_number}", "broadcast", %{location: location, convo: convo.id})
     end
   end
 
