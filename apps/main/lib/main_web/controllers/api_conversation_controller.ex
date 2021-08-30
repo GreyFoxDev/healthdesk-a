@@ -103,7 +103,7 @@ defmodule MainWeb.Api.ConversationController do
                    )
                    close_conversation(convo.id, location)
                    from
-                   |> Main.Email.generate_reply_email(response, subj)
+                   |> Main.Email.generate_reply_email(response, subj,location.phone_number)
                    |> Main.Mailer.deliver_now()
                    Main.LiveUpdates.notify_live_view({convo.id, struct})
                  end
@@ -121,7 +121,7 @@ defmodule MainWeb.Api.ConversationController do
                    )
                    C.pending(convo.id)
                    from
-                   |> Main.Email.generate_reply_email(response, subj)
+                   |> Main.Email.generate_reply_email(response, subj,location.phone_number)
                    |> Main.Mailer.deliver_now()
                    Main.LiveUpdates.notify_live_view({convo.id, struct})
                  end
