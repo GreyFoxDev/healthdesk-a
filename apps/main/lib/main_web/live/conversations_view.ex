@@ -714,9 +714,9 @@ defmodule MainWeb.Live.ConversationsView do
            }
            Chatbot.Client.Twilio.call(message)|> IO.inspect()
          end
-         {:error, _changeset} ->
+         {:error, changeset} ->
            IO.inspect("============_changeset================")
-           IO.inspect(_changeset)
+           IO.inspect(changeset)
            IO.inspect("============_changeset================")
 
            nil
@@ -727,7 +727,7 @@ defmodule MainWeb.Live.ConversationsView do
 
     _from_name = if conversation.team_member do
       IO.inspect("============Conversation.team_member is true================")
-      IO.inspect(conversation.team_memebr)
+      IO.inspect(conversation.team_member)
       IO.inspect("============Conversation.team================")
 
       Enum.join(
@@ -736,7 +736,7 @@ defmodule MainWeb.Live.ConversationsView do
       )
     else
       IO.inspect("============Conversation.team_member is false================")
-      IO.inspect(conversation.team_memebr)
+      IO.inspect(conversation.team_member)
       IO.inspect("============Conversation.team================")
       location.location_name
     end
