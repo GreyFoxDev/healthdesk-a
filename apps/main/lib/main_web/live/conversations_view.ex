@@ -680,39 +680,64 @@ defmodule MainWeb.Live.ConversationsView do
 
   defp send_message(%{original_number: <<"messenger:", _ :: binary>>=original_number} = conversation, params, location, user) do
 
+    IO.inspect("#############inside messenger###########")
     params["conversation_message"]
     |> Map.merge(
          %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
        )
     |> ConversationMessages.create()
     |> case do
-         {:ok, _message} ->
+         {:ok, message} ->
+           IO.inspect("============{:ok, message}================")
+           IO.inspect(message)
+           IO.inspect("============{:ok, message}================")
+
            IO.inspect("#########")
            IO.inspect(location.facebook_token)
            IO.inspect("#########")
          if(location.facebook_token) do
-           MainWeb.FacebookController.reply_to_facebook(params["conversation_message"]["message"],location,String.replace(original_number,"messenger:","")) |> IO.inspect
+             IO.inspect("============location.facebook_token) id True================")
+             IO.inspect(location.facebook_token)
+             IO.inspect("============location.facebook_token) id True================")
+
+             MainWeb.FacebookController.reply_to_facebook(params["conversation_message"]["message"],location,String.replace(original_number,"messenger:","")) |> IO.inspect(label: "facebook reply")
          else
-           message = %Chatbot.Params{
+             IO.inspect("============location.facebook_token) is false================")
+             IO.inspect(location.facebook_token)
+             IO.inspect("============location.facebook_token) is false================")
+
+             message = %Chatbot.Params{
              provider: :twilio,
              from: "messenger:#{location.messenger_id}",
              to: conversation.original_number,
              body: params["conversation_message"]["message"]
            }
-           Chatbot.Client.Twilio.call(message)
+           Chatbot.Client.Twilio.call(message)|> IO.inspect()
          end
          {:error, _changeset} ->
+           IO.inspect("============_changeset================")
+           IO.inspect(_changeset)
+           IO.inspect("============_changeset================")
+
            nil
        end
   end
   defp send_message(%{original_number: <<"CH", _ :: binary>>} = conversation, params, location, user) do
+    IO.inspect("#############inside CH ###########")
 
     _from_name = if conversation.team_member do
+      IO.inspect("============Conversation.team_member is true================")
+      IO.inspect(conversation.team_memebr)
+      IO.inspect("============Conversation.team================")
+
       Enum.join(
         [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
         " "
       )
     else
+      IO.inspect("============Conversation.team_member is false================")
+      IO.inspect(conversation.team_memebr)
+      IO.inspect("============Conversation.team================")
       location.location_name
     end
 
@@ -722,9 +747,11 @@ defmodule MainWeb.Live.ConversationsView do
        )
     |> ConversationMessages.create()
     |> case do
-         {:ok, _message} ->
+         {:ok, message} ->
+           IO.inspect("============{:ok, message}================")
+           IO.inspect(message)
+           IO.inspect("============{:ok, message}================")
            from = if conversation.team_member && conversation.team_member.user.first_name, do: conversation.team_member.user.first_name, else: location.location_name
-
            message = %Chatbot.Params{
              provider: :twilio,
              from: from,
@@ -732,8 +759,12 @@ defmodule MainWeb.Live.ConversationsView do
              body: params["conversation_message"]["message"]
            }
            #account_id= Team.get_sub_account_id_by_location_id(location.id)
-           Chatbot.Client.Twilio.channel(message)
-         {:error, _changeset} -> nil
+           Chatbot.Client.Twilio.channel(message)|> IO.inspect(label: "Web chatbot")
+         {:error, changeset} ->
+           IO.inspect("============_changeset================")
+           IO.inspect(changeset)
+           IO.inspect("============_changeset================")
+           nil
        end
   end
   defp send_message(%{original_number: <<"APP", _ :: binary>>} = conversation, params, location, user) do
