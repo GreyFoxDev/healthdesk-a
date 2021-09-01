@@ -65,7 +65,7 @@ defmodule MainWeb.Api.ConversationController do
     IO.inspect(from, limit: :infinity)
     IO.inspect(to, limit: :infinity)
     IO.inspect(subj, limit: :infinity)
-    subj = String.slice(subj, 1..200)
+    subj = String.slice(subj, 0..200)
     if from != nil && from != "" && message != nil && message != "" do
       with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
         Task.start(fn ->  notify_open(convo.location_id) end)
@@ -184,6 +184,7 @@ defmodule MainWeb.Api.ConversationController do
       disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
 
       Data.ConversationDisposition.create(%{"conversation_call_id" => id, "disposition_id" => disposition.id})
+
       ConversationCall.close(id)
     else
       ConversationCall.close(id)
@@ -253,6 +254,7 @@ defmodule MainWeb.Api.ConversationController do
             disposition = Enum.find(dispositions, &(&1.disposition_name == "Call Hang Up"))
 
             Data.ConversationDisposition.create(%{"conversation_call_id" => convo.id, "disposition_id" => disposition.id})
+
             ConversationCall.close(convo.id)
 #            notify && Main.LiveUpdates.notify_live_view({location.id, :updated_open})
         end
