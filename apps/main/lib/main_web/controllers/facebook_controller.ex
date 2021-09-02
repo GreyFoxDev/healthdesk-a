@@ -83,8 +83,9 @@ defmodule MainWeb.FacebookController do
              :ok =
                Notify.send_to_admin(
                  convo.id,
-                 "Message From: #{convo.original_number}\n#{message}",
-                 location.phone_number
+                 message,
+                 location.phone_number,
+                 "location-admin"
                )
          end
          else
