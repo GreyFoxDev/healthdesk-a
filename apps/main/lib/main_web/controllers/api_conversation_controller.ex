@@ -180,16 +180,26 @@ defmodule MainWeb.Api.ConversationController do
   end
 
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type"=>"call"} = params) do
+    IO.inspect("=======================params in CLSOE=====================")
+    IO.inspect(params)
+    IO.inspect("=======================params in CLSOE=====================")
     if params["disposition"] do
       convo = ConversationCall.get(id)
       location = Location.get(convo.location_id)
       dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
       disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
 
+      IO.inspect("=======================disposition=====================")
+      IO.inspect(disposition)
+      IO.inspect("=======================disposition=====================")
+
       Data.ConversationDisposition.create(%{"conversation_call_id" => id, "disposition_id" => disposition.id})
 
       ConversationCall.close(id)
     else
+      IO.inspect("=======================elseClasueOFClose=====================")
+      IO.inspect("elseClasueOFClose")
+      IO.inspect("=======================elseClasueOFClose=====================")
       ConversationCall.close(id)
     end
 
