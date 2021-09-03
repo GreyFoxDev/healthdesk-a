@@ -215,11 +215,7 @@ defmodule Data.ConversationCall do
          {:ok, convo} <- Query.update(convo, @closed) do
       {:ok, convo}
     else
-      all ->
-        IO.inspect("===================Closes an existing conversation=========================")
-        IO.inspect(all)
-        IO.inspect("=======================Closes an existing conversation=====================")
-        {:error, "Unable to close conversation."}
+      _ -> {:error, "Unable to close conversation."}
     end
   end
 

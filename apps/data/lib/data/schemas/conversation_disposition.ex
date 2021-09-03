@@ -12,10 +12,15 @@ defmodule Data.Schema.ConversationDisposition do
         }
 
   @required_fields ~w|
-  conversation_id
   disposition_id
-  conversation_call_id
   |a
+
+  @optional_fields ~w|
+  conversation_call_id
+  conversation_id
+  |a
+
+  @all_fields @required_fields ++ @optional_fields
 
   schema "conversation_dispositions" do
     belongs_to(:conversation, Data.Schema.Conversation)
@@ -27,7 +32,7 @@ defmodule Data.Schema.ConversationDisposition do
 
   def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields)
+    |> cast(params, @all_fields)
     |> validate_required(@required_fields)
   end
 end
