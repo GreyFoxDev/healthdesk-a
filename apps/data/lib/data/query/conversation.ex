@@ -120,6 +120,49 @@ defmodule Data.Query.Conversation do
     )
     |> repo.all()
   end
+  def count_active_convo(location_id, team_member_id, repo \\ Read) when (is_nil(team_member_id)) do
+
+    from(c in Conversation,
+      where: c.location_id in ^location_id,
+      where: c.status == "pending",
+      select: count(c.id)
+    )
+    |> repo.one()
+  end
+  def count_active_convo(location_id, team_member_id, repo) do
+
+    from(c in Conversation,
+      where: c.location_id in ^location_id,
+      where: c.status == "pending" or c.team_member_id == ^team_member_id,
+      select: count(c.id)
+    )
+    |> repo.one()
+  end
+
+  def count_assigned_convo(location_id, team_member_id, repo \\ Read) when (is_nil(team_member_id)) do
+    from(c in Conversation,
+      where: c.location_id in ^location_id,
+      where: c.status == "open",
+      select: count(c.id)
+    )
+    |> repo.one()
+  end
+  def count_assigned_convo(location_id, team_member_id, repo) do
+    from(c in Conversation,
+      where: c.location_id in ^location_id,
+      where: c.status == "open" and c.team_member_id != ^team_member_id,
+      select: count(c.id)
+    )
+    |> repo.one()
+  end
+  def count_closed_convo(location_id, repo \\ Read) do
+    from(c in Conversation,
+      where: c.location_id in ^location_id,
+      where: c.status == "closed",
+      select: count(c.id)
+    )
+    |> repo.one()
+  end
 
   @doc """
   Return a list of limited conversations for a location
