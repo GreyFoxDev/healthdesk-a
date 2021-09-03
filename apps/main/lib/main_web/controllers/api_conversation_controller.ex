@@ -28,9 +28,6 @@ defmodule MainWeb.Api.ConversationController do
   end
   def create(conn, %{"location" => location, "member" => member, "type" => "call"}) do
     with {:ok, convo} <- ConversationCall.find_or_start_conversation({member, location}) do
-      IO.inspect("=======================createIN API Controller=====================")
-      IO.inspect(convo)
-      IO.inspect("=======================createIN API Controller=====================")
       Task.start(fn ->  close_convo(convo) end)
       conn
       |> put_status(200)
@@ -68,7 +65,7 @@ defmodule MainWeb.Api.ConversationController do
     IO.inspect(from, limit: :infinity)
     IO.inspect(to, limit: :infinity)
     IO.inspect(subj, limit: :infinity)
-    subj = String.slice(subj, 0..200)
+    subj = String.slice(subj, 1..200)
     if from != nil && from != "" && message != nil && message != "" do
       with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
         Task.start(fn ->  notify_open(convo.location_id) end)
@@ -180,36 +177,17 @@ defmodule MainWeb.Api.ConversationController do
   end
 
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type"=>"call"} = params) do
-    IO.inspect("=======================params in CLSOE=====================")
-    IO.inspect(params)
-    IO.inspect("=======================params in CLSOE=====================")
     if params["disposition"] do
       convo = ConversationCall.get(id)
       location = Location.get(convo.location_id)
       dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
       disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
 
-      IO.inspect("=======================disposition=====================")
-      IO.inspect(disposition)
-      IO.inspect("=======================disposition=====================")
 
       cd = Data.ConversationDisposition.create(%{"conversation_call_id" => id, "disposition_id" => disposition.id})
-      IO.inspect("=======================ConversationDisposition=====================")
-      IO.inspect(cd)
-      IO.inspect("=======================ConversationDisposition=====================")
       convo = ConversationCall.close(id)
-      IO.inspect("=======================ConversationCall.close=====================")
-      IO.inspect(cd)
-      IO.inspect("=======================ConversationCall.close=====================")
-
     else
-      IO.inspect("=======================elseClasueOFClose=====================")
-      IO.inspect("elseClasueOFClose")
-      IO.inspect("=======================elseClasueOFClose=====================")
       convo = ConversationCall.close(id)
-      IO.inspect("=======================elseClasueOFClose=====================")
-      IO.inspect(convo)
-      IO.inspect("=======================elseClasueOFClose=====================")
 
     end
 
@@ -275,18 +253,11 @@ defmodule MainWeb.Api.ConversationController do
             location = Location.get(convo.location_id)
             dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
             disposition = Enum.find(dispositions, &(&1.disposition_name == "Call Hang Up"))
-            IO.inspect("=======================disposition=====================")
-            IO.inspect(disposition)
-            IO.inspect("=======================disposition=====================")
 
             conve=Data.ConversationDisposition.create(%{"conversation_call_id" => convo.id, "disposition_id" => disposition.id})
-            IO.inspect("=======================close_convo=====================")
-            IO.inspect(conve)
-            IO.inspect("=======================close_convo=====================")
-
             ConversationCall.close(convo.id)
 #            notify && Main.LiveUpdates.notify_live_view({location.id, :updated_open})
-        end 
+        end
     end
   end
   def close_convo(_), do: nil
