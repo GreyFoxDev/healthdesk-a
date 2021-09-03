@@ -285,8 +285,8 @@ defmodule MainWeb.Notify do
 
   def validate_phone_number(phone_number) do
     if String.starts_with?(phone_number, "+"), do: phone_number, else: "+" <> phone_number
-end
-defp build_member_string(member,location) do
+  end
+  defp build_member_string(member,location) do
     [
       (member.first_name && member.first_name || "") <> " " <> (member.last_name && member.last_name || "")
       |> String.trim(),
