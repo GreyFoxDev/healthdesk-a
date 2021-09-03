@@ -193,14 +193,24 @@ defmodule MainWeb.Api.ConversationController do
       IO.inspect(disposition)
       IO.inspect("=======================disposition=====================")
 
-      Data.ConversationDisposition.create(%{"conversation_call_id" => id, "disposition_id" => disposition.id})
+      cd = Data.ConversationDisposition.create(%{"conversation_call_id" => id, "disposition_id" => disposition.id})
+      IO.inspect("=======================ConversationDisposition=====================")
+      IO.inspect(cd)
+      IO.inspect("=======================ConversationDisposition=====================")
+      convo = ConversationCall.close(id)
+      IO.inspect("=======================ConversationCall.close=====================")
+      IO.inspect(cd)
+      IO.inspect("=======================ConversationCall.close=====================")
 
-      ConversationCall.close(id)
     else
       IO.inspect("=======================elseClasueOFClose=====================")
       IO.inspect("elseClasueOFClose")
       IO.inspect("=======================elseClasueOFClose=====================")
-      ConversationCall.close(id)
+      convo = ConversationCall.close(id)
+      IO.inspect("=======================elseClasueOFClose=====================")
+      IO.inspect(convo)
+      IO.inspect("=======================elseClasueOFClose=====================")
+
     end
 
     conn
