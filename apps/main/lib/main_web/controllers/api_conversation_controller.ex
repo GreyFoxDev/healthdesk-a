@@ -68,7 +68,7 @@ defmodule MainWeb.Api.ConversationController do
     IO.inspect(from, limit: :infinity)
     IO.inspect(to, limit: :infinity)
     IO.inspect(subj, limit: :infinity)
-    subj = String.slice(subj, 1..200)
+    subj = String.slice(subj, 0..200)
     if from != nil && from != "" && message != nil && message != "" do
       with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
         Task.start(fn ->  notify_open(convo.location_id) end)
@@ -201,6 +201,7 @@ defmodule MainWeb.Api.ConversationController do
       IO.inspect("=======================ConversationCall.close=====================")
       IO.inspect(cd)
       IO.inspect("=======================ConversationCall.close=====================")
+
     else
       IO.inspect("=======================elseClasueOFClose=====================")
       IO.inspect("elseClasueOFClose")
@@ -282,9 +283,10 @@ defmodule MainWeb.Api.ConversationController do
             IO.inspect("=======================close_convo=====================")
             IO.inspect(conve)
             IO.inspect("=======================close_convo=====================")
+
             ConversationCall.close(convo.id)
 #            notify && Main.LiveUpdates.notify_live_view({location.id, :updated_open})
-        end
+        end 
     end
   end
   def close_convo(_), do: nil
