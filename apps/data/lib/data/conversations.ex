@@ -18,6 +18,9 @@ defmodule Data.Conversations do
   @pending %{"status" => "pending"}
 
   defdelegate create(params), to: Query
+  defdelegate count_active_convo(location_id, team_member_id), to: Query
+  defdelegate count_assigned_convo(location_id, team_member_id), to: Query
+  defdelegate count_closed_convo(location_id), to: Query
   defdelegate get_by_phone(phone_number, location_id), to: Query
   defdelegate get(conversation_id), to: Query
   defdelegate update_conversation(), to: Query
