@@ -63,23 +63,34 @@ defmodule Data.Query.Appointment do
     end
   end
 
-  @spec count_all(repo :: Ecto.Repo.t()) :: [map()]
-  def count_all(repo \\ Read) do
-    from(a in Data.Schema.Appointment,
+  @spec count_all(to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_all(to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+    query = from(a in Data.Schema.Appointment,
       group_by: [a.confirmed],
       distinct: [a.confirmed],
       order_by: a.confirmed,
       select: %{confirmed: a.confirmed, count: count(a.id)}
     )
+    Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([a,...] in query, where: a.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([a,...] in query, where: a.inserted_at >= ^from)
+      _, query -> query
+    end)
     |> repo.all()
   end
 
   @doc """
   Return a list of dispositions with count of usage by team
   """
-  @spec count_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [map()]
-  def count_by_team_id(team_id, repo \\ Read) do
-    from(a in Data.Schema.Appointment,
+  @spec count_by_team_id(team_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_team_id(team_id, to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+    query = from(a in Data.Schema.Appointment,
       join: c in assoc(a, :conversation),
       join: l in assoc(c, :location),
       group_by: [a.confirmed],
@@ -88,6 +99,14 @@ defmodule Data.Query.Appointment do
       order_by: [a.confirmed],
       select: %{confirmed: a.confirmed, count: count(a.id)}
     )
+    IO.inspect(from, label: "from =>")
+    Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([a,...] in query, where: a.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([a,...] in query, where: a.inserted_at >= ^from)
+      _, query -> query
+    end)
     |> repo.all()
   end
 
@@ -111,9 +130,11 @@ defmodule Data.Query.Appointment do
   @doc """
   Return a list of dispositions with count of usage by locations
   """
-  @spec count_by_location_ids(location_ids :: binary(), repo :: Ecto.Repo.t()) :: [map()]
-  def count_by_location_ids(location_ids, repo \\ Read) do
-    from(a in Data.Schema.Appointment,
+  @spec count_by_location_ids(location_ids :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  def count_by_location_ids(location_ids, to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+    query = from(a in Data.Schema.Appointment,
       join: c in assoc(a, :conversation),
       join: l in assoc(c, :location),
       group_by: [a.confirmed],
@@ -122,6 +143,13 @@ defmodule Data.Query.Appointment do
       order_by: [a.confirmed],
       select: %{confirmed: a.confirmed, count: count(a.id)}
     )
-    |> repo.all()
+    Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([a,...] in query, where: a.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([a,...] in query, where: a.inserted_at >= ^from)
+      _, query -> query
+    end)
+    |> repo.all() |> IO.inspect
   end
 end

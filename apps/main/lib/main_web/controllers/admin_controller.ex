@@ -12,7 +12,7 @@ defmodule MainWeb.AdminController do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_team_id(current_user, team_id)
     dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => team_id}))
-    appointments = Appointments.count_by_team_id(team_id)
+    appointments = Appointments.count_by_team_id(team_id, convert_values(params["to"]), convert_values(params["from"]))
     dispositions_per_day =
       case Disposition.average_per_day_for_team(params) do
         [result] -> result
@@ -53,11 +53,11 @@ defmodule MainWeb.AdminController do
       automated: calculate_percentage("Automated", dispositions),
       call_deflected: calculate_percentage("Call deflected", dispositions),
       dispositions_per_day: dispositions_per_day,
-      web_totals: team_totals_by_channel("WEB", team_id),
-      sms_totals: team_totals_by_channel("SMS", team_id),
-      app_totals: team_totals_by_channel("APP", team_id),
-      facebook_totals: team_totals_by_channel("FACEBOOK", team_id),
-      email_totals: team_totals_by_channel("MAIL",team_id),
+      web_totals: ConversationDisposition.count_channel_type_by_team_id("WEB", team_id, convert_values(params["to"]), convert_values(params["from"])),
+      sms_totals: ConversationDisposition.count_channel_type_by_team_id("SMS", team_id, convert_values(params["to"]), convert_values(params["from"])),
+      app_totals: ConversationDisposition.count_channel_type_by_team_id("APP", team_id, convert_values(params["to"]), convert_values(params["from"])),
+      facebook_totals: ConversationDisposition.count_channel_type_by_team_id("FACEBOOK", team_id, convert_values(params["to"]), convert_values(params["from"])),
+      email_totals: ConversationDisposition.count_channel_type_by_team_id("MAIL", team_id, convert_values(params["to"]), convert_values(params["from"])),
       response_time: response_time.median_response_time||0,
       team_admin_count: team_admin_count,
       tickets_count: Ticket.filter(params),
@@ -82,7 +82,7 @@ defmodule MainWeb.AdminController do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_location_ids(current_user, location_ids)
     dispositions = Disposition.count_by(params)
-    appointments = Appointments.count_by_location_ids(location_ids)
+    appointments = Appointments.count_by_location_ids(location_ids, convert_values(params["to"]), convert_values(params["from"]))
     response_time = count_total_response_time(params)
     dispositions_per_day =
       case Disposition.average_per_day_for_locations(params) do
@@ -114,11 +114,11 @@ defmodule MainWeb.AdminController do
       campaigns: Campaign.get_by_location_ids(location_ids),
       dispositions_per_day: dispositions_per_day,
       response_time: response_time,
-      web_totals: locations_totals_by_channel("WEB", location_ids),
-      sms_totals: locations_totals_by_channel("SMS", location_ids),
-      app_totals: locations_totals_by_channel("APP", location_ids),
-      facebook_totals: locations_totals_by_channel("FACEBOOK", location_ids),
-      email_totals: locations_totals_by_channel("MAIL",location_ids),
+      web_totals: ConversationDisposition.count_channel_type_by_location_ids("WEB", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+      sms_totals: ConversationDisposition.count_channel_type_by_location_ids("SMS", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+      app_totals: ConversationDisposition.count_channel_type_by_location_ids("APP", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+      facebook_totals: ConversationDisposition.count_channel_type_by_location_ids("FACEBOOK", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+      email_totals: ConversationDisposition.count_channel_type_by_location_ids("MAIL", location_ids, convert_values(params["to"]), convert_values(params["from"])),
       team_admin_count: team_admin_count,
       tickets_count: Ticket.filter(params),
       teammate_count: teammate_count,
@@ -132,14 +132,7 @@ defmodule MainWeb.AdminController do
       location: nil)
   end
   def index(conn, params) do
-
-    params=if(!is_nil(params["filters"])) do
-      change_params(params)
-    else
-      params
-    end
-
-
+    params= if (!is_nil(params["filters"])), do: change_params(params), else: params
     current_user = current_user(conn)
     if current_user.role in ["team-admin", "teammate"] do
       index(conn, %{"team_id" => current_user.team_member.team_id})
@@ -162,7 +155,7 @@ defmodule MainWeb.AdminController do
       params= Map.merge(params, filter)
       if current_user.role == "admin" do
         dispositions = Disposition.count_all_by(params)
-        appointments = Appointments.count_all()
+        appointments = Appointments.count_all(convert_values(params["to"]), convert_values(params["from"]))
         [dispositions_per_day] = Disposition.average_per_day(params)
         locations = Location.all()
         location_ids=Enum.map(locations, & &1.id)
@@ -171,11 +164,9 @@ defmodule MainWeb.AdminController do
 #        response_time = response_times |> Enum.sort |> Enum.at(middle_index)
 
         response_time=count_total_response_time(%{"location_ids" => location_ids})
-        campaigns = locations
-                    |> Enum.map(fn(location) ->
-          Campaign.get_by_location_id(location.id)
-        end)
-                    |> List.flatten()
+        campaigns =
+        locations
+        |> Enum.map(fn(location) -> Campaign.get_by_location_id(location.id)end) |> List.flatten()
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
@@ -185,11 +176,11 @@ defmodule MainWeb.AdminController do
           appointments: appointments,
           dispositions_per_day: dispositions_per_day,
           response_time: response_time,
-          web_totals: totals_by_channel("WEB"),
-          sms_totals: totals_by_channel("SMS"),
-          app_totals: totals_by_channel("APP"),
-          facebook_totals: totals_by_channel("FACEBOOK"),
-          email_totals: totals_by_channel("MAIL"),
+          web_totals: ConversationDisposition.count_all_by_channel_type("WEB", convert_values(params["to"]), convert_values(params["from"])),
+          sms_totals: ConversationDisposition.count_all_by_channel_type("SMS", convert_values(params["to"]), convert_values(params["from"])),
+          app_totals: ConversationDisposition.count_all_by_channel_type("APP", convert_values(params["to"]), convert_values(params["from"])),
+          facebook_totals: ConversationDisposition.count_all_by_channel_type("FACEBOOK", convert_values(params["to"]), convert_values(params["from"])),
+          email_totals: ConversationDisposition.count_all_by_channel_type("MAIL", convert_values(params["to"]), convert_values(params["from"])),
           teams: teams,
           team_admin_count: team_admin_count,
           tickets_count: Ticket.filter(params),
@@ -202,7 +193,7 @@ defmodule MainWeb.AdminController do
           team_id: nil)
       else
         dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
-        appointments = Appointments.count_by_team_id(current_user.team_member.team_id)
+        appointments = Appointments.count_by_team_id(current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"]))
         params = Map.merge(params, %{"team_id" => current_user.team_member.team_id})
         dispositions_per_day =
           case Disposition.average_per_day_for_team(params) do
@@ -230,11 +221,11 @@ defmodule MainWeb.AdminController do
           call_deflected: calculate_percentage("Call deflected", dispositions),
           dispositions_per_day: dispositions_per_day,
           response_time: response_time.median_response_time||0,
-          web_totals: team_totals_by_channel("WEB", current_user.team_member.team_id),
-          sms_totals: team_totals_by_channel("SMS", current_user.team_member.team_id),
-          app_totals: team_totals_by_channel("APP", current_user.team_member.team_id),
-          facebook_totals: team_totals_by_channel("FACEBOOK", current_user.team_member.team_id),
-          email_totals: team_totals_by_channel("MAIL",current_user.team_member.team_id),
+          web_totals: ConversationDisposition.count_channel_type_by_team_id("WEB", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
+          sms_totals: ConversationDisposition.count_channel_type_by_team_id("SMS", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
+          app_totals: ConversationDisposition.count_channel_type_by_team_id("APP", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
+          facebook_totals: ConversationDisposition.count_channel_type_by_team_id("FACEBOOK", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
+          email_totals: ConversationDisposition.count_channel_type_by_team_id("MAIL", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
           teams: teams,
           team_admin_count: team_admin_count,
           tickets_count: Ticket.filter(params),
@@ -248,18 +239,6 @@ defmodule MainWeb.AdminController do
           team_id: nil)
       end
     end
-  end
-  defp totals_by_channel(channel_type) do
-    results = ConversationDisposition.count_all_by_channel_type(channel_type)
-    sum(results)
-  end
-  defp team_totals_by_channel(channel_type, team_id) do
-    results = ConversationDisposition.count_channel_type_by_team_id(channel_type, team_id)
-    sum(results)
-  end
-  defp location_totals_by_channel(channel_type, location_id) do
-    results = ConversationDisposition.count_channel_type_by_location_id(channel_type, location_id)
-    sum(results)
   end
   defp calculate_percentage(type, dispositions) do
     total =  Enum.map(dispositions, &(&1.count)) |> Enum.sum()
@@ -277,11 +256,7 @@ defmodule MainWeb.AdminController do
         (call_deflected  / (if (call_transferred + call_deflected + call_hung_up)==0.0,do: 1,else: (call_transferred + call_deflected + call_hung_up))) * 100
     end
   end
-  defp sum(results) do
-    results
-    |> Enum.map(&(&1.disposition_count))
-    |> Enum.sum()
-  end
+
   defp change_params(params) do
     params=Map.merge(params, params["filters"])
     params=Map.delete(params, "filters")
@@ -291,7 +266,10 @@ defmodule MainWeb.AdminController do
     middle_index = response_times |> length() |> div(2)
     response_time = response_times |> Enum.sort |> Enum.at(middle_index)
   end
-  defp locations_totals_by_channel(channel_type, location_ids) do
-    Enum.reduce(location_ids,0, & location_totals_by_channel(channel_type, &1) + &2 )
+  defp convert_values(value) do
+    case value do
+      "" -> nil
+      _-> value
+    end
   end
 end

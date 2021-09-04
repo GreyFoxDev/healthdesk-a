@@ -3,10 +3,11 @@ defmodule Data.Query.ConversationDisposition do
   Module for the Conversation Disposition queries
   """
 
-  alias Data.Schema.ConversationDisposition
+  alias Data.Schema.{Conversation, Disposition, ConversationDisposition}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL
+  import Ecto.Query
 
   @cols [
     :disposition_count,
@@ -35,22 +36,73 @@ defmodule Data.Query.ConversationDisposition do
     end
   end
 
-  def count_channel_type_by_team_id(channel_type, team_id, repo \\ Read) do
-    repo
-    |> SQL.query!(@query1, [team_id, channel_type])
-    |> build_results()
+  @spec count_all_by_channel_type(channel_type :: String.t(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: String.t()
+  def count_all_by_channel_type(channel_type, to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+    query = from(c in Conversation,
+      join: cd in ConversationDisposition,on: c.id == cd.conversation_id,
+      join: d in Disposition, on: cd.disposition_id == d.id,
+      where: c.channel_type == ^channel_type
+    )
+    query = Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([c,...] in query, where: c.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([c,...] in query, where: c.inserted_at >= ^from)
+      _, query -> query
+    end)
+    from([c,_,d] in query,
+      distinct: [c.id],
+      select: c.channel_type
+    )
+    repo.all(query) |> Enum.count
   end
 
-  def count_channel_type_by_location_id(channel_type, location_id, repo \\ Read) do
-    repo
-    |> SQL.query!(@query2, [location_id, channel_type])
-    |> build_results()
+  @spec count_channel_type_by_location_ids(channel_type :: String.t(), location_ids :: [String.t()], to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: String.t()
+  def count_channel_type_by_location_ids(channel_type, location_ids, to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+    query = from(c in Conversation,
+      join: cd in ConversationDisposition,on: c.id == cd.conversation_id,
+      join: d in Disposition, on: cd.disposition_id == d.id,
+      where: c.location_id in ^location_ids and c.channel_type == ^channel_type
+    )
+    query = Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([c,...] in query, where: c.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([c,...] in query, where: c.inserted_at >= ^from)
+      _, query -> query
+    end)
+    from([c,_,d] in query,
+      distinct: [c.id],
+      select: c.channel_type
+    )
+    repo.all(query) |> Enum.count
   end
 
-  def count_all_by_channel_type(channel_type, repo \\ Read) do
-    repo
-    |> SQL.query!(@query3, [channel_type])
-    |> build_results()
+  @spec count_channel_type_by_team_id(channel_type :: String.t(), team_id :: String.t(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: String.t()
+  def count_channel_type_by_team_id(channel_type, team_id, to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+    query = from(c in Conversation,
+      join: cd in ConversationDisposition,on: c.id == cd.conversation_id,
+      join: d in Disposition, on: cd.disposition_id == d.id,
+      where: d.team_id == ^team_id and c.channel_type == ^channel_type
+    )
+    query = Enum.reduce(%{to: to, from: from}, query, fn
+      {:to, to}, query ->
+        if is_nil(to), do: query, else: from([c,...] in query, where: c.inserted_at <= ^to)
+      {:from, from}, query ->
+        if is_nil(from), do: query, else: from([c,...] in query, where: c.inserted_at >= ^from)
+      _, query -> query
+    end)
+    from([c,_,d] in query,
+      distinct: [c.id],
+      select: c.channel_type
+    )
+    repo.all(query) |> Enum.count
   end
 
   defp build_results(results) do

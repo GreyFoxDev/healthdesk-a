@@ -65,9 +65,13 @@ defmodule Data.Disposition do
   end
 
   def convert_string_to_date(date) do
-    case Date.from_iso8601(date) do
-      {:ok, date} -> Timex.to_datetime(date) |> DateTime.to_naive()
-      _-> nil
+    case date do
+      nil -> nil
+      _ ->
+        case Date.from_iso8601(date) do
+          {:ok, date} -> Timex.to_datetime(date) |> DateTime.to_naive()
+          _ -> nil
+        end
     end
   end
 end
