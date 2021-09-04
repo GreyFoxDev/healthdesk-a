@@ -256,6 +256,7 @@ defmodule MainWeb.AdminController do
         (call_deflected  / (if (call_transferred + call_deflected + call_hung_up)==0.0,do: 1,else: (call_transferred + call_deflected + call_hung_up))) * 100
     end
   end
+
   defp change_params(params) do
     params=Map.merge(params, params["filters"])
     params=Map.delete(params, "filters")

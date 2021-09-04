@@ -212,11 +212,10 @@ defmodule Data.ConversationCall do
   @spec close(id :: binary) :: {:ok, ConversationCall.t()} | {:error, String.t()}
   def close(id) do
     with %Schema{id: ^id} = convo <- Query.get(id),
-         %Schema{id: ^id} = convo <- Query.update(convo, @closed) do
+         {:ok, convo} <- Query.update(convo, @closed) do
       {:ok, convo}
     else
-      _ ->
-        {:error, "Unable to close conversation."}
+      _ -> {:error, "Unable to close conversation."}
     end
   end
 

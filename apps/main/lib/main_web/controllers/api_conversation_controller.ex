@@ -183,10 +183,12 @@ defmodule MainWeb.Api.ConversationController do
       dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
       disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
 
-      Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
-      ConversationCall.close(id)
+
+      cd = Data.ConversationDisposition.create(%{"conversation_call_id" => id, "disposition_id" => disposition.id})
+      convo = ConversationCall.close(id)
     else
-      ConversationCall.close(id)
+      convo = ConversationCall.close(id)
+
     end
 
     conn
@@ -252,7 +254,7 @@ defmodule MainWeb.Api.ConversationController do
             dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
             disposition = Enum.find(dispositions, &(&1.disposition_name == "Call Hang Up"))
 
-            Data.ConversationDisposition.create(%{"conversation_id" => convo.id, "disposition_id" => disposition.id})
+            conve=Data.ConversationDisposition.create(%{"conversation_call_id" => convo.id, "disposition_id" => disposition.id})
             ConversationCall.close(convo.id)
 #            notify && Main.LiveUpdates.notify_live_view({location.id, :updated_open})
         end

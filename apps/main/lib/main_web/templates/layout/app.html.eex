@@ -19,19 +19,25 @@
                             <span class="menu-icon oi oi-chat"></span>
                             <span class="menu-text">Conversations</span>
                             <span class="badge badge-subtle badge-success">
-                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"current_user" => @current_user}, id: "conversation_count") %>
+                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"current_user" => @current_user, "convo_type" => :convo}, id: "conversation_count") %>
                             </span>
                         </a>
                         <ul class="menu">
 
                             <li class="menu-item <%= if assigns[:tab] == "active",do: "has-active",else: "" %>">
-                                <a href="/admin/conversations/active" class="menu-link">Active</a>
+                                <a href="/admin/conversations/active" class="menu-link">Active<span class="badge badge-subtle badge-success">
+                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"current_user" => @current_user, "convo_type" => :active}, id: "conversation_count") %>
+                            </span></a>
                             </li>
                             <li class="menu-item <%= if assigns[:tab] == "assigned",do: "has-active",else: "" %>">
-                                <a href="/admin/conversations/assigned" class="menu-link">Assigned</a>
+                                <a href="/admin/conversations/assigned" class="menu-link">Assigned<span class="badge badge-subtle badge-success">
+                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"current_user" => @current_user, "convo_type" => :assigned}, id: "conversation_count") %>
+                            </span></a>
                             </li>
                             <li class="menu-item <%= if assigns[:tab] == "closed",do: "has-active",else: "" %>">
-                                <a href="/admin/conversations/closed" class="menu-link">Closed</a>
+                                <a href="/admin/conversations/closed" class="menu-link">Closed<span class="badge badge-subtle badge-success">
+                                <%= live_render(@conn, MainWeb.Live.OpenConverationsView, session: %{"current_user" => @current_user, "convo_type" => :closed}, id: "conversation_count") %>
+                            </span></a>
                             </li>
                         </ul>
                     </li>
