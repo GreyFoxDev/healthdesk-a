@@ -33,8 +33,10 @@ config :main, MainWeb.Endpoint,
   live_view: [
     signing_salt: "e2coiRnvsrcguHHbgcQDoK4pOKj1x3Il92sTetEUUMjSS1gTu+DNLH0rlWOCdjox"
   ],
-  pubsub: [name: Main.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [
+    name: Main.PubSub,
+    adapter: Phoenix.PubSub.PG2
+  ]
 
 config :tesla, adapter: Tesla.Adapter.Hackney
 
@@ -43,6 +45,7 @@ config :main, Main.Scheduler,
           {"*/60 * * * *", {Scheduler, :schedule_conversation, []}},
         ]
 
+# Configures ueberauth
 config :ueberauth, Ueberauth,
        providers: [
          facebook: {Ueberauth.Strategy.Facebook, [
@@ -51,7 +54,8 @@ config :ueberauth, Ueberauth,
          ]},
          google: {Ueberauth.Strategy.Google, [
            request_path: "/admin/teams/:team_id/locations/:location_id/:provider",
-           callback_path: "/admin/teams/:team_id/locations/:location_id/:provider/callback"]}
+           callback_path: "/admin/teams/:team_id/locations/:location_id/:provider/callback"
+         ]}
        ]
 config :ueberauth, Ueberauth.Strategy.Google.OAuth,
        client_id: System.get_env("GOOGLE_CLIENT_ID"),
