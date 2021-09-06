@@ -44,7 +44,7 @@ defmodule Chatbot.Client.Twilio do
       [to: params.to, from: params.from, body: params.body, friendly_name: "Nick"],
       service_id: service_id,
       to: params.to,
-      account_sid: account,
+      account: account,
       token: token
     )
   end

@@ -34,15 +34,14 @@ defmodule MainWeb.FacebookController do
       nil ->
         with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({"messenger:#{sid}", location.phone_number}) do
           get_user_details(location,sid)
-          close_conversation(convo.id, location)
-          update_convo(msg,convo,location)
+          update_convo(msg,convo,location, true)
         end
     end
     conn
     |> Plug.Conn.resp(200, "")
     |> Plug.Conn.send_resp()
   end
-  def update_convo(message,convo,location)do
+  def update_convo(message,convo,location , check_wit \\false)do
     {:ok, struct} = CM.create(
       %{
         "conversation_id" => convo.id,
@@ -50,7 +49,7 @@ defmodule MainWeb.FacebookController do
         "message" => message,
         "sent_at" => DateTime.utc_now()
       })
-    if convo.status == "closed" do
+    if convo.status == "closed" || check_wit do
       message
       |> ask_wit_ai(convo.id, location)
       |> case do
