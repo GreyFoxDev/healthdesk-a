@@ -48,22 +48,14 @@
                 <div class="dropdown-arrow dropdown-arrow-left"></div><!-- .dropdown-menu -->
                 <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: top, left; top: 56px; left: 0px;">
                     <h6 class="dropdown-header d-none d-md-block d-lg-none"><%= @current_user.first_name %>&nbsp<%= @current_user.last_name %></h6>
-                    <a  class="dropdown-item" href="#">Offline</a>
-                    <a  class="dropdown-item" href="#">Unavailable</a>
-                    <hr>
-
                     <%= link raw("<span class=\"dropdown-icon oi oi-person\"></span> Profile"), to: user_path(@socket, :edit, @current_user), class: "dropdown-item" %>
+                    <%= link raw("<span class=\"dropdown-icon oi oi-credit-card\"></span> Billing"), to: "https://forms.gle/Hsb1bCTXHRxJYcp17", class: "dropdown-item" %>
                     <%= link raw("<span class=\"dropdown-icon oi oi-account-logout\"></span>Logout"), to: session_path(@socket, :delete, @current_user), method: "delete", class: "dropdown-item" %>
-                    <hr />
-                    <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
-                    <%= link "Analytics", to: admin_path(@socket, :index), class: "dropdown-item" %>
-                                    <% end %>
-                    <%= if @current_user.role in ["admin", "team-admin", "location-admin"] do %>
-                    <%= link "Settings", to: MainWeb.LayoutView.settings_url(@socket, @current_user), class: "dropdown-item" %>
-                                    <% end %>
+                    <hr>
                     <%= link "Get support", to: "mailto:support@healthdesk.ai", method: "delete", class: "dropdown-item" %>
-                    <%= link "Terms of use", to: "http://healthdesk.ai/terms", target: "_blank", class: "dropdown-item" %>
-                    <%= link "Privacy policy", to: "http://healthdesk.ai/privacy", target: "_blank", class: "dropdown-item" %>
+                    <%= link "Terms of use", to: "https://healthdesk.ai/terms-of-use/", target: "_blank", class: "dropdown-item" %>
+                    <%= link "Privacy policy", to: "https://healthdesk.ai/privacy-policy/", target: "_blank", class: "dropdown-item" %>
+                    </hr>
 
                 </div><!-- /.dropdown-menu -->
             </div>
