@@ -19,8 +19,9 @@
                        phx-value-nid="<%= n.id %>">
                         <% end %>
                         <div class="user-avatar">
-                            <img src="<%= if @current_user.avatar != "", do: @current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt="">
-                        </div>
+                            <%= if @current_user.avatar != "" do %>
+                            <img src="<%= if @current_user.avatar != "", do: @current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt=""><span class="avatar-badge online"></span>
+                            <% end %>                        </div>
                         <div class="dropdown-item-body">
                             <p class="text">  <%= n.sender.first_name %> <%= n.sender.last_name %> <%= n.text %> </p><span
                                 class="date"><%= format_date(n.inserted_at) %></span>
