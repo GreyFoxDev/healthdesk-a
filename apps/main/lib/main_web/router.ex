@@ -40,8 +40,8 @@ defmodule MainWeb.Router do
   scope "/admin", MainWeb do
     pipe_through [:browser, :auth, :live_root]
 
-    live "/conversations/:id" , Live.ConversationsView,:index
-    live "/conversations/:id/:tab" , Live.ConversationsView, :index
+    live "/conversations/:id" , Live.ConversationsView, only: [:index]
+    live "/conversations/:id/:tab" , Live.ConversationsView, only: [:index]
     live "/campaigns" , Live.CampaignsView
     live "/tickets" , Live.TicketsView
     live "/tickets/:id" , Live.TicketsView
@@ -54,7 +54,7 @@ defmodule MainWeb.Router do
   scope "/admin", MainWeb do
     pipe_through [:browser, :auth, :not_live]
 
-#    post "/", AdminController, :index
+    post "/", AdminController, :index
     get "/", AdminController, :index
     get "/export/campaign-recipients/:campaign_id", CampaignController, :export
     delete "/campaign/:campaign_id", CampaignController, :delete
@@ -71,7 +71,7 @@ defmodule MainWeb.Router do
         get "/:provider/callback", LocationController, :callback
         post "/:provider/callback", LocationController, :callback
         resources "/class-schedule", ClassScheduleController, only: [:new, :create]
-        live "/conversations" , Live.ConversationsView, :index
+        live "/conversations" , Live.ConversationsView, only: [:index]
         resources "/conversations", ConversationController, except: [:index] do
           resources "/conversation-messages", ConversationMessageController
           put "/close", ConversationController, :close

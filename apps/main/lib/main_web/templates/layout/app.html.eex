@@ -8,9 +8,7 @@
             <nav id="stacked-menu" class="stacked-menu">
                 <ul class="menu">
                     <li class="menu-item">
-                        <%IO.inspect("#######################2")%>
-
-                        <a class="menu-link" href="/admin/">
+                        <a class="menu-link" href="/admin">
                             <span class="menu-icon oi oi-home"></span>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -73,6 +71,6 @@
 </aside>
 <main class="app-main">
     <div class="wrapper">
-        <%= @inner_content %>
+        <%= render @view_module, @view_template, assigns %>
     </div>
 </main>

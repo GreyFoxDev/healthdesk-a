@@ -119,7 +119,7 @@
             </a>
         </nav>
 
-            <%= @inner_content %>
+            <%= render @view_module, @view_template, assigns %>
 
 
 

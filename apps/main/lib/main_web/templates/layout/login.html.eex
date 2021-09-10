@@ -35,7 +35,7 @@
                 <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
             <% end %>
 
-            <%= @inner_content %>
+            <%= render @view_module, @view_template, assigns %>
             <!-- copyright -->
             <footer class="auth-footer"> © 2020 All Rights Reserved. <a href="https://healthdesk.ai/privacy/" target="_blank">Privacy</a> and <a href="https://healthdesk.ai/terms/" target="_blank">Terms</a><br> <div class="text-center"> <a href="mailto:support@healthdesk.ai">support@healthdesk.ai</a></div>
             </footer>

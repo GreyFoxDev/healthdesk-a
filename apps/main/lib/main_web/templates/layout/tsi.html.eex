@@ -165,7 +165,7 @@
     </style>
     <body>
         <div class="container">
-            <%= @inner_content %>
+            <%= render @view_module, @view_template, assigns %>
         </div>
     </body>
 </html>
