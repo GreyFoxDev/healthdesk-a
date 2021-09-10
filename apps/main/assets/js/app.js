@@ -13,7 +13,7 @@
 // to also remove its path from "config.paths.watched".
 import "phoenix_html"
 import {Socket} from "phoenix"
-import LiveSocket from "phoenix_live_view"
+import {LiveSocket} from "phoenix_live_view"
 import NotificationHook from "./notification_hooks";
 import LineSpaceHook from "./line_space_hooks";
 import CsvUpload from "./csv_upload";

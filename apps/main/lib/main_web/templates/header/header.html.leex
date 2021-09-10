@@ -28,7 +28,9 @@
             <div class="dropdown d-none d-md-flex">
                 <button class="btn-account" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="user-avatar user-avatar-md">
+                  <%= if @current_user.avatar != "" do %>
                 <img src="<%= if @current_user.avatar != "", do: @current_user.avatar, else: "/images/unknown-profile.jpg" %>" alt=""><span class="avatar-badge online"></span>
+              <% end %>
               </span>
                     <span class="account-summary pr-lg-4 d-none d-lg-block">
                 <span class="account-name"> <%= @current_user.first_name %>  <%= @current_user.last_name %></span>

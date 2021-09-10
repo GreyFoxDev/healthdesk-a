@@ -8,7 +8,8 @@
             <nav id="stacked-menu" class="stacked-menu">
                 <ul class="menu">
                     <li class="menu-item">
-                        <a class="menu-link" href="/admin">
+                        <%IO.inspect("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2")%>
+                        <a class="menu-link" href="/admin/">
                             <span class="menu-icon oi oi-home"></span>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -18,9 +19,7 @@
                         <a class="menu-link" href="#">
                             <span class="menu-icon oi oi-chat"></span>
                             <span class="menu-text">Conversations</span>
-                            <span class="badge badge-subtle badge-success">
-                                <%= live_render(@socket, MainWeb.Live.OpenConverationsView, session: %{"current_user" => @current_user, "convo_type" => :convo}, id: "conversation_count") %>
-                            </span>
+                            <span class="badge badge-subtle badge-success"></span>
                         </a>
                         <ul class="menu">
                             <li class="menu-item <%= if assigns[:tab] == "active",do: "has-active",else: "" %>">

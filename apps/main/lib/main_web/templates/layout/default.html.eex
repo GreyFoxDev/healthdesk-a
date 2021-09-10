@@ -22,7 +22,7 @@
   <body>
       <div class="app" style="height: 100%;">
           <main class="empty-state empty-state-fullpage bg-primary text-white" style="height: 100%;">
-              <%= render @view_module, @view_template, assigns %>
+              <%= @inner_content %>
           </main>
       </div>
   </body>
