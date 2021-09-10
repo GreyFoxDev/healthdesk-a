@@ -99,6 +99,8 @@ defmodule MainWeb.Router do
     pipe_through [:api, :not_live]
     get "/facebook/hook", FacebookController, :hook
     post "/facebook/hook", FacebookController, :event
+    get "/instagram/hook", InstagramController, :hook
+    post "/instagram/hook", InstagramController, :event
   end
   scope "/api", MainWeb do
     pipe_through :api
