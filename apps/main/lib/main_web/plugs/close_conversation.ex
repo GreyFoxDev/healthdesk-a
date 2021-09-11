@@ -6,7 +6,9 @@ defmodule MainWeb.Plug.CloseConversation do
 
   alias Data.Conversations, as: C
   alias Data.ConversationMessages, as: CM
-  alias Data.Member
+  alias Data.{Member, Location}
+  alias MainWeb.Notify
+
   @spec init(list()) :: list()
   def init(opts), do: opts
 
@@ -70,16 +72,19 @@ defmodule MainWeb.Plug.CloseConversation do
   end
 
   def call(%{assigns: %{convo: id, intent: {:unknown, []}}} = conn, _opts) do
+    IO.inspect("----------------unknown intent---------------")
     C.pending(id)
     conn
   end
 
   def call(%{assigns: %{convo: id, intent: :unknown_intent}} = conn, _opts) do
+    IO.inspect("----------------unknown_intent intent---------------")
     C.pending(id)
     conn
   end
 
   def call(%{assigns: %{convo: id,location: location, intent: {:subscribe, []}}} = conn, _opts) do
+    IO.inspect("----------------subscribe intent---------------")
     datetime = DateTime.utc_now()
     _ = CM.create(%{
       "conversation_id" => id,
@@ -93,8 +98,9 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
   def call(%{assigns: %{convo: id,location: location, intent: {:unsubscribe, []}}} = conn, _opts) do
+    IO.inspect("------unsubscribe intent-----------")
     datetime = DateTime.utc_now()
-    _ = CM.create(%{
+    {:ok, struct} = CM.create(%{
       "conversation_id" => id,
       "phone_number" => location,
       "message" => "unsubscribed",
@@ -103,8 +109,49 @@ defmodule MainWeb.Plug.CloseConversation do
     convo = C.get(id)
     Member.update(convo.member.id, %{consent: false})
     C.close(id)
+
+    Main.LiveUpdates.notify_live_view({convo.id, struct})
+    :ok =
+      Notify.send_to_admin(
+        convo.id,
+        "unsubscribed",
+        location.phone_number,
+        "location-admin"
+      )
     conn
   end
+
+#  defp close_conversation(convo_id, location_id) do
+#    location = Location.get_by_phone(location_id)
+#    disposition =
+#      %{role: "system"}
+#      |> Data.Disposition.get_by_team_id(location.team_<id)
+#      |> Enum.find(&(&1.disposition_name == "Automated"))
+#
+#    if disposition do
+#      Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})
+#
+#      _ =  %{
+#             "conversation_id" => convo_id,
+#             "phone_number" => location.phone_number,
+#             "message" =>
+#               "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+#             "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+#           }
+#           |> CM.create()
+#    else
+#      _ = %{
+#            "conversation_id" => convo_id,
+#            "phone_number" => location.phone_number,
+#            "message" =>
+#              "CLOSED: Closed by System",
+#            "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+#          }
+#          |> CM.create()
+#    end
+#
+#    C.close(convo_id)
+#  end
 
   @doc """
   If the question has been answered then close the conversation
