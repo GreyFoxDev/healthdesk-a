@@ -120,7 +120,9 @@ defmodule Data.Query.Conversation do
     )
     |> repo.all()
   end
-  def count_active_convo(location_id, team_member_id, repo \\ Read) when (is_nil(team_member_id)) do
+
+  def count_active_convo(location_id, team_member_id, repo \\ Read)
+  def count_active_convo(location_id, team_member_id, repo) when (is_nil(team_member_id)) do
 
     from(c in Conversation,
       where: c.location_id in ^location_id,
@@ -139,7 +141,8 @@ defmodule Data.Query.Conversation do
     |> repo.one()
   end
 
-  def count_assigned_convo(location_id, team_member_id, repo \\ Read) when (is_nil(team_member_id)) do
+  def count_assigned_convo(location_id, team_member_id, repo \\ Read)
+  def count_assigned_convo(location_id, team_member_id, repo) when (is_nil(team_member_id)) do
     from(c in Conversation,
       where: c.location_id in ^location_id,
       where: c.status == "open",

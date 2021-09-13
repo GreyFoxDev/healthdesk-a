@@ -27,7 +27,7 @@ defmodule MainWeb.AutomationController do
     )
   end
 
-  def create(conn, %{"question" => question, "answer" => answer, "location_id" => location_id, "team_id" => team_id}=params) do
+  def create(conn, %{"question" => question, "answer" => answer, "location_id" => location_id, "team_id" => _team_id}=params) do
 
     location =
       conn
@@ -62,7 +62,7 @@ defmodule MainWeb.AutomationController do
     end
   end
 
-  def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id} = params) do
+  def update(conn, %{"id" => id, "location_id" => location_id, "team_id" => _team_id} = params) do
     with %Data.Schema.Automation{} = automation <- Automation.get_by( id),
          {:ok, result} <- Automation.update(automation, params) do
       location =
@@ -97,7 +97,7 @@ defmodule MainWeb.AutomationController do
     end
   end
 
-  def delete(conn, %{"id" => id, "location_id" => location_id, "team_id" => team_id}= params) do
+  def delete(conn, %{"id" => id, "location_id" => location_id, "team_id" => _team_id}= _params) do
     with %Data.Schema.Automation{} = automation <- Automation.get_by(id),
          {:ok, result} <- Automation.delete(automation) do
       location =
