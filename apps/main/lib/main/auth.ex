@@ -2,7 +2,6 @@ defmodule MainWeb.Auth do
   @moduledoc false
 
   import Plug.Conn
-  alias Data.User
   alias MainWeb.Auth.Guardian
 
   def login(conn, user) do
@@ -13,7 +12,7 @@ defmodule MainWeb.Auth do
   end
 
   def logout(conn) do
-    user = MainWeb.Auth.Guardian.Plug.current_resource(conn)
+    _user = MainWeb.Auth.Guardian.Plug.current_resource(conn)
     Guardian.Plug.sign_out(conn)
     end
 

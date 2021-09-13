@@ -22,6 +22,19 @@ defmodule MainWeb.Helper.LocationHelper do
     |> Kernel.++([current_user.team_member.location])
     |> Enum.dedup_by(&(&1.id))
   end
+
+  def teammate_locations(conn) do
+
+    current_user = current_user(conn)
+
+    current_user.team_member.team_member_locations
+    |> Stream.map(&(&1.location))
+    |> Stream.filter(&(&1.deleted_at == nil))
+    |> Enum.to_list()
+    |> Kernel.++([current_user.team_member.location])
+    |> Enum.dedup_by(&(&1.id))
+  end
+
   def teammate_locations(%Data.Schema.User{role: "admin"}=_current_user, true) do
     Location.all()
     |> Stream.filter(&(&1.deleted_at == nil))
@@ -37,17 +50,6 @@ defmodule MainWeb.Helper.LocationHelper do
     |> Enum.to_list()
     |> Kernel.++([current_user.team_member.location.id])
     |> Enum.dedup()
-  end
-  def teammate_locations(conn) do
-
-    current_user = current_user(conn)
-
-    current_user.team_member.team_member_locations
-    |> Stream.map(&(&1.location))
-    |> Stream.filter(&(&1.deleted_at == nil))
-    |> Enum.to_list()
-    |> Kernel.++([current_user.team_member.location])
-    |> Enum.dedup_by(&(&1.id))
   end
 
 end

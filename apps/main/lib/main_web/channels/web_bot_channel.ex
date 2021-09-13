@@ -58,6 +58,11 @@ defmodule MainWeb.WebBotChannel do
     {:noreply, socket}
   end
 
+  def handle_in(event, payload, socket) do
+    Logger.warn("INVALID EVENT: #{IO.inspect(event)} with payload #{IO.inspect(payload)}")
+    {:noreply, socket}
+  end
+
   def handle_info(:after_join, socket) do
     location = get_location(socket.assigns[:key])
 
@@ -67,11 +72,6 @@ defmodule MainWeb.WebBotChannel do
       broadcast socket, "shout", %{message: "Greetings! How can I help?", from: "Website Bot"}
     end
 
-    {:noreply, socket}
-  end
-
-  def handle_in(event, payload, socket) do
-    Logger.warn("INVALID EVENT: #{IO.inspect(event)} with payload #{IO.inspect(payload)}")
     {:noreply, socket}
   end
 

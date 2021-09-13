@@ -44,6 +44,16 @@ defmodule MainWeb.Live.NotificationsView do
     {:noreply, socket}
   end
 
+  def handle_info({:update_notif, %{url: url}}, socket) do
+    Main.LiveUpdates.notify_live_view(socket.assigns.current_user.id,{__MODULE__, :new_notif})
+    {
+      :noreply,
+      socket
+      |> redirect(to: url)
+    }
+
+  end
+
   def handle_event("conversation", params, socket) do
     Notifications.update(%{"id" => params["nid"], "read" => true})
     notifications = Notifications.get_by_user(socket.assigns.current_user.id)
@@ -67,16 +77,6 @@ defmodule MainWeb.Live.NotificationsView do
     end
     Process.send_after(self(), {:update_notif, %{url: url}},300)
     {:noreply, socket}
-  end
-
-  def handle_info({:update_notif, %{url: url}}, socket) do
-    Main.LiveUpdates.notify_live_view(socket.assigns.current_user.id,{__MODULE__, :new_notif})
-    {
-      :noreply,
-      socket
-      |> redirect(to: url)
-    }
-
   end
 
 end

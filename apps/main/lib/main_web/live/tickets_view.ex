@@ -62,44 +62,10 @@ defmodule MainWeb.Live.TicketsView do
     {:ok, socket}
 
   end
-  def handle_info({:fetch_c, %{user: user, locations: locations}}, socket)
-    do
-    team_members =
-      Enum.map(locations,fn(location) ->
-        TeamMember.all(user,location)
-      end) |> List.flatten() |> Enum.uniq_by(fn tm -> tm.id end)
 
-    team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
-    tickets = Ticket.get_by_location_ids(socket.assigns.location_ids)
-    socket = socket
-             |> assign(:team_members, team_members)
-             |> assign(:team_members_all, team_members_all)
-             |> assign(:tickets, tickets)
-             |> assign(:table_id, gen_reference())
-    socket = if ((tickets |> List.first) !=nil)  do
-      socket
-      |> assign(:open_ticket, tickets |> List.first)
-    else
-      socket
-
-    end
-
-
-    if connected?(socket), do: Process.send_after(self(), :init_ticket, 3000)
-    {:noreply,socket}
-  end
   def handle_event("edit_ticket",%{"id" => id}, socket) do
     send(self(), {:fetch_s, %{id: id}})
     {:noreply, assign(socket,loading: true)}
-  end
-  def handle_info({:fetch_s, %{id: id}}, socket)do
-    open_ticket = Ticket.get(id)
-    Process.send_after(self(), :open_edit, 3000)
-    Process.send_after(self(), :init_ticket, 3000)
-    socket = socket
-             |> assign(:table_id, gen_reference())
-             |> assign(:open_ticket, open_ticket)
-    {:noreply, socket}
   end
   def handle_event("new_ticket",%{"ticket" => params}, socket)do
     {:ok, res}=Ticket.create(params)
@@ -167,6 +133,46 @@ defmodule MainWeb.Live.TicketsView do
     {:noreply, assign(socket,loading: true)}
   end
 
+  def handle_event(_,_params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_info({:fetch_c, %{user: user, locations: locations}}, socket)
+    do
+    team_members =
+      Enum.map(locations,fn(location) ->
+        TeamMember.all(user,location)
+      end) |> List.flatten() |> Enum.uniq_by(fn tm -> tm.id end)
+
+    team_members_all = Enum.map(team_members, fn x -> {x.user.first_name <> " " <> x.user.last_name, x.id} end)
+    tickets = Ticket.get_by_location_ids(socket.assigns.location_ids)
+    socket = socket
+             |> assign(:team_members, team_members)
+             |> assign(:team_members_all, team_members_all)
+             |> assign(:tickets, tickets)
+             |> assign(:table_id, gen_reference())
+    socket = if ((tickets |> List.first) !=nil)  do
+      socket
+      |> assign(:open_ticket, tickets |> List.first)
+    else
+      socket
+
+    end
+
+
+    if connected?(socket), do: Process.send_after(self(), :init_ticket, 3000)
+    {:noreply,socket}
+  end
+  def handle_info({:fetch_s, %{id: id}}, socket)do
+    open_ticket = Ticket.get(id)
+    Process.send_after(self(), :open_edit, 3000)
+    Process.send_after(self(), :init_ticket, 3000)
+    socket = socket
+             |> assign(:table_id, gen_reference())
+             |> assign(:open_ticket, open_ticket)
+    {:noreply, socket}
+  end
+
   def handle_info(:menu_fix, socket) do
     {:noreply, push_event(socket, "menu_fix", %{})}
   end
@@ -184,6 +190,11 @@ defmodule MainWeb.Live.TicketsView do
   def handle_info(:close_edit, socket) do
     {:noreply, push_event(socket, "close_edit", %{})}
   end
+
+  def handle_info(_, socket) do
+    {:noreply, socket}
+  end
+
   defp gen_reference() do
     min = String.to_integer("100000", 36)
     max = String.to_integer("ZZZZZZ", 36)
@@ -203,10 +214,5 @@ defmodule MainWeb.Live.TicketsView do
     end
 
   end
-  def handle_info(_, socket) do
-    {:noreply, socket}
-  end
-  def handle_event(_,_params, socket) do
-    {:noreply, socket}
-  end
+
 end

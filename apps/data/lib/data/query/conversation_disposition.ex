@@ -6,7 +6,6 @@ defmodule Data.Query.ConversationDisposition do
   alias Data.Schema.{Conversation, Disposition, ConversationDisposition}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
-  alias Ecto.Adapters.SQL
   import Ecto.Query
 
   @cols [
@@ -15,9 +14,9 @@ defmodule Data.Query.ConversationDisposition do
     :channel_type
   ]
 
-  @query1 "SELECT * FROM count_team_dispositions_by_channel_type($1, $2);"
-  @query2 "SELECT * FROM count_location_dispositions_by_channel_type($1, $2);"
-  @query3 "SELECT * FROM count_dispositions_by_channel_type($1);"
+#  @query1 "SELECT * FROM count_team_dispositions_by_channel_type($1, $2);"
+#  @query2 "SELECT * FROM count_location_dispositions_by_channel_type($1, $2);"
+#  @query3 "SELECT * FROM count_dispositions_by_channel_type($1);"
 
   @doc """
   Creates a new conversation disposition
@@ -103,9 +102,5 @@ defmodule Data.Query.ConversationDisposition do
       select: c.channel_type
     )
     repo.all(query) |> Enum.count
-  end
-
-  defp build_results(results) do
-    Enum.map(results.rows, fn row -> Map.new(Enum.zip(@cols, row)) end)
   end
 end
