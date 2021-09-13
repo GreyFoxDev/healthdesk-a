@@ -24,12 +24,44 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
 
+  def call(%{assigns: %{convo: id,location: location, intent: {:unsubscribe, []}}} = conn, _opts) do
+    IO.inspect("------unsubscribe intent-----------")
+    IO.inspect("------conn-----------")
+    IO.inspect(conn)
+    IO.inspect("------conn----------")
+    IO.inspect(conn)
+    datetime = DateTime.utc_now()
+    {:ok, struct} = CM.create(%{
+      "conversation_id" => id,
+      "phone_number" => location,
+      "message" => "unsubscribed",
+      "sent_at" => DateTime.add(datetime, 1)})
+
+    convo = C.get(id)
+    Member.update(convo.member.id, %{consent: false})
+    C.close(id)
+
+    Main.LiveUpdates.notify_live_view({convo.id, struct})
+    :ok =
+      Notify.send_to_admin(
+        convo.id,
+        "unsubscribed",
+        location.phone_number,
+        "location-admin"
+      )
+    conn
+  end
+
   @doc """
   If the conversation is in a pending state, or the member has not opted in,
   then no need to do anything. Just return the connection.
   """
+
   def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
     IO.inspect("########we are here###########")
+    IO.inspect("------conn-----------")
+    IO.inspect(conn)
+    IO.inspect("------conn----------")
 
 
     _convo = C.get(id)
@@ -97,29 +129,7 @@ defmodule MainWeb.Plug.CloseConversation do
     C.close(id)
     conn
   end
-  def call(%{assigns: %{convo: id,location: location, intent: {:unsubscribe, []}}} = conn, _opts) do
-    IO.inspect("------unsubscribe intent-----------")
-    datetime = DateTime.utc_now()
-    {:ok, struct} = CM.create(%{
-      "conversation_id" => id,
-      "phone_number" => location,
-      "message" => "unsubscribed",
-      "sent_at" => DateTime.add(datetime, 1)})
 
-    convo = C.get(id)
-    Member.update(convo.member.id, %{consent: false})
-    C.close(id)
-
-    Main.LiveUpdates.notify_live_view({convo.id, struct})
-    :ok =
-      Notify.send_to_admin(
-        convo.id,
-        "unsubscribed",
-        location.phone_number,
-        "location-admin"
-      )
-    conn
-  end
 
 #  defp close_conversation(convo_id, location_id) do
 #    location = Location.get_by_phone(location_id)

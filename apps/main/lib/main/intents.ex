@@ -72,7 +72,6 @@ defmodule MainWeb.Intents do
     end
   end
   def get({name, _} = intent, location) do
-
     location = Location.get_by_phone(location)
     local_intent = Intent.get_by(name, location.id)
 
@@ -175,7 +174,7 @@ defmodule MainWeb.Intents do
     get({:unknown, %{}}, location)
   end
   def get_({"unsubscribe", _}, location) do
-    get({:unknown, %{}}, location)
+    get({:unknown, %{}}, location.phone_number)
   end
 
   def get_({intent, args}, location) do
