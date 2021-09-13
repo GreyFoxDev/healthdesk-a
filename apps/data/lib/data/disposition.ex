@@ -58,6 +58,9 @@ defmodule Data.Disposition do
   def get_by_team_id(%{role: role}, team_id) when role in @roles,
     do: Query.get_by_team_id(team_id)
 
+  def get_by_team_and_name(team_id, name),
+    do: Query.get_by_team_and_name(team_id, name)
+
   def update(%{"id" => id} = params) do
     id
     |> Query.get()

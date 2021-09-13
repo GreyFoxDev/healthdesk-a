@@ -17,22 +17,26 @@ defmodule MainWeb.DispositionController do
     render conn, "index.html", location: nil, dispositions: dispositions, team: team, teams: teams(conn), changeset: Disposition.get_changeset()
   end
 
-  def create(conn, %{"disposition" => disposition, "team_id" => team_id}) do
-    disposition
-    |> Map.put("team_id", team_id)
-    |> Disposition.create()
-    |> case do
-         {:ok, _hours} ->
-           conn
-           |> put_flash(:success, "Disposition created successfully.")
-           |> redirect(to: team_disposition_path(conn, :index, team_id))
-
-         {:error, changeset} ->
-           conn
-           |> put_flash(:error, "Disposition failed to create")
-           |> render_page("index.html", changeset, changeset.errors)
-       end
-
+  def create(conn, %{"disposition" => %{"disposition_name" => name} = disposition, "team_id" => team_id}) do
+    case Disposition.get_by_team_and_name(team_id, name) do
+      [] ->
+        Map.put(disposition, "team_id", team_id)
+        |> Disposition.create()
+        |> case do
+             {:ok, _hours} ->
+               conn
+               |> put_flash(:success, "Disposition created successfully.")
+               |> redirect(to: team_disposition_path(conn, :index, team_id))
+             {:error, changeset} ->
+               conn
+               |> put_flash(:error, "Disposition failed to create")
+               |> render_page("index.html", changeset, changeset.errors)
+           end
+      _ ->
+        conn
+        |> put_flash(:error, "Disposition already exists")
+        |> redirect(to: team_disposition_path(conn, :index, team_id))
+    end
   end
 
   def delete(conn, %{"id" => id, "team_id" => team_id}) do

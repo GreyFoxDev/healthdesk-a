@@ -45,6 +45,7 @@ defmodule MainWeb.TeamController do
         %{"disposition_name" => "Call Hang Up"} |> Map.put("team_id", team.id)|> Disposition.create()
         %{"disposition_name" => "Call Deflected"} |> Map.put("team_id", team.id)|> Disposition.create()
         %{"disposition_name" => "Call Transferred"} |> Map.put("team_id", team.id)|> Disposition.create()
+        %{"disposition_name" => "SMS Unsubscribe"} |> Map.put("team_id", team.id)|> Disposition.create()
         conn
         |> put_flash(:success, "Team created successfully.")
         |> redirect(to: team_path(conn, :index))

@@ -35,6 +35,18 @@ defmodule Data.Query.Disposition do
     |> repo.all()
   end
 
+ @doc """
+  Return a list of active dispositions for a team
+  """
+  @spec get_by_team_and_name(team_id :: binary(), name :: binary(), repo :: Ecto.Repo.t()) :: [Disposition.t()]
+  def get_by_team_and_name(team_id, name, repo \\ Read) do
+    from(t in Disposition,
+      where: is_nil(t.deleted_at),
+      where: t.team_id == ^team_id and t.disposition_name == ^name
+    )
+    |> repo.all()
+  end
+
   @doc """
   Return a list of all dispositions with count of usage. Used by super admin
   """

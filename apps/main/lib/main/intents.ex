@@ -1,5 +1,7 @@
 defmodule MainWeb.Intents do
   alias Data.{Location, Intent}
+  alias Data.ConversationMessages, as: CM
+  alias Data.Conversations, as: C
   @moduledoc """
   This module receives the intent and args from Wit and then routes
   the information to the correct intent handler. To add a new intent
@@ -70,7 +72,6 @@ defmodule MainWeb.Intents do
     end
   end
   def get({name, _} = intent, location) do
-
     location = Location.get_by_phone(location)
     local_intent = Intent.get_by(name, location.id)
 
@@ -172,6 +173,9 @@ defmodule MainWeb.Intents do
   def get_({"startOver", _}, location) do
     get({:unknown, %{}}, location)
   end
+  def get_({"unsubscribe", _}, location) do
+    get({:unknown, %{}}, location.phone_number)
+  end
 
   def get_({intent, args}, location) do
     args = remove_intent(args)
@@ -202,4 +206,35 @@ defmodule MainWeb.Intents do
 
   defp remove_intent(args) when is_binary(args), do: args
 
+  defp close_conversation(convo_id, location_id) do
+    location = Location.get_by_phone(location_id)
+    disposition =
+      %{role: "system"}
+      |> Data.Disposition.get_by_team_id(location.team_id)
+      |> Enum.find(&(&1.disposition_name == "Automated"))
+
+    if disposition do
+      Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})
+
+      _ =  %{
+             "conversation_id" => convo_id,
+             "phone_number" => location.phone_number,
+             "message" =>
+               "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+             "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+           }
+           |> CM.create()
+    else
+      _ = %{
+            "conversation_id" => convo_id,
+            "phone_number" => location.phone_number,
+            "message" =>
+              "CLOSED: Closed by System",
+            "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+          }
+          |> CM.create()
+    end
+
+    C.close(convo_id)
+  end
 end

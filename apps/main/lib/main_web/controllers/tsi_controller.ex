@@ -282,7 +282,9 @@ defmodule MainWeb.TsiController do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
-
+          IO.inspect("------response-----------")
+          IO.inspect(response)
+          IO.inspect("------response----------")
           message =  Appointment.get_next_reply(convo_id, response, location.phone_number)
           if String.contains?(message,location.default_message) do
             {:unknown, message}
