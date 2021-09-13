@@ -263,7 +263,7 @@ defmodule MainWeb.Live.WebChat.Index do
     Location.get(%{role: "admin"}, id)
   end
 
-  defp notify_admin_user(%{message: message, member: member, convo: convo, location: location}) do
+  defp notify_admin_user(%{message: message, member: _member, convo: convo, location: location}) do
     case convo.status do
       "open" ->
         Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )

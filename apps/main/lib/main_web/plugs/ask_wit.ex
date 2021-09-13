@@ -6,7 +6,7 @@ defmodule MainWeb.Plug.AskWit do
   require Logger
   import Plug.Conn
   alias Data.Conversations, as: C
-  alias Data.{Location,Team}
+  alias Data.Team
 
   @spec init(list()) :: list()
   def init(opts), do: opts

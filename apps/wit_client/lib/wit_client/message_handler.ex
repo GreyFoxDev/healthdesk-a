@@ -2,8 +2,6 @@ defmodule WitClient.MessageHandler do
   use GenServer,
     start: {WitClient.MessageHandler, :start_link, []},
     restart: :transient
-    alias Data.Team
-
   @moduledoc """
 
   The Message Handler is the process responsible for sending
@@ -30,7 +28,7 @@ defmodule WitClient.MessageHandler do
     {:ok, args}
   end
 
-  def handle_info(:ask, [from, nil,bot_id]) do
+  def handle_info(:ask, [from, nil,_bot_id]) do
     send(from, {:error, :unknown})
     {:stop, :normal, []}
   end
@@ -66,6 +64,11 @@ defmodule WitClient.MessageHandler do
     {:stop, :normal, []}
   end
 
+  def handle_info(_, state) do
+    Logger.error("Unkown message: #{inspect(state)}")
+    {:stop, :normal, state}
+  end
+
   def get_intent(%{"intent" => [%{"value" => value} | _]}), do: value
   def get_intent(%{"thanks" => [%{"value" => "true"} | _]}), do: "getMessageGeneric"
   def get_intent(_response), do: :unknown
@@ -92,18 +95,18 @@ defmodule WitClient.MessageHandler do
   end
 
   defp set_value(value, "greetings"),
-    do: {:greetings, value}
+                        do: {:greetings, value}
 
   defp set_value(value, key) do
     try do
       key =
-        key
-        |> String.downcase()
-        |> String.to_existing_atom()
+      key
+      |> String.downcase()
+      |> String.to_existing_atom()
 
       {key, value}
     rescue
-      _error in ArgumentError ->
+        _error in ArgumentError ->
         Logger.error("Invalid key from Wit.AI: #{inspect(key)} value: #{inspect(value)}")
         {key, value}
     end
@@ -112,14 +115,10 @@ defmodule WitClient.MessageHandler do
   defp parse_datetime([%{"type" => "value", "value" => value} | _]), do: value
 
   defp parse_datetime([
-         %{"type" => "interval", "from" => %{"value" => from}, "to" => %{"value" => to}} | _
-       ]),
-       do: {from, to}
+%{"type" => "interval", "from" => %{"value" => from}, "to" => %{"value" => to}} | _
+]),
+do: {from, to}
 
   defp parse_datetime(_), do: nil
 
-  def handle_info(_, state) do
-    Logger.error("Unkown message: #{inspect(state)}")
-    {:stop, :normal, state}
-  end
 end

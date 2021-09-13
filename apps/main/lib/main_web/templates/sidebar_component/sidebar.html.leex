@@ -63,7 +63,7 @@
                 <div class="card-footer p-3">
                     <!-- .
                     <form id="member-form" method="PUT" style="width:100%;"> -->
-                    <%= f = form_for :foo, "#", [ phx_submit: :save_member, id: "member-form", style: "width: 100%"] %>
+                    <%= _f = form_for :foo, "#", [ phx_submit: :save_member, id: "member-form", style: "width: 100%"] %>
                     <%= if @open_conversation.member do %>
                     <input name="member[id]" type="hidden" value="<%= @open_conversation.member.id %>">
                     <% end %>

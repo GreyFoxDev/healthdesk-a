@@ -9,9 +9,6 @@ defmodule MainWeb.InstagramController do
 
   alias MainWeb.{Notify}
 
-  alias Data.{Member, TimezoneOffset, TeamMember, Conversations}
-
-  alias Ueberauth.Strategy.Helpers
   alias Data.{Location, Team}
 
   def hook(conn, %{"hub.challenge" => challenge}=_params) do
@@ -157,7 +154,7 @@ defmodule MainWeb.InstagramController do
             }} |> Jason.encode!
     case HTTPoison.post(url,body,[{"Content-Type", "application/json"}])do
       {:ok, res} -> Poison.decode!(res.body)
-      error ->
+      _error ->
         :error
     end
   end
@@ -176,7 +173,7 @@ defmodule MainWeb.InstagramController do
            }
            MainWeb.UpdateMemberController.update(member)
            :ok
-         error ->
+         _error ->
            {:error, :unauthorized}
        end
   end
