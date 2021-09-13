@@ -2,7 +2,7 @@ defmodule MainWeb.Live.OpenConverationsView do
   use Phoenix.HTML
   use Phoenix.LiveView
   import MainWeb.Helper.LocationHelper
-  alias Data.Conversations, as: C
+  alias Data.Conversations
 
 
 
@@ -11,7 +11,7 @@ defmodule MainWeb.Live.OpenConverationsView do
 
 
     location_ids = teammate_locations(current_user,true)
-
+    page= 0
     Main.LiveUpdates.subscribe_live_view()
     team_member_id=
       if is_nil(current_user.team_member) do
@@ -21,7 +21,7 @@ defmodule MainWeb.Live.OpenConverationsView do
       end
     socket =
       socket
-      |> assign(:count, open_convos(location_ids,team_member_id))
+      |> assign(:count, open_convos(location_ids, current_user, page))
       |> assign(:current_user, current_user)
       |> assign(:team_member_id, team_member_id)
       |> assign(:session, session)
@@ -66,9 +66,10 @@ defmodule MainWeb.Live.OpenConverationsView do
   end
 
   def handle_info(_broadcast = %{topic: << "alert:", _location_id :: binary >>}, socket) do
+    page= 0
     count =
       try do
-        open_convos(socket.assigns.location_ids, socket.assigns.team_member_id)
+        open_convos(socket.assigns.location_ids, socket.current_user.user, page)
       rescue
         _ ->
           socket.assigns.count
@@ -81,9 +82,10 @@ defmodule MainWeb.Live.OpenConverationsView do
   end
 
   def handle_info({location_id, :updated_open}, socket) do
+    page=  0
     count =
       if Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
-        open_convos(socket.assigns.location_ids, socket.assigns.team_member.id)
+        open_convos(socket.assigns.location_ids, socket.current_user.user, page)
       else
         socket.assigns.count
       end
@@ -97,9 +99,10 @@ defmodule MainWeb.Live.OpenConverationsView do
     end
   end
   def handle_info({location_id, :updated_count}, socket) do
+    page=  0
     count =
       if Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
-        open_convos(socket.assigns.location_ids, socket.assigns.team_member.id)
+        open_convos(socket.assigns.location_ids, socket.current_user.user, page)
       else
         socket.assigns.count
       end
@@ -115,10 +118,10 @@ defmodule MainWeb.Live.OpenConverationsView do
   def handle_info(_, socket) do
     {:noreply, socket}
   end
-  defp open_convos(location_id, team_member_id) do
-    active= C.count_active_convo(location_id, team_member_id)
-    assigned = C.count_assigned_convo(location_id, team_member_id)
-    closed=C.count_closed_convo(location_id)
+  defp open_convos(location_ids, user, page) do
+    active= Conversations.count_active_convo(location_ids,["open", "pending"], user.id,true)
+    assigned =Conversations.count_assigned_convo(location_ids,["open", "pending"], user.id)
+    closed=Conversations.count_closed_convo(location_ids,["closed"])
 
     %{"active_count"=> active, "assigned_count"=> assigned, "total"=> active+assigned, "closed_count"=> closed }
   end

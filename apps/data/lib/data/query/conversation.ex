@@ -124,22 +124,18 @@ defmodule Data.Query.Conversation do
   def count_active_convo(location_id, team_member_id, repo \\ Read)
   def count_active_convo(location_id, team_member_id, repo) when (is_nil(team_member_id)) do
 
-    from(c in Conversation,
-      where: c.location_id in ^location_id,
-      where: c.status == "pending",
-      select: count(c.id)
-    )
-    |> repo.one()
-  end
-  def count_active_convo(location_id, team_member_id, repo) do
 
-    from(c in Conversation,
+  def count_active_convo(location_id, status, user_id , true, repo\\ Read) do
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
       where: c.location_id in ^location_id,
-      where: c.status == "pending" or c.team_member_id == ^team_member_id,
+      where: c.user_id == ^user_id or is_nil(c.user_id),
       select: count(c.id)
     )
     |> repo.one()
   end
+
 
   def count_assigned_convo(location_id, team_member_id, repo \\ Read)
   def count_assigned_convo(location_id, team_member_id, repo) when (is_nil(team_member_id)) do
@@ -152,16 +148,18 @@ defmodule Data.Query.Conversation do
   end
   def count_assigned_convo(location_id, team_member_id, repo) do
     from(c in Conversation,
+
       where: c.location_id in ^location_id,
-      where: c.status == "open" and c.team_member_id != ^team_member_id,
+      where: c.user_id != ^user_id,
       select: count(c.id)
     )
     |> repo.one()
   end
-  def count_closed_convo(location_id, repo \\ Read) do
-    from(c in Conversation,
+    def count_closed_convo(location_id, status, repo \\ Read) do
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
       where: c.location_id in ^location_id,
-      where: c.status == "closed",
       select: count(c.id)
     )
     |> repo.one()
