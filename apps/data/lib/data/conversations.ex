@@ -48,14 +48,12 @@ defmodule Data.Conversations do
     Query.get_by_location_id(location_id)
   end
 
-  def all(_, _), do: {:error, :invalid_permissions}
-
   def all(%{role: role}, location_id, status) when role in @roles and is_list(location_id) do
     Query.get_by_status(location_id, status)
   end
-  #  def filter(%{role: role}, location_id, status, search_String) when role in @roles and is_list(location_id) do
-  #    Query.get_by_status(location_id, status,search_String)
-  #  end
+#  def filter(%{role: role}, location_id, status, search_String) when role in @roles and is_list(location_id) do
+#    Query.get_by_status(location_id, status,search_String)
+#  end
 
   def filter(%{role: role}, location_id, status, user_id,check,search_string) when role in @roles and is_list(location_id) do
     Query.get_filtered_conversations(location_id, status, user_id, check,search_string)
@@ -81,6 +79,7 @@ defmodule Data.Conversations do
     Query.get_by_status_count(location_id, status)
   end
 
+  def all(_, _), do: {:error, :invalid_permissions}
 
   def all_open(%{role: role}, location_id, limit, offset) when role in @roles do
     Query.get_open_by_location_id(location_id, limit, offset)
@@ -90,14 +89,13 @@ defmodule Data.Conversations do
     Query.get_closed_by_location_id(location_id, limit, offset)
   end
 
-
   def get(%{role: role}, id) when role in @roles,
       do: Query.get(id, true)
 
-  def get(_, _), do: {:error, :invalid_permissions}
-
   def get(%{role: role}, id, preload_f) when role in @roles,
       do: Query.get(id, preload_f)
+
+  def get(_, _), do: {:error, :invalid_permissions}
 
   def update(%{"id" => id} = params) do
     id

@@ -151,7 +151,7 @@ defmodule MainWeb.Api.ConversationController do
     conn |> send_resp(200, "ok")
   end
 
-  def update(conn, %{"conversation_id" => id, "from" => _from, "message" => _message, "type" =>"call"}) do
+  def update(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type" =>"call"}) do
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
@@ -176,7 +176,7 @@ defmodule MainWeb.Api.ConversationController do
     |> json(%{success: false})
   end
 
-  def close(conn, %{"conversation_id" => id, "from" => _from, "message" => _message, "type"=>"call"} = params) do
+  def close(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type"=>"call"} = params) do
     if params["disposition"] do
       convo = ConversationCall.get(id)
       location = Location.get(convo.location_id)
@@ -184,10 +184,10 @@ defmodule MainWeb.Api.ConversationController do
       disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
 
 
-      _cd = Data.ConversationDisposition.create(%{"conversation_call_id" => id, "disposition_id" => disposition.id})
-      _convo = ConversationCall.close(id)
+      cd = Data.ConversationDisposition.create(%{"conversation_call_id" => id, "disposition_id" => disposition.id})
+      convo = ConversationCall.close(id)
     else
-      _convo = ConversationCall.close(id)
+      convo = ConversationCall.close(id)
 
     end
 
@@ -254,7 +254,7 @@ defmodule MainWeb.Api.ConversationController do
             dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
             disposition = Enum.find(dispositions, &(&1.disposition_name == "Call Hang Up"))
 
-            _conve=Data.ConversationDisposition.create(%{"conversation_call_id" => convo.id, "disposition_id" => disposition.id})
+            conve=Data.ConversationDisposition.create(%{"conversation_call_id" => convo.id, "disposition_id" => disposition.id})
             ConversationCall.close(convo.id)
 #            notify && Main.LiveUpdates.notify_live_view({location.id, :updated_open})
         end

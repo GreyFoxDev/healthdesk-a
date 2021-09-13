@@ -10,7 +10,7 @@ defmodule MainWeb.Plug.BuildAnswer do
   alias MainWeb.{Notify}
   alias Data.Location
   alias Data.Conversations, as: C
-  alias Data.{TeamMember, Location}
+  alias Data.{Conversations, ConversationMessages, TeamMember, Location}
 
   alias Main.Service.Appointment
   @spec init(list()) :: list()
@@ -23,7 +23,7 @@ defmodule MainWeb.Plug.BuildAnswer do
   If the intent is 'unknown' then the super admin for the location needs to be notified that there is a new
   message in the queue.
   """
-  def call(%{assigns: %{convo: id,  status: "open",message: message, member: _member, intent: nil,location: location} = assigns} = conn, _opts) do
+  def call(%{assigns: %{convo: id,  status: "open",message: message, member: member, intent: nil,location: location} = assigns} = conn, _opts) do
     IO.inspect("###123######")
     IO.inspect(assigns)
     IO.inspect("#########")
@@ -36,7 +36,7 @@ defmodule MainWeb.Plug.BuildAnswer do
       else
         if (convo.channel_type != "App" ) do
           team_member =
-            _team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
+            team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
           location = Location.get_by_phone(location)
           case convo.member do
             nil ->  Notify.send_to_teammate(id, message, location, team_member, build_member(conn))
@@ -106,7 +106,7 @@ defmodule MainWeb.Plug.BuildAnswer do
     end
   end
 
-  def call(%{assigns: %{convo: id,message: message, member: _member, location: location} = assigns} = conn, _opts)do
+  def call(%{assigns: %{convo: id,message: message, member: member, location: location} = assigns} = conn, _opts)do
     IO.inspect("##567#######")
     IO.inspect(conn.assigns)
     IO.inspect("#########")
@@ -117,7 +117,7 @@ defmodule MainWeb.Plug.BuildAnswer do
 
       if (convo.channel_type != "App" ) do
         team_member =
-          _team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
+          team_member = TeamMember.get(%{role: "admin"}, assigns[:team_member_id])
         location = Location.get_by_phone(location)
         case convo.member do
           nil ->  Notify.send_to_teammate(id, message, location, team_member, build_member(conn))
@@ -130,11 +130,11 @@ defmodule MainWeb.Plug.BuildAnswer do
   end
 
 
-  defp notify_admin_user(%{message: message, member: _member, convo: convo_id, location: location}) do
+  defp notify_admin_user(%{message: message, member: member, convo: convo_id, location: location}) do
         Notify.send_to_admin(convo_id, message, location, "location-admin")
 
   end
-  defp build_member(%{assigns: %{memberName: memberName, phoneNumber: phoneNumber, email: email}} = _conn) do
+  defp build_member(%{assigns: %{memberName: memberName, phoneNumber: phoneNumber, email: email}} = conn) do
     name=String.split(memberName, " ", parts: 2)
     name = if(length(name)==1) do
       %{first_name: List.first(name), last_name: ""}

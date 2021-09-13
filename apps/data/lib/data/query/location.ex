@@ -42,8 +42,7 @@ defmodule Data.Query.Location do
   @doc """
   Return a single active location by a unique phone number
   """
-  def get_by_phone(phone_number, repo \\ Read)
-  def get_by_phone(phone_number, repo) when is_binary(phone_number) do
+  def get_by_phone(phone_number, repo \\ Read) when is_binary(phone_number) do
     from(t in Location,
       where: is_nil(t.deleted_at),
       where: t.phone_number == ^phone_number,

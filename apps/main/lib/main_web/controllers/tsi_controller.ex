@@ -137,7 +137,7 @@ defmodule MainWeb.TsiController do
     end
   end
 
-  def edit(conn, _params), do:
+  def edit(conn, params), do:
     send_resp(conn, 400, "Bad request")
 
   def create(conn, %{"phone_number" => phone_number, "api_key" => api_key} = params) do

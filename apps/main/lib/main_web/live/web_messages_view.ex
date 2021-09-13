@@ -39,6 +39,10 @@ defmodule MainWeb.Live.WebMessagesView do
     end
   end
 
+  def handle_info({:update, convo_id}, socket) do
+    Main.LiveUpdates.notify_live_view({convo_id, :online})
+    {:noreply, socket}
+  end
   def terminate(_reason, socket) do
     convo_id = socket.assigns.convo_id
     Main.LiveUpdates.notify_live_view({convo_id, :offline})
@@ -50,53 +54,40 @@ defmodule MainWeb.Live.WebMessagesView do
     {:noreply, socket}
 
   end
-
   def handle_event("blured",_,socket)do
     convo_id = socket.assigns.convo_id
     Main.LiveUpdates.notify_live_view({convo_id, :user_typing_stop})
     {:noreply, socket}
   end
 
-  def handle_event(_,_params, socket) do
-    {:noreply, socket}
-  end
-
-  def handle_info({:update, convo_id}, socket) do
-    Main.LiveUpdates.notify_live_view({convo_id, :online})
-    {:noreply, socket}
-  end
-
   def handle_info({_requesting_module, :agent_typing_start}, socket) do
     {:noreply, assign(socket, %{typing: true})}
   end
-
   def handle_info({_requesting_module, :agent_typing_stop}, socket) do
     {:noreply, assign(socket, %{typing: false})}
   end
-
   def handle_info({_requesting_module, {:new_msg,msg}}, socket) do
-    socket.assigns.convo_id |> mark_read(msg)
+     socket.assigns.convo_id |> mark_read(msg)
 
-     messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
-     messages = messages ++ [msg]
-     socket =
-     socket
-     |> assign(:messages, messages)
-     {:noreply, socket}
+    messages = if socket.assigns, do: (socket.assigns[:messages] || []), else: []
+    messages = messages ++ [msg]
+    socket =
+      socket
+      |> assign(:messages, messages)
+    {:noreply, socket}
   end
-
   def handle_info(_, socket) do
     {:noreply, socket}
   end
-
+  def handle_event(_,_params, socket) do
+    {:noreply, socket}
+  end
   def fetch_member(%{original_number: <<"CH", _rest :: binary>> = channel} = conversation) do
     with [%Channel{} = channel] <- MemberChannel.get_by_channel_id(channel) do
       Map.put(conversation, :member, channel.member)
     end
   end
-
   def fetch_member(conversation), do: conversation
-
   defp mark_read(convo_id,msg) do
     {:ok, msg}= ConversationMessages.mark_read(msg)
     Main.LiveUpdates.notify_live_view({convo_id, msg})

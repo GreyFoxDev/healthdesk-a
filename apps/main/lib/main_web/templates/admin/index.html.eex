@@ -360,7 +360,7 @@
             </div>
             <div class="modal-body">
                 <ul class="list-group">
-                    <%= for {name, count} <- @dispositions |> Enum.group_by(&(&1.name),&(&1.count)) |> Enum.map(fn {k,v} -> {k,Enum.sum(v)} end) |> Enum.sort_by(fn {_k,v} -> v end, fn a,b -> a>b end ) do %>
+                    <%= for {name, count} <- @dispositions |> Enum.group_by(&(&1.name),&(&1.count)) |> Enum.map(fn {k,v} -> {k,Enum.sum(v)} end) |> Enum.sort_by(fn {k,v} -> v end, fn a,b -> a>b end ) do %>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <%= name %>
                         <span class="badge badge-primary badge-pill"><%= count |> format_comma_numbers %></span>

@@ -4,8 +4,8 @@
 # is restricted to this project.
 use Mix.Config
 alias Main.Scheduler
+
 # General application configuration
-#abc
 config :main,
   namespace: Main
 

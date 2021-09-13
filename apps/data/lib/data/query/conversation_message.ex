@@ -24,9 +24,7 @@ defmodule Data.Query.ConversationMessage do
   @doc """
   Return median response time based on location
   """
-
-  def count_by_location_id(location_id,from,to, repo \\ Read)
-  def count_by_location_id(location_id,nil,nil, repo) do
+  def count_by_location_id(location_id,nil,nil, repo \\ Read) do
     repo
     |> SQL.query!("SELECT count_messages_by_location_id('#{location_id}') AS #{:median_response_time}")
     |> build_results()
@@ -50,9 +48,7 @@ defmodule Data.Query.ConversationMessage do
   @doc """
   Return median response time based on team
   """
-
-  def count_by_team_id(team_id,from,to, repo \\ Read)
-  def count_by_team_id(team_id,nil,nil, repo) do
+  def count_by_team_id(team_id,nil,nil, repo \\ Read) do
     repo
     |> SQL.query!("SELECT count_messages_by_team_id('#{team_id}') AS #{:median_response_time}")
     |> build_results()

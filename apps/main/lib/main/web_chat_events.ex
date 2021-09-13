@@ -76,8 +76,73 @@ defmodule Main.WebChat.Events do
     {:reply, build_message(text_box(), location, "outbound"), state}
   end
 
+  def build_link_10_fitness(club, plan) do
+    club = case club do
+             "Bryant" -> "0011"
+             "Cabot" -> "1013"
+             "Conway" -> "1014"
+             "West Conway" -> "7310"
+             "Jonesboro" -> "1015"
+             "Downtown" -> "1036"
+             "Rodney Parham" -> "0010"
+             "University" -> "7010"
+             "Maumelle" -> "0112"
+             "North Little Rock" -> "1010"
+             "Paragould" -> "1086"
+             "Searcy" -> "1048"
+             "Springfield" -> "0111"
+             _ -> nil
+           end
+
+    if club do
+      """
+      <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;">
+        <a href="http://10fitness.com/buy?club=#{club}&plan=#{plan}" style="color: white;" target="_top">
+          Proceed to checkout
+        </a>
+      </div>
+      """
+    else
+      nil
+    end
+  end
+
+  def build_signup_message(club, plan) when club in ["Bryant", "Paragould"] do
+    case plan do
+      "basic" ->
+    """
+    The Basic plan joining fee is $1 and the annual fee is $39.95. Click below to proceed to checkout.
+    """
+      "premium" ->
+    """
+    The Premium plan joining fee is $1 and the annual fee is $39.95. Click below to proceed to checkout.
+    """
+      "level-10" ->
+    """
+    The Level 10 plan joining fee is $1 and the annual fee is $39.95. Click below to proceed to checkout.
+    """
+    end
+  end
+
+  def build_signup_message(_club, plan) do
+    case plan do
+      "basic" ->
+        """
+        The Basic plan joining fee is $59.95 and the annual fee is $39.95. Click below to proceed to checkout.
+        """
+      "premium" ->
+        """
+        The Premium plan joining fee is $19.95 and the annual fee is $39.95. Click below to proceed to checkout.
+        """
+      "level-10" ->
+        """
+        The Level 10 plan joining fee is FREE and the annual fee is $39.95. Click below to proceed to checkout.
+        """
+    end
+  end
+
   def handle_call(<< "join:", plan :: binary >>, _from, %{assigns: %{location: location}, current_location: current_location} = state)
-      when plan in ["basic", "premium", "level-10"] do
+  when plan in ["basic", "premium", "level-10"] do
     location = (current_location || location)
 
     link = build_link_10_fitness(location.location_name, String.replace(plan, "-", ""))
@@ -129,13 +194,13 @@ defmodule Main.WebChat.Events do
     location_requested = Location.get(%{role: "admin"}, id)
 
     next = case state.current_event do
-      :tour ->
-        day_of_week()
-      :other ->
-        text_box()
-      _ ->
-        which_plans(location_requested)
-    end
+             :tour ->
+               day_of_week()
+             :other ->
+               text_box()
+             _ ->
+               which_plans(location_requested)
+           end
 
     response = """
     #{location_requested.location_name}<br />
@@ -218,71 +283,6 @@ defmodule Main.WebChat.Events do
     end
 
     {:reply, build_message(response, location, "outbound"), %{state | current_event: :other}}
-  end
-
-  def build_link_10_fitness(club, plan) do
-    club = case club do
-             "Bryant" -> "0011"
-             "Cabot" -> "1013"
-             "Conway" -> "1014"
-             "West Conway" -> "7310"
-             "Jonesboro" -> "1015"
-             "Downtown" -> "1036"
-             "Rodney Parham" -> "0010"
-             "University" -> "7010"
-             "Maumelle" -> "0112"
-             "North Little Rock" -> "1010"
-             "Paragould" -> "1086"
-             "Searcy" -> "1048"
-             "Springfield" -> "0111"
-             _ -> nil
-           end
-
-    if club do
-      """
-      <div style="width: 90%; padding: 5px; margin: 5px; background-color: #9B3426;border-radius: 5px;">
-        <a href="http://10fitness.com/buy?club=#{club}&plan=#{plan}" style="color: white;" target="_top">
-          Proceed to checkout
-        </a>
-      </div>
-      """
-    else
-      nil
-    end
-  end
-
-  def build_signup_message(club, plan) when club in ["Bryant", "Paragould"] do
-    case plan do
-      "basic" ->
-    """
-    The Basic plan joining fee is $1 and the annual fee is $39.95. Click below to proceed to checkout.
-    """
-      "premium" ->
-    """
-    The Premium plan joining fee is $1 and the annual fee is $39.95. Click below to proceed to checkout.
-    """
-      "level-10" ->
-    """
-    The Level 10 plan joining fee is $1 and the annual fee is $39.95. Click below to proceed to checkout.
-    """
-    end
-  end
-
-  def build_signup_message(_club, plan) do
-    case plan do
-      "basic" ->
-        """
-        The Basic plan joining fee is $59.95 and the annual fee is $39.95. Click below to proceed to checkout.
-        """
-      "premium" ->
-        """
-        The Premium plan joining fee is $19.95 and the annual fee is $39.95. Click below to proceed to checkout.
-        """
-      "level-10" ->
-        """
-        The Level 10 plan joining fee is FREE and the annual fee is $39.95. Click below to proceed to checkout.
-        """
-    end
   end
 
   defp build_message(response, location, direction) do

@@ -54,7 +54,7 @@
                                     <span class='fa fa-check'></span>
                                 <% end %>
                             <% end %>
-                            <%= form_for @conn, team_location_saved_reply_path(@conn, :delete, @location.team_id, @location.id, saved_reply.id),[method: "delete"] , fn _f -> %>
+                            <%= form_for @conn, team_location_saved_reply_path(@conn, :delete, @location.team_id, @location.id, saved_reply.id),[method: "delete"] , fn f -> %>
                                 <%= submit class: "btn btn-secondary" do %>
                                     <span class='fa fa-times'></span>
                                 <% end %>
