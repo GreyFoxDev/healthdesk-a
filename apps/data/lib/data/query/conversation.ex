@@ -126,7 +126,7 @@ defmodule Data.Query.Conversation do
     |> repo.all()
   end
 
-  def count_active_convo(location_id, status, user_id, true, repo \\ Read) do
+  def count_active_convo(location_id, status, user_id , true, repo\\ Read) do
     from(
       c in ConversationList,
       where: c.status in ^status,
@@ -137,7 +137,8 @@ defmodule Data.Query.Conversation do
     |> repo.one()
   end
 
-  def count_assigned_convo(location_id, status, user_id, repo \\ Read) do
+
+  def count_assigned_convo(location_id, status, user_id, repo\\ Read) do
     from(
       c in ConversationList,
       where: c.status in ^status,
@@ -171,6 +172,7 @@ defmodule Data.Query.Conversation do
     ) |>Read.all
 
   end
+  def get_limited_conversations(location_id, status,  offset , limit , user_id ) when is_list(status) do
 
     from(
       c in ConversationList,
@@ -180,6 +182,7 @@ defmodule Data.Query.Conversation do
       offset: ^offset, limit: ^limit
     ) |>Read.all
   end
+  def get_limited_conversations(location_id, status,  offset , limit ) when is_list(status) do
 
     from(
       c in ConversationList,
