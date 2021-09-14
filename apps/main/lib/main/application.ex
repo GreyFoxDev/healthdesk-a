@@ -5,8 +5,8 @@ defmodule Main.Application do
     import Supervisor.Spec
 
     children = [
+      {Phoenix.PubSub, name: Main.PubSub},
       supervisor(MainWeb.Endpoint, []),
-#      {Phoenix.PubSub, name: Main.PubSub},
       MainWeb.Presence,
       {Main.WebChat.Supervisor, []},
       {Main.Scheduler, []},
