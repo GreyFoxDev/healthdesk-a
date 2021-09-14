@@ -99,10 +99,6 @@ defmodule MainWeb.Live.NormalHourEditForm do
   end
 
   def handle_event(event, params, socket) do
-    IO.inspect("====================================HANDLE EVENT ERROR====================================")
-    IO.inspect(event)
-    IO.inspect(params)
-    IO.inspect("====================================HANDLE EVENT ERROR======================================")
     {:noreply, socket}
   end
 

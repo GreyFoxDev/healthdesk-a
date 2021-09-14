@@ -5,11 +5,11 @@ defmodule Data.Schema.Automation do
   use Data.Schema
 
   @type t :: %__MODULE__{
-               id: binary(),
-               question: Text.t(),
-               answer: Text.t() | nil,
-               location_id: binary()
-             }
+          id: binary(),
+          question: Text.t(),
+          answer: Text.t() | nil,
+          location_id: binary()
+        }
 
   @required_fields ~w|
   location_id
@@ -28,7 +28,7 @@ defmodule Data.Schema.Automation do
 
     belongs_to(:location, Data.Schema.Location)
 
-    timestamps([type: :naive_datetime_usec])
+    timestamps(type: :naive_datetime_usec)
   end
 
   def changeset(model, params \\ %{}) do

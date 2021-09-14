@@ -4,7 +4,7 @@ defmodule Data.Query.Conversation do
   """
   import Ecto.Query, only: [from: 2]
 
-  alias Data.Schema.{Conversation,ConversationList, Member}
+  alias Data.Schema.{Conversation, ConversationList, Member}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
 
@@ -57,15 +57,17 @@ defmodule Data.Query.Conversation do
            ]
          )
   end
+
   @doc """
   Return a list of conversations for a location
   """
   @spec get_by_status(location_id :: [binary()], status :: [binary()], repo :: Ecto.Repo.t()) :: [
-                                                                                                   Conversation.t()
-                                                                                                 ]
-  def get_by_status(location_id, status,search_string, repo \\ Read) when is_list(status) do
+          Conversation.t()
+        ]
+  def get_by_status(location_id, status, search_string, repo \\ Read) when is_list(status) do
     time = DateTime.add(DateTime.utc_now(), -1_296_000, :seconds)
     like = "%#{search_string}%"
+
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
       left_join: member in Member,
@@ -74,34 +76,37 @@ defmodule Data.Query.Conversation do
       where: c.location_id in ^location_id,
       where: c.status in ^status,
       where: m.sent_at >= ^time,
-      or_where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(location.location_name,^like)
-                 or like(member.first_name,^like) or like(member.phone_number,^like) or like(member.last_name,^like)),
+      or_where:
+        like(c.original_number, ^like) or like(c.channel_type, ^like) or
+          like(location.location_name, ^like) or
+          like(member.first_name, ^like) or like(member.phone_number, ^like) or
+          like(member.last_name, ^like),
       # most recent first
       order_by: [desc: m.sent_at],
       preload: [conversation_messages: m, team_member: [:user], location: []],
       select: %{c | member: member}
     )
-    |> repo.all() |> IO.inspect(limit: :infinity)
+    |> repo.all()
   end
 
   def get_by_status(location_id, status) when is_list(status) do
     repo = Read
     time = DateTime.add(DateTime.utc_now(), -1_296_000, :seconds)
-    q=from(c in Conversation,
-      join: m in assoc(c, :conversation_messages),
-      left_join: member in Member,
-      on: c.original_number == member.phone_number,
-      where: c.location_id in ^location_id,
-      where: c.status in ^status,
-      where: m.sent_at >= ^time,
-      # most recent first
-      order_by: [desc: m.sent_at],
-      preload: [conversation_messages: m, team_member: [:user], location: []],
-      select: %{c | member: member}
-    )
-    IO.inspect("########asd###########")
-    IO.inspect(repo.to_sql(:all, q))
-    IO.inspect("###################")
+
+    q =
+      from(c in Conversation,
+        join: m in assoc(c, :conversation_messages),
+        left_join: member in Member,
+        on: c.original_number == member.phone_number,
+        where: c.location_id in ^location_id,
+        where: c.status in ^status,
+        where: m.sent_at >= ^time,
+        # most recent first
+        order_by: [desc: m.sent_at],
+        preload: [conversation_messages: m, team_member: [:user], location: []],
+        select: %{c | member: member}
+      )
+
     q
     |> repo.all()
   end
@@ -121,7 +126,7 @@ defmodule Data.Query.Conversation do
     |> repo.all()
   end
 
-  def count_active_convo(location_id, status, user_id , true, repo\\ Read) do
+  def count_active_convo(location_id, status, user_id, true, repo \\ Read) do
     from(
       c in ConversationList,
       where: c.status in ^status,
@@ -132,8 +137,7 @@ defmodule Data.Query.Conversation do
     |> repo.one()
   end
 
-
-  def count_assigned_convo(location_id, status, user_id, repo\\ Read) do
+  def count_assigned_convo(location_id, status, user_id, repo \\ Read) do
     from(
       c in ConversationList,
       where: c.status in ^status,
@@ -167,7 +171,6 @@ defmodule Data.Query.Conversation do
     ) |>Read.all
 
   end
-  def get_limited_conversations(location_id, status,  offset , limit , user_id ) when is_list(status) do
 
     from(
       c in ConversationList,
@@ -177,7 +180,6 @@ defmodule Data.Query.Conversation do
       offset: ^offset, limit: ^limit
     ) |>Read.all
   end
-  def get_limited_conversations(location_id, status,  offset , limit ) when is_list(status) do
 
     from(
       c in ConversationList,
@@ -187,7 +189,7 @@ defmodule Data.Query.Conversation do
     ) |>Read.all
   end
 
-  def get_filtered_conversations(location_id, status , user_id , true,s ) when is_list(status) do
+  def get_filtered_conversations(location_id, status, user_id, true, s) when is_list(status) do
     like = "%#{s}%"
     from(
       c in ConversationList,
@@ -198,8 +200,20 @@ defmodule Data.Query.Conversation do
               or like(c.first_name,^like)  or like(c.last_name,^like))
     ) |>Read.all
 
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
+      where: c.location_id in ^location_id,
+      where: c.user_id == ^user_id or is_nil(c.user_id),
+      where:
+        like(c.original_number, ^like) or like(c.channel_type, ^like) or
+          like(c.location_name, ^like) or
+          like(c.first_name, ^like) or like(c.last_name, ^like)
+    )
+    |> Read.all()
   end
-  def get_filtered_conversations(location_id, status,   user_id,s ) when is_list(status) do
+
+  def get_filtered_conversations(location_id, status, user_id, s) when is_list(status) do
     like = "%#{s}%"
 
     from(
@@ -211,7 +225,8 @@ defmodule Data.Query.Conversation do
               or like(c.first_name,^like)  or like(c.last_name,^like))
     ) |>Read.all
   end
-  def get_filtered_conversations(location_id, status,s ) when is_list(status) do
+
+  def get_filtered_conversations(location_id, status, s) when is_list(status) do
     like = "%#{s}%"
 
     from(
@@ -229,7 +244,6 @@ defmodule Data.Query.Conversation do
       left_join: member in Member,
       on: c.original_number == member.phone_number,
       where: c.id in ^ids,
-
       order_by: [desc: m.sent_at],
       preload: [:location, conversation_messages: m, team_member: [:user]],
       select: %{c | member: member}

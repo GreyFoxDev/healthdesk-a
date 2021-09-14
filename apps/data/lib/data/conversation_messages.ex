@@ -14,8 +14,8 @@ defmodule Data.ConversationMessages do
 
   defdelegate create(params), to: Query
   defdelegate get_by_conversation_id(conversation_id), to: Query
-  defdelegate count_by_location_id(location_id,to,from), to: Query
-  defdelegate count_by_team_id(team_id,to,from), to: Query
+  defdelegate count_by_location_id(location_id, to, from), to: Query
+  defdelegate count_by_team_id(team_id, to, from), to: Query
   defdelegate mark_read(msg), to: Query
 
   def get_changeset(),

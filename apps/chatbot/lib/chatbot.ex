@@ -22,13 +22,9 @@ defmodule Chatbot do
       when is_nil(from) or is_nil(to) or is_nil(body),
       do: {:error, :missing_params}
 
-  def send(params)do
-    IO.inspect("-------------------------------------------------------------")
-    IO.inspect(Process.info(self(), :current_stacktrace), label: "STACKTRACE")
-    IO.inspect(params, label: "params")
-    IO.inspect("-------------------------------------------------------------")
+  def send(params) do
     GenServer.cast(Chatbot, {:inbound, params})
-    end
+  end
 
   def handle_cast({:inbound, params}, state) do
     Logger.info("sending message...")
@@ -38,7 +34,6 @@ defmodule Chatbot do
       Logger.info("message sent...")
     else
       error ->
-        IO.inspect(error)
         Logger.error("Unable to send message for: #{inspect(params)}")
     end
 

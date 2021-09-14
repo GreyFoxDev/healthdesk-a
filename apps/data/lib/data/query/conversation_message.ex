@@ -24,48 +24,68 @@ defmodule Data.Query.ConversationMessage do
   @doc """
   Return median response time based on location
   """
-  def count_by_location_id(location_id,nil,nil, repo \\ Read) do
+  def count_by_location_id(location_id, nil, nil, repo \\ Read) do
     repo
-    |> SQL.query!("SELECT count_messages_by_location_id('#{location_id}') AS #{:median_response_time}")
+    |> SQL.query!(
+      "SELECT count_messages_by_location_id('#{location_id}') AS #{:median_response_time}"
+    )
     |> build_results()
   end
-  def count_by_location_id(location_id,from,nil, repo) do
+
+  def count_by_location_id(location_id, from, nil, repo) do
     repo
-    |> SQL.query!("SELECT count_messages_by_location_id_from('#{location_id}','#{from}') AS #{:median_response_time}")
+    |> SQL.query!(
+      "SELECT count_messages_by_location_id_from('#{location_id}','#{from}') AS #{:median_response_time}"
+    )
     |> build_results()
   end
-  def count_by_location_id(location_id,nil,to, repo) do
+
+  def count_by_location_id(location_id, nil, to, repo) do
     repo
-    |> SQL.query!("SELECT count_messages_by_location_id('#{location_id}','#{to}') AS #{:median_response_time}")
+    |> SQL.query!(
+      "SELECT count_messages_by_location_id('#{location_id}','#{to}') AS #{:median_response_time}"
+    )
     |> build_results()
   end
-  def count_by_location_id(location_id,from,to, repo) do
+
+  def count_by_location_id(location_id, from, to, repo) do
     repo
-    |> SQL.query!("SELECT count_messages_by_location_id('#{location_id}','#{to}','#{from}') AS #{:median_response_time}")
+    |> SQL.query!(
+      "SELECT count_messages_by_location_id('#{location_id}','#{to}','#{from}') AS #{:median_response_time}"
+    )
     |> build_results()
   end
 
   @doc """
   Return median response time based on team
   """
-  def count_by_team_id(team_id,nil,nil, repo \\ Read) do
+  def count_by_team_id(team_id, nil, nil, repo \\ Read) do
     repo
     |> SQL.query!("SELECT count_messages_by_team_id('#{team_id}') AS #{:median_response_time}")
     |> build_results()
   end
-  def count_by_team_id(team_id,to,nil, repo) do
+
+  def count_by_team_id(team_id, to, nil, repo) do
     repo
-    |> SQL.query!("SELECT count_messages_by_team_id_from('#{team_id}','#{to}') AS #{:median_response_time}")
+    |> SQL.query!(
+      "SELECT count_messages_by_team_id_from('#{team_id}','#{to}') AS #{:median_response_time}"
+    )
     |> build_results()
   end
-  def count_by_team_id(team_id,nil,from, repo) do
+
+  def count_by_team_id(team_id, nil, from, repo) do
     repo
-    |> SQL.query!("SELECT count_messages_by_team_id('#{team_id}','#{from}') AS #{:median_response_time}")
+    |> SQL.query!(
+      "SELECT count_messages_by_team_id('#{team_id}','#{from}') AS #{:median_response_time}"
+    )
     |> build_results()
   end
-  def count_by_team_id(team_id,from,to, repo) do
+
+  def count_by_team_id(team_id, from, to, repo) do
     repo
-    |> SQL.query!("SELECT count_messages_by_team_id('#{team_id}','#{to}','#{from}') AS #{:median_response_time}")
+    |> SQL.query!(
+      "SELECT count_messages_by_team_id('#{team_id}','#{to}','#{from}') AS #{:median_response_time}"
+    )
     |> build_results()
   end
 
@@ -111,8 +131,7 @@ defmodule Data.Query.ConversationMessage do
         ]
   def mark_read(msg, repo \\ Write)
 
-
-    def mark_read(%{read: false} = msg, repo) do
+  def mark_read(%{read: false} = msg, repo) do
     cs =
       msg
       |> ConversationMessage.changeset(%{read: true})
@@ -134,8 +153,6 @@ defmodule Data.Query.ConversationMessage do
   def mark_read(msg, _repo) do
     {:ok, msg}
   end
-
-
 
   defp build_results(results) do
     cols = Enum.map(results.columns, &String.to_existing_atom/1)

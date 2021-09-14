@@ -33,12 +33,12 @@ defmodule Data.Query.Ticket do
     %Ticket{}
     |> Ticket.changeset(params)
     |> case do
-         %Ecto.Changeset{valid?: true} = changeset ->
-           repo.insert(changeset)
+      %Ecto.Changeset{valid?: true} = changeset ->
+        repo.insert(changeset)
 
-         changeset ->
-           {:error, changeset}
-       end
+      changeset ->
+        {:error, changeset}
+    end
   end
 
   @doc """
@@ -50,12 +50,12 @@ defmodule Data.Query.Ticket do
     original
     |> Ticket.changeset(params)
     |> case do
-         %Ecto.Changeset{valid?: true} = changeset ->
-           repo.update(changeset)
+      %Ecto.Changeset{valid?: true} = changeset ->
+        repo.update(changeset)
 
-         changeset ->
-           {:error, changeset}
-       end
+      changeset ->
+        {:error, changeset}
+    end
   end
 
   @doc """
@@ -88,7 +88,11 @@ defmodule Data.Query.Ticket do
   @doc """
   Get opened Tickets for team-member and location.
   """
-  @spec get_by_team_member_and_location_id(team_member_id :: binary(), location_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
+  @spec get_by_team_member_and_location_id(
+          team_member_id :: binary(),
+          location_id :: binary(),
+          repo :: Ecto.Repo.t()
+        ) :: [Ticket.t()]
   def get_by_team_member_and_location_id(team_member_id, location_id, repo \\ Read) do
     from(t in Ticket,
       where: t.team_member_id == ^team_member_id,
@@ -135,7 +139,8 @@ defmodule Data.Query.Ticket do
   @spec get_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def get_by_team_id(team_id, repo \\ Read) do
     from(t in Ticket,
-      join: tm in TeamMember, on: t.team_member_id == tm.id,
+      join: tm in TeamMember,
+      on: t.team_member_id == tm.id,
       where: tm.team_id == ^team_id,
       where: t.status == "open"
     )
@@ -145,10 +150,15 @@ defmodule Data.Query.Ticket do
   @doc """
   Get opened Tickets for specific team and location.
   """
-  @spec get_by_team_and_location_id(team_id :: binary(), location_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
+  @spec get_by_team_and_location_id(
+          team_id :: binary(),
+          location_id :: binary(),
+          repo :: Ecto.Repo.t()
+        ) :: [Ticket.t()]
   def get_by_team_and_location_id(team_id, location_id, repo \\ Read) do
     from(t in Ticket,
-      join: tm in TeamMember, on: t.team_member_id == tm.id,
+      join: tm in TeamMember,
+      on: t.team_member_id == tm.id,
       where: tm.team_id == ^team_id,
       where: t.location_id == ^location_id,
       where: t.status == "open"
@@ -185,50 +195,70 @@ defmodule Data.Query.Ticket do
   @spec get_by_admin_location(team_member_id :: binary(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
   def get_by_admin_location(team_member_id, repo \\ Read) do
     from(t in Ticket,
-      join: tl in TeamMemberLocation, on: t.location_id == tl.location_id,
+      join: tl in TeamMemberLocation,
+      on: t.location_id == tl.location_id,
       where: tl.team_member_id == ^team_member_id,
       where: t.status == "open"
     )
     |> repo.all()
   end
+
   @spec filter(params :: map(), repo :: Ecto.Repo.t()) :: [Ticket.t()]
 
   def filter(params, repo \\ Read) do
-    query = from(t in Ticket,
-      where: t.status == "open",
-      distinct: t.id
-      #      group_by: t.id,
-      #      select: count(t.id)
+    query =
+      from(t in Ticket,
+        where: t.status == "open",
+        distinct: t.id
+        #      group_by: t.id,
+        #      select: count(t.id)
+      )
 
-    )
-    query = Enum.reduce(params, query, fn {key, value}, query ->
-      case key do
-        "team_id" when is_nil(value) == false and value != "" ->
-          from(t in query,join: tm in TeamMember,
-            on: t.team_member_id == tm.id,
-            where: tm.team_id == ^value
-          )
-        "team_member_id" when is_nil(value) == false and value != "" ->
-          from(t in query,join: tl in TeamMemberLocation,
-            on: t.location_id == tl.location_id,
-            where: tl.team_member_id == ^value
-          )
-        "location_ids" when is_nil(value) == false and value != "" ->
-          from(t in  query, where: t.location_id in ^value)
+    query =
+      Enum.reduce(params, query, fn {key, value}, query ->
+        case key do
+          "team_id" when is_nil(value) == false and value != "" ->
+            from(t in query,
+              join: tm in TeamMember,
+              on: t.team_member_id == tm.id,
+              where: tm.team_id == ^value
+            )
 
-        "to" when is_nil(value) == false or value != "" ->
-          to = Disposition.convert_string_to_date(value)
-          if is_nil(to), do: query, else: from([t,...] in query,
-            where: t.inserted_at <= ^to)
+          "team_member_id" when is_nil(value) == false and value != "" ->
+            from(t in query,
+              join: tl in TeamMemberLocation,
+              on: t.location_id == tl.location_id,
+              where: tl.team_member_id == ^value
+            )
 
-        "from" when is_nil(value) == false and value != "" ->
-          from = Disposition.convert_string_to_date(value)
-          if is_nil(from), do: query, else: from([t,...] in query,
-            where: t.inserted_at >= ^from)
+          "location_ids" when is_nil(value) == false and value != "" ->
+            from(t in query, where: t.location_id in ^value)
 
-        _ -> query
-      end
-    end)
+          "to" when is_nil(value) == false or value != "" ->
+            to = Disposition.convert_string_to_date(value)
+
+            if is_nil(to),
+              do: query,
+              else:
+                from([t, ...] in query,
+                  where: t.inserted_at <= ^to
+                )
+
+          "from" when is_nil(value) == false and value != "" ->
+            from = Disposition.convert_string_to_date(value)
+
+            if is_nil(from),
+              do: query,
+              else:
+                from([t, ...] in query,
+                  where: t.inserted_at >= ^from
+                )
+
+          _ ->
+            query
+        end
+      end)
+
     repo.all(query)
     |> Enum.count()
   end

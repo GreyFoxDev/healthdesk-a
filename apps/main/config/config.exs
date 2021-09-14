@@ -33,10 +33,7 @@ config :main, MainWeb.Endpoint,
   live_view: [
     signing_salt: "e2coiRnvsrcguHHbgcQDoK4pOKj1x3Il92sTetEUUMjSS1gTu+DNLH0rlWOCdjox"
   ],
-  pubsub: [
-    name: Main.PubSub,
-    adapter: Phoenix.PubSub.PG2
-  ]
+  pubsub_server: Main.PubSub
 
 config :tesla, adapter: Tesla.Adapter.Hackney
 

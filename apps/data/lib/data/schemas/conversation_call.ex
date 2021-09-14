@@ -5,15 +5,15 @@ defmodule Data.Schema.ConversationCall do
   use Data.Schema
 
   @type t :: %__MODULE__{
-               id: binary(),
-               location_id: binary(),
-               team_member_id: binary() | nil,
-               original_number: String.t(),
-               channel_type: String.t() | nil,
-               status: String.t() | nil,
-               subject: String.t() | nil,
-               started_at: :utc_datetime | nil
-             }
+          id: binary(),
+          location_id: binary(),
+          team_member_id: binary() | nil,
+          original_number: String.t(),
+          channel_type: String.t() | nil,
+          status: String.t() | nil,
+          subject: String.t() | nil,
+          started_at: :utc_datetime | nil
+        }
 
   @required_fields ~w|
   location_id
@@ -48,7 +48,7 @@ defmodule Data.Schema.ConversationCall do
     belongs_to(:location, Data.Schema.Location)
     belongs_to(:team_member, Data.Schema.TeamMember)
 
-    timestamps([type: :naive_datetime_usec])
+    timestamps(type: :naive_datetime_usec)
   end
 
   def changeset(model, params \\ %{}) do
@@ -62,14 +62,14 @@ defmodule Data.Schema.ConversationCall do
     changeset
     |> get_field(:channel_type)
     |> case do
-         nil ->
-           changeset
-           |> get_field(:original_number)
-           |> set_channel_type(changeset)
+      nil ->
+        changeset
+        |> get_field(:original_number)
+        |> set_channel_type(changeset)
 
-         _channel_type ->
-           changeset
-       end
+      _channel_type ->
+        changeset
+    end
   end
 
   defp set_channel_type(nil, changeset), do: changeset
@@ -93,7 +93,7 @@ defmodule Data.Schema.ConversationCall do
   defp set_channel_type(email, changeset) do
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
 
-    if Regex.match?(regex,email) do
+    if Regex.match?(regex, email) do
       put_change(changeset, :channel_type, "MAIL")
     else
       put_change(changeset, :channel_type, "SMS")

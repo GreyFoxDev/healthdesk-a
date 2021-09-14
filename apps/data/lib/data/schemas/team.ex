@@ -16,8 +16,7 @@ defmodule Data.Schema.Team do
           deleted_at: :utc_datetime | nil,
           bot_id: String.t() | nil,
           twilio_sub_account_id: String.t() | nil
-
-             }
+        }
 
   @required_fields ~w|
     team_name
@@ -46,7 +45,6 @@ defmodule Data.Schema.Team do
     field(:deleted_at, :utc_datetime)
     field(:bot_id, :string)
     field(:twilio_sub_account_id, :string)
-
 
     has_many(:locations, Data.Schema.Location)
     has_many(:team_members, Data.Schema.TeamMember)

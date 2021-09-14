@@ -18,13 +18,13 @@ defmodule Data.Query.TeamMember do
   def all(repo \\ Read) do
     from(t in TeamMember,
       inner_join: r in assoc(t, :team),
-      inner_join: u in assoc(t,:user),
+      inner_join: u in assoc(t, :user),
       where: is_nil(r.deleted_at),
       where: is_nil(t.deleted_at),
       where: is_nil(u.deleted_at),
       where: t.user_id == u.id,
       order_by: [u.first_name, u.last_name],
-      preload: [ user: u]
+      preload: [user: u]
     )
     |> repo.all()
   end
@@ -36,7 +36,7 @@ defmodule Data.Query.TeamMember do
   def get(id, repo \\ Read) do
     from(t in TeamMember,
       inner_join: r in assoc(t, :team),
-      inner_join: u in assoc(t,:user),
+      inner_join: u in assoc(t, :user),
       where: is_nil(r.deleted_at),
       where: is_nil(t.deleted_at),
       where: is_nil(u.deleted_at),
@@ -54,7 +54,7 @@ defmodule Data.Query.TeamMember do
   def get_by_team_id(team_id, repo \\ Read) do
     from(t in TeamMember,
       inner_join: r in assoc(t, :team),
-      inner_join: u in assoc(t,:user),
+      inner_join: u in assoc(t, :user),
       where: is_nil(r.deleted_at),
       where: is_nil(t.deleted_at),
       where: is_nil(u.deleted_at),
@@ -73,15 +73,15 @@ defmodule Data.Query.TeamMember do
   def get_by_location_id(location_id, repo \\ Read) do
     from(t in TeamMember,
       inner_join: r in assoc(t, :team),
-      inner_join: u in assoc(t,:user),
-      left_join: tml in assoc(t,:team_member_locations),
+      inner_join: u in assoc(t, :user),
+      left_join: tml in assoc(t, :team_member_locations),
       where: is_nil(t.deleted_at),
       where: is_nil(u.deleted_at),
       where: is_nil(r.deleted_at),
-      where: tml.location_id == ^location_id or t.location_id == ^location_id ,
+      where: tml.location_id == ^location_id or t.location_id == ^location_id,
       order_by: [u.first_name, u.last_name],
       distinct: t.id,
-      preload: [ :user]
+      preload: [:user]
     )
     |> repo.all()
   end
@@ -93,15 +93,15 @@ defmodule Data.Query.TeamMember do
   def get_by_location_ids(location_ids, repo \\ Read) do
     from(t in TeamMember,
       inner_join: r in assoc(t, :team),
-      inner_join: u in assoc(t,:user),
-      left_join: tml in assoc(t,:team_member_locations),
+      inner_join: u in assoc(t, :user),
+      left_join: tml in assoc(t, :team_member_locations),
       where: is_nil(t.deleted_at),
       where: is_nil(u.deleted_at),
       where: is_nil(r.deleted_at),
-      where: tml.location_id in ^location_ids or t.location_id in ^location_ids ,
+      where: tml.location_id in ^location_ids or t.location_id in ^location_ids,
       order_by: [u.first_name, u.last_name],
       distinct: t.id,
-      preload: [ :user]
+      preload: [:user]
     )
     |> repo.all()
   end
@@ -119,15 +119,23 @@ defmodule Data.Query.TeamMember do
     |> SQL.query!(@available_function, [location.id, current_time])
     |> build_results()
   end
-  def fetch_admins(%{email: email,phone_number: phone_number,role: role,use_email: use_email,use_sms: use_sms})do
+
+  def fetch_admins(%{
+        email: email,
+        phone_number: phone_number,
+        role: role,
+        use_email: use_email,
+        use_sms: use_sms
+      }) do
     from(u in Data.Schema.User,
       where: u.email == ^email,
       where: u.phone_number == ^phone_number,
       where: u.role == ^role,
       where: u.use_email == ^use_email,
       where: u.use_sms == ^use_sms,
-      where:  is_nil(u.deleted_at)
-    ) |> Read.one
+      where: is_nil(u.deleted_at)
+    )
+    |> Read.one()
   end
 
   @doc """

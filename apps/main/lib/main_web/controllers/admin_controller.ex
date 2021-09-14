@@ -3,7 +3,6 @@ defmodule MainWeb.AdminController do
   alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
 
   def index(conn, %{"team_id" => team_id} = params) do
-    IO.inspect(params)
     params=if(!is_nil(params["filters"])) do
       change_params(params)
     else

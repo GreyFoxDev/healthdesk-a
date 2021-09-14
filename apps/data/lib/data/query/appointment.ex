@@ -67,18 +67,24 @@ defmodule Data.Query.Appointment do
   def count_all(to, from, repo \\ Read) do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
-    query = from(a in Data.Schema.Appointment,
-      group_by: [a.confirmed],
-      distinct: [a.confirmed],
-      order_by: a.confirmed,
-      select: %{confirmed: a.confirmed, count: count(a.id)}
-    )
+
+    query =
+      from(a in Data.Schema.Appointment,
+        group_by: [a.confirmed],
+        distinct: [a.confirmed],
+        order_by: a.confirmed,
+        select: %{confirmed: a.confirmed, count: count(a.id)}
+      )
+
     Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
-        if is_nil(to), do: query, else: from([a,...] in query, where: a.inserted_at <= ^to)
+        if is_nil(to), do: query, else: from([a, ...] in query, where: a.inserted_at <= ^to)
+
       {:from, from}, query ->
-        if is_nil(from), do: query, else: from([a,...] in query, where: a.inserted_at >= ^from)
-      _, query -> query
+        if is_nil(from), do: query, else: from([a, ...] in query, where: a.inserted_at >= ^from)
+
+      _, query ->
+        query
     end)
     |> repo.all()
   end
@@ -86,26 +92,36 @@ defmodule Data.Query.Appointment do
   @doc """
   Return a list of dispositions with count of usage by team
   """
-  @spec count_by_team_id(team_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  @spec count_by_team_id(
+          team_id :: binary(),
+          to :: String.t(),
+          from :: String.t(),
+          repo :: Ecto.Repo.t()
+        ) :: [map()]
   def count_by_team_id(team_id, to, from, repo \\ Read) do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
-    query = from(a in Data.Schema.Appointment,
-      join: c in assoc(a, :conversation),
-      join: l in assoc(c, :location),
-      group_by: [a.confirmed],
-      where: l.team_id == ^team_id,
-      distinct: [a.confirmed],
-      order_by: [a.confirmed],
-      select: %{confirmed: a.confirmed, count: count(a.id)}
-    )
-    IO.inspect(from, label: "from =>")
+
+    query =
+      from(a in Data.Schema.Appointment,
+        join: c in assoc(a, :conversation),
+        join: l in assoc(c, :location),
+        group_by: [a.confirmed],
+        where: l.team_id == ^team_id,
+        distinct: [a.confirmed],
+        order_by: [a.confirmed],
+        select: %{confirmed: a.confirmed, count: count(a.id)}
+      )
+
     Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
-        if is_nil(to), do: query, else: from([a,...] in query, where: a.inserted_at <= ^to)
+        if is_nil(to), do: query, else: from([a, ...] in query, where: a.inserted_at <= ^to)
+
       {:from, from}, query ->
-        if is_nil(from), do: query, else: from([a,...] in query, where: a.inserted_at >= ^from)
-      _, query -> query
+        if is_nil(from), do: query, else: from([a, ...] in query, where: a.inserted_at >= ^from)
+
+      _, query ->
+        query
     end)
     |> repo.all()
   end
@@ -130,26 +146,37 @@ defmodule Data.Query.Appointment do
   @doc """
   Return a list of dispositions with count of usage by locations
   """
-  @spec count_by_location_ids(location_ids :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  @spec count_by_location_ids(
+          location_ids :: binary(),
+          to :: String.t(),
+          from :: String.t(),
+          repo :: Ecto.Repo.t()
+        ) :: [map()]
   def count_by_location_ids(location_ids, to, from, repo \\ Read) do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
-    query = from(a in Data.Schema.Appointment,
-      join: c in assoc(a, :conversation),
-      join: l in assoc(c, :location),
-      group_by: [a.confirmed],
-      where: l.id in ^location_ids,
-      distinct: [a.confirmed],
-      order_by: [a.confirmed],
-      select: %{confirmed: a.confirmed, count: count(a.id)}
-    )
+
+    query =
+      from(a in Data.Schema.Appointment,
+        join: c in assoc(a, :conversation),
+        join: l in assoc(c, :location),
+        group_by: [a.confirmed],
+        where: l.id in ^location_ids,
+        distinct: [a.confirmed],
+        order_by: [a.confirmed],
+        select: %{confirmed: a.confirmed, count: count(a.id)}
+      )
+
     Enum.reduce(%{to: to, from: from}, query, fn
       {:to, to}, query ->
-        if is_nil(to), do: query, else: from([a,...] in query, where: a.inserted_at <= ^to)
+        if is_nil(to), do: query, else: from([a, ...] in query, where: a.inserted_at <= ^to)
+
       {:from, from}, query ->
-        if is_nil(from), do: query, else: from([a,...] in query, where: a.inserted_at >= ^from)
-      _, query -> query
+        if is_nil(from), do: query, else: from([a, ...] in query, where: a.inserted_at >= ^from)
+
+      _, query ->
+        query
     end)
-    |> repo.all() |> IO.inspect
+    |> repo.all()
   end
 end

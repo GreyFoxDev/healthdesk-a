@@ -50,7 +50,7 @@ defmodule Data.Schema.Conversation do
 
     has_many(:conversation_messages, Data.Schema.ConversationMessage)
 
-    timestamps([type: :naive_datetime_usec])
+    timestamps(type: :naive_datetime_usec)
   end
 
   def changeset(model, params \\ %{}) do
@@ -94,12 +94,8 @@ defmodule Data.Schema.Conversation do
 
   defp set_channel_type(email, changeset) do
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
-    IO.inspect("#########")
-    IO.inspect(email)
-    IO.inspect(changeset)
-    IO.inspect(Regex.match?(regex,email))
-    IO.inspect("#########")
-    if Regex.match?(regex,email) do
+
+    if Regex.match?(regex, email) do
       put_change(changeset, :channel_type, "MAIL")
     else
       put_change(changeset, :channel_type, "SMS")

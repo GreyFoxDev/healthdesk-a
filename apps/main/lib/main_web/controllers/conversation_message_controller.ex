@@ -30,7 +30,6 @@ defmodule MainWeb.ConversationMessageController do
     conn
     |> current_user()
     |> Conversations.get(conversation_id)
-    |> IO.inspect(label: "CONVERSATION")
     |> send_message(conn, params, location)
     |> redirect(to: team_location_conversation_conversation_message_path(conn, :index, location.team_id, location.id, conversation_id))
   end

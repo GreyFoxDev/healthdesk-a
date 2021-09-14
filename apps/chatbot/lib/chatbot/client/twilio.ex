@@ -12,26 +12,27 @@ defmodule Chatbot.Client.Twilio do
   require Logger
 
   def call(%Chatbot.Params{provider: :twilio} = params) do
-#    body = Poison.encode!(params.body)
+    #    body = Poison.encode!(params.body)
     location_id = Location.get_by_phone(params.from).id
     account = Team.get_sub_account_id_by_location_id(location_id)
 
     ExTwilio.Message.create(
-      [from: params.from,
-      to: params.to,
-      body: params.body],
-      [flow_sid: params.twilio_flow_id, account_sid: account]
-    ) |> IO.inspect
+      [from: params.from, to: params.to, body: params.body],
+      flow_sid: params.twilio_flow_id,
+      account_sid: account
+    )
   end
 
   def execution(%Chatbot.Params{provider: :twilio} = params) do
     body = Poison.encode!(params.body)
     location_id = Location.get_by_phone(params.from).id
     account = Team.get_sub_account_id_by_location_id(location_id)
+
     ExTwilio.Api.create(
       ExTwilio.Studio.Execution,
       [to: params.to, from: params.from, parameters: body],
-      [flow_sid: params.body.twilio_flow_id, account_sid: account]
+      flow_sid: params.body.twilio_flow_id,
+      account_sid: account
     )
   end
 
@@ -39,6 +40,7 @@ defmodule Chatbot.Client.Twilio do
     account = Application.get_env(:ex_twilio, :flex_account_sid)
     token = Application.get_env(:ex_twilio, :flex_auth_token)
     service_id = Application.get_env(:ex_twilio, :flex_service_id)
+
     ExTwilio.Api.create(
       ExTwilio.ProgrammableChat.Channel,
       [to: params.to, from: params.from, body: params.body, friendly_name: "Nick"],
@@ -49,7 +51,7 @@ defmodule Chatbot.Client.Twilio do
     )
   end
 
-  def verify(phone_number,country) do
+  def verify(phone_number, country) do
     [authy_url(), "via=sms&code_length=6&phone_number=", phone_number, "&country_code=#{country}"]
     |> Enum.join()
     |> HTTPoison.post!("", authy_header())
@@ -63,7 +65,7 @@ defmodule Chatbot.Client.Twilio do
     end
   end
 
-  def check(phone_number, country,verification_code) do
+  def check(phone_number, country, verification_code) do
     [
       check_url(),
       "phone_number=",
