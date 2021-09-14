@@ -24,7 +24,7 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
 
-  def call(%{assigns: %{convo: id,location: location, intent: {:unsubscribe, []}}} = conn, _opts) do
+  def call(%{assigns: %{convo: id,location: location, intent: {"unsubscribe", _}}} = conn, _opts) do
     IO.inspect("------unsubscribe intent-----------")
     IO.inspect("------conn-----------")
     IO.inspect(conn)
