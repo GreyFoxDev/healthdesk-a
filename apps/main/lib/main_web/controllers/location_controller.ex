@@ -226,7 +226,9 @@ defmodule MainWeb.LocationController do
       google_refresh_token: nil,
       google_token: nil,
       facebook_page_id: nil,
-      facebook_token: nil
+      facebook_token: nil,
+      whatsapp_token: nil,
+      whatsapp_login: false
     }) do
 
       {:ok, %Data.Schema.Location{}} ->
