@@ -8,7 +8,6 @@ defmodule Data.Query.SavedReply do
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
 
-
   @doc """
   Returns a saved reply by id
   """

@@ -7,7 +7,6 @@ defmodule MainWeb.Live.SidebarComponent do
   def render(assigns), do: MainWeb.SidebarComponentView.render("sidebar.html", assigns)
 
   def update(assigns, socket) do
-#    IO.inspect("person sidebar component update fun-------------")
     socket = socket
              |> assign(:open_conversation, assigns.open_conversation)
              |> assign(:tab1, assigns.tab1)

@@ -103,9 +103,6 @@ defmodule MainWeb.Live.TicketsView do
   end
   def handle_event("new_ticket",%{"ticket" => params}, socket)do
     {:ok, res}=Ticket.create(params)
-    IO.inspect("###################")
-    IO.inspect(res)
-    IO.inspect("###################")
     tm = TeamMember.get(%{role: "admin"}, res.team_member_id)
     notify(%{user_id: tm.user.id, from: res.user_id, ticket_id: res.id, text: " has assigned you a ticket"})
     Process.send_after(self(), :close_new, 10)
@@ -118,11 +115,6 @@ defmodule MainWeb.Live.TicketsView do
     {:noreply, socket}
   end
   def handle_event("save_note", %{"ticket_note" => %{"note" => note}= params}, socket)do
-
-    IO.inspect("###################")
-    IO.inspect(params)
-    IO.inspect(note)
-    IO.inspect("###################")
     user = socket.assigns.user
     team_members = socket.assigns.team_members
     {_text,notifications} = if note|>String.contains?("@") do

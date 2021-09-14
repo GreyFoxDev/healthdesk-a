@@ -14,8 +14,6 @@ defmodule Main.LiveUpdates do
     socket
 #  rescue
 #    error ->
-#      IO.inspect("============rescue================")
-#      IO.inspect(error)
   end
 
   @doc "subscribe for specific user"

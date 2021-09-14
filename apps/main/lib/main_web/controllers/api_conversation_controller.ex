@@ -10,9 +10,6 @@ defmodule MainWeb.Api.ConversationController do
   @role %{role: "admin"}
 
   def create_(conn,params)do
-    IO.inspect("#########paramas recieved##########")
-    IO.inspect(params)
-    IO.inspect("###################")
     create(conn,params)
   end
   def create(conn, %{"location" => << "messenger:", location :: binary>>, "member" => << "messenger:", _ :: binary>> = member}) do
@@ -46,9 +43,6 @@ defmodule MainWeb.Api.ConversationController do
   end
   def create(conn, %{"location" => location, "member" => member}) do
     with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
-      IO.inspect("####open#####")
-      IO.inspect(convo)
-      IO.inspect("#########")
       Task.start(fn ->  notify_open(convo.location_id) end)
       conn
       |> put_status(200)
@@ -62,9 +56,6 @@ defmodule MainWeb.Api.ConversationController do
     from = List.first(Regex.run(regex,from))
     message = ElixirEmailReplyParser.parse_reply message
     to = Regex.scan(regex,to) |> List.flatten |> Enum.uniq
-    IO.inspect(from, limit: :infinity)
-    IO.inspect(to, limit: :infinity)
-    IO.inspect(subj, limit: :infinity)
     subj = String.length(subj)>200 && String.slice(subj, 0..200) || subj
     if from != nil && from != "" && message != nil && message != "" do
       with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do

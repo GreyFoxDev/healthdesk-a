@@ -25,11 +25,6 @@ defmodule MainWeb.Plug.CloseConversation do
   end
 
   def call(%{assigns: %{convo: id,location: location, intent: {:unsubscribe, []}}} = conn, _opts) do
-    IO.inspect("------unsubscribe intent-----------")
-    IO.inspect("------conn-----------")
-    IO.inspect(conn)
-    IO.inspect("------conn----------")
-    IO.inspect(conn)
     datetime = DateTime.utc_now()
     {:ok, struct} = CM.create(%{
       "conversation_id" => id,
@@ -58,12 +53,6 @@ defmodule MainWeb.Plug.CloseConversation do
   """
 
   def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
-    IO.inspect("########we are here###########")
-    IO.inspect("------conn-----------")
-    IO.inspect(conn)
-    IO.inspect("------conn----------")
-
-
     _convo = C.get(id)
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
@@ -85,10 +74,6 @@ defmodule MainWeb.Plug.CloseConversation do
   """
   def call(%{assigns: %{convo: _id, intent: nil}} = conn, _opts), do: conn
   def call(%{assigns: %{convo: id, location: location, appointment: true} = _assigns} = conn, _opts) do
-    IO.inspect("########we are heres###########")
-    IO.inspect(conn.assigns[:response])
-    IO.inspect("###################")
-
     datetime = DateTime.utc_now()
     _ = CM.create(%{
       "conversation_id" => id,
@@ -104,19 +89,16 @@ defmodule MainWeb.Plug.CloseConversation do
   end
 
   def call(%{assigns: %{convo: id, intent: {:unknown, []}}} = conn, _opts) do
-    IO.inspect("----------------unknown intent---------------")
     C.pending(id)
     conn
   end
 
   def call(%{assigns: %{convo: id, intent: :unknown_intent}} = conn, _opts) do
-    IO.inspect("----------------unknown_intent intent---------------")
     C.pending(id)
     conn
   end
 
   def call(%{assigns: %{convo: id,location: location, intent: {:subscribe, []}}} = conn, _opts) do
-    IO.inspect("----------------subscribe intent---------------")
     datetime = DateTime.utc_now()
     _ = CM.create(%{
       "conversation_id" => id,
@@ -167,9 +149,6 @@ defmodule MainWeb.Plug.CloseConversation do
   If the question has been answered then close the conversation
   """
   def call(%{assigns: %{convo: id, location: location} = _assigns} = conn, _opts) do
-    IO.inspect("########we are here2###########")
-    IO.inspect(conn.assigns[:response])
-    IO.inspect("###################")
 
     datetime = DateTime.utc_now()
     _ = CM.create(%{
@@ -208,9 +187,6 @@ defmodule MainWeb.Plug.CloseConversation do
   end
 
   def call(conn, _opts) do
-    IO.inspect("=======================default Clause=====================")
-    IO.inspect("default Clause")
-    IO.inspect("=======================default Clause=====================")
     conn
   end
 

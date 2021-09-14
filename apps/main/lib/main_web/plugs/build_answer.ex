@@ -24,9 +24,6 @@ defmodule MainWeb.Plug.BuildAnswer do
   message in the queue.
   """
   def call(%{assigns: %{convo: id,  status: "open",message: message, member: member, intent: nil,location: location} = assigns} = conn, _opts) do
-    IO.inspect("###123######")
-    IO.inspect(assigns)
-    IO.inspect("#########")
     if (assigns[:team_member_id] == nil) do
       notify_admin_user(conn.assigns)
     else
@@ -50,9 +47,6 @@ defmodule MainWeb.Plug.BuildAnswer do
     |> assign(:status, "open")
   end
   def call(%{assigns: %{convo: id,  status: "open", intent: {:unknown, []}=intent, location: location} = assigns} = conn, _opts) do
-    IO.inspect("###321######")
-    IO.inspect(assigns)
-    IO.inspect("#########")
     convo = C.get(id)
     appointment = convo.appointment
     reply = Appointment.get_next_reply(id,intent, location)
@@ -88,9 +82,6 @@ defmodule MainWeb.Plug.BuildAnswer do
     response = Appointment.get_next_reply(id,intent, location)
 
     location = Location.get_by_phone(location)
-    IO.inspect("##########response#########")
-    IO.inspect(response)
-    IO.inspect("###################")
 
     if String.contains?(response,location.default_message)do
       pending_message_count = (ConCache.get(:session_cache, id) || 0)
@@ -107,9 +98,6 @@ defmodule MainWeb.Plug.BuildAnswer do
   end
 
   def call(%{assigns: %{convo: id,message: message, member: member, location: location} = assigns} = conn, _opts)do
-    IO.inspect("##567#######")
-    IO.inspect(conn.assigns)
-    IO.inspect("#########")
     convo = C.get(id)
     if (assigns[:team_member_id] == nil && convo.channel_type != "App") do
       notify_admin_user(conn.assigns)

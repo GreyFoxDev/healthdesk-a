@@ -35,10 +35,12 @@ defmodule Data.Query.Disposition do
     |> repo.all()
   end
 
- @doc """
+  @doc """
   Return a list of active dispositions for a team
   """
-  @spec get_by_team_and_name(team_id :: binary(), name :: binary(), repo :: Ecto.Repo.t()) :: [Disposition.t()]
+  @spec get_by_team_and_name(team_id :: binary(), name :: binary(), repo :: Ecto.Repo.t()) :: [
+          Disposition.t()
+        ]
   def get_by_team_and_name(team_id, name, repo \\ Read) do
     from(t in Disposition,
       where: is_nil(t.deleted_at),
@@ -54,7 +56,13 @@ defmodule Data.Query.Disposition do
   def count_all(repo \\ Read) do
     from(d in Data.Schema.Disposition,
       join: cd in assoc(d, :conversation_dispositions),
-      group_by: [d.disposition_name, cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
+      group_by: [
+        d.disposition_name,
+        cd.conversation_id,
+        cd.conversation_call_id,
+        cd.disposition_id,
+        cd.inserted_at
+      ],
       distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
       select: %{name: d.disposition_name, count: count(cd.id)}
@@ -69,23 +77,41 @@ defmodule Data.Query.Disposition do
   def count_all_by(to, from, repo \\ Read) do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
-    query = from(d in Disposition,
-      join: cd in assoc(d, :conversation_dispositions)
-    )
-    query = Enum.reduce(%{to: to, from: from}, query, fn
-      {:to, to}, query ->
-        if is_nil(to), do: query, else: from([_,cd,...] in query, where: cd.inserted_at <= ^to)
-      {:from, from}, query ->
-        if is_nil(from), do: query, else: from([_,cd,...] in query, where: cd.inserted_at >= ^from)
-      _, query -> query
-    end)
+
+    query =
+      from(d in Disposition,
+        join: cd in assoc(d, :conversation_dispositions)
+      )
+
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+            do: query,
+            else: from([_, cd, ...] in query, where: cd.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+            do: query,
+            else: from([_, cd, ...] in query, where: cd.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
     from([d, cd] in query,
-      group_by: [d.disposition_name, cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
+      group_by: [
+        d.disposition_name,
+        cd.conversation_id,
+        cd.conversation_call_id,
+        cd.disposition_id,
+        cd.inserted_at
+      ],
       distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
       select: %{name: d.disposition_name, count: count(cd.id)}
     )
-    |> repo.all() |> IO.inspect
+    |> repo.all()
   end
 
   @doc """
@@ -95,7 +121,13 @@ defmodule Data.Query.Disposition do
   def count_by_team_id(team_id, repo \\ Read) do
     from(d in Disposition,
       join: cd in assoc(d, :conversation_dispositions),
-      group_by: [d.disposition_name, cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
+      group_by: [
+        d.disposition_name,
+        cd.conversation_id,
+        cd.conversation_call_id,
+        cd.disposition_id,
+        cd.inserted_at
+      ],
       where: d.team_id == ^team_id,
       distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
@@ -107,23 +139,46 @@ defmodule Data.Query.Disposition do
   @doc """
   Return a list of dispositions with count of usage by team, with to and from filters
   """
-  @spec count_by_team(team_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
-  def count_by_team(team_id, to, from,repo \\ Read) do
+  @spec count_by_team(
+          team_id :: binary(),
+          to :: String.t(),
+          from :: String.t(),
+          repo :: Ecto.Repo.t()
+        ) :: [map()]
+  def count_by_team(team_id, to, from, repo \\ Read) do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
-    query = from(d in Disposition,
-      join: cd in assoc(d, :conversation_dispositions)
-    )
-    query = Enum.reduce(%{to: to, from: from}, query, fn
-      {:to, to}, query ->
-        if is_nil(to), do: query, else: from([_,cd,...] in query, where: cd.inserted_at <= ^to)
-      {:from, from}, query ->
-        if is_nil(from), do: query, else: from([_,cd,...] in query, where: cd.inserted_at >= ^from)
-      _, query -> query
-    end)
+
+    query =
+      from(d in Disposition,
+        join: cd in assoc(d, :conversation_dispositions)
+      )
+
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+            do: query,
+            else: from([_, cd, ...] in query, where: cd.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+            do: query,
+            else: from([_, cd, ...] in query, where: cd.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
     from(
       [d, cd] in query,
-      group_by: [d.disposition_name, cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
+      group_by: [
+        d.disposition_name,
+        cd.conversation_id,
+        cd.conversation_call_id,
+        cd.disposition_id,
+        cd.inserted_at
+      ],
       where: d.team_id == ^team_id,
       distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
@@ -132,54 +187,77 @@ defmodule Data.Query.Disposition do
     |> repo.all()
   end
 
-#  @doc """
-#  Return a list of dispositions with count of usage by location
-#  """
-#  @spec count_by_location_id(location_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
-#  def count_by_location_id(location_id, to, from, repo \\ Read) do
-#    to = Data.Disposition.convert_string_to_date(to)
-#    from = Data.Disposition.convert_string_to_date(from)
-#    query = from(d in Disposition,
-#      join: cd in assoc(d, :conversation_dispositions),
-#      join: c in assoc(cd, :conversation)
-#    )
-#    query = Enum.reduce(%{to: to, from: from}, query, fn
-#      {:to, to}, query ->
-#        if is_nil(to), do: query, else: from([d, cd, c] in query, where: cd.inserted_at <= ^to)
-#      {:from, from}, query ->
-#        if is_nil(from), do: query, else: from([d, cd, c] in query, where: cd.inserted_at >= ^from)
-#      _, query -> query
-#    end)
-#    from([d, cd, c] in query,
-#      group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
-#      where: c.location_id == ^location_id,
-#      distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
-#      order_by: d.disposition_name,
-#      select: %{name: d.disposition_name, count: count(cd.id)}
-#    )
-#    |> repo.all()
-#  end
+  #  @doc """
+  #  Return a list of dispositions with count of usage by location
+  #  """
+  #  @spec count_by_location_id(location_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  #  def count_by_location_id(location_id, to, from, repo \\ Read) do
+  #    to = Data.Disposition.convert_string_to_date(to)
+  #    from = Data.Disposition.convert_string_to_date(from)
+  #    query = from(d in Disposition,
+  #      join: cd in assoc(d, :conversation_dispositions),
+  #      join: c in assoc(cd, :conversation)
+  #    )
+  #    query = Enum.reduce(%{to: to, from: from}, query, fn
+  #      {:to, to}, query ->
+  #        if is_nil(to), do: query, else: from([d, cd, c] in query, where: cd.inserted_at <= ^to)
+  #      {:from, from}, query ->
+  #        if is_nil(from), do: query, else: from([d, cd, c] in query, where: cd.inserted_at >= ^from)
+  #      _, query -> query
+  #    end)
+  #    from([d, cd, c] in query,
+  #      group_by: [d.disposition_name, cd.conversation_id, cd.disposition_id, cd.inserted_at],
+  #      where: c.location_id == ^location_id,
+  #      distinct: [cd.conversation_id, cd.disposition_id, cd.inserted_at],
+  #      order_by: d.disposition_name,
+  #      select: %{name: d.disposition_name, count: count(cd.id)}
+  #    )
+  #    |> repo.all()
+  #  end
 
   @doc """
   Return a list of dispositions with count by location_id and dates
   """
-  @spec get_by(location_id :: binary(), to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: [map()]
+  @spec get_by(
+          location_id :: binary(),
+          to :: String.t(),
+          from :: String.t(),
+          repo :: Ecto.Repo.t()
+        ) :: [map()]
   def get_by(location_ids, to, from, repo \\ Read) do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
-    query = from(d in Disposition,
-      join: cd in assoc(d, :conversation_dispositions),
-      join: c in assoc(cd, :conversation)
-    )
-    query = Enum.reduce(%{to: to, from: from}, query, fn
-      {:to, to}, query ->
-        if is_nil(to), do: query, else: from([_,cd,...] in query, where: cd.inserted_at <= ^to)
-      {:from, from}, query ->
-        if is_nil(from), do: query, else: from([_,cd,...] in query, where: cd.inserted_at >= ^from)
-      _, query -> query
-    end)
+
+    query =
+      from(d in Disposition,
+        join: cd in assoc(d, :conversation_dispositions),
+        join: c in assoc(cd, :conversation)
+      )
+
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+            do: query,
+            else: from([_, cd, ...] in query, where: cd.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+            do: query,
+            else: from([_, cd, ...] in query, where: cd.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
     from([d, cd, c] in query,
-      group_by: [d.disposition_name, cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
+      group_by: [
+        d.disposition_name,
+        cd.conversation_id,
+        cd.conversation_call_id,
+        cd.disposition_id,
+        cd.inserted_at
+      ],
       where: c.location_id in ^location_ids,
       distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
@@ -199,120 +277,193 @@ defmodule Data.Query.Disposition do
   end
 
   def average_per_day(params, repo \\ Read) do
-   query =  from(cd in ConversationDisposition,
-      group_by: fragment("date_trunc('day',?)", cd.inserted_at),
-      select: %{count: count(cd.id)})
-   query = Enum.reduce(params, query, fn {key, value}, query ->
-     case key do
-       "to" ->
-         to = Data.Disposition.convert_string_to_date(value)
-         if is_nil(to), do: query, else: from([cd,...] in query,
-           where: cd.inserted_at <= ^to)
-       "from" ->
-         from = Data.Disposition.convert_string_to_date(value)
-         if is_nil(from), do: query, else: from([cd,...] in query,
-           where: cd.inserted_at >= ^from)
-       _ -> query
-     end
-   end)
-   from(f in subquery(query), select: avg(f.count))
-   |> repo.one
-   |> format_avg()
+    query =
+      from(cd in ConversationDisposition,
+        group_by: fragment("date_trunc('day',?)", cd.inserted_at),
+        select: %{count: count(cd.id)}
+      )
 
+    query =
+      Enum.reduce(params, query, fn {key, value}, query ->
+        case key do
+          "to" ->
+            to = Data.Disposition.convert_string_to_date(value)
+
+            if is_nil(to),
+              do: query,
+              else:
+                from([cd, ...] in query,
+                  where: cd.inserted_at <= ^to
+                )
+
+          "from" ->
+            from = Data.Disposition.convert_string_to_date(value)
+
+            if is_nil(from),
+              do: query,
+              else:
+                from([cd, ...] in query,
+                  where: cd.inserted_at >= ^from
+                )
+
+          _ ->
+            query
+        end
+      end)
+
+    from(f in subquery(query), select: avg(f.count))
+    |> repo.one
+    |> format_avg()
   end
 
-#  def average_per_day(repo\\ Read) do
-#    repo
-#    |> SQL.query!("SELECT average_dispositions_per_day() AS #{:sessions_per_day};")
-#    |> build_results()
-#  end
+  #  def average_per_day(repo\\ Read) do
+  #    repo
+  #    |> SQL.query!("SELECT average_dispositions_per_day() AS #{:sessions_per_day};")
+  #    |> build_results()
+  #  end
 
+  def average_per_day_for_team(%{"team_id" => team_id} = params, repo \\ Read) do
+    query =
+      from(cd in ConversationDisposition,
+        join: d in Disposition,
+        on: d.id == cd.disposition_id,
+        where: d.team_id == ^team_id,
+        group_by: [d.team_id, fragment("date_trunc('day',?)", cd.inserted_at)],
+        select: %{count: count(cd.id)}
+      )
 
-  def average_per_day_for_team(%{"team_id" => team_id}=params, repo \\ Read) do
-    query =  from(cd in ConversationDisposition,
-      join: d in Disposition, on: d.id == cd.disposition_id,
-      where: d.team_id == ^team_id,
-      group_by: [d.team_id, fragment("date_trunc('day',?)", cd.inserted_at)],
-      select: %{count: count(cd.id)})
-    query = Enum.reduce(params, query, fn {key, value}, query ->
-      case key do
-        "to" ->
-          to = Data.Disposition.convert_string_to_date(value)
-          if is_nil(to), do: query, else: from([cd,...] in query,
-            where: cd.inserted_at <= ^to)
-        "from" ->
-          from = Data.Disposition.convert_string_to_date(value)
-          if is_nil(from), do: query, else: from([cd,...] in query,
-            where: cd.inserted_at >= ^from)
-        _ -> query
-      end
-    end)
+    query =
+      Enum.reduce(params, query, fn {key, value}, query ->
+        case key do
+          "to" ->
+            to = Data.Disposition.convert_string_to_date(value)
+
+            if is_nil(to),
+              do: query,
+              else:
+                from([cd, ...] in query,
+                  where: cd.inserted_at <= ^to
+                )
+
+          "from" ->
+            from = Data.Disposition.convert_string_to_date(value)
+
+            if is_nil(from),
+              do: query,
+              else:
+                from([cd, ...] in query,
+                  where: cd.inserted_at >= ^from
+                )
+
+          _ ->
+            query
+        end
+      end)
+
     from(d in subquery(query), select: avg(d.count))
     |> repo.one
     |> format_avg()
   end
 
-#  def average_per_day_for_team(team_id, repo \\ Read) do #5, 7
-#    repo
-#    |> SQL.query!("SELECT * FROM average_dispositions_per_day_by_team();")
-#    |> build_results()
-#    |> Enum.filter(&(&1.team_id == team_id))
-#  end
+  #  def average_per_day_for_team(team_id, repo \\ Read) do #5, 7
+  #    repo
+  #    |> SQL.query!("SELECT * FROM average_dispositions_per_day_by_team();")
+  #    |> build_results()
+  #    |> Enum.filter(&(&1.team_id == team_id))
+  #  end
 
-  def average_per_day_for_location(%{"location_id" => location_id}=params, repo \\ Read) do
-    query =  from(cd in ConversationDisposition,
-      join: c in Conversation, on: c.id == cd.conversation_id,
-      where: c.location_id == ^location_id,
-      group_by: fragment("date_trunc('day',?)", cd.inserted_at),
-      select: %{count: count(cd.id)})
-    query = Enum.reduce(params, query, fn {key, value}, query ->
-      case key do
-        "to" ->
-          to = Data.Disposition.convert_string_to_date(value)
-          if is_nil(to), do: query, else: from([cd,...] in query,
-            where: cd.inserted_at <= ^to)
-        "from" ->
-          from = Data.Disposition.convert_string_to_date(value)
-          if is_nil(from), do: query, else: from([cd,...] in query,
-            where: cd.inserted_at >= ^from)
-        _ -> query
-      end
-    end)
+  def average_per_day_for_location(%{"location_id" => location_id} = params, repo \\ Read) do
+    query =
+      from(cd in ConversationDisposition,
+        join: c in Conversation,
+        on: c.id == cd.conversation_id,
+        where: c.location_id == ^location_id,
+        group_by: fragment("date_trunc('day',?)", cd.inserted_at),
+        select: %{count: count(cd.id)}
+      )
+
+    query =
+      Enum.reduce(params, query, fn {key, value}, query ->
+        case key do
+          "to" ->
+            to = Data.Disposition.convert_string_to_date(value)
+
+            if is_nil(to),
+              do: query,
+              else:
+                from([cd, ...] in query,
+                  where: cd.inserted_at <= ^to
+                )
+
+          "from" ->
+            from = Data.Disposition.convert_string_to_date(value)
+
+            if is_nil(from),
+              do: query,
+              else:
+                from([cd, ...] in query,
+                  where: cd.inserted_at >= ^from
+                )
+
+          _ ->
+            query
+        end
+      end)
+
     from(c in subquery(query), select: avg(c.count))
     |> repo.one
     |> format_avg()
   end
 
-  def average_per_day_for_locations(%{"location_ids" => location_ids}=params, repo \\ Read) do
-    query =  from(cd in ConversationDisposition,
-      join: c in Conversation, on: c.id == cd.conversation_id,
-      where: c.location_id in ^location_ids,
-      group_by: fragment("date_trunc('day',?)", cd.inserted_at),
-      select: %{count: count(cd.id)})
-    query = Enum.reduce(params, query, fn {key, value}, query ->
-      case key do
-        "to" ->
-          to = Data.Disposition.convert_string_to_date(value)
-          if is_nil(to), do: query, else: from([cd,...] in query,
-            where: cd.inserted_at <= ^to)
-        "from" ->
-          from = Data.Disposition.convert_string_to_date(value)
-          if is_nil(from), do: query, else: from([cd,...] in query,
-            where: cd.inserted_at >= ^from)
-        _ -> query
-      end
-    end)
+  def average_per_day_for_locations(%{"location_ids" => location_ids} = params, repo \\ Read) do
+    query =
+      from(cd in ConversationDisposition,
+        join: c in Conversation,
+        on: c.id == cd.conversation_id,
+        where: c.location_id in ^location_ids,
+        group_by: fragment("date_trunc('day',?)", cd.inserted_at),
+        select: %{count: count(cd.id)}
+      )
+
+    query =
+      Enum.reduce(params, query, fn {key, value}, query ->
+        case key do
+          "to" ->
+            to = Data.Disposition.convert_string_to_date(value)
+
+            if is_nil(to),
+              do: query,
+              else:
+                from([cd, ...] in query,
+                  where: cd.inserted_at <= ^to
+                )
+
+          "from" ->
+            from = Data.Disposition.convert_string_to_date(value)
+
+            if is_nil(from),
+              do: query,
+              else:
+                from([cd, ...] in query,
+                  where: cd.inserted_at >= ^from
+                )
+
+          _ ->
+            query
+        end
+      end)
+
     from(c in subquery(query), select: avg(c.count))
     |> repo.one
     |> format_avg()
   end
 
-#  def average_per_day_for_location(location_id, repo \\ Read) do
-#    repo
-#    |> SQL.query!("SELECT * FROM average_dispositions_per_day_by_location();")
-#    |> build_results()
-#    |> Enum.filter(&(&1.location_id == location_id))
-#  end
+  #  def average_per_day_for_location(location_id, repo \\ Read) do
+  #    repo
+  #    |> SQL.query!("SELECT * FROM average_dispositions_per_day_by_location();")
+  #    |> build_results()
+  #    |> Enum.filter(&(&1.location_id == location_id))
+  #  end
 
   @doc """
   Creates a new disposition
@@ -358,7 +509,7 @@ defmodule Data.Query.Disposition do
     |> get(repo)
     |> case do
       %Disposition{} = disposition ->
-      Dispositions.update(disposition, %{deleted_at: DateTime.utc_now()}, repo)
+        Dispositions.update(disposition, %{deleted_at: DateTime.utc_now()}, repo)
 
       nil ->
         {:error, :no_record_found}
@@ -374,7 +525,7 @@ defmodule Data.Query.Disposition do
     if is_nil(avg) do
       [%{sessions_per_day: 0}]
     else
-      sessions = trunc(avg.coef * (:math.pow(10, avg.exp)))
+      sessions = trunc(avg.coef * :math.pow(10, avg.exp))
       [%{sessions_per_day: sessions}]
     end
   end

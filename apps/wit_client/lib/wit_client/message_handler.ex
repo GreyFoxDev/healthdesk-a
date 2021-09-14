@@ -2,7 +2,8 @@ defmodule WitClient.MessageHandler do
   use GenServer,
     start: {WitClient.MessageHandler, :start_link, []},
     restart: :transient
-    alias Data.Team
+
+  alias Data.Team
 
   @moduledoc """
 
@@ -13,16 +14,13 @@ defmodule WitClient.MessageHandler do
 
   require Logger
 
-  #@access_token Application.get_env(:wit_client, :access_token)
+  # @access_token Application.get_env(:wit_client, :access_token)
 
+  def start_link(from, question, bot_id),
+    do: GenServer.start_link(__MODULE__, [from, question, bot_id])
 
-  def start_link(from, question,bot_id),
-    do: GenServer.start_link(__MODULE__, [from, question,bot_id])
   def start_link(default) when is_list(default) do
-    IO.inspect("###default######")
-    IO.inspect(default)
-    IO.inspect("#########")
-     GenServer.start_link(__MODULE__, default)
+    GenServer.start_link(__MODULE__, default)
   end
 
   def init(args) do
@@ -30,12 +28,12 @@ defmodule WitClient.MessageHandler do
     {:ok, args}
   end
 
-  def handle_info(:ask, [from, nil,bot_id]) do
+  def handle_info(:ask, [from, nil, bot_id]) do
     send(from, {:error, :unknown})
     {:stop, :normal, []}
   end
 
-  def handle_info(:ask, [from, question,bot_id]) do
+  def handle_info(:ask, [from, question, bot_id]) do
     question = Inflex.parameterize(question, "%20")
 
     case System.cmd("curl", [
@@ -45,16 +43,11 @@ defmodule WitClient.MessageHandler do
          ]) do
       {response, 0} ->
         with %{} = response <- Poison.Parser.parse!(response)["entities"],
-        IO.inspect(response),
              intent <- get_intent(response),
              args <- get_args(response) do
           send(from, {:response, {intent, args}})
         else
           error ->
-            IO.inspect("###################")
-            IO.inspect(error)
-            IO.inspect("###################")
-
             Logger.error(inspect(error))
             send(from, {:response, :unknown})
         end

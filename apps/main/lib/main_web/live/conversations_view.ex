@@ -205,18 +205,14 @@ defmodule MainWeb.Live.ConversationsView do
 
   def handle_event("openconvo", %{"cid" => conversation_id} = _params, socket) do
     user = socket.assigns.user
-    #    IO.inspect(conversation_id)
     convo =
       user
       |> Conversations.get(conversation_id)
-        #      |> IO.inspect()
       |> fetch_member()
     #    team_members =
     #      socket
     #      |> current_user()
     #      |> TeamMember.all(socket.location_id)
-    #    IO.inspect("team_members-----")
-    #    IO.inspect(team_members)
     socket = socket
              |> assign(:team_members, [])
              |> assign(:team_members_all, [])
@@ -680,7 +676,6 @@ defmodule MainWeb.Live.ConversationsView do
 
   defp send_message(%{original_number: <<"messenger:", _ :: binary>>=original_number} = conversation, params, location, user) do
 
-    IO.inspect("#############inside messenger###########")
     params["conversation_message"]
     |> Map.merge(
          %{"conversation_id" => conversation.id, "phone_number" => user.phone_number, "sent_at" => DateTime.utc_now()}
@@ -688,23 +683,10 @@ defmodule MainWeb.Live.ConversationsView do
     |> ConversationMessages.create()
     |> case do
          {:ok, message} ->
-           IO.inspect("============{:ok, message}================")
-           IO.inspect(message)
-           IO.inspect("============{:ok, message}================")
-
-           IO.inspect("#########")
-           IO.inspect(location.facebook_token)
-           IO.inspect("#########")
          if(location.facebook_token) do
-             IO.inspect("============location.facebook_token) id True================")
-             IO.inspect(location.facebook_token)
-             IO.inspect("============location.facebook_token) id True================")
 
-             MainWeb.FacebookController.reply_to_facebook(params["conversation_message"]["message"],location,String.replace(original_number,"messenger:","")) |> IO.inspect(label: "facebook reply")
+             MainWeb.FacebookController.reply_to_facebook(params["conversation_message"]["message"],location,String.replace(original_number,"messenger:",""))
          else
-             IO.inspect("============location.facebook_token) is false================")
-             IO.inspect(location.facebook_token)
-             IO.inspect("============location.facebook_token) is false================")
 
              message = %Chatbot.Params{
              provider: :twilio,
@@ -712,32 +694,22 @@ defmodule MainWeb.Live.ConversationsView do
              to: conversation.original_number,
              body: params["conversation_message"]["message"]
            }
-           Chatbot.Client.Twilio.call(message)|> IO.inspect()
+           Chatbot.Client.Twilio.call(message)
          end
          {:error, changeset} ->
-           IO.inspect("============_changeset================")
-           IO.inspect(changeset)
-           IO.inspect("============_changeset================")
 
            nil
        end
   end
   defp send_message(%{original_number: <<"CH", _ :: binary>>} = conversation, params, location, user) do
-    IO.inspect("#############inside CH ###########")
 
     _from_name = if conversation.team_member do
-      IO.inspect("============Conversation.team_member is true================")
-      IO.inspect(conversation.team_member)
-      IO.inspect("============Conversation.team================")
 
       Enum.join(
         [conversation.team_member.user.first_name, "#{String.first(conversation.team_member.user.last_name)}."],
         " "
       )
     else
-      IO.inspect("============Conversation.team_member is false================")
-      IO.inspect(conversation.team_member)
-      IO.inspect("============Conversation.team================")
       location.location_name
     end
 
@@ -748,9 +720,6 @@ defmodule MainWeb.Live.ConversationsView do
     |> ConversationMessages.create()
     |> case do
          {:ok, message} ->
-           IO.inspect("============{:ok, message}================")
-           IO.inspect(message)
-           IO.inspect("============{:ok, message}================")
            from = if conversation.team_member && conversation.team_member.user.first_name, do: conversation.team_member.user.first_name, else: location.location_name
            message = %Chatbot.Params{
              provider: :twilio,
@@ -759,11 +728,8 @@ defmodule MainWeb.Live.ConversationsView do
              body: params["conversation_message"]["message"]
            }
            #account_id= Team.get_sub_account_id_by_location_id(location.id)
-           Chatbot.Client.Twilio.channel(message)|> IO.inspect(label: "Web chatbot")
+           Chatbot.Client.Twilio.channel(message)
          {:error, changeset} ->
-           IO.inspect("============_changeset================")
-           IO.inspect(changeset)
-           IO.inspect("============_changeset================")
            nil
        end
   end
@@ -814,7 +780,7 @@ defmodule MainWeb.Live.ConversationsView do
          {:ok, message} ->
            email
            |> Main.Email.generate_reply_email(message.message, conversation.subject,location.phone_number)
-           |> Main.Mailer.deliver_now() |> IO.inspect
+           |> Main.Mailer.deliver_now()
            Main.LiveUpdates.notify_live_view(conversation.id, {__MODULE__, {:new_msg, message}})
          _ -> nil
        end
@@ -926,9 +892,6 @@ defmodule MainWeb.Live.ConversationsView do
       assigns: Map.delete(Map.delete(Map.delete(socket.assigns, :conversation_id), :conversation), :new),
       changed: Map.put_new(socket.changed, :key, true)
     }
-    IO.inspect("###################")
-    IO.inspect(open_convo)
-    IO.inspect("###################")
 
 
     socket = socket |> assign(open_conversation: open_convo)
@@ -964,7 +927,6 @@ defmodule MainWeb.Live.ConversationsView do
     end
   end
   def handle_info({convo_id, :user_typing_start}, socket) do
-    IO.inspect("typing")
     if  socket.assigns.open_conversation && convo_id == socket.assigns.open_conversation.id do
       if connected?(socket), do: Process.send_after(self(), :menu_fix, 1000)
 
@@ -1118,9 +1080,6 @@ defmodule MainWeb.Live.ConversationsView do
     {:noreply, socket}
   end
   def handle_event(event,params, socket) do
-    IO.inspect("#########################")
-    IO.inspect(params)
-    IO.inspect(event)
     {:noreply, socket}
   end
   def notify(params)do

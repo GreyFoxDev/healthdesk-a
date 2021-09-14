@@ -46,15 +46,13 @@ defmodule Data.Query.Team do
   """
   @spec get_bot_id_by_location_id(id :: binary(), repo :: Ecto.Repo.t()) :: Team.t() | nil
   def get_bot_id_by_location_id(id, repo \\ Read) do
-
     from(t in Team,
       left_join: l in Location,
       on: t.id == l.team_id,
-      where: l.id==^id,
+      where: l.id == ^id,
       select: t.bot_id
     )
     |> repo.one()
-
   end
 
   @doc """
@@ -62,15 +60,13 @@ defmodule Data.Query.Team do
   """
   @spec get_sub_account_id_by_location_id(id :: binary(), repo :: Ecto.Repo.t()) :: Team.t() | nil
   def get_sub_account_id_by_location_id(id, repo \\ Read) do
-
     from(t in Team,
       left_join: l in Location,
       on: t.id == l.team_id,
-      where: l.id==^id,
+      where: l.id == ^id,
       select: t.twilio_sub_account_id
     )
     |> repo.one()
-
   end
 
   @doc """

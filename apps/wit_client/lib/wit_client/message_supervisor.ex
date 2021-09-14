@@ -13,5 +13,5 @@ defmodule WitClient.MessageSupervisor do
     do: Supervisor.init(@child_spec, strategy: :simple_one_for_one)
 
   def ask_question(pid, question, bot_id),
-    do: Supervisor.start_child(@supervisor, [pid, question, bot_id]) |> IO.inspect(label: "starting wit")
+    do: Supervisor.start_child(@supervisor, [pid, question, bot_id])
 end

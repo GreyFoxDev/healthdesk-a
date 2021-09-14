@@ -115,9 +115,6 @@ defmodule MainWeb.LocationController do
     end
   end
   def callback(conn, params) do
-    IO.inspect("=======================location callback default=====================")
-    IO.inspect(params)
-    IO.inspect("=======================callback default=====================")
     conn
   end
 

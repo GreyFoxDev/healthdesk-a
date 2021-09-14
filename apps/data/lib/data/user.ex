@@ -35,8 +35,6 @@ defmodule Data.User do
 
   def get(_, _), do: {:error, :invalid_permissions}
 
-
-
   def update(id, params) do
     id
     |> Query.get()

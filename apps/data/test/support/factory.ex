@@ -219,7 +219,7 @@ defmodule Data.Factory do
       last_name: Faker.Name.last_name(),
       email: Faker.Internet.email(),
       avatar: nil,
-      logged_in_at: nil
+      logged_in_at: nil,
       deleted_at: nil
     }
   end

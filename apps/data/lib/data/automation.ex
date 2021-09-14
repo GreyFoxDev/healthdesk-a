@@ -12,12 +12,12 @@ defmodule Data.Automation do
     %Automation{}
     |> Automation.changeset(params)
     |> case do
-         %Ecto.Changeset{valid?: true} = changeset ->
-           repo.insert(changeset)
+      %Ecto.Changeset{valid?: true} = changeset ->
+        repo.insert(changeset)
 
-         changeset ->
-           {:error, changeset}
-       end
+      changeset ->
+        {:error, changeset}
+    end
   end
 
   def get_by_location_id(location_id, repo \\ Read) do
@@ -41,24 +41,25 @@ defmodule Data.Automation do
     original
     |> Automation.changeset(params)
     |> case do
-         %Ecto.Changeset{valid?: true} = changeset ->
-           repo.update(changeset)
-         changeset ->
-           {:error, changeset}
-       end
+      %Ecto.Changeset{valid?: true} = changeset ->
+        repo.update(changeset)
+
+      changeset ->
+        {:error, changeset}
+    end
   end
 
   def delete(%Automation{} = automation, repo \\ Write) do
     automation
     |> case do
-         %Automation{} = automation ->
-           repo.delete(automation)
-         nil ->
-           {:error, :no_record_found}
-       end
+      %Automation{} = automation ->
+        repo.delete(automation)
+
+      nil ->
+        {:error, :no_record_found}
+    end
   end
 
   def get_changeset(),
-      do: Schema.changeset(%Schema{})
-
+    do: Schema.changeset(%Schema{})
 end
