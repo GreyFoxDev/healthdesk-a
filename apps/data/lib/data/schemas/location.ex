@@ -34,7 +34,9 @@ defmodule Data.Schema.Location do
           deleted_at: :utc_datetime | nil,
           automation_limit: integer() | 3,
           facebook_page_id: String.t() | nil,
-          facebook_token: String.t() | nil
+          facebook_token: String.t() | nil,
+          whatsapp_login: boolean | false,
+          whatsapp_token: String.t() | nil
         }
 
   @required_fields ~w|
@@ -67,6 +69,8 @@ defmodule Data.Schema.Location do
   automation_limit
   facebook_page_id
   facebook_token
+  whatsapp_login
+  whatsapp_token
   |a
 
   @all_fields @required_fields ++ @optional_fields
@@ -96,6 +100,8 @@ defmodule Data.Schema.Location do
     field(:automation_limit, :integer)
     field(:facebook_page_id, :string)
     field(:facebook_token, :string)
+    field(:whatsapp_login, :boolean)
+    field(:whatsapp_token, :string)
 
     field(:deleted_at, :utc_datetime)
 
