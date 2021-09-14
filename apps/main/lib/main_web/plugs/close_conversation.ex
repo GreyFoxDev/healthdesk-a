@@ -25,11 +25,6 @@ defmodule MainWeb.Plug.CloseConversation do
   end
 
   def call(%{assigns: %{convo: id, location: location, intent: {"unsubscribe", _}}} = conn, _opts) do
-    IO.inspect("------unsubscribe intent-----------")
-    IO.inspect("------conn-----------")
-    IO.inspect(conn)
-    IO.inspect("------conn----------")
-    IO.inspect(conn)
     datetime = DateTime.utc_now()
     {:ok, struct} = CM.create(%{
       "conversation_id" => id,
@@ -53,10 +48,6 @@ defmodule MainWeb.Plug.CloseConversation do
   end
 
   def call(%{assigns: %{convo: id, location: location, intent: {"subscribe", _}}} = conn, _opts) do
-    IO.inspect("----------------subscribe intent---------------")
-    IO.inspect("------conn-----------")
-    IO.inspect(conn)
-    IO.inspect("------conn----------")
     datetime = DateTime.utc_now()
     _ = CM.create(%{
       "conversation_id" => id,
