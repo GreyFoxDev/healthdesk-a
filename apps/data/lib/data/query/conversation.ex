@@ -52,10 +52,10 @@ defmodule Data.Query.Conversation do
         select: c.appointment
       )
       |> repo.update_all(
-        set: [
-          appointment: false
-        ]
-      )
+           set: [
+             appointment: false
+           ]
+         )
   end
   @doc """
   Return a list of conversations for a location
@@ -121,10 +121,6 @@ defmodule Data.Query.Conversation do
     |> repo.all()
   end
 
-  def count_active_convo(location_id, team_member_id, repo \\ Read)
-  def count_active_convo(location_id, team_member_id, repo) when (is_nil(team_member_id)) do
-
-
   def count_active_convo(location_id, status, user_id , true, repo\\ Read) do
     from(
       c in ConversationList,
@@ -137,25 +133,17 @@ defmodule Data.Query.Conversation do
   end
 
 
-  def count_assigned_convo(location_id, team_member_id, repo \\ Read)
-  def count_assigned_convo(location_id, team_member_id, repo) when (is_nil(team_member_id)) do
-    from(c in Conversation,
-      where: c.location_id in ^location_id,
-      where: c.status == "open",
-      select: count(c.id)
-    )
-    |> repo.one()
-  end
-  def count_assigned_convo(location_id, team_member_id, repo) do
-    from(c in Conversation,
-
+  def count_assigned_convo(location_id, status, user_id, repo\\ Read) do
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
       where: c.location_id in ^location_id,
       where: c.user_id != ^user_id,
       select: count(c.id)
     )
     |> repo.one()
   end
-    def count_closed_convo(location_id, status, repo \\ Read) do
+  def count_closed_convo(location_id, status, repo \\ Read) do
     from(
       c in ConversationList,
       where: c.status in ^status,
@@ -170,69 +158,69 @@ defmodule Data.Query.Conversation do
   """
 
   def get_limited_conversations(location_id, status, offset , limit , user_id , true) when is_list(status) do
-     from(
-        c in ConversationList,
-        where: c.status in ^status,
-        where: c.location_id in ^location_id,
-        where: c.user_id == ^user_id or is_nil(c.user_id),
-        offset: ^offset, limit: ^limit
-      ) |>Read.all
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
+      where: c.location_id in ^location_id,
+      where: c.user_id == ^user_id or is_nil(c.user_id),
+      offset: ^offset, limit: ^limit
+    ) |>Read.all
 
   end
   def get_limited_conversations(location_id, status,  offset , limit , user_id ) when is_list(status) do
 
-      from(
-        c in ConversationList,
-        where: c.status in ^status,
-        where: c.location_id in ^location_id,
-        where: c.user_id != ^user_id,
-        offset: ^offset, limit: ^limit
-      ) |>Read.all
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
+      where: c.location_id in ^location_id,
+      where: c.user_id != ^user_id,
+      offset: ^offset, limit: ^limit
+    ) |>Read.all
   end
   def get_limited_conversations(location_id, status,  offset , limit ) when is_list(status) do
 
-      from(
-        c in ConversationList,
-        where: c.status in ^status,
-        where: c.location_id in ^location_id,
-        offset: ^offset, limit: ^limit
-      ) |>Read.all
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
+      where: c.location_id in ^location_id,
+      offset: ^offset, limit: ^limit
+    ) |>Read.all
   end
 
   def get_filtered_conversations(location_id, status , user_id , true,s ) when is_list(status) do
     like = "%#{s}%"
-     from(
-        c in ConversationList,
-        where: c.status in ^status,
-        where: c.location_id in ^location_id,
-        where: c.user_id == ^user_id or is_nil(c.user_id),
-        where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
-                  or like(c.first_name,^like)  or like(c.last_name,^like))
-      ) |>Read.all
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
+      where: c.location_id in ^location_id,
+      where: c.user_id == ^user_id or is_nil(c.user_id),
+      where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
+              or like(c.first_name,^like)  or like(c.last_name,^like))
+    ) |>Read.all
 
   end
   def get_filtered_conversations(location_id, status,   user_id,s ) when is_list(status) do
     like = "%#{s}%"
 
-      from(
-        c in ConversationList,
-        where: c.status in ^status,
-        where: c.location_id in ^location_id,
-        where: c.user_id != ^user_id,
-        where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
-                   or like(c.first_name,^like)  or like(c.last_name,^like))
-      ) |>Read.all
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
+      where: c.location_id in ^location_id,
+      where: c.user_id != ^user_id,
+      where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
+              or like(c.first_name,^like)  or like(c.last_name,^like))
+    ) |>Read.all
   end
   def get_filtered_conversations(location_id, status,s ) when is_list(status) do
     like = "%#{s}%"
 
-      from(
-        c in ConversationList,
-        where: c.status in ^status,
-        where: c.location_id in ^location_id,
-        where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
-                   or like(c.first_name,^like)  or like(c.last_name,^like))
-      ) |>Read.all
+    from(
+      c in ConversationList,
+      where: c.status in ^status,
+      where: c.location_id in ^location_id,
+      where: (like(c.original_number,^like) or like(c.channel_type,^like) or like(c.location_name,^like)
+              or like(c.first_name,^like)  or like(c.last_name,^like))
+    ) |>Read.all
   end
 
   def get_conversations(ids, repo) do
@@ -250,8 +238,8 @@ defmodule Data.Query.Conversation do
   end
 
   @spec get_by_location_ids(location_id :: [binary()], repo :: Ecto.Repo.t()) :: [
-          Conversation.t()
-        ]
+                                                                                   Conversation.t()
+                                                                                 ]
   def get_by_location_ids(location_id, repo \\ Read) do
     from(c in Conversation,
       join: m in assoc(c, :conversation_messages),
@@ -304,12 +292,12 @@ defmodule Data.Query.Conversation do
     %Conversation{}
     |> Conversation.changeset(params)
     |> case do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        repo.insert(changeset)
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.insert(changeset)
 
-      changeset ->
-        {:error, changeset}
-    end
+         changeset ->
+           {:error, changeset}
+       end
   end
 
   @doc """
@@ -321,11 +309,11 @@ defmodule Data.Query.Conversation do
     original
     |> Conversation.changeset(params)
     |> case do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        repo.update(changeset)
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.update(changeset)
 
-      changeset ->
-        {:error, changeset}
-    end
+         changeset ->
+           {:error, changeset}
+       end
   end
 end
