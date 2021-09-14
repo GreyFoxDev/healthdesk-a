@@ -24,7 +24,7 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
 
-  def call(%{assigns: %{convo: id,location: location, intent: {"unsubscribe", _}}} = conn, _opts) do
+  def call(%{assigns: %{convo: id, location: location, intent: {"unsubscribe", _}}} = conn, _opts) do
     IO.inspect("------unsubscribe intent-----------")
     IO.inspect("------conn-----------")
     IO.inspect(conn)
@@ -39,7 +39,7 @@ defmodule MainWeb.Plug.CloseConversation do
 
     convo = C.get(id)
     Member.update(convo.member.id, %{consent: false})
-    C.close(id)
+    close_conversation(id, location)
 
     Main.LiveUpdates.notify_live_view({convo.id, struct})
     :ok =
@@ -49,6 +49,24 @@ defmodule MainWeb.Plug.CloseConversation do
         location.phone_number,
         "location-admin"
       )
+    conn
+  end
+
+  def call(%{assigns: %{convo: id, location: location, intent: {"subscribe", _}}} = conn, _opts) do
+    IO.inspect("----------------subscribe intent---------------")
+    IO.inspect("------conn-----------")
+    IO.inspect(conn)
+    IO.inspect("------conn----------")
+    datetime = DateTime.utc_now()
+    _ = CM.create(%{
+      "conversation_id" => id,
+      "phone_number" => location,
+      "message" => "subscribed",
+      "sent_at" => DateTime.add(datetime, 1)})
+
+    convo = C.get(id)
+    Member.update(convo.member.id, %{consent: true})
+    close_conversation(id, location)
     conn
   end
 
@@ -115,54 +133,6 @@ defmodule MainWeb.Plug.CloseConversation do
     conn
   end
 
-  def call(%{assigns: %{convo: id,location: location, intent: {:subscribe, []}}} = conn, _opts) do
-    IO.inspect("----------------subscribe intent---------------")
-    datetime = DateTime.utc_now()
-    _ = CM.create(%{
-      "conversation_id" => id,
-      "phone_number" => location,
-      "message" => "subscribed",
-      "sent_at" => DateTime.add(datetime, 1)})
-
-    convo = C.get(id)
-    Member.update(convo.member.id, %{consent: true})
-    C.close(id)
-    conn
-  end
-
-
-#  defp close_conversation(convo_id, location_id) do
-#    location = Location.get_by_phone(location_id)
-#    disposition =
-#      %{role: "system"}
-#      |> Data.Disposition.get_by_team_id(location.team_<id)
-#      |> Enum.find(&(&1.disposition_name == "Automated"))
-#
-#    if disposition do
-#      Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})
-#
-#      _ =  %{
-#             "conversation_id" => convo_id,
-#             "phone_number" => location.phone_number,
-#             "message" =>
-#               "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
-#             "sent_at" => DateTime.add(DateTime.utc_now(), 3)
-#           }
-#           |> CM.create()
-#    else
-#      _ = %{
-#            "conversation_id" => convo_id,
-#            "phone_number" => location.phone_number,
-#            "message" =>
-#              "CLOSED: Closed by System",
-#            "sent_at" => DateTime.add(DateTime.utc_now(), 3)
-#          }
-#          |> CM.create()
-#    end
-#
-#    C.close(convo_id)
-#  end
-
   @doc """
   If the question has been answered then close the conversation
   """
@@ -212,6 +182,37 @@ defmodule MainWeb.Plug.CloseConversation do
     IO.inspect("default Clause")
     IO.inspect("=======================default Clause=====================")
     conn
+  end
+  defp close_conversation(convo_id, location_id) do
+    location = Location.get_by_phone(location_id)
+    disposition =
+      %{role: "system"}
+      |> Data.Disposition.get_by_team_id(location.team_id)
+      |> Enum.find(&(&1.disposition_name == "SMS Unsubscribe"))
+
+    if disposition do
+      Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})
+
+      _ =  %{
+             "conversation_id" => convo_id,
+             "phone_number" => location.phone_number,
+             "message" =>
+               "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
+             "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+           }
+           |> CM.create()
+    else
+      _ = %{
+            "conversation_id" => convo_id,
+            "phone_number" => location.phone_number,
+            "message" =>
+              "CLOSED: Closed by System",
+            "sent_at" => DateTime.add(DateTime.utc_now(), 3)
+          }
+          |> CM.create()
+    end
+
+    C.close(convo_id)
   end
 
 end
