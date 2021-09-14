@@ -149,6 +149,8 @@
                         <%= text_input f, :facebook_page_id, class: "form-control", disabled: false %>
                         <label>Facebook Token</label>
                         <%= text_input f, :facebook_token, class: "form-control", disabled: true %>
+                        <label>Whatsapp Token</label>
+                        <%= text_input f, :whatsapp_token, class: "form-control", disabled: true %>
                     </div>
                     <div class="form-actions">
                         <%= submit "Save", class: "btn btn-primary" %>
@@ -162,6 +164,9 @@
             </a>
             <a class="btn btn-primary btn-lg" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location && @conn.assigns.location.id %>/edit/facebook">
                 Sign in with Facebook
+            </a>
+            <a class="btn btn-primary btn-lg" href="/admin/teams/<%= @conn.assigns.team_id %>/locations/<%= @conn.assigns.location && @conn.assigns.location.id %>/edit/whatsapp">
+                Sign in with Whatsapp
             </a>
         </div>
     </section>
