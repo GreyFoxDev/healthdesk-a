@@ -130,6 +130,7 @@ defmodule MainWeb.Api.ConversationController do
           :ok =
             case convo.status do
               "open" ->
+                convo = C.get(convo.id)
                 Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )
               _ ->
                 Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin")
