@@ -6,7 +6,7 @@
 
 <% end %>
 
-<div class="page has-sidebar has-sidebar-fluid has-sidebar-expand-xl" phx-hook ="ReloadTable">
+<div class="page has-sidebar has-sidebar-fluid has-sidebar-expand-xl" phx-hook ="ReloadTable" id="sidebar_hook">
     <!-- Message List -->
     <%= if assigns[:open_conversation] || assigns[:searching]  do %>
     <div class="page-inner page-inner-fill position-relative" >
