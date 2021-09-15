@@ -302,6 +302,7 @@ defmodule MainWeb.Live.ConversationsView do
               |> assign(:conversations, conversations)
               |> assign(:changeset, Conversations.get_changeset())
             if connected?(socket), do: Process.send_after(self(), :menu_fix, 100)
+            if connected?(socket), do: Process.send_after(self(), {locations.id, :updated_count}, 100)
 
             {:noreply, socket}
           else

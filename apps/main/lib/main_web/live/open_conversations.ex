@@ -69,7 +69,7 @@ defmodule MainWeb.Live.OpenConverationsView do
     page= 0
     count =
       try do
-        open_convos(socket.assigns.location_ids, socket.current_user.user, page)
+        open_convos(socket.assigns.location_ids, socket.assigns.current_user, page)
       rescue
         _ ->
           socket.assigns.count
@@ -85,7 +85,7 @@ defmodule MainWeb.Live.OpenConverationsView do
     page=  0
     count =
       if Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
-        open_convos(socket.assigns.location_ids, socket.current_user.user, page)
+        open_convos(socket.assigns.location_ids, socket.assigns.current_user, page)
       else
         socket.assigns.count
       end
@@ -102,7 +102,7 @@ defmodule MainWeb.Live.OpenConverationsView do
     page=  0
     count =
       if Enum.any?(socket.assigns.location_ids, fn x -> x == location_id end) do
-        open_convos(socket.assigns.location_ids, socket.current_user.user, page)
+        open_convos(socket.assigns.location_ids, socket.assigns.current_user, page)
       else
         socket.assigns.count
       end
