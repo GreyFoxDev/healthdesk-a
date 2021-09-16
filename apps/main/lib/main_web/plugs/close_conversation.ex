@@ -163,6 +163,10 @@ defmodule MainWeb.Plug.CloseConversation do
       |> Data.Disposition.get_by_team_id(location.team_id)
       |> Enum.find(&(&1.disposition_name == "SMS Unsubscribe"))
 
+    IO.inspect("=======================dispositionByTeamId=====================")
+    IO.inspect(disposition)
+    IO.inspect("=======================dispositionByTeamId=====================")
+
     if disposition do
       Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})
 
@@ -174,6 +178,7 @@ defmodule MainWeb.Plug.CloseConversation do
              "sent_at" => DateTime.add(DateTime.utc_now(), 3)
            }
            |> CM.create()
+           |> IO.inspect(label: " CONVERSATION_MESSAGES =>")
     else
       _ = %{
             "conversation_id" => convo_id,
@@ -184,6 +189,7 @@ defmodule MainWeb.Plug.CloseConversation do
           }
           |> CM.create()
     end
+
 
     C.close(convo_id)
   end
