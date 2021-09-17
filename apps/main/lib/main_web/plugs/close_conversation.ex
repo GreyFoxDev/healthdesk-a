@@ -38,6 +38,9 @@ defmodule MainWeb.Plug.CloseConversation do
       "sent_at" => DateTime.add(datetime, 1)})
 
     convo = C.get(id)
+    IO.inspect("------convo in unsub-----------")
+    IO.inspect(convo)
+    IO.inspect("------convo----------")
     Member.update(convo.member.id, %{consent: false})
     close_conversation(id, location)
 
@@ -65,6 +68,9 @@ defmodule MainWeb.Plug.CloseConversation do
       "sent_at" => DateTime.add(datetime, 1)})
 
     convo = C.get(id)
+    IO.inspect("------convo in sub-----------")
+    IO.inspect(convo)
+    IO.inspect("------convo in sub----------")
     Member.update(convo.member.id, %{consent: true})
     close_conversation(id, location)
     conn
