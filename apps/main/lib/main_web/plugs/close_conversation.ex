@@ -52,6 +52,10 @@ defmodule MainWeb.Plug.CloseConversation do
         location.phone_number,
         "location-admin"
       )
+    convo = C.get(id)
+    IO.inspect("------convo in unsub-----------")
+    IO.inspect(convo)
+    IO.inspect("------convo----------")
     conn
   end
 
@@ -73,6 +77,10 @@ defmodule MainWeb.Plug.CloseConversation do
     IO.inspect("------convo in sub----------")
     Member.update(convo.member.id, %{consent: true})
     close_conversation(id, location)
+    convo = C.get(id)
+    IO.inspect("------convo in sub-----------")
+    IO.inspect(convo)
+    IO.inspect("------convo in sub----------")
     conn
   end
 
