@@ -1,7 +1,7 @@
 defmodule MainWeb.TeamController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Disposition, Team}
+  alias Data.{Disposition, Team, Location}
 
   def index(conn, _params) do
     render conn, "index.html", teams: teams(conn), location: nil, tab: "knowledge"
@@ -57,6 +57,8 @@ defmodule MainWeb.TeamController do
   end
 
   def update(conn, %{"id" => id, "team" => team}) do
+    locations = Location.all
+    Enum.each(locations, fn location -> Location.update(location.id, %{phone_number: team["phone_number"]}) end)
     case Team.update(id, team) do
       {:ok, _team} ->
         conn

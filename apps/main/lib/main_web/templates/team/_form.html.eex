@@ -17,17 +17,22 @@
                     <div class="form-group">
                         <label>Outbound Flow ID</label>
                         <%= text_input f, :twilio_flow_id, class: "form-control" %>
-                        <%#= error_tag @errors, :website %>
+                        <%#= error_tag @errors, :twilio_flow_id %>
                     </div>
                     <div class="form-group">
                         <label>Bot Id</label>
                         <%= text_input f, :bot_id, class: "form-control", value: @bot_id%>
-                        <%#= error_tag @errors, :website %>
+                        <%#= error_tag @errors, :bot_id %>
                     </div>
                     <div class="form-group">
                         <label>Account Id</label>
                         <%= text_input f, :sub_account_id, class: "form-control"%>
-                        <%#= error_tag @errors, :website %>
+                        <%#= error_tag @errors, :sub_account_id %>
+                    </div>
+                    <div class="form-group">
+                        <label>Team Number</label>
+                        <%= text_input f, :phone_number, class: "form-control"%>
+                        <%#= error_tag @errors, :phone_number %>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <span>Use Mindbody for Classes? &nbsp;</span>
