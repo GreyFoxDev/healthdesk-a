@@ -244,7 +244,16 @@
                 <%= if assigns[:typing] do %>
                 <li class="conversation-inbound">
                     <div class="conversation-meta">
-                        <p class="ticontainer"><span>User is typing </span>
+                        <%
+                member=@open_conversation.member
+                user_name=
+                if(member.first_name != nil || member.last_name != nil ) do
+                  (member.first_name && member.first_name || "") <>" "<> (member.last_name && member.last_name || "")|> String.trim()
+                  else
+                  member.phone_number
+                end
+                %>
+                        <p class="ticontainer"><span><%=user_name%> is typing </span>
                             <span class="tiblock">
                                                 <span class="tidot"></span>
                                                 <span class="tidot"></span>
