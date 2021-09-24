@@ -8,6 +8,7 @@ defmodule MainWeb.Live.MessageComponent do
 
 
   def update(assigns, socket) do
+    sent_by = Data.Query.ConversationMessage.get_first_msg_by_convo_id(assigns.open_conversation.id)
     socket = socket
              |> assign(:open_conversation, assigns.open_conversation)
              |> assign(:user, assigns.user)
@@ -19,6 +20,7 @@ defmodule MainWeb.Live.MessageComponent do
              |> assign(:typing, assigns.typing)
              |> assign(:online, assigns.online)
              |> assign(:notes, assigns.notes)
+             |> assign(:sent_by, sent_by)
 
     {:ok, socket}
   end
