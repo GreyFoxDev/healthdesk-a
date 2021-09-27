@@ -159,8 +159,8 @@ defmodule MainWeb.Plug.CloseConversation do
         "sent_at" => DateTime.add(datetime, 3)}
       |> CM.create()
     end
-
-    C.close(id) |> IO.inspect(label: "after closing")
+#test
+    C.close(id)
 
     _ = ConCache.delete(:session_cache, id)
 
