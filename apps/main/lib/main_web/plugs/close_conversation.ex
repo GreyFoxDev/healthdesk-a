@@ -160,7 +160,7 @@ defmodule MainWeb.Plug.CloseConversation do
       |> CM.create()
     end
 
-    C.close(id)
+    C.close(id) |> IO.inspect(label: "after closing")
 
     _ = ConCache.delete(:session_cache, id)
 
