@@ -207,6 +207,7 @@ defmodule MainWeb.Plug.CloseConversation do
 
 
     #C.close(convo_id)|> IO.inspect(label: "inside close conversation")
+
     C.update(%{"id" => convo_id, "status" => "closed","appointment" => false, "team_member_id" => nil})
     ConCache.put(:session_cache, convo_id, 0)
     Main.LiveUpdates.notify_live_view( {location.id, :updated_open})
