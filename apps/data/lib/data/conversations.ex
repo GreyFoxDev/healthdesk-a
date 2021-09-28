@@ -237,12 +237,13 @@ defmodule Data.Conversations do
     IO.inspect("------Query.update(convo, @closed)-----------")
     IO.inspect(Query.update(convo, @closed))
     IO.inspect("------Query.update(convo, @closed)----------")
-
     with %Schema{id: ^id} = convo <- Query.get(id),
-         %Schema{id: ^id} = convo <- Query.update(convo, @closed) do
+         {:ok, %Schema{id: ^id} = convo} <- Query.update(convo, @closed) do
+      IO.inspect("------{:ok, convo}-----------")
+      IO.inspect({:ok, convo})
+      IO.inspect("------{:ok, convo}----------")
       {:ok, convo}
     else
-
       abc ->
         IO.inspect("------{:error}-----------")
         IO.inspect(abc)
