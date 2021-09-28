@@ -230,11 +230,23 @@ defmodule Data.Conversations do
   """
   @spec close(id :: binary) :: {:ok, Conversation.t()} | {:error, String.t()}
   def close(id) do
+    convo = Query.get(id)
+    IO.inspect("------convo <- Query.get(id)-----------")
+    IO.inspect(convo)
+    IO.inspect("------convo <- Query.get(id)----------")
+    IO.inspect("------Query.update(convo, @closed)-----------")
+    IO.inspect(Query.update(convo, @closed))
+    IO.inspect("------Query.update(convo, @closed)----------")
+
     with %Schema{id: ^id} = convo <- Query.get(id),
          %Schema{id: ^id} = convo <- Query.update(convo, @closed) do
       {:ok, convo}
     else
-      _ ->
+
+      abc ->
+        IO.inspect("------{:error}-----------")
+        IO.inspect(abc)
+        IO.inspect("------{:error}----------")
         {:error, "Unable to close conversation."}
     end
   end
