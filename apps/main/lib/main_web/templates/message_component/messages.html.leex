@@ -96,12 +96,22 @@
                                         <span>
                                         <i class="far fa-fw fa-comment-alt"></i> Conversation started by
                                         <strong>
+
+                                            <%= if @sent_by == @open_conversation.original_number do%>
                                             <%= if @open_conversation.member && @open_conversation.member.first_name do %>
                                                  <%= Enum.join([@open_conversation.member.first_name, @open_conversation.member.last_name], " ") %>
                                             <% else %>
                                                 <%= format_phone(@open_conversation.original_number) %>
                                             <% end %>
-                                        </strong> ·&nbsp;
+                                            <% else %>
+                                            <%= if @user && @user.first_name do %>
+                                                 <%= Enum.join([@user.first_name, @user.last_name], " ") %>
+                                            <% else %>
+                                                <%= format_phone(@user.phone_number) %>
+                                            <% end %>
+                                            <% end %>
+
+                                        </strong> ·
                                             <%= format_date(@open_conversation.started_at) %> </span>
 
                 </li><!-- /.conversation-divider -->

@@ -106,6 +106,17 @@ defmodule Data.Query.ConversationMessage do
     |> repo.all()
   end
 
+  def get_first_msg_by_convo_id(conversation_id, repo \\ Read) do
+    from(
+     c in ConversationMessage,
+     where: c.conversation_id == ^conversation_id,
+     order_by: c.sent_at,
+     limit: 1,
+     select: c.phone_number
+    )
+    |> repo.one()
+  end
+
   @doc """
   Creates a new conversation message
   """
