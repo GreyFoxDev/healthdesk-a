@@ -205,7 +205,7 @@ defmodule MainWeb.Plug.CloseConversation do
     end
 
 
-    C.close(convo_id)
+    C.close(convo_id)|> IO.inspect(label: "inside close conversation")
   end
 
 end
