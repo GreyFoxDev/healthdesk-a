@@ -37,7 +37,7 @@ defmodule MainWeb.Plug.CloseConversation do
     IO.inspect(convo)
     IO.inspect("------convo----------")
     Member.update(convo.member.id, %{consent: false})
-    close_conversation(id, location)
+    close_conversation(id, location, "SMS Unsubscribe")
 
     Main.LiveUpdates.notify_live_view({convo.id, struct})
     :ok =
@@ -67,7 +67,7 @@ defmodule MainWeb.Plug.CloseConversation do
     IO.inspect(convo)
     IO.inspect("------convo in sub----------")
     Member.update(convo.member.id, %{consent: true})
-    close_conversation(id, location)
+    close_conversation(id, location, "Automated")
     convo = C.get(id)
     IO.inspect("------convo in sub-----------")
     IO.inspect(convo)
@@ -170,12 +170,12 @@ defmodule MainWeb.Plug.CloseConversation do
   def call(conn, _opts) do
     conn
   end
-  defp close_conversation(convo_id, location_id) do
+  defp close_conversation(convo_id, location_id, disposition) do
     location = Location.get_by_phone(location_id)
     disposition =
       %{role: "system"}
       |> Data.Disposition.get_by_team_id(location.team_id)
-      |> Enum.find(&(&1.disposition_name == "SMS Unsubscribe"))
+      |> Enum.find(&(&1.disposition_name == disposition))
 
     IO.inspect("=======================dispositionByTeamId=====================")
     IO.inspect(disposition)
