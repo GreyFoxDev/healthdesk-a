@@ -127,6 +127,9 @@ defmodule MainWeb.Api.ConversationController do
                    )
              end
         else
+          IO.inspect("------convo-----------")
+          IO.inspect(convo)
+          IO.inspect("------convo----------")
           :ok =
                 Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin")
         end
