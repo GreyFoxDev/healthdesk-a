@@ -135,7 +135,7 @@ defmodule MainWeb.Api.ConversationController do
               IO.inspect("------convo inside open-----------")
               IO.inspect(convo)
               IO.inspect("------convo----------")
-              team_member=TeamMember.get(convo.team_member_id)
+              team_member=TeamMember.get(@role, convo.team_member_id)
               Notify.send_to_teammate(convo.id, message, location, team_member, convo.member )|> IO.inspect()
             _ ->
               IO.inspect("------convo inside default-----------")
