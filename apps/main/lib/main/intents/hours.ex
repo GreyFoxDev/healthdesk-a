@@ -19,10 +19,8 @@ defmodule MainWeb.Intents.Hours do
   def build_response([datetime: {datetime, _}], location),
       do: build_response([datetime: datetime], location)
 
-  def build_response([datetime: datetime], location) do
+  def build_response([datetime: <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), rest::binary>>] = datetime, location) do
     location = Location.get_by_phone(location)
-
-    <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
 
     with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}, location.id),
          [hours] <- get_hours(location.id, {term, day_of_week}) do
@@ -142,7 +140,8 @@ defmodule MainWeb.Intents.Hours do
         else
           @default_response
         end
-      datetime -> build_response([datetime: datetime], location)
+      datetime ->
+        build_response([datetime: datetime], location)
     end
   end
 
