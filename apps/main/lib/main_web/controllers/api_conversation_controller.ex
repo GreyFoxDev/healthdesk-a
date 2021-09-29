@@ -4,7 +4,7 @@ defmodule MainWeb.Api.ConversationController do
   alias Data.Conversations, as: C
   alias Data.ConversationCall
   alias Data.ConversationMessages, as: CM
-  alias Data.{Location, Team}
+  alias Data.{Location, Team, TeamMember}
   alias Data.Member
   alias MainWeb.{Notify, Intents}
   @role %{role: "admin"}
@@ -135,7 +135,8 @@ defmodule MainWeb.Api.ConversationController do
               IO.inspect("------convo inside open-----------")
               IO.inspect(convo)
               IO.inspect("------convo----------")
-              Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )|> IO.inspect()
+              team_member=TeamMember.get(convo.team_member_id)
+              Notify.send_to_teammate(convo.id, message, location, team_member, convo.member )|> IO.inspect()
             _ ->
               IO.inspect("------convo inside default-----------")
               IO.inspect(convo)
