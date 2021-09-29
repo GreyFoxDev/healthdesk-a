@@ -132,9 +132,15 @@ defmodule MainWeb.Api.ConversationController do
           IO.inspect("------convo----------")
           case convo.status do
             "open" ->
-              Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )
+              IO.inspect("------convo inside open-----------")
+              IO.inspect(convo)
+              IO.inspect("------convo----------")
+              Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )|> IO.inspect()
             _ ->
-              Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin")
+              IO.inspect("------convo inside default-----------")
+              IO.inspect(convo)
+              IO.inspect("------convo----------")
+              Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin") |> IO.inspect()
           end
          end
       else
