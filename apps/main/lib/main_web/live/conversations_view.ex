@@ -319,37 +319,43 @@ defmodule MainWeb.Live.ConversationsView do
       |> fetch_member()
     location = conversation.location
 
-    case MainWeb.AssignTeamMemberController.assign(
-           %{"id" => conversation.id, "location_id" => location.id, "team_member_id" => user.team_member.id}
-         ) do
-      {:ok, _} ->
-        if socket.assigns.tab == "active" do
-          conversation =
-            user
-            |> Conversations.get(conversation.id)
-            |> fetch_member()
-          locations = socket.assigns.location_ids
-          page= socket.assigns.page || 0
-          conversations =
-            user
-            |> Conversations.all(locations,["open", "pending"],page*30,30, user.id,true)
+    if not is_nil(user.team_member) do
+      case MainWeb.AssignTeamMemberController.assign(
+             %{"id" => conversation.id, "location_id" => location.id, "team_member_id" => user.team_member.id}
+           ) do
+        {:ok, _} ->
+          if socket.assigns.tab == "active" do
+            conversation =
+              user
+              |> Conversations.get(conversation.id)
+              |> fetch_member()
+            locations = socket.assigns.location_ids
+            page= socket.assigns.page || 0
+            conversations =
+              user
+              |> Conversations.all(locations,["open", "pending"],page*30,30, user.id,true)
 
-          socket =
-            socket
-            |> assign(:open_conversation, conversation |>fetch_member())
-            |> assign(:conversations, conversations)
-            |> assign(:changeset, Conversations.get_changeset())
-          if connected?(socket), do: Process.send_after(self(), :reload_convo, 500)
+            socket =
+              socket
+              |> assign(:open_conversation, conversation |>fetch_member())
+              |> assign(:conversations, conversations)
+              |> assign(:changeset, Conversations.get_changeset())
+            if connected?(socket), do: Process.send_after(self(), :reload_convo, 500)
+
+            {:noreply, socket}
+          else
+            {:noreply, redirect(socket, to: "/admin/conversations/active")}
+          end
+        _ ->
 
           {:noreply, socket}
-        else
-          {:noreply, redirect(socket, to: "/admin/conversations/active")}
-        end
-      _ ->
-
-        {:noreply, socket}
+      end
+    else
+    {:noreply,
+      socket
+#      |> live_flash("Team member does not exist")
+    }
     end
-
 
   end
   def handle_event("close", %{"did" => disposition_id} = _params, socket)do
