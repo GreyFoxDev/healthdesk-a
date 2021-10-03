@@ -37,7 +37,7 @@
                     <!-- message header -->
                     <!-- message body -->
                     <!-- message publisher -->
-                        <%= live_component @socket, MainWeb.Live.MessageComponent, typing: assigns[:typing], online: assigns[:online], open_conversation: @open_conversation, user: @user, team_members: @team_members, mchangeset: @mchangeset, team_members_all: @team_members_all, dispositions: @dispositions, notes: @notes, saved_replies: @saved_replies, id: "message_body" %>
+                        <%= live_component @socket, MainWeb.Live.MessageComponent, typing: assigns[:typing], online: assigns[:online], open_conversation: @open_conversation, user: @user, team_members: @team_members, mchangeset: @mchangeset, team_members_all: @team_members_all, dispositions: @dispositions, notes: @notes, saved_replies: @saved_replies, id: "message_body", started_by: assigns[:started_by] %>
                     <!-- /message header -->
                     <!-- /message body -->
                     <!-- /message publisher -->

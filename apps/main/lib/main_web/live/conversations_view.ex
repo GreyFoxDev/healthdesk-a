@@ -204,6 +204,7 @@ defmodule MainWeb.Live.ConversationsView do
   end
 
   def handle_event("openconvo", %{"cid" => conversation_id} = _params, socket) do
+    started_by = Data.Query.ConversationMessage.get_first_msg_by_convo_id(conversation_id)
     user = socket.assigns.user
     convo =
       user
@@ -224,6 +225,7 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:open_conversation, convo)
              |> assign(:online, false)
              |> assign(:typing, false)
+             |> assign(:started_by, started_by)
 
 
     send(self(), {:fetch_d, %{user: user, locations: socket.assigns.location_ids, convo: convo}})
@@ -499,7 +501,7 @@ defmodule MainWeb.Live.ConversationsView do
       nil -> nil
       c -> c.id |> Conversations.get() |> fetch_member()
     end
-
+    started_by = Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
     socket = socket
              |> assign(:team_members, [])
              |> assign(:team_members_all, [])
@@ -508,6 +510,7 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:dispositions, [])
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
+             |> assign(:started_by, started_by)
 
     socket = if (socket.assigns.tab == "active" && socket.assigns[:open_conversation] != nil) do
       send(self(), {:fetch_d, %{user: user, locations: locations, convo: socket.assigns[:open_conversation]}})
@@ -529,6 +532,7 @@ defmodule MainWeb.Live.ConversationsView do
       nil -> nil
       c -> c.id |> Conversations.get() |> fetch_member()
     end
+    started_by = Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
 
     socket = socket
              |> assign(:team_members, [])
@@ -539,6 +543,7 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
              |> assign(:open_conversation, open_conversation)
+             |> assign(:started_by, started_by)
     if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
     send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
 
@@ -556,7 +561,7 @@ defmodule MainWeb.Live.ConversationsView do
       nil -> nil
       c -> c.id |> Conversations.get() |> fetch_member()
     end
-
+    started_by = Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
 
     socket = socket
              |> assign(:team_members, [])
@@ -567,6 +572,7 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
              |> assign(:open_conversation, open_conversation)
+             |> assign(:started_by, started_by)
     if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
     socket = if (socket.assigns.tab == "closed" && socket.assigns[:open_conversation] != nil) do
       send(self(), {:fetch_d, %{user: user, locations: locations, convo: socket.assigns[:open_conversation]}})

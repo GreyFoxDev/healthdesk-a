@@ -97,7 +97,7 @@
                                         <i class="far fa-fw fa-comment-alt"></i> Conversation started by
                                         <strong>
 
-                                            <%= if @sent_by == @open_conversation.original_number do%>
+                                            <%= if @started_by == @open_conversation.original_number do%>
                                             <%= if @open_conversation.member && @open_conversation.member.first_name do %>
                                                  <%= Enum.join([@open_conversation.member.first_name, @open_conversation.member.last_name], " ") %>
                                             <% else %>
