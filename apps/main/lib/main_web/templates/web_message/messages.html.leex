@@ -28,17 +28,16 @@
 <% end %>
 
         <%= if assigns[:typing] do %>
-        <div class="media my-3 w-75 ml-auto">
-            <div class="media-body">
-                <p class="small mb-0 text-muted ticontainer">
-                    <span>Agent is typing </span>
+            <div class="conversation-meta">
+                <p class="ticontainer">
+                    <%name = if @member && @member.user.first_name, do: @member.user.first_name, else: @location.location_name %>
+                    <span><%=name%> is typing </span>
                     <span class="tiblock">
                             <span class="tidot"></span>
                             <span class="tidot"></span>
                             <span class="tidot"></span>
                         </span>
                 </p>
-            </div>
         </div>
 
         <% end %>
