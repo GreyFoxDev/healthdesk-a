@@ -298,8 +298,7 @@ defmodule MainWeb.Live.ConversationsView do
               |> assign(:conversations, conversations)
               |> assign(:changeset, Conversations.get_changeset())
             if connected?(socket), do: Process.send_after(self(), :menu_fix, 100)
-            if connected?(socket), do: Process.send_after(self(), {locations.id, :updated_count}, 100)
-
+            Main.LiveUpdates.notify_live_view( {location.id, :updated_count})
             {:noreply, socket}
           else
             {:noreply, redirect(socket, to: "/admin/conversations/assigned")}
