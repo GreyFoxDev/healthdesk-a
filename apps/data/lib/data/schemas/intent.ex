@@ -20,9 +20,9 @@ defmodule Data.Schema.Intent do
 
   @primary_key false
   schema "intents" do
-    field(:intent, :string, primary_key: true)
+    field(:intent, :string)
     field(:message, :string)
-    belongs_to(:location, Data.Schema.Location, primary_key: true)
+    belongs_to(:location, Data.Schema.Location)
     timestamps()
   end
 
