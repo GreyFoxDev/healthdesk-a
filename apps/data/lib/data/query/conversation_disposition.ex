@@ -3,7 +3,7 @@ defmodule Data.Query.ConversationDisposition do
   Module for the Conversation Disposition queries
   """
 
-  alias Data.Schema.{Conversation, Disposition, ConversationDisposition}
+  alias Data.Schema.{Conversation, Disposition, ConversationDisposition, ConversationCall}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL
@@ -47,13 +47,24 @@ defmodule Data.Query.ConversationDisposition do
     from = Data.Disposition.convert_string_to_date(from)
 
     query =
-      from(c in Conversation,
+    if channel_type == "CAll" do
+      from(c in ConversationCall,
         join: cd in ConversationDisposition,
-        on: c.id == cd.conversation_id,
+        on: c.id == cd.conversation_call_id,
         join: d in Disposition,
-        on: cd.disposition_id == d.id,
-        where: c.channel_type == ^channel_type
+        on: cd.disposition_id == d.id
       )
+    else
+        from(c in Conversation,
+          join: cd in ConversationDisposition,
+          on: c.id == cd.conversation_id,
+          join: d in Disposition,
+          on: cd.disposition_id == d.id,
+          where: c.channel_type == ^channel_type,
+          where: d.disposition_name not in ["Call Deflected","Call deflected","Call Transferred","Call Hang Up"]
+        )
+    end
+
 
     query =
       Enum.reduce(%{to: to, from: from}, query, fn
@@ -87,14 +98,24 @@ defmodule Data.Query.ConversationDisposition do
     from = Data.Disposition.convert_string_to_date(from)
 
     query =
+    if channel_type == "CALL" do
+      from(c in ConversationCall,
+        join: cd in ConversationDisposition,
+        on: c.id == cd.conversation_call_id,
+        join: d in Disposition,
+        on: cd.disposition_id == d.id,
+        where: c.location_id in ^location_ids
+      )
+    else
       from(c in Conversation,
         join: cd in ConversationDisposition,
         on: c.id == cd.conversation_id,
         join: d in Disposition,
         on: cd.disposition_id == d.id,
-        where: c.location_id in ^location_ids and c.channel_type == ^channel_type
+        where: c.location_id in ^location_ids and c.channel_type == ^channel_type,
+        where: d.disposition_name not in ["Call Deflected","Call deflected","Call Transferred","Call Hang Up"]
       )
-
+    end
     query =
       Enum.reduce(%{to: to, from: from}, query, fn
         {:to, to}, query ->
@@ -127,13 +148,25 @@ defmodule Data.Query.ConversationDisposition do
     from = Data.Disposition.convert_string_to_date(from)
 
     query =
+    if channel_type == "CALL" do
       from(c in Conversation,
         join: cd in ConversationDisposition,
-        on: c.id == cd.conversation_id,
+        on: c.id == cd.conversation_call_id,
         join: d in Disposition,
         on: cd.disposition_id == d.id,
-        where: d.team_id == ^team_id and c.channel_type == ^channel_type
+        where: d.team_id == ^team_id,
       )
+    else
+        from(c in Conversation,
+          join: cd in ConversationDisposition,
+          on: c.id == cd.conversation_id,
+          join: d in Disposition,
+          on: cd.disposition_id == d.id,
+          where: d.team_id == ^team_id and c.channel_type == ^channel_type,
+          where: d.disposition_name not in ["Call Deflected","Call deflected","Call Transferred","Call Hang Up"]
+        )
+    end
+
 
     query =
       Enum.reduce(%{to: to, from: from}, query, fn
