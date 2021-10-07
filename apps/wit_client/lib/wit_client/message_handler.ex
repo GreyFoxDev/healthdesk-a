@@ -1,7 +1,7 @@
 defmodule WitClient.MessageHandler do
   use GenServer,
-    start: {WitClient.MessageHandler, :start_link, []},
-    restart: :transient
+      start: {WitClient.MessageHandler, :start_link, []},
+      restart: :transient
 
   alias Data.Team
 
@@ -17,7 +17,7 @@ defmodule WitClient.MessageHandler do
   # @access_token Application.get_env(:wit_client, :access_token)
 
   def start_link(from, question, bot_id),
-    do: GenServer.start_link(__MODULE__, [from, question, bot_id])
+      do: GenServer.start_link(__MODULE__, [from, question, bot_id])
 
   def start_link(default) when is_list(default) do
     GenServer.start_link(__MODULE__, default)
@@ -35,27 +35,33 @@ defmodule WitClient.MessageHandler do
 
   def handle_info(:ask, [from, question, bot_id]) do
     question = Inflex.parameterize(question, "%20")
+    try do
 
-    case System.cmd("curl", [
-           "-H",
-           "Authorization: Bearer #{bot_id}",
-           "https://api.wit.ai/message?v=20181028&q=#{question}"
-         ]) do
-      {response, 0} ->
-        with %{} = response <- Poison.Parser.parse!(response)["entities"],
-             intent <- get_intent(response),
-             args <- get_args(response) do
-          send(from, {:response, {intent, args}})
-        else
-          error ->
-            Logger.error(inspect(error))
-            send(from, {:response, :unknown})
-        end
 
-      {error, _code} ->
-        send(from, {:error, error})
+
+      case System.cmd("curl", [
+        "-H",
+        "Authorization: Bearer #{bot_id}",
+        "https://api.wit.ai/message?v=20181028&q=#{question}"
+      ]) do
+        {response, 0} ->
+          with %{} = response <- Poison.Parser.parse!(response)["entities"],
+               intent <- get_intent(response),
+               args <- get_args(response) do
+            send(from, {:response, {intent, args}})
+          else
+            error ->
+              Logger.error(inspect(error))
+              send(from, {:response, :unknown})
+          end
+
+        {error, _code} ->
+          send(from, {:error, error})
+      end
+    rescue
+      _ ->
+        {:stop, :normal, []}
     end
-
     {:stop, :normal, []}
   end
 
@@ -85,7 +91,7 @@ defmodule WitClient.MessageHandler do
   end
 
   defp set_value(value, "greetings"),
-    do: {:greetings, value}
+       do: {:greetings, value}
 
   defp set_value(value, key) do
     try do
@@ -105,8 +111,8 @@ defmodule WitClient.MessageHandler do
   defp parse_datetime([%{"type" => "value", "value" => value} | _]), do: value
 
   defp parse_datetime([
-         %{"type" => "interval", "from" => %{"value" => from}, "to" => %{"value" => to}} | _
-       ]),
+    %{"type" => "interval", "from" => %{"value" => from}, "to" => %{"value" => to}} | _
+  ]),
        do: {from, to}
 
   defp parse_datetime(_), do: nil

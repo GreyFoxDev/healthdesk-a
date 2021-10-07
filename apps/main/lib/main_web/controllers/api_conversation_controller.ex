@@ -142,6 +142,101 @@ defmodule MainWeb.Api.ConversationController do
     end
     conn |> send_resp(200, "ok")
   end
+  def create(conn, %{"from" => from, "subject" => subj, "html" => message,"to" => to} = _params) do
+    regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
+    name = List.first(Regex.split(regex,from))
+    from = List.first(Regex.run(regex,from))
+    message = ElixirEmailReplyParser.parse_reply message
+    to = Regex.scan(regex,to) |> List.flatten |> Enum.uniq
+    subj = String.length(subj)>200 && String.slice(subj, 0..200) || subj
+    if from != nil && from != "" && message != nil && message != "" do
+      with {:ok, convo} <- C.find_or_start_conversation(from, to,subj) do
+        Task.start(fn ->  notify_open(convo.location_id) end)
+        {:ok, struct}= CM.create(%{
+          "conversation_id" => convo.id,
+          "phone_number" => from,
+          "message" => message,
+          "sent_at" => DateTime.utc_now()})
+        location = Location.get(convo.location_id)
+        Main.LiveUpdates.notify_live_view({convo.id, struct})
+        with %Data.Schema.Member{} = member <- Member.get_by_phone_number(@role, from) do
+          Member.update(member.id, %{first_name:  String.replace(name||"","<","")|>String.trim,email: from})
+        else
+          nil ->
+            Member.create(%{
+              team_id: location.team_id,
+              first_name: String.replace(name||"","<","")|>String.trim,
+              email: from,
+              phone_number: from
+            })
+        end
+        if convo.status == "closed"  do
+          message
+          |> ask_wit_ai(location)
+          |> case do
+               {:ok, response} ->
+                 if convo.status == "closed" do
+                   {:ok, struct}=  CM.create(
+                     %{
+                       "conversation_id" => convo.id,
+                       "phone_number" => location.phone_number,
+                       "message" => response,
+                       "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                     }
+                   )
+                   close_conversation(convo.id, location)
+                   from
+                   |> Main.Email.generate_reply_email(response, subj,location.phone_number)
+                   |> Main.Mailer.deliver_now()
+                   Main.LiveUpdates.notify_live_view({convo.id, struct})
+                 end
+
+               {:unknown, response} ->
+
+                 if convo.status == "closed" do
+                   {:ok, struct}=  CM.create(
+                     %{
+                       "conversation_id" => convo.id,
+                       "phone_number" => location.phone_number,
+                       "message" => response,
+                       "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                     }
+                   )
+                   C.pending(convo.id)
+                   from
+                   |> Main.Email.generate_reply_email(response, subj,location.phone_number)
+                   |> Main.Mailer.deliver_now()
+                   Main.LiveUpdates.notify_live_view({convo.id, struct})
+                 end
+
+                 Main.LiveUpdates.notify_live_view({location.id, :updated_open})
+                 :ok =
+                   Notify.send_to_admin(
+                     convo.id,
+                     "#{message}",
+                     location.phone_number,
+                     "location-admin"
+                   )
+             end
+        else
+          :ok =
+            case convo.status do
+              "open" ->
+                convo = C.get(convo.id)
+                convo.team_member &&  Notify.send_to_teammate(convo.id, message, location, convo.team_member, convo.member )
+              _ ->
+                Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin")
+            end
+        end
+      else
+        _ -> nil
+      end
+    end
+    conn |> send_resp(200, "ok")
+  end
+  def create(conn, _params) do
+    conn |> send_resp(200, "ok")
+  end
 
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type" =>"call"}) do
     conn

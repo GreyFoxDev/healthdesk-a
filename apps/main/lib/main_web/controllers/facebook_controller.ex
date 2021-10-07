@@ -26,23 +26,18 @@ defmodule MainWeb.FacebookController do
   end
 
   def event(conn, %{"entry" => [%{"messaging" => [%{"message" => %{"text" =>msg}, "sender" => %{"id" => sid},"recipient" => %{"id" => pid}}|_]}|_]}) do
-
-    case Location.get_by_page_id(pid) do
-
-    %Data.Schema.Location{} = location ->
-      with %Schema{} = convo <- C.get_by_phone("messenger:#{sid}", location.id) do
-        get_user_details(location,sid)
-        update_convo(msg,convo,location)
-      else
-        nil ->
-          with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({"messenger:#{sid}", location.phone_number}) do
-            get_user_details(location,sid)
-            update_convo(msg,convo,location, true)
-          end
-      end
-
+    with %Schema{} = location = Location.get_by_page_id(pid),
+    %Schema{} = convo <- C.get_by_phone("messenger:#{sid}", location.id) do
+      get_user_details(location,sid)
+      update_convo(msg,convo,location)
+    else
       nil ->
-        nil
+        with %Schema{} = location = Location.get_by_page_id(pid),
+             {:ok, %Schema{} = convo} <- C.find_or_start_conversation({"messenger:#{sid}", location.phone_number}) do
+          get_user_details(location,sid)
+          update_convo(msg,convo,location, true)
+        end
+        _->:ok
     end
 
     conn

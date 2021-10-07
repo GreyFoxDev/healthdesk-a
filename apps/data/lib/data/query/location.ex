@@ -110,13 +110,14 @@ defmodule Data.Query.Location do
   """
   @spec get_by_page_id(page_id :: binary(), repo :: Ecto.Repo.t()) :: Location.t() | nil
   def get_by_page_id(page_id, repo \\ Read) do
-    from(t in Location,
+    location = from(t in Location,
       where: is_nil(t.deleted_at),
       where: t.facebook_page_id == ^page_id,
       limit: 1,
       preload: [:team]
     )
     |> repo.one()
+    location || false
   end
 
   @doc """

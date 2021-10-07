@@ -21,6 +21,8 @@ defmodule MainWeb.Live.ConversationsView do
       case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
         {:error, :token_expired} -> socket |> redirect(to: "/")
         res -> res
+        {:ok, resource} -> resource
+        _-> socket |> redirect(to: "/")
       end
     location_ids = user |> teammate_locations(true)
     locations = user |> teammate_locations()

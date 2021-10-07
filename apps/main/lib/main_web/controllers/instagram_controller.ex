@@ -26,17 +26,19 @@ defmodule MainWeb.InstagramController do
   end
 
   def event(conn, %{"entry" => [%{"changes" => [%{"field" => msg, "value" => %{"event_data" => %{"sender" => %{"username" => u_id}, "recipient" => %{"thread_id" => t_id}}}}|_]}|_]}) do
-    location = Location.get_by_page_id(t_id)
-    with %Schema{} = convo <- C.get_by_phone("instagram:#{u_id}", location.id) do
+    with %Schema{} = location = Location.get_by_page_id(t_id),
+         %Schema{} = convo <- C.get_by_phone("instagram:#{u_id}", location.id) do
 #      get_user_details(location, sid)
       update_convo(msg,convo,location)
     else
       nil ->
-        with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({"messenger:#{u_id}", location.phone_number}) do
+        with %Schema{} = location = Location.get_by_page_id(t_id),
+             {:ok, %Schema{} = convo} <- C.find_or_start_conversation({"messenger:#{u_id}", location.phone_number}) do
 #          get_user_details(location,sid)
           close_conversation(convo.id, location)
           update_convo(msg,convo,location)
         end
+        _-> :ok
     end
     conn
     |> Plug.Conn.resp(200, "")
