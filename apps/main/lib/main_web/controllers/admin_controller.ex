@@ -262,8 +262,7 @@ defmodule MainWeb.AdminController do
   end
   defp count_total_response_time(%{"location_ids" => location_ids}= params) do
     response_times = Enum.map(location_ids, fn location_id -> ConversationMessages.count_by_location_id(location_id,params["from"] != "" && params["from"] || nil, params["to"] != "" && params["to"] || nil).median_response_time||0 end)
-    middle_index = response_times |> length() |> div(2)
-    response_time = response_times |> Enum.sort |> Enum.at(middle_index)
+    Enum.sum(response_times)|> div(length(response_times))
   end
   defp convert_values(value) do
     case value do
