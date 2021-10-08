@@ -24,34 +24,34 @@ defmodule Data.Query.ConversationMessage do
   @doc """
   Return median response time based on location
   """
-  def count_by_location_id(location_id, nil, nil, repo \\ Read) do
+  def count_by_location_id(location_ids, nil, nil, repo \\ Read) do
     repo
     |> SQL.query!(
-      "SELECT count_messages_by_location_id('#{location_id}') AS #{:median_response_time}"
+      "SELECT count_messages_by_location_id('{#{Enum.join(location_ids,",")}}') AS #{:median_response_time}"
     )
     |> build_results()
   end
 
-  def count_by_location_id(location_id, from, nil, repo) do
+  def count_by_location_id(location_ids, from, nil, repo) do
     repo
     |> SQL.query!(
-      "SELECT count_messages_by_location_id_from('#{location_id}','#{from}') AS #{:median_response_time}"
+      "SELECT count_messages_by_location_id_from('{#{Enum.join(location_ids,",")}}','#{from}') AS #{:median_response_time}"
     )
     |> build_results()
   end
 
-  def count_by_location_id(location_id, nil, to, repo) do
+  def count_by_location_id(location_ids, nil, to, repo) do
     repo
     |> SQL.query!(
-      "SELECT count_messages_by_location_id('#{location_id}','#{to}') AS #{:median_response_time}"
+      "SELECT count_messages_by_location_id('{#{Enum.join(location_ids,",")}}','#{to}') AS #{:median_response_time}"
     )
     |> build_results()
   end
 
-  def count_by_location_id(location_id, from, to, repo) do
+  def count_by_location_id(location_ids, from, to, repo) do
     repo
     |> SQL.query!(
-      "SELECT count_messages_by_location_id('#{location_id}','#{to}','#{from}') AS #{:median_response_time}"
+      "SELECT count_messages_by_location_id('{#{Enum.join(location_ids,",")}}','#{to}','#{from}') AS #{:median_response_time}"
     )
     |> build_results()
   end

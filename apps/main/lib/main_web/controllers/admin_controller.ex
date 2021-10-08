@@ -27,8 +27,9 @@ defmodule MainWeb.AdminController do
       |> Enum.filter(&(&1.user.role == "teammate"))
       |> Enum.count()
     locations = Location.get_by_team_id(current_user, team_id)
+    location_ids=Enum.map(locations, fn location-> location.id end)
     location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
-    response_time=ConversationMessages.count_by_team_id(team_id,params["from"] != "" && params["from"] || nil,params["to"] != "" && params["to"] || nil)
+    response_time=ConversationMessages.count_by_location_id(location_ids,params["from"] != "" && params["from"] || nil,params["to"] != "" && params["to"] || nil)
     campaigns = if location_id do
       Campaign.get_by_location_id(location_id)
     else
@@ -278,8 +279,7 @@ defmodule MainWeb.AdminController do
     params=Map.delete(params, "filters")
   end
   defp count_total_response_time(%{"location_ids" => location_ids}= params) do
-    response_times = Enum.map(location_ids, fn location_id -> ConversationMessages.count_by_location_id(location_id,params["from"] != "" && params["from"] || nil, params["to"] != "" && params["to"] || nil).median_response_time||0 end)
-    Enum.sum(response_times)|> div(length(response_times))
+    response_times = ConversationMessages.count_by_location_id(location_ids, params["from"] != "" && params["from"] || nil,params["to"] != "" && params["to"] || nil).median_response_time||0
   end
   defp convert_values(value) do
     case value do
