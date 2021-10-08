@@ -237,7 +237,7 @@
                 <div class="metric">
                     <h2 class="metric-label"> SESSIONS BY CHANNEL </h2>
                     <p class="metric-label">
-                        <canvas id="canvas-sessions-by-channel" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
+                        <canvas id="canvas-sessions-by-channel" class="chartjs chartjs-render-monitor" style="display: block; height: 270px; width: 500px;"></canvas>
                     </p>
                 </div>
             </div><!-- /.metric -->
@@ -248,7 +248,7 @@
                 <div class="metric">
                     <h2 class="metric-label"> APPOINTMENTS </h2>
                     <p class="metric-label">
-                        <canvas id="canvas-appointments" class="chartjs chartjs-render-monitor" style="display: block; height: 250px; width: 500px;"></canvas>
+                        <canvas id="canvas-appointments" class="chartjs chartjs-render-monitor" style="display: block; height: 270px; width: 500px;"></canvas>
                     </p>
                 </div>
             </div><!-- /.metric -->
@@ -264,7 +264,8 @@
                     'Email',
                     'Facebook',
                     'Web',
-                    'App'
+                    'App',
+                    'Phone'
                 ],
                 datasets: [{
                     data: [
@@ -272,11 +273,12 @@
                         <%= @email_totals %>,
                         <%= @facebook_totals %>,
                         <%= @web_totals %>,
-                        <%= @app_totals %>
+                        <%= @app_totals %>,
+                        <%= @call_totals%>
                     ],
                     borderWidth: 5,
-                    backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40','#ff973d'],
-                    hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70','#ff973d'],
+                    backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40','#ff973d', '#ff1000'],
+                    hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70','#ff973d', '#D33311'],
                 }],
             };
             new Chart(ctx, {
