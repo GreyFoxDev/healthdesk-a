@@ -11,6 +11,7 @@ defmodule MainWeb.AdminController do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_team_id(current_user, team_id)
     dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => team_id}))
+    automated = Data.IntentUsage.count_intent_by(Map.merge(params, %{"team_id" => team_id}))
     appointments = Appointments.count_by_team_id(team_id, convert_values(params["to"]), convert_values(params["from"]))
     dispositions_per_day =
       case Disposition.average_per_day_for_team(params) do
@@ -49,7 +50,8 @@ defmodule MainWeb.AdminController do
       dispositions: dispositions,
       campaigns: campaigns,
       appointments: appointments,
-      automated: calculate_percentage("Automated", dispositions),
+      automated_data: automated,
+      automated: calculate_automated_percentage(dispositions, automated),
       call_deflected: calculate_percentage("Call deflected", dispositions),
       dispositions_per_day: dispositions_per_day,
       web_totals: ConversationDisposition.count_channel_type_by_team_id("WEB", team_id, convert_values(params["to"]), convert_values(params["from"])),
@@ -71,7 +73,8 @@ defmodule MainWeb.AdminController do
       to: params["to"],
       location: nil,
 
-      location_ids: [])
+      location_ids: [],
+      role: current_user.role)
   end
   def index(conn, %{"filters" => %{"location_ids" => location_ids}} = params) do
     params=if(!is_nil(params["filters"])) do
@@ -82,6 +85,7 @@ defmodule MainWeb.AdminController do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_location_ids(current_user, location_ids)
     dispositions = Disposition.count_by(params)
+    automated = Data.IntentUsage.count_intent_by(params)
     appointments = Appointments.count_by_location_ids(location_ids, convert_values(params["to"]), convert_values(params["from"]))
     response_time = count_total_response_time(params)
     dispositions_per_day =
@@ -108,7 +112,8 @@ defmodule MainWeb.AdminController do
     params=Map.merge(params, filter)
     render(conn, "index.html",
       dispositions: dispositions,
-      automated: calculate_percentage("Automated", dispositions),
+      automated_data: automated,
+      automated: calculate_automated_percentage(dispositions, automated),
       call_deflected: calculate_percentage("Call deflected", dispositions),
       appointments: appointments,
       campaigns: Campaign.get_by_location_ids(location_ids),
@@ -130,7 +135,8 @@ defmodule MainWeb.AdminController do
       location_ids: location_ids,
       from: params["from"],
       to: params["to"],
-      location: nil)
+      location: nil,
+      role: current_user.role)
   end
   def index(conn, params) do
     params= if (!is_nil(params["filters"])), do: change_params(params), else: params
@@ -156,6 +162,7 @@ defmodule MainWeb.AdminController do
       params= Map.merge(params, filter)
       if current_user.role == "admin" do
         dispositions = Disposition.count_all_by(params)
+        automated = Data.IntentUsage.count_intent_by(params)
         appointments = Appointments.count_all(convert_values(params["to"]), convert_values(params["from"]))
         [dispositions_per_day] = Disposition.average_per_day(params)
         locations = Location.all()
@@ -172,7 +179,8 @@ defmodule MainWeb.AdminController do
           metrics: [],
           campaigns: campaigns,
           dispositions: dispositions,
-          automated: calculate_percentage("Automated", dispositions),
+          automated_data: automated,
+          automated: calculate_automated_percentage(dispositions ,automated),
           call_deflected: calculate_percentage("Call deflected", dispositions),
           appointments: appointments,
           dispositions_per_day: dispositions_per_day,
@@ -192,9 +200,11 @@ defmodule MainWeb.AdminController do
           from: params["from"],
           to: params["to"],
           location_ids: [],
-          team_id: nil)
+          team_id: nil,
+          role: current_user.role)
       else
         dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
+        automated = Data.IntentUsage.count_intent_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
         appointments = Appointments.count_by_team_id(current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"]))
         params = Map.merge(params, %{"team_id" => current_user.team_member.team_id})
         dispositions_per_day =
@@ -219,7 +229,8 @@ defmodule MainWeb.AdminController do
           campaigns: campaigns,
           dispositions: dispositions,
           appointments: appointments,
-          automated: calculate_percentage("Automated", dispositions),
+          automated_data: automated,
+          automated: calculate_automated_percentage(dispositions, automated),
           call_deflected: calculate_percentage("Call deflected", dispositions),
           dispositions_per_day: dispositions_per_day,
           response_time: response_time.median_response_time||0,
@@ -239,24 +250,26 @@ defmodule MainWeb.AdminController do
           location: nil,
           from: params["from"],
           to: params["to"],
-          team_id: nil)
+          team_id: nil,
+          role: current_user.role)
       end
     end
   end
   defp calculate_percentage(type, dispositions) do
     total =  Enum.map(dispositions, &(&1.count)) |> Enum.sum()
-
     call_transferred = (dispositions |> Enum.filter(&(&1.name == "Call Transferred")) |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
-    call_deflected =  (dispositions |> Enum.filter(&( &1.name == "Call Deflected"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
+    call_Deflected =  (dispositions |> Enum.filter(&( &1.name == "Call Deflected"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
+    call_deflected =  (dispositions |> Enum.filter(&( &1.name == "Call deflected"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
     call_hung_up =  (dispositions |> Enum.filter(&(&1.name == "Call Hang Up"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
+    missed_call_texted =  (dispositions |> Enum.filter(&(&1.name == "Missed Call Texted"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
     automated = (dispositions |> Enum.filter(&(&1.name == "Automated"))  |> Enum.map( &(&1.count)) |> Enum.sum()) || 0
     case type do
       "Automated" ->
         test = dispositions |> Enum.count(&(&1.name == "GENERAL - Test")) || 0
-        (automated / (if (total - (call_transferred + call_deflected + call_hung_up + test))== 0.0,do: 1,else: (total - (call_transferred + call_deflected + call_hung_up + test)))) * 100
+        (automated / (if (total - (call_transferred + call_deflected + call_hung_up + test + call_Deflected + missed_call_texted))== 0.0,do: 1,else: (total - (call_transferred + call_deflected + call_hung_up + test + call_Deflected + missed_call_texted)))) * 100
       "Call deflected" ->
-
-        (call_deflected  / (if (call_transferred + call_deflected + call_hung_up)==0.0,do: 1,else: (call_transferred + call_deflected + call_hung_up))) * 100
+        call_deflected = call_deflected + call_Deflected
+        (call_deflected  / (if (call_transferred + call_deflected + call_hung_up + missed_call_texted)==0.0,do: 1,else: (call_transferred + call_deflected + call_hung_up + missed_call_texted))) * 100
     end
   end
 
@@ -274,5 +287,10 @@ defmodule MainWeb.AdminController do
       "" -> nil
       _-> value
     end
+  end
+  defp calculate_automated_percentage(dispositions, automated)do
+    total =  Enum.reduce(dispositions,0,fn %{count: x},sum -> x+sum end)
+    automated = Enum.reduce(automated,0,fn %{count: x},sum -> x+sum end)
+    automated / if total == 0, do: 1, else: total * 100
   end
 end

@@ -193,17 +193,30 @@ defmodule MainWeb.TsiController do
       _member = Member.get_by_phone_number(@role, convo.original_number)
 
       if convo.status == "closed" do
+        IO.inspect("=========convo status closed=======")
+        IO.inspect("convo status closed")
+        IO.inspect("=========convo status closed=======")
+
+        IO.inspect("=========message=======")
+        IO.inspect(message)
+        IO.inspect("=========message=======")
         message
         |> ask_wit_ai(convo_id, location)
         |> case do
-             {:ok, response} ->
-               _ = CM.create(
+             {:ok, response , intent} ->
+               {:ok, saved_message} = CM.create(
                  %{
                    "conversation_id" => convo.id,
                    "phone_number" => location.phone_number,
                    "message" => response,
                    "sent_at" => DateTime.add(DateTime.utc_now(), 2)
                  }
+               )
+               _ = Data.Query.IntentUsage.create(
+               %{
+                    "message_id" => saved_message.id,
+                    "intent" => intent
+               }
                )
 
                close_conversation(convo_id, location)
@@ -278,15 +291,23 @@ defmodule MainWeb.TsiController do
     end
   end
   defp ask_wit_ai(question, convo_id, location) do
+
     bot_id = Team.get_bot_id_by_location_id(location.id)
+    IO.inspect("=========bot-id=======")
+    IO.inspect(bot_id)
+    IO.inspect("=========bot-id=======")
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
+          intent = elem(response, 0)
+#          intent = intent["intent"]
+#          intent = hd(intent)
+#          intent = intent["value"]
           message =  Appointment.get_next_reply(convo_id, response, location.phone_number)
           if String.contains?(message,location.default_message) do
             {:unknown, message}
           else
-            {:ok, message}
+            {:ok, message, intent}
           end
         _ ->
           {:unknown, location.default_message}

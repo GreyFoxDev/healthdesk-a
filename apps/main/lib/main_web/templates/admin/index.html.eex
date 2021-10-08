@@ -138,9 +138,16 @@
             <!-- .metric -->
             <div class="card-metric" data-toggle="modal" data-target="#exampleModalLong">
                 <div class="metric">
+                    <%= if @role == "admin" do%>
+                    <%= if @team_id != nil do%>
+                    <a href="admin/teams/<%= @team_id %>/dispositions"
+                       style = "position: absolute;top: 2px;
+                    right: 5px;">Edit Dispostion</a>
+                    <% end %>
+                    <% end %>
                     <h2 class="metric-label"> DISPOSITIONS </h2>
                     <p class="metric-value h3">
-                    <span class="value"><%= Enum.map(@dispositions, &(&1.count)) |> Enum.sum() |> format_comma_numbers %>
+                    <span class="value"><%= Enum.filter(@dispositions, &(&1.name not in ["Call deflected", "Call Deflected", "Call Hang Up", "Call Transferred", "Missed Call Texted"])) |> Enum.map(&(&1.count)) |> Enum.sum() |> format_comma_numbers %>
                     </span>
                     </p>
                 </div>
@@ -199,8 +206,8 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric">
-                <div class="metric">
-                    <h2 class="metric-label"> AUTOMATED </h2>
+                <div class="metric" data-toggle="modal" data-target="#exampleAssistLong">
+                    <h2 class="metric-label"> ASSISTED </h2>
                     <p class="metric-value h3">
                     <span class="value">
                         <%= if @automated == 0.0 do %>
@@ -369,6 +376,38 @@
                     </li>
                     <% end %>
                 </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button"  data-dismiss="modal" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleAssistLong" tabindex="-1" role="dialog" aria-labelledby="exampleAssistLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Assisted</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <%= if List.first(@automated_data) do%>
+                    <%= for intent <- @automated_data do%>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <%= intent.intent %>
+                        <span class="badge badge-primary badge-pill"><%= (intent.count/Enum.reduce(@automated_data, 0, fn %{count: x},acc -> x+acc end)) *100 |> Decimal.from_float() |> Decimal.round(1) %>%</span>
+                    </li>
+                    <% end %>
+                    <% else %>
+                    <span class="list-group-item d-flex justify-content-between align-items-center">No Assisted Yet</span>
+                    <% end %>
+                </ul>
+
             </div>
             <div class="modal-footer">
                 <button type="button"  data-dismiss="modal" class="btn btn-primary">Close</button>
