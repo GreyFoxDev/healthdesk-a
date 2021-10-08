@@ -65,18 +65,18 @@ defmodule Data.Query.ConversationMessage do
     |> build_results()
   end
 
-  def count_by_team_id(team_id, to, nil, repo) do
+  def count_by_team_id(team_id, from, nil, repo) do
     repo
     |> SQL.query!(
-      "SELECT count_messages_by_team_id_from('#{team_id}','#{to}') AS #{:median_response_time}"
+      "SELECT count_messages_by_team_id_from('#{team_id}','#{from}') AS #{:median_response_time}"
     )
     |> build_results()
   end
 
-  def count_by_team_id(team_id, nil, from, repo) do
+  def count_by_team_id(team_id, nil, to, repo) do
     repo
     |> SQL.query!(
-      "SELECT count_messages_by_team_id('#{team_id}','#{from}') AS #{:median_response_time}"
+      "SELECT count_messages_by_team_id('#{team_id}','#{to}') AS #{:median_response_time}"
     )
     |> build_results()
   end
