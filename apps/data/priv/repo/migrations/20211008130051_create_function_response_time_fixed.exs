@@ -2,7 +2,8 @@ defmodule Data.Repo.Migrations.CreateFunctionResponseTimeDateFilter do
   use Ecto.Migration
 
   def up do
-    execute "DROP FUNCTION IF EXISTS count_messages_by_location_id(location uuid);"
+    execute "DROP FUNCTION IF EXISTS count_messages_by_location_id(location uuid[]);"
+    flush();
     execute """
     CREATE FUNCTION count_messages_by_location_id(location uuid[])
     RETURNS integer AS
@@ -30,8 +31,11 @@ defmodule Data.Repo.Migrations.CreateFunctionResponseTimeDateFilter do
     $$ LANGUAGE plpgsql;
     """
 
+    flush();
 
-    execute "DROP FUNCTION IF EXISTS count_messages_by_location_id(location uuid, to_data date);"
+    execute "DROP FUNCTION IF EXISTS count_messages_by_location_id(location uuid[], to_data date);"
+    flush();
+
     execute """
     CREATE FUNCTION count_messages_by_location_id(location uuid[], to_data date)
     RETURNS integer AS
@@ -58,8 +62,10 @@ defmodule Data.Repo.Migrations.CreateFunctionResponseTimeDateFilter do
     END
     $$ LANGUAGE plpgsql;
     """
+    flush();
 
-    execute "DROP FUNCTION IF EXISTS count_messages_by_location_id(location uuid, to_data date, from_date date);"
+    execute "DROP FUNCTION IF EXISTS count_messages_by_location_id(location uuid[], to_data date, from_date date);"
+    flush();
 
     execute """
     CREATE FUNCTION count_messages_by_location_id(location uuid[], to_data date, from_date date)
@@ -87,8 +93,10 @@ defmodule Data.Repo.Migrations.CreateFunctionResponseTimeDateFilter do
     END
     $$ LANGUAGE plpgsql;
     """
+    flush();
 
-    execute "DROP FUNCTION IF EXISTS count_messages_by_location_id_from(location uuid, from_date date);"
+    execute "DROP FUNCTION IF EXISTS count_messages_by_location_id_from(location uuid[], from_date date);"
+    flush();
 
     execute """
     CREATE FUNCTION count_messages_by_location_id_from(location uuid[], from_date date)
