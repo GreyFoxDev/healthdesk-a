@@ -47,13 +47,8 @@ defmodule Data.Query.ConversationDisposition do
     from = Data.Disposition.convert_string_to_date(from)
 
     query =
-    if channel_type == "CAll" do
-      from(c in ConversationCall,
-        join: cd in ConversationDisposition,
-        on: c.id == cd.conversation_call_id,
-        join: d in Disposition,
-        on: cd.disposition_id == d.id
-      )
+    if channel_type == "CALL" do
+      from(c in ConversationCall)
     else
         from(c in Conversation,
           join: cd in ConversationDisposition,
@@ -78,9 +73,9 @@ defmodule Data.Query.ConversationDisposition do
           query
       end)
 
-    from([c, _, d] in query,
+    from([c, ...] in query,
       distinct: [c.id],
-      select: c.channel_type
+      select: c.id
     )
 
     repo.all(query) |> Enum.count()
@@ -100,10 +95,6 @@ defmodule Data.Query.ConversationDisposition do
     query =
     if channel_type == "CALL" do
       from(c in ConversationCall,
-        join: cd in ConversationDisposition,
-        on: c.id == cd.conversation_call_id,
-        join: d in Disposition,
-        on: cd.disposition_id == d.id,
         where: c.location_id in ^location_ids
       )
     else
@@ -128,9 +119,9 @@ defmodule Data.Query.ConversationDisposition do
           query
       end)
 
-    from([c, _, d] in query,
+    from([c, ...] in query,
       distinct: [c.id],
-      select: c.channel_type
+      select: c.id
     )
 
     repo.all(query) |> Enum.count()
@@ -149,7 +140,7 @@ defmodule Data.Query.ConversationDisposition do
 
     query =
     if channel_type == "CALL" do
-      from(c in Conversation,
+      from(c in ConversationCall,
         join: cd in ConversationDisposition,
         on: c.id == cd.conversation_call_id,
         join: d in Disposition,
@@ -176,16 +167,17 @@ defmodule Data.Query.ConversationDisposition do
         {:from, from}, query ->
           if is_nil(from), do: query, else: from([c, ...] in query, where: c.inserted_at >= ^from)
 
-        _, query ->
-          query
+        _, query -> query
       end)
 
-    from([c, _, d] in query,
-      distinct: [c.id],
-      select: c.channel_type
+    from([c, ...] in query,
+      distinct: c.id, #not working here, so enum used
+      select: c.id
     )
 
-    repo.all(query) |> Enum.count()
+    repo.all(query)
+    |> Enum.uniq()
+    |> Enum.count()
   end
 
   defp build_results(results) do
