@@ -18,7 +18,6 @@ defmodule Data.Schema.Intent do
 
   @all_fields @required_fields
 
-  @primary_key false
   schema "intents" do
     field(:intent, :string)
     field(:message, :string)
