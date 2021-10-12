@@ -503,7 +503,11 @@ defmodule MainWeb.Live.ConversationsView do
       nil -> nil
       c -> c.id |> Conversations.get() |> fetch_member()
     end
-    started_by = Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
+    started_by = if open_conversation do
+      Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
+    else
+     ""
+    end
     socket = socket
              |> assign(:team_members, [])
              |> assign(:team_members_all, [])
@@ -534,7 +538,11 @@ defmodule MainWeb.Live.ConversationsView do
       nil -> nil
       c -> c.id |> Conversations.get() |> fetch_member()
     end
-    started_by = Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
+    started_by = if open_conversation do
+      Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
+    else
+    ""
+    end
 
     socket = socket
              |> assign(:team_members, [])
@@ -563,7 +571,11 @@ defmodule MainWeb.Live.ConversationsView do
       nil -> nil
       c -> c.id |> Conversations.get() |> fetch_member()
     end
-    started_by = Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
+    started_by = if open_conversation do
+      Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
+    else
+      ""
+    end
 
     socket = socket
              |> assign(:team_members, [])
