@@ -31,6 +31,15 @@ defmodule Data.Query.Location do
   end
 
   @doc """
+  Returns a locations by ids
+  """
+  @spec get_locations_by_ids(id :: binary(), repo :: Ecto.Repo.t()) :: Location.t() | nil
+  def get_locations_by_ids(id, repo \\ Read) do
+    from(t in Location, where: is_nil(t.deleted_at), where: t.id in ^id)
+    |> repo.all()
+  end
+
+  @doc """
   Returns a Automation Limit by id
   """
   @spec get_automation_limit(id :: binary(), repo :: Ecto.Repo.t()) :: Location.t() | nil
@@ -87,6 +96,19 @@ defmodule Data.Query.Location do
       where: t.team_id == ^team_id,
       order_by: t.location_name,
       preload: [:team]
+    )
+    |> repo.all()
+  end
+
+  @doc """
+  Return a list of active location ids for a team
+  """
+  @spec get_location_ids_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [Location.t()]
+  def get_location_ids_by_team_id(team_id, repo \\ Read) do
+    from(t in Location,
+      where: is_nil(t.deleted_at),
+      where: t.team_id == ^team_id,
+      select: t.id
     )
     |> repo.all()
   end
