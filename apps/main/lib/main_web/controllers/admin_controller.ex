@@ -307,6 +307,6 @@ defmodule MainWeb.AdminController do
   defp calculate_automated_percentage(dispositions, automated)do
     total =  Enum.reduce(dispositions,0,fn %{count: x},sum -> x+sum end)
     automated = Enum.reduce(automated,0,fn %{count: x},sum -> x+sum end)
-    automated / if total == 0, do: 1, else: total * 100
+    (automated / if total == 0, do: 1, else: total) * 100
   end
 end

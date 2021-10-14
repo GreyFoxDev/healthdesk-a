@@ -20,17 +20,11 @@ defmodule MainWeb.Plug.CloseConversation do
   we will keep conversation closed.
   """
   def call(%{assigns: %{convo: id, barcode: barcode, status: "closed"}} = conn, _opts) when (barcode != nil) do
-    IO.inspect("=========Close Convo Plug call 1=======")
-    IO.inspect(barcode)
-    IO.inspect("=========Close plug call 1=======")
     C.close(id)
     conn
   end
 
   def call(%{assigns: %{convo: id, location: location, intent: {"unsubscribe", _}}} = conn, _opts) do
-    IO.inspect("=========Close Convo Plug call 2=======")
-    IO.inspect("intent {unsubscribe, _}")
-    IO.inspect("=========Close plug call 2=======")
     datetime = DateTime.utc_now()
     {:ok, struct} = CM.create(%{
       "conversation_id" => id,
@@ -54,9 +48,6 @@ defmodule MainWeb.Plug.CloseConversation do
   end
 
   def call(%{assigns: %{convo: id, location: location, intent: {"subscribe", _}}} = conn, _opts) do
-    IO.inspect("=========Close Convo Plug call 3=======")
-    IO.inspect("intent {subscribe, _}")
-    IO.inspect("=========Close plug call 3=======")
     datetime = DateTime.utc_now()
     _ = CM.create(%{
       "conversation_id" => id,
@@ -76,9 +67,6 @@ defmodule MainWeb.Plug.CloseConversation do
   """
 
   def call(%{assigns: %{convo: id, location: location, status: "pending"}} = conn, _opts) do
-    IO.inspect("=========Close Convo Plug call 4=======")
-    IO.inspect("status: pending")
-    IO.inspect("=========Close plug call 4=======")
     _convo = C.get(id)
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
 
@@ -100,9 +88,6 @@ defmodule MainWeb.Plug.CloseConversation do
   """
   def call(%{assigns: %{convo: _id, intent: nil}} = conn, _opts), do: conn
   def call(%{assigns: %{convo: id, location: location, appointment: true} = _assigns} = conn, _opts) do
-    IO.inspect("=========Close Convo Plug call 5=======")
-    IO.inspect("appointment: true")
-    IO.inspect("=========Close plug call 5=======")
     datetime = DateTime.utc_now()
     _ = CM.create(%{
       "conversation_id" => id,
@@ -118,17 +103,11 @@ defmodule MainWeb.Plug.CloseConversation do
   end
 
   def call(%{assigns: %{convo: id, intent: {:unknown, []}}} = conn, _opts) do
-    IO.inspect("=========Close Convo Plug call 6=======")
-    IO.inspect("intent: :unknown,[] ")
-    IO.inspect("=========Close plug call 6=======")
     C.pending(id)
     conn
   end
 
   def call(%{assigns: %{convo: id, intent: :unknown_intent}} = conn, _opts) do
-    IO.inspect("=========Close Convo Plug call 7=======")
-    IO.inspect(":unknown_intent")
-    IO.inspect("=========Close plug call 7=======")
     C.pending(id)
     conn
   end
@@ -137,10 +116,6 @@ defmodule MainWeb.Plug.CloseConversation do
   If the question has been answered then close the conversation
   """
   def call(%{assigns: %{convo: id, location: location} = _assigns} = conn, _opts) do
-
-    IO.inspect("=========Close Convo Plug call 8=======")
-    IO.inspect("question is answered close the conversation")
-    IO.inspect("=========Close plug call 8=======")
     loc = Location.get_by_phone(location)
     datetime = DateTime.utc_now()
     {:ok, saved_message} = CM.create(%{

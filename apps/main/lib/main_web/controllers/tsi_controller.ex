@@ -72,10 +72,6 @@ defmodule MainWeb.TsiController do
   end
 
   def new(conn, %{"phone-number" => phone_number, "api_key" => api_key} = params) do
-
-    IO.inspect("=========in new=======")
-    IO.inspect("in new")
-    IO.inspect("=========in new=======")
     location = conn.assigns.location
     phone = "APP:#{format_phone(phone_number)}"
 
@@ -112,9 +108,6 @@ defmodule MainWeb.TsiController do
       do: send_resp(conn, 400, "Bad request")
 
   def edit(conn, %{"api_key" => api_key,"id" => convo_id}=params) do
-    IO.inspect("=========in edit=======")
-    IO.inspect("in edit")
-    IO.inspect("=========in edit=======")
     location = conn.assigns.location
 
     with %Schema{} = convo <- C.get(convo_id) do
@@ -146,9 +139,6 @@ defmodule MainWeb.TsiController do
     send_resp(conn, 400, "Bad request")
 
   def create(conn, %{"phone_number" => phone_number, "api_key" => api_key} = params) do
-    IO.inspect("=========in create=======")
-    IO.inspect("in create")
-    IO.inspect("=========in create=======")
     phone_number = "APP:#{format_phone(phone_number)}"
     location = conn.assigns.location
 
@@ -201,18 +191,11 @@ defmodule MainWeb.TsiController do
       _member = Member.get_by_phone_number(@role, convo.original_number)
 
       if convo.status == "closed" do
-        IO.inspect("=========convo status closed=======")
-        IO.inspect("convo status closed")
-        IO.inspect("=========convo status closed=======")
 
-        IO.inspect("=========message=======")
-        IO.inspect(message)
-        IO.inspect("=========message=======")
         message
         |> ask_wit_ai(convo_id, location)
         |> case do
              {:ok, response , intent} ->
-               IO.inspect(intent_and_message: response)
                {:ok, saved_message} = CM.create(
                  %{
                    "conversation_id" => convo.id,
@@ -226,11 +209,11 @@ defmodule MainWeb.TsiController do
                     "message_id" => saved_message.id,
                     "intent" => intent
                }
-               )|> IO.inspect()
+               )
 
                close_conversation(convo_id, location)
              {:unknown, response} ->
-               IO.inspect(unknown: response)
+
                _ = CM.create(
                  %{
                    "conversation_id" => convo.id,
@@ -303,38 +286,25 @@ defmodule MainWeb.TsiController do
   defp ask_wit_ai(question, convo_id, location) do
 
     bot_id = Team.get_bot_id_by_location_id(location.id)
-    IO.inspect("=========bot-id=======")
-    IO.inspect(bot_id)
-    IO.inspect("=========bot-id=======")
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
-          IO.inspect("=========response of ask-wit-ai=======")
-          IO.inspect(response)
-          IO.inspect("=========response of ask-wit-ai=======")
           intent = elem(response, 0)
 #          intent = intent["intent"]
 #          intent = hd(intent)
 #          intent = intent["value"]
           message =  Appointment.get_next_reply(convo_id, response, location.phone_number)
-          IO.inspect("========message Form Appointment against  intent========")
-          IO.inspect(message)
-          IO.inspect("========message From Appointment aginst intent========")
           if String.contains?(message,location.default_message) do
-            IO.inspect("-----------Message contains location default--------------")
             {:unknown, message}
           else
-            IO.inspect("-----------------Message against recognized intent--------------")
             {:ok, message, intent}
           end
         _ ->
-          IO.inspect("-------------no  intent recognized-------------")
           {:unknown, location.default_message}
       end
     else
 
       {:error, _error} ->
-        IO.inspect("--------witClientError------------------")
         {:unknown, location.default_message}
     end
   end

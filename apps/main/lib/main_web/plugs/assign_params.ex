@@ -17,9 +17,6 @@ defmodule MainWeb.Plug.AssignParams do
   """
   @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t()
   def call(%{params: %{"Body" => body, "From" => member, "To" => location} = params} = conn, _opts) do
-    IO.inspect("=========Assigns Plug Call 1=======")
-    IO.inspect(params)
-    IO.inspect("=========Assigns Plug Call 1=======")
     if String.starts_with?(location, "messenger:") do
       messenger_id = String.replace(location, "messenger:", "")
       location = Location.get_by_messenger_id(messenger_id)
@@ -39,9 +36,6 @@ defmodule MainWeb.Plug.AssignParams do
   end
 
   def call(%{params: %{"flow_name" => flow} = params} = conn, _opts) do
-    IO.inspect("=========Assigns Plug Call 2=======")
-    IO.inspect(params)
-    IO.inspect("=========Assigns Plug Call 2=======")
     location = Location.get(%{role: "admin"}, params["location_id"])
     conn
     |> assign(:flow_name, flow)

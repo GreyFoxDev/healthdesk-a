@@ -18,9 +18,6 @@ defmodule MainWeb.Plug.AskWit do
   Only once the member has opted in will the question be sent to Wit
   """
   def call(%{assigns: %{convo: id,  status: "open", message: message}} = conn, _opts) do
-    IO.inspect("=========call 1 Ask wit ai plug=======")
-    IO.inspect(message)
-    IO.inspect("=========call 1 Ask wit ai plug=======")
     convo = C.get(id)
 #    location = Location.get(convo.location_id)
     pending_message_count = (ConCache.get(:session_cache, id) || 0)
@@ -44,21 +41,15 @@ defmodule MainWeb.Plug.AskWit do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
-          IO.inspect("=========reponse from wit=======")
-          IO.inspect(response)
-          IO.inspect("=========reponse for wit=======")
+
           response
         _ ->
-          IO.inspect("=========no intent found=======")
-          IO.inspect("no intent found")
-          IO.inspect("=========no intent found=======")
+
           {:unknown_intent, []}
       end
     else
       {:error, _error} ->
-        IO.inspect("=========error occured=======")
-        IO.inspect("error occured")
-        IO.inspect("=========error occured=======")
+
         {:unknown_intent, []}
     end
   end
