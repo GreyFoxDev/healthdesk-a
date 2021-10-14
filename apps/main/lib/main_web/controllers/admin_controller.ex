@@ -167,7 +167,9 @@ defmodule MainWeb.AdminController do
         _ -> %{}
       end
       params= Map.merge(params, filter)
+
       if current_user.role == "admin" do
+
         if (!is_nil(params["team_id"])) do
           location_ids = Location.get_location_ids_by_team_id(current_user, params["team_id"])
           index(conn, %{"filters" => %{"from" => params["from"],"location_ids" => location_ids, "to" =>params["to"]}, "team_id" => params["team_id"]})
@@ -187,6 +189,9 @@ defmodule MainWeb.AdminController do
         campaigns =
         locations
         |> Enum.map(fn(location) -> Campaign.get_by_location_id(location.id)end) |> List.flatten()
+        IO.inspect("------params-----------")
+        IO.inspect(params)
+        IO.inspect("------params----------")
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
@@ -212,21 +217,21 @@ defmodule MainWeb.AdminController do
           from: params["from"],
           to: params["to"],
           location_ids: [],
-          team_id: nil,
+          team_id: TeamMember.get_by_user_id(%{role: current_user.role},current_user.id),
           role: current_user.role)
       else
         location_ids = Location.get_location_ids_by_team_id(current_user, current_user.team_member.team_id)
-        dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
-        automated = Data.IntentUsage.count_intent_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
-        appointments = Appointments.count_by_team_id(current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"]))
-        params = Map.merge(params, %{"team_id" => current_user.team_member.team_id})
+        dispositions = Disposition.count_by(%{"location_ids" => location_ids, "to" => convert_values(params["filter"]["to"]), "from" => convert_values(params["filter"]["from"])})
+        automated = Data.IntentUsage.count_intent_by(%{"location_ids" => location_ids, "to" => convert_values(params["filter"]["to"]), "from" => convert_values(params["filter"]["from"])})
+        appointments = Appointments.count_by_location_ids(location_ids, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]))
+        params = Map.merge(params, %{"location_ids" => location_ids})
         dispositions_per_day =
-          case Disposition.average_per_day_for_team(params) do
+          case Disposition.average_per_day_for_locations(params) do
             [result] -> result
             _ -> %{sessions_per_day: 0}
           end
         locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
-        response_time=ConversationMessages.count_by_team_id(current_user.team_member.team_id,params["to"] != "" && params["to"] || nil,params["from"] != "" && params["from"] || nil)
+        response_time=ConversationMessages.count_by_location_id(location_ids,convert_values(params["filter"]["to"]),convert_values(params["filter"]["from"]))
         location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
         campaigns = if location_id do
           Campaign.get_by_location_id(location_id)
@@ -247,12 +252,12 @@ defmodule MainWeb.AdminController do
           call_deflected: calculate_percentage("Call deflected", dispositions),
           dispositions_per_day: dispositions_per_day,
           response_time: response_time.median_response_time||0,
-          web_totals: ConversationDisposition.count_channel_type_by_location_ids("WEB", location_ids, convert_values(params["to"]), convert_values(params["from"])),
-          sms_totals: ConversationDisposition.count_channel_type_by_location_ids("SMS", location_ids, convert_values(params["to"]), convert_values(params["from"])),
-          app_totals: ConversationDisposition.count_channel_type_by_location_ids("APP", location_ids, convert_values(params["to"]), convert_values(params["from"])),
-          facebook_totals: ConversationDisposition.count_channel_type_by_location_ids("FACEBOOK", location_ids, convert_values(params["to"]), convert_values(params["from"])),
-          email_totals: ConversationDisposition.count_channel_type_by_location_ids("MAIL", location_ids, convert_values(params["to"]), convert_values(params["from"])),
-          call_totals: ConversationDisposition.count_channel_type_by_location_ids("CALL", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+          web_totals: ConversationDisposition.count_channel_type_by_location_ids("WEB", location_ids, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"])),
+          sms_totals: ConversationDisposition.count_channel_type_by_location_ids("SMS", location_ids, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"])),
+          app_totals: ConversationDisposition.count_channel_type_by_location_ids("APP", location_ids, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"])),
+          facebook_totals: ConversationDisposition.count_channel_type_by_location_ids("FACEBOOK", location_ids, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"])),
+          email_totals: ConversationDisposition.count_channel_type_by_location_ids("MAIL", location_ids, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"])),
+          call_totals: ConversationDisposition.count_channel_type_by_location_ids("CALL", location_ids, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"])),
           teams: teams,
           team_admin_count: team_admin_count,
           tickets_count: Ticket.filter(params),
