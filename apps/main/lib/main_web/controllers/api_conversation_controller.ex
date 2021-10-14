@@ -10,13 +10,9 @@ defmodule MainWeb.Api.ConversationController do
   @role %{role: "admin"}
 
   def create_(conn,params)do
-    IO.inspect("=========params=======")
-    IO.inspect(params)
-    IO.inspect("=========params=======")
     create(conn,params)
   end
   def create(conn, %{"location" => << "messenger:", location :: binary>>, "member" => << "messenger:", _ :: binary>> = member}) do
-    IO.inspect(create1: member)
     location = Location.get_by_messenger_id(location)
 
     with {:ok, convo} <- C.find_or_start_conversation({member, location.phone_number}) do
@@ -28,7 +24,6 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
   def create(conn, %{"location" => location, "member" => member, "type" => "call"}) do
-    IO.inspect(create_2: member)
     with {:ok, convo} <- ConversationCall.find_or_start_conversation({member, location}) do
       Task.start(fn ->  close_convo(convo) end)
       conn
@@ -38,7 +33,6 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
   def create(conn, %{"location" => location, "member" => member, "preEngagementData" => %{"memberName" => _name, "phoneNumber" => _number}}) do
-    IO.inspect(create_3: member)
     with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
       Task.start(fn ->  notify_open(convo.location_id) end)
       conn
@@ -48,8 +42,6 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
   def create(conn, %{"location" => location, "member" => member}) do
-    IO.inspect(create_4:  member)
-    IO.inspect(create_4: location)
     with {:ok, convo} <- C.find_or_start_conversation({member, location}) do
       Task.start(fn ->  notify_open(convo.location_id) end)
       conn
@@ -59,7 +51,6 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
   def create(conn, %{"from" => from, "subject" => subj, "text" => message,"to" => to} = params) do
-    IO.inspect(create_5: params)
 
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
     name = List.first(Regex.split(regex,from))
@@ -153,7 +144,6 @@ defmodule MainWeb.Api.ConversationController do
     conn |> send_resp(200, "ok")
   end
   def create(conn, %{"from" => from, "subject" => subj, "html" => message,"to" => to} = params) do
-    IO.inspect(create_6: params)
     regex = ~r{([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)}
     name = List.first(Regex.split(regex,from))
     from = List.first(Regex.run(regex,from))
@@ -250,14 +240,12 @@ defmodule MainWeb.Api.ConversationController do
   end
 
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type" =>"call"}) do
-    IO.inspect(update_1:  message)
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
     |> json(%{conversation_id: id, updated: true})
   end
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message}) do
-    IO.inspect(update_2: message)
     _ = CM.create(%{
       "conversation_id" => id,
       "phone_number" => from,
@@ -270,7 +258,6 @@ defmodule MainWeb.Api.ConversationController do
     |> json(%{conversation_id: id, updated: true})
   end
   def update(conn, _params) do
-    IO.inspect(update_3: "Simple")
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
@@ -278,7 +265,6 @@ defmodule MainWeb.Api.ConversationController do
   end
 
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type"=>"call"} = params) do
-    IO.inspect(close_1: message)
     if params["disposition"] do
       convo = ConversationCall.get(id)
       location = Location.get(convo.location_id)
@@ -299,7 +285,6 @@ defmodule MainWeb.Api.ConversationController do
     |> json(%{conversation_id: id})
   end
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message} = params) do
-    IO.inspect(close_2:  params)
     if message == "Sent to Slack" do
       _ =  CM.create(%{
         "conversation_id" => id,
