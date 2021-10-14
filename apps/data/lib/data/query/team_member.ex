@@ -48,6 +48,20 @@ defmodule Data.Query.TeamMember do
   end
 
   @doc """
+  Returns a team member by user id
+  """
+  @spec get_by_user_id(id :: binary(), repo :: Ecto.Repo.t()) :: TeamMember.t() | nil
+  def get_by_user_id(id, repo \\ Read) do
+    from(t in TeamMember,
+      where: is_nil(t.deleted_at),
+      where: t.user_id == ^id,
+    select: t.team_id,
+      limit: 1
+    )
+    |> repo.one()
+  end
+
+  @doc """
   Return a list of active team members for a team
   """
   @spec get_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [TeamMember.t()]

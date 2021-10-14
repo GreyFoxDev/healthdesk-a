@@ -138,8 +138,10 @@
             <!-- .metric -->
             <div class="card-metric" data-toggle="modal" data-target="#exampleModalLong">
                 <div class="metric">
-                    <%= if @role == "admin" and @team_id != nil do%>
-                    <a href="admin/teams/<%= @team_id %>/dispositions"
+                    <%= if @role in ["admin","team-admin"] and @team_id != nil do%>
+                    <a href=
+                      "admin/teams/<%=@team_id%>/dispositions"
+
                        style = "position: absolute;top: 2px;
                     right: 5px;">Edit Dispostion</a>
                     <% end %>

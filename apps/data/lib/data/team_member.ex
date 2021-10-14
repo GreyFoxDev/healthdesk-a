@@ -39,6 +39,9 @@ defmodule Data.TeamMember do
   def get(%{role: role}, id) when role in @roles,
     do: Query.get(id)
 
+  def get_by_user_id(%{role: role}, id) when role in @roles,
+    do: Query.get_by_user_id(id)
+
   def get(_, _), do: {:error, :invalid_permissions}
 
   def get_by_team_id(%{role: role}, team_id) when role in @roles,
