@@ -24,6 +24,9 @@ defmodule MainWeb.Plug.BuildAnswer do
   message in the queue.
   """
   def call(%{assigns: %{convo: id,  status: "open",message: message, member: member, intent: nil,location: location} = assigns} = conn, _opts) do
+    IO.inspect("=========build  answer plug call 1=======")
+    IO.inspect("intent is nil notify the admin")
+    IO.inspect("=========build  answer plug call 1=======")
     if (assigns[:team_member_id] == nil) do
       notify_admin_user(conn.assigns)
     else
@@ -47,9 +50,15 @@ defmodule MainWeb.Plug.BuildAnswer do
     |> assign(:status, "open")
   end
   def call(%{assigns: %{convo: id,  status: "open", intent: {:unknown, []}=intent, location: location} = assigns} = conn, _opts) do
+    IO.inspect("=========build answer call 2=======")
+    IO.inspect("intent = {:unknown, []}")
+    IO.inspect("=========build answer call 2=======")
     convo = C.get(id)
     appointment = convo.appointment
     reply = Appointment.get_next_reply(id,intent, location)
+    IO.inspect("=========Response from Appointment.get_next_reply=======")
+    IO.inspect(reply)
+    IO.inspect("=========Response from Appointment.get_next_reply=======")
     if appointment do
       conn
       |> assign(:response, reply)
@@ -70,17 +79,28 @@ defmodule MainWeb.Plug.BuildAnswer do
   If there is a known intent then get the corresponding response.
   """
   def call(%{assigns: %{convo: _id, status: "open", intent: {:subscribe, []}=_intent, location: _location}} = conn, _opts) do
+    IO.inspect("=========Build answer plug call 3=======")
+    IO.inspect("intnt: subscribe []")
+    IO.inspect("=========Build answer plug call 3=======")
     conn
     |> assign(:status, "closed")
   end
   def call(%{assigns: %{convo: _id, status: "open", _intent: {:unsubscribe, []}=_intent, location: _location}} = conn, _opts) do
+    IO.inspect("=========Build answer plug call 4=======")
+    IO.inspect("intnt: unsubscribe []")
+    IO.inspect("=========Build answer plug call 4=======")
     conn
     |> assign(:status, "closed")
   end
 
   def call(%{assigns: %{convo: id, status: "open", intent: intent, location: location}} = conn, _opts) do
+    IO.inspect("=========Build answer plug call 5=======")
+    IO.inspect(intent)
+    IO.inspect("=========Build answer plug call 5=======")
     response = Appointment.get_next_reply(id,intent, location)
-
+    IO.inspect("========Response from Appointment.getNext_reply========")
+    IO.inspect(response)
+    IO.inspect("=======Response from Appointment.getNext_reply=========")
     location = Location.get_by_phone(location)
 
     if String.contains?(response,location.default_message)do
@@ -98,6 +118,9 @@ defmodule MainWeb.Plug.BuildAnswer do
   end
 
   def call(%{assigns: %{convo: id,message: message, member: member, location: location} = assigns} = conn, _opts)do
+    IO.inspect("=========Build answer plug call 6=======")
+    IO.inspect(assigns)
+    IO.inspect("=========Build answer plug call 6=======")
     convo = C.get(id)
     if (assigns[:team_member_id] == nil && convo.channel_type != "App") do
       notify_admin_user(conn.assigns)
