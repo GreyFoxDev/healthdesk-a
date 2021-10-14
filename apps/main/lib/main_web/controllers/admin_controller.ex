@@ -215,7 +215,7 @@ defmodule MainWeb.AdminController do
           team_id: nil,
           role: current_user.role)
       else
-        IO.inspect("\=-=-=-=-0-089098768764654377890-==-==--==-0/")
+        location_ids = Location.get_location_ids_by_team_id(current_user, current_user.team_member.team_id)
         dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
         automated = Data.IntentUsage.count_intent_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
         appointments = Appointments.count_by_team_id(current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"]))
@@ -247,12 +247,12 @@ defmodule MainWeb.AdminController do
           call_deflected: calculate_percentage("Call deflected", dispositions),
           dispositions_per_day: dispositions_per_day,
           response_time: response_time.median_response_time||0,
-          web_totals: ConversationDisposition.count_channel_type_by_team_id("WEB", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
-          sms_totals: ConversationDisposition.count_channel_type_by_team_id("SMS", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
-          app_totals: ConversationDisposition.count_channel_type_by_team_id("APP", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
-          facebook_totals: ConversationDisposition.count_channel_type_by_team_id("FACEBOOK", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
-          email_totals: ConversationDisposition.count_channel_type_by_team_id("MAIL", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
-          call_totals: ConversationDisposition.count_channel_type_by_team_id("CALL", current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"])),
+          web_totals: ConversationDisposition.count_channel_type_by_location_ids("WEB", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+          sms_totals: ConversationDisposition.count_channel_type_by_location_ids("SMS", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+          app_totals: ConversationDisposition.count_channel_type_by_location_ids("APP", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+          facebook_totals: ConversationDisposition.count_channel_type_by_location_ids("FACEBOOK", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+          email_totals: ConversationDisposition.count_channel_type_by_location_ids("MAIL", location_ids, convert_values(params["to"]), convert_values(params["from"])),
+          call_totals: ConversationDisposition.count_channel_type_by_location_ids("CALL", location_ids, convert_values(params["to"]), convert_values(params["from"])),
           teams: teams,
           team_admin_count: team_admin_count,
           tickets_count: Ticket.filter(params),
