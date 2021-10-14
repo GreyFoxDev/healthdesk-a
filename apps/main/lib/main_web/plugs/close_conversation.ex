@@ -141,12 +141,22 @@ defmodule MainWeb.Plug.CloseConversation do
     IO.inspect("=========Close Convo Plug call 8=======")
     IO.inspect("question is answered close the conversation")
     IO.inspect("=========Close plug call 8=======")
+    loc = Location.get_by_phone(location)
     datetime = DateTime.utc_now()
-    _ = CM.create(%{
+    {:ok, saved_message} = CM.create(%{
           "conversation_id" => id,
           "phone_number" => location,
           "message" => conn.assigns[:response],
           "sent_at" => DateTime.add(datetime, 1)})
+
+    if conn.assigns[:response] != loc.default_message  do
+      Data.Query.IntentUsage.create(
+        %{
+          "message_id" => saved_message.id,
+          "intent" => elem(conn.assigns[:intent], 0)
+        }
+      )
+    end
 
     convo = C.get(id)
     location = Data.Location.get(convo.location_id)
