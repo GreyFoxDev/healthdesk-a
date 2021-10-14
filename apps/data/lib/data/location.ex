@@ -46,11 +46,17 @@ defmodule Data.Location do
   def get(%{role: role}, id) when role in @roles,
     do: Query.get(id)
 
+  def get_locations_by_ids(%{role: role}, id) when role in @roles,
+    do: Query.get_locations_by_ids(id)
+
   def get(_, _), do: {:error, :invalid_permissions}
   def get(id), do: Query.get(id)
 
   def get_by_team_id(%{role: role}, team_id) when role in @roles,
     do: Query.get_by_team_id(team_id)
+
+  def get_location_ids_by_team_id(%{role: role}, team_id) when role in @roles,
+    do: Query.get_location_ids_by_team_id(team_id)
 
   def update(id, params) do
     id

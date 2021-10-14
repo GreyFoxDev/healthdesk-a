@@ -1,82 +1,83 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
-  alias Data.{Campaign, Disposition, Location, TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
+  alias Data.{Campaign, Disposition, Location, Teams ,TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
 
-  def index(conn, %{"team_id" => team_id} = params) do
-    params=if(!is_nil(params["filters"])) do
-      change_params(params)
-    else
-      params
-    end
-    current_user = current_user(conn)
-    team_members = TeamMember.get_by_team_id(current_user, team_id)
-    dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => team_id}))
-    automated = Data.IntentUsage.count_intent_by(Map.merge(params, %{"team_id" => team_id}))
-    appointments = Appointments.count_by_team_id(team_id, convert_values(params["to"]), convert_values(params["from"]))
-    dispositions_per_day =
-      case Disposition.average_per_day_for_team(params) do
-        [result] -> result
-        _ -> %{sessions_per_day: 0}
-      end
-    team_admin_count =
-      team_members
-      |> Enum.filter(&(&1.user.role in ["location-admin", "team-admin"]))
-      |> Enum.count()
-    teammate_count =
-      team_members
-      |> Enum.filter(&(&1.user.role == "teammate"))
-      |> Enum.count()
-    locations = Location.get_by_team_id(current_user, team_id)
-    location_ids=Enum.map(locations, fn location-> location.id end)
-    location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
-    response_time=ConversationMessages.count_by_location_id(location_ids,params["from"] != "" && params["from"] || nil,params["to"] != "" && params["to"] || nil)
-    campaigns = if location_id do
-      Campaign.get_by_location_id(location_id)
-    else
-      locations
-      |> Enum.map(fn(location) ->
-        Campaign.get_by_location_id(location.id)
-      end)
-      |> List.flatten()
-    end
-    filter =
-      case current_user do
-        %{role: "team-admin"} -> %{"team_id" => current_user.team_member.team_id}
-        %{role: "admin"} -> %{"team_member_id" => current_user.team_member && current_user.team_member.id}
-        %{role: "teammate"} -> %{"tem_member_id" => current_user.team_member.id, location_id: current_user.team_member.location_id}
-        _ -> %{}
-      end
-    params = Map.merge(params, filter)
-    render(conn, "index.html",
-      dispositions: dispositions,
-      campaigns: campaigns,
-      appointments: appointments,
-      automated_data: automated,
-      automated: calculate_automated_percentage(dispositions, automated),
-      call_deflected: calculate_percentage("Call deflected", dispositions),
-      dispositions_per_day: dispositions_per_day,
-      web_totals: ConversationDisposition.count_channel_type_by_team_id("WEB", team_id, convert_values(params["to"]), convert_values(params["from"])),
-      sms_totals: ConversationDisposition.count_channel_type_by_team_id("SMS", team_id, convert_values(params["to"]), convert_values(params["from"])),
-      app_totals: ConversationDisposition.count_channel_type_by_team_id("APP", team_id, convert_values(params["to"]), convert_values(params["from"])),
-      facebook_totals: ConversationDisposition.count_channel_type_by_team_id("FACEBOOK", team_id, convert_values(params["to"]), convert_values(params["from"])),
-      email_totals: ConversationDisposition.count_channel_type_by_team_id("MAIL", team_id, convert_values(params["to"]), convert_values(params["from"])),
-      call_totals: ConversationDisposition.count_channel_type_by_team_id("CALL", team_id, convert_values(params["to"]), convert_values(params["from"])),
-      response_time: response_time.median_response_time||0,
-      team_admin_count: team_admin_count,
-      tickets_count: Ticket.filter(params),
-      teammate_count: teammate_count,
-      locations: locations,
-      location_count: Enum.count(locations),
-      teams: teams(conn),
-      team_id: team_id,
-      location_id: location_id,
-      from: params["from"],
-      to: params["to"],
-      location: nil,
-
-      location_ids: [],
-      role: current_user.role)
-  end
+#  def index(conn, %{"team_id" => team_id} = params) do
+#    IO.inspect("++++++++++++++inside team_id++++++++++++++++")
+#    params=if(!is_nil(params["filters"])) do
+#      change_params(params)
+#    else
+#      params
+#    end
+#    current_user = current_user(conn)
+#    team_members = TeamMember.get_by_team_id(current_user, team_id)
+#    dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => team_id}))
+#    automated = Data.IntentUsage.count_intent_by(Map.merge(params, %{"team_id" => team_id}))
+#    appointments = Appointments.count_by_team_id(team_id, convert_values(params["to"]), convert_values(params["from"]))
+#    dispositions_per_day =
+#      case Disposition.average_per_day_for_team(params) do
+#        [result] -> result
+#        _ -> %{sessions_per_day: 0}
+#      end
+#    team_admin_count =
+#      team_members
+#      |> Enum.filter(&(&1.user.role in ["location-admin", "team-admin"]))
+#      |> Enum.count()
+#    teammate_count =
+#      team_members
+#      |> Enum.filter(&(&1.user.role == "teammate"))
+#      |> Enum.count()
+#    locations = Location.get_by_team_id(current_user, team_id)
+#    location_ids=Enum.map(locations, fn location-> location.id end)
+#    location_id = if current_user.team_member, do: current_user.team_member.location_id, else: nil
+#    response_time=ConversationMessages.count_by_location_id(location_ids,params["from"] != "" && params["from"] || nil,params["to"] != "" && params["to"] || nil)
+#    campaigns = if location_id do
+#      Campaign.get_by_location_id(location_id)
+#    else
+#      locations
+#      |> Enum.map(fn(location) ->
+#        Campaign.get_by_location_id(location.id)
+#      end)
+#      |> List.flatten()
+#    end
+#    filter =
+#      case current_user do
+#        %{role: "team-admin"} -> %{"team_id" => current_user.team_member.team_id}
+#        %{role: "admin"} -> %{"team_member_id" => current_user.team_member && current_user.team_member.id}
+#        %{role: "teammate"} -> %{"tem_member_id" => current_user.team_member.id, location_id: current_user.team_member.location_id}
+#        _ -> %{}
+#      end
+#    params = Map.merge(params, filter)
+#    render(conn, "index.html",
+#      dispositions: dispositions,
+#      campaigns: campaigns,
+#      appointments: appointments,
+#      automated_data: automated,
+#      automated: calculate_automated_percentage(dispositions, automated),
+#      call_deflected: calculate_percentage("Call deflected", dispositions),
+#      dispositions_per_day: dispositions_per_day,
+#      web_totals: ConversationDisposition.count_channel_type_by_team_id("WEB", team_id, convert_values(params["to"]), convert_values(params["from"])),
+#      sms_totals: ConversationDisposition.count_channel_type_by_team_id("SMS", team_id, convert_values(params["to"]), convert_values(params["from"])),
+#      app_totals: ConversationDisposition.count_channel_type_by_team_id("APP", team_id, convert_values(params["to"]), convert_values(params["from"])),
+#      facebook_totals: ConversationDisposition.count_channel_type_by_team_id("FACEBOOK", team_id, convert_values(params["to"]), convert_values(params["from"])),
+#      email_totals: ConversationDisposition.count_channel_type_by_team_id("MAIL", team_id, convert_values(params["to"]), convert_values(params["from"])),
+#      call_totals: ConversationDisposition.count_channel_type_by_team_id("CALL", team_id, convert_values(params["to"]), convert_values(params["from"])),
+#      response_time: response_time.median_response_time||0,
+#      team_admin_count: team_admin_count,
+#      tickets_count: Ticket.filter(params),
+#      teammate_count: teammate_count,
+#      locations: locations,
+#      location_count: Enum.count(locations),
+#      teams: teams(conn),
+#      team_id: team_id,
+#      location_id: location_id,
+#      from: params["from"],
+#      to: params["to"],
+#      location: nil,
+#
+#      location_ids: [],
+#      role: current_user.role)
+#  end
   def index(conn, %{"filters" => %{"location_ids" => location_ids}} = params) do
     params=if(!is_nil(params["filters"])) do
       change_params(params)
@@ -102,7 +103,7 @@ defmodule MainWeb.AdminController do
       team_members
       |> Enum.filter(&(&1.user.role == "teammate"))
       |> Enum.count()
-    locations = Location.get_by_team_id(current_user, current_user.team_member.team_id)
+    locations = Location.get_locations_by_ids(current_user, location_ids)
     filter =
       case current_user do
         %{role: "team-admin"} -> %{"team_id" => current_user.team_member.team_id, location_ids: location_ids}
@@ -110,6 +111,10 @@ defmodule MainWeb.AdminController do
         %{role: "location-admin"} -> %{"location_ids" => location_ids}
         _ -> %{}
       end
+      team_id = case current_user.team_member do
+        nil -> params["team_id"]
+        _ -> current_user.team_member.team_id
+    end
     params=Map.merge(params, filter)
     render(conn, "index.html",
       dispositions: dispositions,
@@ -129,10 +134,10 @@ defmodule MainWeb.AdminController do
       team_admin_count: team_admin_count,
       tickets_count: Ticket.filter(params),
       teammate_count: teammate_count,
-      locations: locations,
+      locations: Location.get_by_team_id(current_user, team_id),
       location_count: Enum.count(locations),
       teams: teams(conn),
-      team_id: current_user.team_member.team_id,
+      team_id: team_id,
       location_ids: location_ids,
       from: params["from"],
       to: params["to"],
@@ -143,7 +148,8 @@ defmodule MainWeb.AdminController do
     params= if (!is_nil(params["filters"])), do: change_params(params), else: params
     current_user = current_user(conn)
     if current_user.role in ["team-admin", "teammate"] do
-      index(conn, %{"team_id" => current_user.team_member.team_id})
+      location_ids = Location.get_location_ids_by_team_id(current_user, current_user.team_member.team_id)
+      index(conn, %{"filters" => %{"from" => "","location_ids" => location_ids, "to" => ""}})
     else
       teams = teams(conn)
       team_members = TeamMember.all()
@@ -162,6 +168,11 @@ defmodule MainWeb.AdminController do
       end
       params= Map.merge(params, filter)
       if current_user.role == "admin" do
+        if (!is_nil(params["team_id"])) do
+          location_ids = Location.get_location_ids_by_team_id(current_user, params["team_id"])
+          index(conn, %{"filters" => %{"from" => params["from"],"location_ids" => location_ids, "to" =>params["to"]}, "team_id" => params["team_id"]})
+
+        end
         dispositions = Disposition.count_all_by(params)
         automated = Data.IntentUsage.count_intent_by(params)
         appointments = Appointments.count_all(convert_values(params["to"]), convert_values(params["from"]))
@@ -204,6 +215,7 @@ defmodule MainWeb.AdminController do
           team_id: nil,
           role: current_user.role)
       else
+        IO.inspect("\=-=-=-=-0-089098768764654377890-==-==--==-0/")
         dispositions = Disposition.count_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
         automated = Data.IntentUsage.count_intent_by(Map.merge(params, %{"team_id" => current_user.team_member.team_id}))
         appointments = Appointments.count_by_team_id(current_user.team_member.team_id, convert_values(params["to"]), convert_values(params["from"]))

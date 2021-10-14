@@ -171,12 +171,10 @@ defmodule Data.Query.ConversationDisposition do
       end)
 
     from([c, ...] in query,
-      distinct: c.id, #not working here, so enum used
+      distinct: c.id,
       select: c.id
     )
-
-    repo.all(query)
-    |> Enum.uniq()
+    |> repo.all()
     |> Enum.count()
   end
 
