@@ -22,6 +22,9 @@ defmodule MainWeb.Plug.CacheQuestion do
   def call(conn, _opts), do: conn
 
   def call(%{assigns: %{ member: member, message: message}} = conn, _opts) do
+    IO.inspect("=========Cache Question Plug=======")
+    IO.inspect("Cache Question Plug")
+    IO.inspect("=========Cache Question Plug=======")
     downcased = String.downcase(message)
     cond do
       downcased in ["no", "stop"] ->

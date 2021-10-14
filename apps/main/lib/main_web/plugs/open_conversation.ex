@@ -21,6 +21,9 @@ defmodule MainWeb.Plug.OpenConversation do
   @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t()
   def call(%{assigns: %{member: member, location: location}} = conn, _opts)
   when is_binary(member) and is_binary(location) do
+    IO.inspect("=========opening a conversation plug=======")
+    IO.inspect("opening a conversation")
+    IO.inspect("=========opening a conversation plug=======")
     with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({member, location}) do
 
       _ = CM.create(%{
