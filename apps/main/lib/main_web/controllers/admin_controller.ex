@@ -189,9 +189,6 @@ defmodule MainWeb.AdminController do
         campaigns =
         locations
         |> Enum.map(fn(location) -> Campaign.get_by_location_id(location.id)end) |> List.flatten()
-        IO.inspect("------params-----------")
-        IO.inspect(params)
-        IO.inspect("------params----------")
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
