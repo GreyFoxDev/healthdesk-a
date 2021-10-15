@@ -83,7 +83,7 @@ defmodule MainWeb.Api.ConversationController do
           message
           |> ask_wit_ai(location)
           |> case do
-               {:ok, response} ->
+               {:ok, response, intent} ->
                  if convo.status == "closed" do
                    {:ok, struct}=  CM.create(
                      %{
@@ -91,6 +91,12 @@ defmodule MainWeb.Api.ConversationController do
                        "phone_number" => location.phone_number,
                        "message" => response,
                        "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                     }
+                   )
+                   _ = Data.Query.IntentUsage.create(
+                     %{
+                       "message_id" => struct.id,
+                       "intent" => intent
                      }
                    )
                    close_conversation(convo.id, location)
@@ -175,7 +181,7 @@ defmodule MainWeb.Api.ConversationController do
           message
           |> ask_wit_ai(location)
           |> case do
-               {:ok, response} ->
+               {:ok, response, intent} ->
                  if convo.status == "closed" do
                    {:ok, struct}=  CM.create(
                      %{
@@ -183,6 +189,12 @@ defmodule MainWeb.Api.ConversationController do
                        "phone_number" => location.phone_number,
                        "message" => response,
                        "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+                     }
+                   )
+                   _ = Data.Query.IntentUsage.create(
+                     %{
+                       "message_id" => struct.id,
+                       "intent" => intent
                      }
                    )
                    close_conversation(convo.id, location)
@@ -354,11 +366,12 @@ defmodule MainWeb.Api.ConversationController do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
+          intent = elem(response, 0)
           message = Intents.get(response, location.phone_number)
           if message == location.default_message do
             {:unknown, location.default_message}
           else
-            {:ok, message}
+            {:ok, message, intent}
           end
         _ ->
           {:unknown, location.default_message}
