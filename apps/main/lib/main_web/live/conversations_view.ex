@@ -21,6 +21,8 @@ defmodule MainWeb.Live.ConversationsView do
       case MainWeb.Auth.Guardian.resource_from_token(session["guardian_default_token"]) do
         {:error, :token_expired} -> socket |> redirect(to: "/")
         res -> res
+        {:ok, resource} -> resource
+        _-> socket |> redirect(to: "/")
       end
     location_ids = user |> teammate_locations(true)
     locations = user |> teammate_locations()
@@ -204,6 +206,7 @@ defmodule MainWeb.Live.ConversationsView do
   end
 
   def handle_event("openconvo", %{"cid" => conversation_id} = _params, socket) do
+    started_by = Data.Query.ConversationMessage.get_first_msg_by_convo_id(conversation_id)
     user = socket.assigns.user
     convo =
       user
@@ -224,6 +227,7 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:open_conversation, convo)
              |> assign(:online, false)
              |> assign(:typing, false)
+             |> assign(:started_by, started_by)
 
 
     send(self(), {:fetch_d, %{user: user, locations: socket.assigns.location_ids, convo: convo}})
@@ -298,8 +302,7 @@ defmodule MainWeb.Live.ConversationsView do
               |> assign(:conversations, conversations)
               |> assign(:changeset, Conversations.get_changeset())
             if connected?(socket), do: Process.send_after(self(), :menu_fix, 100)
-            if connected?(socket), do: Process.send_after(self(), {locations.id, :updated_count}, 100)
-
+            Main.LiveUpdates.notify_live_view( {location.id, :updated_count})
             {:noreply, socket}
           else
             {:noreply, redirect(socket, to: "/admin/conversations/assigned")}
@@ -319,37 +322,43 @@ defmodule MainWeb.Live.ConversationsView do
       |> fetch_member()
     location = conversation.location
 
-    case MainWeb.AssignTeamMemberController.assign(
-           %{"id" => conversation.id, "location_id" => location.id, "team_member_id" => user.team_member.id}
-         ) do
-      {:ok, _} ->
-        if socket.assigns.tab == "active" do
-          conversation =
-            user
-            |> Conversations.get(conversation.id)
-            |> fetch_member()
-          locations = socket.assigns.location_ids
-          page= socket.assigns.page || 0
-          conversations =
-            user
-            |> Conversations.all(locations,["open", "pending"],page*30,30, user.id,true)
+    if not is_nil(user.team_member) do
+      case MainWeb.AssignTeamMemberController.assign(
+             %{"id" => conversation.id, "location_id" => location.id, "team_member_id" => user.team_member.id}
+           ) do
+        {:ok, _} ->
+          if socket.assigns.tab == "active" do
+            conversation =
+              user
+              |> Conversations.get(conversation.id)
+              |> fetch_member()
+            locations = socket.assigns.location_ids
+            page= socket.assigns.page || 0
+            conversations =
+              user
+              |> Conversations.all(locations,["open", "pending"],page*30,30, user.id,true)
 
-          socket =
-            socket
-            |> assign(:open_conversation, conversation |>fetch_member())
-            |> assign(:conversations, conversations)
-            |> assign(:changeset, Conversations.get_changeset())
-          if connected?(socket), do: Process.send_after(self(), :reload_convo, 500)
+            socket =
+              socket
+              |> assign(:open_conversation, conversation |>fetch_member())
+              |> assign(:conversations, conversations)
+              |> assign(:changeset, Conversations.get_changeset())
+            if connected?(socket), do: Process.send_after(self(), :reload_convo, 500)
+
+            {:noreply, socket}
+          else
+            {:noreply, redirect(socket, to: "/admin/conversations/active")}
+          end
+        _ ->
 
           {:noreply, socket}
-        else
-          {:noreply, redirect(socket, to: "/admin/conversations/active")}
-        end
-      _ ->
-
-        {:noreply, socket}
+      end
+    else
+    {:noreply,
+      socket
+#      |> live_flash("Team member does not exist")
+    }
     end
-
 
   end
   def handle_event("close", %{"did" => disposition_id} = _params, socket)do
@@ -494,7 +503,11 @@ defmodule MainWeb.Live.ConversationsView do
       nil -> nil
       c -> c.id |> Conversations.get() |> fetch_member()
     end
-
+    started_by = if open_conversation do
+      Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
+    else
+     ""
+    end
     socket = socket
              |> assign(:team_members, [])
              |> assign(:team_members_all, [])
@@ -503,6 +516,7 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:dispositions, [])
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
+             |> assign(:started_by, started_by)
 
     socket = if (socket.assigns.tab == "active" && socket.assigns[:open_conversation] != nil) do
       send(self(), {:fetch_d, %{user: user, locations: locations, convo: socket.assigns[:open_conversation]}})
@@ -524,6 +538,11 @@ defmodule MainWeb.Live.ConversationsView do
       nil -> nil
       c -> c.id |> Conversations.get() |> fetch_member()
     end
+    started_by = if open_conversation do
+      Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
+    else
+    ""
+    end
 
     socket = socket
              |> assign(:team_members, [])
@@ -534,6 +553,7 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
              |> assign(:open_conversation, open_conversation)
+             |> assign(:started_by, started_by)
     if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
     send(self(), {:fetch_d, %{user: user, locations: locations, convo: open_conversation}})
 
@@ -551,7 +571,11 @@ defmodule MainWeb.Live.ConversationsView do
       nil -> nil
       c -> c.id |> Conversations.get() |> fetch_member()
     end
-
+    started_by = if open_conversation do
+      Data.Query.ConversationMessage.get_first_msg_by_convo_id(open_conversation.id)
+    else
+      ""
+    end
 
     socket = socket
              |> assign(:team_members, [])
@@ -562,6 +586,7 @@ defmodule MainWeb.Live.ConversationsView do
              |> assign(:loading, false)
              |> assign(:conversations, conversations)
              |> assign(:open_conversation, open_conversation)
+             |> assign(:started_by, started_by)
     if connected?(socket), do: Process.send_after(self(), :init_convo, 3000)
     socket = if (socket.assigns.tab == "closed" && socket.assigns[:open_conversation] != nil) do
       send(self(), {:fetch_d, %{user: user, locations: locations, convo: socket.assigns[:open_conversation]}})

@@ -44,10 +44,12 @@ defmodule MainWeb.Plug.AskWit do
 
           response
         _ ->
+
           {:unknown_intent, []}
       end
     else
       {:error, _error} ->
+
         {:unknown_intent, []}
     end
   end

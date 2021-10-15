@@ -31,6 +31,15 @@ defmodule Data.Query.Location do
   end
 
   @doc """
+  Returns a locations by ids
+  """
+  @spec get_locations_by_ids(id :: binary(), repo :: Ecto.Repo.t()) :: Location.t() | nil
+  def get_locations_by_ids(id, repo \\ Read) do
+    from(t in Location, where: is_nil(t.deleted_at), where: t.id in ^id)
+    |> repo.all()
+  end
+
+  @doc """
   Returns a Automation Limit by id
   """
   @spec get_automation_limit(id :: binary(), repo :: Ecto.Repo.t()) :: Location.t() | nil
@@ -92,6 +101,19 @@ defmodule Data.Query.Location do
   end
 
   @doc """
+  Return a list of active location ids for a team
+  """
+  @spec get_location_ids_by_team_id(team_id :: binary(), repo :: Ecto.Repo.t()) :: [Location.t()]
+  def get_location_ids_by_team_id(team_id, repo \\ Read) do
+    from(t in Location,
+      where: is_nil(t.deleted_at),
+      where: t.team_id == ^team_id,
+      select: t.id
+    )
+    |> repo.all()
+  end
+
+  @doc """
   Return a single active location by a unique api key
   """
   @spec get_by_api_key(api_key :: binary(), repo :: Ecto.Repo.t()) :: Location.t() | nil
@@ -110,13 +132,14 @@ defmodule Data.Query.Location do
   """
   @spec get_by_page_id(page_id :: binary(), repo :: Ecto.Repo.t()) :: Location.t() | nil
   def get_by_page_id(page_id, repo \\ Read) do
-    from(t in Location,
+    location = from(t in Location,
       where: is_nil(t.deleted_at),
       where: t.facebook_page_id == ^page_id,
       limit: 1,
       preload: [:team]
     )
     |> repo.one()
+    location || false
   end
 
   @doc """

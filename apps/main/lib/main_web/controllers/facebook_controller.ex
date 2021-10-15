@@ -26,17 +26,20 @@ defmodule MainWeb.FacebookController do
   end
 
   def event(conn, %{"entry" => [%{"messaging" => [%{"message" => %{"text" =>msg}, "sender" => %{"id" => sid},"recipient" => %{"id" => pid}}|_]}|_]}) do
-    location = Location.get_by_page_id(pid)
-    with %Schema{} = convo <- C.get_by_phone("messenger:#{sid}", location.id) do
+    with %Schema{} = location = Location.get_by_page_id(pid),
+    %Schema{} = convo <- C.get_by_phone("messenger:#{sid}", location.id) do
       get_user_details(location,sid)
       update_convo(msg,convo,location)
     else
       nil ->
-        with {:ok, %Schema{} = convo} <- C.find_or_start_conversation({"messenger:#{sid}", location.phone_number}) do
+        with %Schema{} = location = Location.get_by_page_id(pid),
+             {:ok, %Schema{} = convo} <- C.find_or_start_conversation({"messenger:#{sid}", location.phone_number}) do
           get_user_details(location,sid)
           update_convo(msg,convo,location, true)
         end
+        _->:ok
     end
+
     conn
     |> Plug.Conn.resp(200, "")
     |> Plug.Conn.send_resp()
@@ -53,13 +56,19 @@ defmodule MainWeb.FacebookController do
       message
       |> ask_wit_ai(convo.id, location)
       |> case do
-           {:ok, response} ->
-              CM.create(
+           {:ok, response, intent} ->
+             {:ok, saved_message} = CM.create(
                %{
                  "conversation_id" => convo.id,
                  "phone_number" => location.phone_number,
                  "message" => response,
                  "sent_at" => DateTime.add(DateTime.utc_now(), 2)
+               }
+             )
+             _ = Data.Query.IntentUsage.create(
+               %{
+                 "message_id" => saved_message.id,
+                 "intent" => intent
                }
              )
              reply_to_facebook(response,location,String.replace(convo.original_number,"messenger:",""))
@@ -98,11 +107,12 @@ defmodule MainWeb.FacebookController do
     with {:ok, _pid} <- WitClient.MessageSupervisor.ask_question(self(), question, bot_id) do
       receive do
         {:response, response} ->
+          intent = elem(response, 0)
           message =  Appointment.get_next_reply(convo_id, response, location.phone_number)
           if String.contains?(message,location.default_message) do
             {:unknown, message}
           else
-            {:ok, message}
+            {:ok, message, intent}
           end
         _ ->
           {:unknown, location.default_message}

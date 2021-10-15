@@ -47,18 +47,9 @@ defmodule Data.Query.ConversationDisposition do
     from = Data.Disposition.convert_string_to_date(from)
 
     query =
-<<<<<<< Updated upstream
-    if channel_type == "CAll" do
-      from(c in ConversationCall,
-        join: cd in ConversationDisposition,
-        on: c.id == cd.conversation_call_id,
-        join: d in Disposition,
-        on: cd.disposition_id == d.id
-=======
     if channel_type == "CALL" do
       from(c in ConversationDisposition,
       where: not is_nil(c.conversation_call_id)
->>>>>>> Stashed changes
       )
     else
         from(c in Conversation,
@@ -84,9 +75,9 @@ defmodule Data.Query.ConversationDisposition do
           query
       end)
 
-    from([c, _, d] in query,
+    from([c, ...] in query,
       distinct: [c.id],
-      select: c.channel_type
+      select: c.id
     )
 
     repo.all(query) |> Enum.count()
@@ -105,18 +96,9 @@ defmodule Data.Query.ConversationDisposition do
 
     query =
     if channel_type == "CALL" do
-<<<<<<< Updated upstream
-      from(c in ConversationCall,
-        join: cd in ConversationDisposition,
-        on: c.id == cd.conversation_call_id,
-        join: d in Disposition,
-        on: cd.disposition_id == d.id,
-        where: c.location_id in ^location_ids
-=======
       from(c in ConversationDisposition,
       join: cc in ConversationCall, on: cc.id == c.conversation_call_id,
         where: cc.location_id in ^location_ids
->>>>>>> Stashed changes
       )
     else
       from(c in Conversation,
@@ -140,9 +122,9 @@ defmodule Data.Query.ConversationDisposition do
           query
       end)
 
-    from([c, _, d] in query,
+    from([c, ...] in query,
       distinct: [c.id],
-      select: c.channel_type
+      select: c.id
     )
 
     repo.all(query) |> Enum.count()
@@ -161,17 +143,9 @@ defmodule Data.Query.ConversationDisposition do
 
     query =
     if channel_type == "CALL" do
-<<<<<<< Updated upstream
-      from(c in Conversation,
-        join: cd in ConversationDisposition,
-        on: c.id == cd.conversation_call_id,
-        join: d in Disposition,
-        on: cd.disposition_id == d.id,
-=======
       from(c in ConversationDisposition,
         join: cc in ConversationCall, on: cc.id == c.conversation_call_id,
         join: d in Disposition, on: c.disposition_id == d.id,
->>>>>>> Stashed changes
         where: d.team_id == ^team_id,
       )
     else
@@ -194,16 +168,15 @@ defmodule Data.Query.ConversationDisposition do
         {:from, from}, query ->
           if is_nil(from), do: query, else: from([c, ...] in query, where: c.inserted_at >= ^from)
 
-        _, query ->
-          query
+        _, query -> query
       end)
 
-    from([c, _, d] in query,
-      distinct: [c.id],
-      select: c.channel_type
+    from([c, ...] in query,
+      distinct: c.id,
+      select: c.id
     )
-
-    repo.all(query) |> Enum.count()
+    |> repo.all()
+    |> Enum.count()
   end
 
   defp build_results(results) do

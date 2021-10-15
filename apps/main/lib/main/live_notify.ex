@@ -9,11 +9,13 @@ defmodule Main.LiveUpdates do
 
   @doc "subscribe for specific user"
   def subscribe_live_view_and_track(user_id) do
+    try do
     socket = Phoenix.PubSub.subscribe(Main.PubSub, topic(user_id), link: true)
     Presence.track(self(), "online_users", user_id, %{})
     socket
-#  rescue
-#    error ->
+  rescue
+    _ -> :ok
+    end
   end
 
   @doc "subscribe for specific user"

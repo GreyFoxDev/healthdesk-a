@@ -15,7 +15,8 @@ defmodule Data.Schema.Team do
           mindbody_site_id: String.t() | nil,
           deleted_at: :utc_datetime | nil,
           bot_id: String.t() | nil,
-          twilio_sub_account_id: String.t() | nil
+          twilio_sub_account_id: String.t() | nil,
+          phone_number: String.t() | nil
         }
 
   @required_fields ~w|
@@ -31,6 +32,7 @@ defmodule Data.Schema.Team do
     deleted_at
     bot_id
     twilio_sub_account_id
+    phone_number
   |a
 
   @all_fields @required_fields ++ @optional_fields
@@ -45,6 +47,7 @@ defmodule Data.Schema.Team do
     field(:deleted_at, :utc_datetime)
     field(:bot_id, :string)
     field(:twilio_sub_account_id, :string)
+    field(:phone_number, :string)
 
     has_many(:locations, Data.Schema.Location)
     has_many(:team_members, Data.Schema.TeamMember)

@@ -97,7 +97,7 @@
                                         <i class="far fa-fw fa-comment-alt"></i> Conversation started by
                                         <strong>
 
-                                            <%= if @sent_by == @open_conversation.original_number do%>
+                                            <%= if @started_by == @open_conversation.original_number do%>
                                             <%= if @open_conversation.member && @open_conversation.member.first_name do %>
                                                  <%= Enum.join([@open_conversation.member.first_name, @open_conversation.member.last_name], " ") %>
                                             <% else %>
@@ -254,7 +254,16 @@
                 <%= if assigns[:typing] do %>
                 <li class="conversation-inbound">
                     <div class="conversation-meta">
-                        <p class="ticontainer"><span>User is typing </span>
+                        <%
+                member=@open_conversation.member
+                user_name=
+                if(member.first_name != nil || member.last_name != nil ) do
+                  (member.first_name && member.first_name || "") <>" "<> (member.last_name && member.last_name || "")|> String.trim()
+                  else
+                  member.phone_number
+                end
+                %>
+                        <p class="ticontainer"><span><%=user_name%> is typing </span>
                             <span class="tiblock">
                                                 <span class="tidot"></span>
                                                 <span class="tidot"></span>

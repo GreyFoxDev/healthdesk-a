@@ -20,9 +20,11 @@ defmodule MainWeb.Intents.Hours do
       do: build_response([datetime: datetime], location)
 
   def build_response([datetime: datetime], location) do
-    location = Location.get_by_phone(location)
 
+    case Location.get_by_phone(location) do
+      %Data.Schema.Location{} = location ->
     <<year::binary-size(4), "-", month::binary-size(2), "-", day::binary-size(2), _rest::binary>> = datetime
+
 
     with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week({year, month, day}, location.id),
          [hours] <- get_hours(location.id, {term, day_of_week}) do
@@ -87,62 +89,75 @@ defmodule MainWeb.Intents.Hours do
           @default_response
         end
     end
+
+    nil -> nil
   end
-
+end
   def build_response([], location) do
-    location = Location.get_by_phone(location)
 
-    erl_date =
-      location.timezone
-      |> Calendar.Date.today!()
-      |> Calendar.Date.to_erl()
+    case Location.get_by_phone(location) do
+      %Data.Schema.Location{} = location ->
+        erl_date =
+          location.timezone
+          |> Calendar.Date.today!()
+          |> Calendar.Date.to_erl()
 
-    with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week(erl_date, location.id),
-         [hours] <- get_hours(location.id, {term, day_of_week}) do
+        with {term, day_of_week} when term in [:holiday, :normal] <- get_day_of_week(erl_date, location.id),
+             [hours] <- get_hours(location.id, {term, day_of_week}) do
 
-      if length(hours.times) do
-        times =
-          hours.times
-          |> Enum.reduce([],fn b,acc ->[(b.open_at<>" to "<>b.close_at)|acc] end)
-          |> Enum.join(" and ")
-        if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
-          @alt_response
-          |> String.replace("[date_prefix]", "Today")
-          |> String.replace("[hours]", times)
+          if length(hours.times) do
+            times =
+              hours.times
+              |> Enum.reduce([],fn b,acc ->[(b.open_at<>" to "<>b.close_at)|acc] end)
+              |> Enum.join(" and ")
+            if location.team.team_name in ["92nd Street Y", "10 Fitness"] do
+              @alt_response
+              |> String.replace("[date_prefix]", "Today")
+              |> String.replace("[hours]", times)
+            else
+              @hours
+              |> String.replace("[date_prefix]", "Today")
+              |> String.replace("[hours]", times)
+            end
+          else
+            String.replace(@closed, "[data_prefix]", "Today")
+          end
         else
-          @hours
-          |> String.replace("[date_prefix]", "Today")
-          |> String.replace("[hours]", times)
-        end
-      else
-        String.replace(@closed, "[data_prefix]", "Today")
-      end
-    else
-      [] ->
-        {term, day_of_week} = get_day_of_week(erl_date, location.id)
+          [] ->
+            {term, day_of_week} = get_day_of_week(erl_date, location.id)
 
-        String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, erl_date, location.timezone))
-      _ ->
-        if location.default_message != "" do
-          location.default_message
-        else
-          @default_response
+            String.replace(@closed, "[date_prefix]", date_prefix({term, day_of_week}, erl_date, location.timezone))
+          _ ->
+            if location.default_message != "" do
+              location.default_message
+            else
+              @default_response
+            end
         end
+
+      nil -> nil
+
     end
+
   end
 
   def build_response(wtf, location) do
     case wtf[:datetime] do
       nil ->
 
-        location = Location.get_by_phone(location)
+        case Location.get_by_phone(location) do
+          %Data.Schema.Location{} = location ->
+            if location.default_message != "" do
+              location.default_message
+            else
+              @default_response
+            end
 
-        if location.default_message != "" do
-          location.default_message
-        else
-          @default_response
+          nil -> nil
         end
+
       datetime -> build_response([datetime: datetime], location)
+
     end
   end
 

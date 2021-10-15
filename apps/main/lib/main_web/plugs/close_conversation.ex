@@ -33,9 +33,6 @@ defmodule MainWeb.Plug.CloseConversation do
       "sent_at" => DateTime.add(datetime, 1)})
 
     convo = C.get(id)
-    IO.inspect("------convo in unsub-----------")
-    IO.inspect(convo)
-    IO.inspect("------convo----------")
     Member.update(convo.member.id, %{consent: false})
     close_conversation(id, location, "SMS Unsubscribe")
 
@@ -47,10 +44,6 @@ defmodule MainWeb.Plug.CloseConversation do
         location,
         "location-admin"
       )
-    convo = C.get(id)
-    IO.inspect("------convo in unsub-----------")
-    IO.inspect(convo)
-    IO.inspect("------convo----------")
     conn
   end
 
@@ -63,15 +56,8 @@ defmodule MainWeb.Plug.CloseConversation do
       "sent_at" => DateTime.add(datetime, 1)})
 
     convo = C.get(id)
-    IO.inspect("------convo in sub-----------")
-    IO.inspect(convo)
-    IO.inspect("------convo in sub----------")
     Member.update(convo.member.id, %{consent: true})
     close_conversation(id, location, "Automated")
-    convo = C.get(id)
-    IO.inspect("------convo in sub-----------")
-    IO.inspect(convo)
-    IO.inspect("------convo in sub----------")
     conn
   end
 
@@ -130,13 +116,22 @@ defmodule MainWeb.Plug.CloseConversation do
   If the question has been answered then close the conversation
   """
   def call(%{assigns: %{convo: id, location: location} = _assigns} = conn, _opts) do
-
+    loc = Location.get_by_phone(location)
     datetime = DateTime.utc_now()
-    _ = CM.create(%{
+    {:ok, saved_message} = CM.create(%{
           "conversation_id" => id,
           "phone_number" => location,
           "message" => conn.assigns[:response],
           "sent_at" => DateTime.add(datetime, 1)})
+
+    if conn.assigns[:response] != loc.default_message  do
+      Data.Query.IntentUsage.create(
+        %{
+          "message_id" => saved_message.id,
+          "intent" => elem(conn.assigns[:intent], 0)
+        }
+      )
+    end
 
     convo = C.get(id)
     location = Data.Location.get(convo.location_id)
@@ -176,11 +171,6 @@ defmodule MainWeb.Plug.CloseConversation do
       %{role: "system"}
       |> Data.Disposition.get_by_team_id(location.team_id)
       |> Enum.find(&(&1.disposition_name == disposition))
-
-    IO.inspect("=======================dispositionByTeamId=====================")
-    IO.inspect(disposition)
-    IO.inspect("=======================dispositionByTeamId=====================")
-
     if disposition do
       Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})
 
@@ -204,10 +194,7 @@ defmodule MainWeb.Plug.CloseConversation do
           |> CM.create()
     end
 
-
-
     #C.close(convo_id)|> IO.inspect(label: "inside close conversation")
-
     C.update(%{"id" => convo_id, "status" => "closed","appointment" => false, "team_member_id" => nil})
     ConCache.put(:session_cache, convo_id, 0)
     Main.LiveUpdates.notify_live_view( {location.id, :updated_open})

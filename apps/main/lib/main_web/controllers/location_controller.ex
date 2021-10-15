@@ -1,7 +1,7 @@
 defmodule MainWeb.LocationController do
   use MainWeb.SecuredContoller
   plug Ueberauth
-  alias Data.Location
+  alias Data.{Location, Team}
   alias Ueberauth.Strategy.Helpers
 
   @app_id System.get_env("FACEBOOK_CLIENT_ID")
@@ -121,7 +121,6 @@ defmodule MainWeb.LocationController do
   def new(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
     team = Team.get(current_user, team_id)
-
     render(conn, "new.html",
       changeset: Location.get_changeset(),
       team_id: team_id,
@@ -167,8 +166,11 @@ defmodule MainWeb.LocationController do
   end
 
   def create(conn, %{"location" => location, "team_id" => team_id}) do
+    current_user = current_user(conn)
+    team = Team.get(current_user, team_id)
     location
     |> Map.put("team_id", team_id)
+    |> Map.put("phone_number", team.phone_number)
     |> Location.create()
     |> case do
          {:ok, %Data.Schema.Location{}} ->

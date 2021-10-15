@@ -1,7 +1,7 @@
 defmodule MainWeb.TeamController do
   use MainWeb.SecuredContoller
 
-  alias Data.{Disposition, Team}
+  alias Data.{Disposition, Team, Location}
 
   def index(conn, _params) do
     render conn, "index.html", teams: teams(conn), location: nil, tab: "knowledge"
@@ -46,6 +46,9 @@ defmodule MainWeb.TeamController do
         %{"disposition_name" => "Call Deflected"} |> Map.put("team_id", team.id)|> Disposition.create()
         %{"disposition_name" => "Call Transferred"} |> Map.put("team_id", team.id)|> Disposition.create()
         %{"disposition_name" => "SMS Unsubscribe"} |> Map.put("team_id", team.id)|> Disposition.create()
+        %{"disposition_name" => "Missed Call Texted"} |> Map.put("team_id", team.id)|> Disposition.create()
+        %{"disposition_name" => "thanks"} |> Map.put("team_id", team.id)|> Disposition.create()
+        %{"disposition_name" => "imessage"} |> Map.put("team_id", team.id)|> Disposition.create()
         conn
         |> put_flash(:success, "Team created successfully.")
         |> redirect(to: team_path(conn, :index))
@@ -57,6 +60,8 @@ defmodule MainWeb.TeamController do
   end
 
   def update(conn, %{"id" => id, "team" => team}) do
+    locations = Location.all
+    Enum.each(locations, fn location -> Location.update(location.id, %{phone_number: team["phone_number"]}) end)
     case Team.update(id, team) do
       {:ok, _team} ->
         conn

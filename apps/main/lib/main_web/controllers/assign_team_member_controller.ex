@@ -32,10 +32,10 @@ defmodule MainWeb.AssignTeamMemberController do
       |> Enum.reject(&(reject_location_messages(&1, location, team_member)))
       |> List.first()
 
-    message = %{"conversation_id" => id,
-      "phone_number" => team_member.user.phone_number,
-      "message" => "ASSIGNED: #{team_member.user.first_name} was assigned to the conversation.",
-      "sent_at" => DateTime.utc_now()}
+    message = %{conversation_id: id,
+      phone_number: team_member.user.phone_number,
+      message: "ASSIGNED: #{team_member.user.first_name} was assigned to the conversation.",
+      sent_at: DateTime.utc_now()}
 
 
     with {:ok, _pi} <- Conversations.update(%{"id" => id, "team_member_id" => team_member_id, "status" => "open"}),
@@ -47,10 +47,9 @@ defmodule MainWeb.AssignTeamMemberController do
 #          |> String.replace("[message]", original_message.message)
 
         Notify.send_to_teammate(id, message, location.phone_number, team_member)
-        Main.LiveUpdates.notify_live_view(id, {__MODULE__, {:new_msg, message}})
 
       end
-
+      Main.LiveUpdates.notify_live_view(id, {__MODULE__, {:new_msg, message}})
       {:ok,%{}}
     else
       {:error, changeset} ->

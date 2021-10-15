@@ -79,8 +79,8 @@ defmodule MainWeb.Plug.BuildAnswer do
   end
 
   def call(%{assigns: %{convo: id, status: "open", intent: intent, location: location}} = conn, _opts) do
-    response = Appointment.get_next_reply(id,intent, location)
 
+    response = Appointment.get_next_reply(id,intent, location)
     location = Location.get_by_phone(location)
 
     if String.contains?(response,location.default_message)do
