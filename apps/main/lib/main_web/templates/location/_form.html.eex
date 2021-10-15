@@ -12,7 +12,7 @@
 
                     <div class="form-group">
                         <label>Phone Number</label>
-                        <%= text_input f, :phone_number, class: "form-control", disabled: true %>
+                        <%= text_input f, :phone_number, class: "form-control", disabled: true, value: @phone_number %>
                         <%#= error_tag @errors, :website %>
                     </div>
 
