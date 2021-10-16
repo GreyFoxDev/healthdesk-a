@@ -121,11 +121,13 @@ defmodule MainWeb.LocationController do
   def new(conn, %{"team_id" => team_id}) do
     current_user = current_user(conn)
     team = Team.get(current_user, team_id)
+    phone_number=team.phone_number
     render(conn, "new.html",
       changeset: Location.get_changeset(),
       team_id: team_id,
       team: team,
       location: nil,
+      phone_number: phone_number,
       teams: teams(conn),
       errors: [])
   end
@@ -159,6 +161,7 @@ defmodule MainWeb.LocationController do
         team_id: team_id,
         teams: teams(conn),
         team: team,
+        phone_number: team.phone_number,
         callback_url: Helpers.callback_url(conn),
         location: changeset.data,
         errors: [])
@@ -185,7 +188,6 @@ defmodule MainWeb.LocationController do
   end
 
   def update(conn, %{"id" => id, "location" => location, "team_id" => team_id} = _params) do
-
     location = Map.put(location, "team_id", team_id)
 
     case Location.update(id, location) do
