@@ -23,7 +23,10 @@ defmodule MainWeb.Api.ConversationController do
       |> json(%{conversation_id: convo.id})
     end
   end
-  def create(conn, %{"location" => location, "member" => member, "type" => "call"}) do
+  def create(conn, %{"location" => location, "member" => member, "type" => "call"}=params) do
+    IO.inspect("------params-----------")
+    IO.inspect(params)
+    IO.inspect("------params----------")
     with {:ok, convo} <- ConversationCall.find_or_start_conversation({member, location}) do
       Task.start(fn ->  close_convo(convo) end)
       conn
@@ -251,7 +254,10 @@ defmodule MainWeb.Api.ConversationController do
     conn |> send_resp(200, "ok")
   end
 
-  def update(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type" =>"call"}) do
+  def update(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type" =>"call"}=params) do
+    IO.inspect("------params-----------")
+    IO.inspect(params)
+    IO.inspect("------params----------")
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
@@ -277,6 +283,9 @@ defmodule MainWeb.Api.ConversationController do
   end
 
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type"=>"call"} = params) do
+    IO.inspect("------params-----------")
+    IO.inspect(params)
+    IO.inspect("------params----------")
     if params["disposition"] do
       convo = ConversationCall.get(id)
       location = Location.get(convo.location_id)
