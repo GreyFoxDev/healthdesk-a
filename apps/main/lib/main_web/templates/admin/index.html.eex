@@ -136,15 +136,15 @@
         <!-- metric column -->
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
-            <div class="card-metric" data-toggle="modal" data-target="#exampleModalLong">
-                <div class="metric">
-                    <%= if @role in ["admin","team-admin"] and @team_id != nil do%>
-                    <a href=
-                      "admin/teams/<%=@team_id%>/dispositions"
+            <div class="card-metric" >
+                <%= if @role in ["admin"] and @team_id != nil do%>
+                <a href=
+                           "admin/teams/<%=@team_id%>/dispositions"
+                   style = "position: absolute;top: 10px;
+                    right: 16px;z-index: 100;color:#666;"><i class="fas fa-edit"></i></a>
+                <% end %>
+                <div class="metric" data-toggle="modal" data-target="#exampleModalLong">
 
-                       style = "position: absolute;top: 2px;
-                    right: 5px;">Edit Dispostion</a>
-                    <% end %>
                     <h2 class="metric-label"> DISPOSITIONS </h2>
                     <p class="metric-value h3">
                     <span class="value"><%= Enum.filter(@dispositions, &(&1.name not in ["Call deflected", "Call Deflected", "Call Hang Up", "Call Transferred", "Missed Call Texted"])) |> Enum.map(&(&1.count)) |> Enum.sum() |> format_comma_numbers %>
