@@ -23,7 +23,11 @@ defmodule Data.Query.IntentUsage do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
     query = from(t in IntentUsage,
-          []
+      join: cm in ConversationMessage, on: cm.id == t.message_id,
+      join: c in Conversation, on: cm.conversation_id == c.id,
+      join: l in Location, on: c.location_id == l.id,
+      join: te in Team, on: l.team_id == te.id,
+      where: is_nil(l.deleted_at) and is_nil(te.deleted_at),
     )
 
     query = Enum.reduce(%{to: to, from: from}, query, fn
@@ -124,6 +128,11 @@ defmodule Data.Query.IntentUsage do
 
   def count_all(repo \\ Read)do
     from(t in IntentUsage,
+    join: cm in ConversationMessage, on: cm.id == t.message_id,
+    join: c in Conversation, on: cm.conversation_id == c.id,
+    join: l in Location, on: c.location_id == l.id,
+    join: te in Team, on: l.team_id == te.id,
+    where: is_nil(l.deleted_at) and is_nil(te.deleted_at),
     select: %{count: count(t.id),intent: t.intent},
     group_by: t.intent,
     order_by: [desc: count(t.id)]
