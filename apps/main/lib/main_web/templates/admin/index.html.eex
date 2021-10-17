@@ -137,9 +137,8 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric" >
-                <%= if @role in ["admin"] and @team_id != nil do%>
-                <a href=
-                           "admin/teams/<%=@team_id%>/dispositions"
+                <%= if ((@role in ["admin"] and @team_id != nil)or @role in ["team-admin"]) do%>
+                <a href="admin/teams/<%=@team_id%>/dispositions"
                    style = "position: absolute;top: 10px;
                     right: 16px;z-index: 100;color:#666;"><i class="fas fa-edit"></i></a>
                 <% end %>

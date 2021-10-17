@@ -49,7 +49,10 @@ defmodule Data.Query.ConversationDisposition do
     query =
     if channel_type == "CALL" do
       from(c in ConversationDisposition,
-      where: not is_nil(c.conversation_call_id)
+      where: not is_nil(c.conversation_call_id),
+        join: d in Disposition,
+        on: c.disposition_id == d.id,
+        where: d.disposition_name  in ["Call Deflected","Call deflected","Call Transferred","Call Hang Up"]
       )
     else
         from(c in Conversation,
@@ -98,7 +101,10 @@ defmodule Data.Query.ConversationDisposition do
     if channel_type == "CALL" do
       from(c in ConversationDisposition,
       join: cc in ConversationCall, on: cc.id == c.conversation_call_id,
-        where: cc.location_id in ^location_ids
+        where: cc.location_id in ^location_ids,
+        join: d in Disposition,
+        on: c.disposition_id == d.id,
+        where: d.disposition_name  in ["Call Deflected","Call deflected","Call Transferred","Call Hang Up"]
       )
     else
       from(c in Conversation,
@@ -147,6 +153,7 @@ defmodule Data.Query.ConversationDisposition do
         join: cc in ConversationCall, on: cc.id == c.conversation_call_id,
         join: d in Disposition, on: c.disposition_id == d.id,
         where: d.team_id == ^team_id,
+        where: d.disposition_name  in ["Call Deflected","Call deflected","Call Transferred","Call Hang Up"]
       )
     else
         from(c in Conversation,
