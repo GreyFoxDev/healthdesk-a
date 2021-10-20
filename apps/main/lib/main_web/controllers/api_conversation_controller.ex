@@ -24,9 +24,6 @@ defmodule MainWeb.Api.ConversationController do
     end
   end
   def create(conn, %{"location" => location, "member" => member, "type" => "call"}=params) do
-    IO.inspect("------params-----------")
-    IO.inspect(params)
-    IO.inspect("------params----------")
     with {:ok, convo} <- ConversationCall.find_or_start_conversation({member, location}) do
       Task.start(fn ->  close_convo(convo) end)
       conn
@@ -140,10 +137,10 @@ defmodule MainWeb.Api.ConversationController do
           case convo.status do
             "open" ->
               team_member=TeamMember.get(@role, convo.team_member_id)
-              Notify.send_to_teammate(convo.id, message, location, team_member, convo.member )|> IO.inspect()
+              Notify.send_to_teammate(convo.id, message, location, team_member, convo.member )
             _ ->
 
-              Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin") |> IO.inspect()
+              Notify.send_to_admin(convo.id, message, location.phone_number, "location-admin")
           end
          end
       else
@@ -255,9 +252,6 @@ defmodule MainWeb.Api.ConversationController do
   end
 
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type" =>"call"}=params) do
-    IO.inspect("------params-----------")
-    IO.inspect(params)
-    IO.inspect("------params----------")
     conn
     |> put_status(200)
     |> put_resp_content_type("application/json")
@@ -283,9 +277,6 @@ defmodule MainWeb.Api.ConversationController do
   end
 
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type"=>"call"} = params) do
-    IO.inspect("------params-----------")
-    IO.inspect(params)
-    IO.inspect("------params----------")
     if params["disposition"] do
       convo = ConversationCall.get(id)
       location = Location.get(convo.location_id)
