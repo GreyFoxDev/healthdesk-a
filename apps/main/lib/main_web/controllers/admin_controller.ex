@@ -1,6 +1,6 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
-  alias Data.{Campaign, Disposition, Location, Teams ,TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
+  alias Data.{Campaign, Disposition, Location, Team ,TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
 
 #  def index(conn, %{"team_id" => team_id} = params) do
 #    IO.inspect("++++++++++++++inside team_id++++++++++++++++")
@@ -111,9 +111,22 @@ defmodule MainWeb.AdminController do
         %{role: "location-admin"} -> %{"location_ids" => location_ids}
         _ -> %{}
       end
-      team_id = case current_user.team_member do
-        nil -> params["team_id"]
-        _ -> current_user.team_member.team_id
+      team_id =
+      if (current_user.role == "admin") do
+        Team.get_by_location_id(List.first(location_ids)).id
+      else
+          case current_user.team_member do
+            nil -> params["team_id"]
+            _ -> current_user.team_member.team_id
+          end
+
+      end
+
+    locations=
+    if(current_user.role == "admin") do
+      Location.get_by_team_id(%{role: current_user.role},team_id)
+      else
+      Location.get_by_team_id(current_user, team_id)
     end
     params=Map.merge(params, filter)
     render(conn, "index.html",
@@ -134,7 +147,7 @@ defmodule MainWeb.AdminController do
       team_admin_count: team_admin_count,
       tickets_count: Ticket.filter(params),
       teammate_count: teammate_count,
-      locations: Location.get_by_team_id(current_user, team_id),
+      locations: locations,
       location_count: Enum.count(locations),
       teams: teams(conn),
       team_id: team_id,
@@ -210,7 +223,7 @@ defmodule MainWeb.AdminController do
           tickets_count: Ticket.filter(params),
           teammate_count: teammate_count,
           location_count: Enum.count(locations),
-          location: nil,
+          locations: nil,
           from: params["from"],
           to: params["to"],
           location_ids: [],

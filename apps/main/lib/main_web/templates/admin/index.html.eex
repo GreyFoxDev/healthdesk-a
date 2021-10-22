@@ -4,46 +4,97 @@
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> TEAMS </h2>
-            <select class="form-control" id="team_id" name="team[id]" onchange="filterTeam(this)">
+            <%=form_for :filters, admin_path(@conn, :index), fn f -> %>
+            <select class="form-control" id="team_id" name="team[id]" >
                 <%= unless @team_id do %>
-                <option selected value="-99">All Teams</option>
+                <option name="all" selected value="-99">All Teams</option>
                 <% else %>
-                <option value="-99">All Teams</option>
+                <option name="all" value="-99">All Teams</option>
                 <% end %>
                 <%= for team <- @teams do %>
                 <%= if team.id == @team_id do %>
-                <option selected value="<%= team.id %>"><%= team.team_name %></option>
+                <option selected value="<%= Enum.reduce(team.locations, "", fn location, acc -> acc <> location.id <> ","<> location.location_name <> "--"  end)  %>"><%= team.team_name %></option>
                 <% else %>
-                <option value="<%= team.id %>"><%= team.team_name %></option>
+                <option value="<%=Enum.reduce(team.locations, "", fn location, acc -> acc <> location.id <> ","<> location.location_name <> "--"  end) %>"><%= team.team_name %></option>
                 <% end %>
                 <% end %>
             </select>
+
+            <div id="selectDiv">
+               <select data-selected-text-format="count" data-count-selected-text="({0}) Locations" title="All Locations"
+                       class="selectpicker form-control border border-dark dropdown bootstrap-select" multiple data-actions-box="true"
+                       data-live-search="true" name="filters[location_ids][]", id="locations"  >
+                   <%= if (@locations != nil) do%>
+                   <%= for location <- @locations do %>
+                   <option
+                           <%=
+                        case @location_ids do
+                          [] ->
+                          "selected"
+                          _ ->
+                          if (location.id in @location_ids)do
+                            "selected"
+                          end
+                        end %>
+                           value="<%= location.id %>"><%= location.location_name %>
+                   </option>
+                   <% end %>
+                   <% end %>
+               </select>
+            </div>
+
+            <style>
+                .dropdown.bootstrap-select {
+                    margin-top: 20px;
+                }
+                </style>
+            <script>
+                if ($('#locations option').length != 0){
+                window.addEventListener("load",function(){
+                    document.getElementById("selectDiv").style.display = "block";
+                });}
+            </script>
+            <script>
+
+                $(document).ready(function () {
+                    document.getElementById("selectDiv").style.display = "none";
+                    $("#team_id").change(function () {
+                        $("#locations").empty();
+                        if (document.getElementById("team_id").value == -99) document.getElementById("selectDiv").style.display = "none";
+                        else
+                            document.getElementById("selectDiv").style.display = "block";
+                        document.getElementById("locations").disabled = false;
+                        var arr = document.getElementById("team_id").value.split("--");
+                        var locationDropdown=  document.getElementById("locations");
+                        var val = $(this).val();
+                        for (var i = 0; i < arr.length-1; i++) {
+                            var arr2=arr[i].split(",")
+                            console.log(arr2[0])
+                            var opt = document.createElement('option');
+                            opt.value = arr2[0];
+                            opt.innerHTML = arr2[1];
+                            locationDropdown.appendChild(opt);
+                            opt.selected = "true";
+                        }
+                        $('.selectpicker').selectpicker('refresh');
+                    });
+                });
+            </script>
         </div><!-- /metric column -->
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> From </h2>
-            <input id="from" type="date" class="form-control" value="<%= @from %>" onchange="filterTeam(this)" />
+            <%= date_input f, :from, class: "form-control border border-dark", value: @from %>
         </div><!-- /metric column -->
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> To </h2>
-            <input id="to" type="date" class="form-control" value="<%= @to %>" onchange="filterTeam(this)" />
+            <%= date_input f, :to, class: "form-control border border-dark", value: @to %>
+            <button type="submit" class="btn btn-light border border-dark" style="float: right;  margin-top: 20px;">
+                <i style="color: black" class="fa fa-search"></i>
+            </button>
         </div><!-- /metric column -->
+        <% end %>
+
     </div>
-    <script>
-        function filterTeam(e) {
-            console.log(document.getElementById("team_id").value)
-            console.log(document.getElementById("to").value)
-            if (document.getElementById("team_id").value === "-99") {
-                window.location.href = window.location.origin + '/admin' +
-                    '?from=' + document.getElementById("from").value +
-                    '&to=' + document.getElementById("to").value;
-            } else {
-                window.location.href = window.location.origin + '/admin' +
-                    '?from=' + document.getElementById("from").value +
-                    '&to=' + document.getElementById("to").value +
-                    '&team_id=' + document.getElementById("team_id").value ;
-            }
-        }
-    </script>
     <% end %>
 
     <div class="metric-row">
