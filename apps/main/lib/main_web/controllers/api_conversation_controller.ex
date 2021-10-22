@@ -29,7 +29,7 @@ defmodule MainWeb.Api.ConversationController do
     IO.inspect("------params----------")
     with {:ok, convo} <- ConversationCall.find_or_start_conversation({member, location}) do
       Task.start(fn ->  close_convo(convo) end)
-      {:ok, chat_convo} = C.find_or_start_conversation({{member, location}})
+      {:ok, chat_convo} = C.find_or_start_conversation({member, location})
       conn
       |> put_status(200)
       |> put_resp_content_type("application/json")
