@@ -30,9 +30,6 @@ defmodule MainWeb.Api.ConversationController do
     with {:ok, convo} <- ConversationCall.find_or_start_conversation({member, location}) do
       Task.start(fn ->  close_convo(convo) end)
       {:ok, chat_convo} = C.find_or_start_conversation({member, location})
-      IO.inspect("=========chat_convo=======")
-      IO.inspect(chat_convo)
-      IO.inspect("=========chat_convo=======")
       conn
       |> put_status(200)
       |> put_resp_content_type("application/json")
@@ -258,30 +255,19 @@ defmodule MainWeb.Api.ConversationController do
     conn |> send_resp(200, "ok")
   end
 
-  def update(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type" =>"call"}=params) do
+  def update(conn, %{"conversation_id" => id, "chat_convo" => chat_convo, "from" => from, "message" => message, "type" =>"call"}=params) do
     IO.inspect("------params-----------")
     IO.inspect(params)
     IO.inspect("------params----------")
-    if params["chat_convo"] do
-      _ = CM.create(%{
-        "conversation_id" => params["chat_convo"],
-        "phone_number" => from,
-        "message" => message,
-        "sent_at" => DateTime.utc_now()})
-      conn
-      |> put_status(200)
-      |> put_resp_content_type("application/json")
-      |> json(%{conversation_id: id, chat_convo: params["chat_convo"], updated: true})
-    else
-      IO.inspect("=========no chat convo in update=======")
-      IO.inspect("no chat convo in update")
-      IO.inspect("=========no chat convo in update=======")
-      conn
-      |> put_status(200)
-      |> put_resp_content_type("application/json")
-      |> json(%{conversation_id: id, updated: true})
-    end
-
+    _ = CM.create(%{
+      "conversation_id" => chat_convo,
+      "phone_number" => from,
+      "message" => message,
+      "sent_at" => DateTime.utc_now()})
+    conn
+    |> put_status(200)
+    |> put_resp_content_type("application/json")
+    |> json(%{conversation_id: id, chat_convo: chat_convo, updated: true})
   end
   def update(conn, %{"conversation_id" => id, "from" => from, "message" => message}) do
     _ = CM.create(%{
@@ -302,61 +288,38 @@ defmodule MainWeb.Api.ConversationController do
     |> json(%{success: false})
   end
 
-  def close(conn, %{"conversation_id" => id, "from" => from, "message" => message, "type"=>"call"} = params) do
+  def close(conn, %{"conversation_id" => id, "chat_convo" => chat_convo, "from" => from, "message" => message, "type"=>"call"} = params) do
     IO.inspect("------params-----------")
     IO.inspect(params)
     IO.inspect("------params----------")
-    if params["chat_convo"] do
+    _ = CM.create(%{
+      "conversation_id" => chat_convo,
+      "phone_number" => from,
+      "message" => message,
+      "sent_at" => DateTime.utc_now()})
+    if params["disposition"] do
+      convo = ConversationCall.get(id)
+      location = Location.get(convo.location_id)
+      dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
+      disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
+
+      cd = Data.ConversationDisposition.create(%{"conversation_call_id" => id,"conversation_id" => chat_convo, "disposition_id" => disposition.id})
       _ = CM.create(%{
-        "conversation_id" => params["chat_convo"],
+        "conversation_id" => chat_convo,
         "phone_number" => from,
-        "message" => message,
+        "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
         "sent_at" => DateTime.utc_now()})
-      if params["disposition"] do
-        convo = ConversationCall.get(id)
-        location = Location.get(convo.location_id)
-        dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
-        disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
-
-        cd = Data.ConversationDisposition.create(%{"conversation_call_id" => id,"conversation_id" => params["chat_convo"], "disposition_id" => disposition.id})
-        _ = CM.create(%{
-          "conversation_id" => params["chat_convo"],
-          "phone_number" => from,
-          "message" => "CLOSED: Closed by System with disposition #{disposition.disposition_name}",
-          "sent_at" => DateTime.utc_now()})
-        convo = ConversationCall.close(id)
-        C.close(params["chat_convo"])
-      else
-        convo = ConversationCall.close(id)
-        C.close(params["chat_convo"])
-      end
-      conn
-      |> put_status(200)
-      |> put_resp_content_type("application/json")
-      |> json(%{conversation_id: id, chat_convo: params["chat_convo"]})
-
-      else
-      IO.inspect("=========no chat convo=======")
-      IO.inspect("no chat convo")
-      IO.inspect("=========no chat convo=======")
-      if params["disposition"] do
-        convo = ConversationCall.get(id)
-        location = Location.get(convo.location_id)
-        dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
-        disposition = Enum.find(dispositions, &(&1.disposition_name == params["disposition"]))
-
-        cd = Data.ConversationDisposition.create(%{"conversation_call_id" => id,"disposition_id" => disposition.id})
-        convo = ConversationCall.close(id)
-      else
-        convo = ConversationCall.close(id)
-        conn
-        |> put_status(200)
-        |> put_resp_content_type("application/json")
-        |> json(%{conversation_id: id})
-      end
+      convo = ConversationCall.close(id)
+      C.close(chat_convo)
+    else
+      convo = ConversationCall.close(id)
+      C.close(chat_convo)
     end
-    end
-
+    conn
+    |> put_status(200)
+    |> put_resp_content_type("application/json")
+    |> json(%{conversation_id: id, chat_convo: chat_convo})
+  end
   def close(conn, %{"conversation_id" => id, "from" => from, "message" => message} = params) do
     if message == "Sent to Slack" do
       _ =  CM.create(%{
