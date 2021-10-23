@@ -12,6 +12,8 @@ defmodule MainWeb.Intents do
   @callback build_response(List.t, location :: Data.Schema.Location.t()) :: String.t
   @default_response "During normal business hours, someone from our staff will be with you shortly. If this is during off hours, we will reply the next business day."
   @default_greeting "Hello! How can I help you?"
+  @default_thanks "No sweat!"
+  @default_imessage "Have a great day."
 
   alias MainWeb.Intents.{
     Address,
@@ -50,8 +52,25 @@ defmodule MainWeb.Intents do
   implemented then a default message is returned.
   """
 
-  def get({:unknown, [{"greetings"=name, _}]} = intent, location) do
-
+  def get({"greetings"=name, _} = intent, location) do
+    location = Location.get_by_phone(location)
+    local_intent = Intent.get_by(name, location.id)
+    if local_intent != nil do
+      local_intent.message
+    else
+      get_(intent, location)
+    end
+  end
+  def get({"thanks"=name, _} = intent, location) do
+    location = Location.get_by_phone(location)
+    local_intent = Intent.get_by(name, location.id)
+    if local_intent != nil do
+      local_intent.message
+    else
+      get_(intent, location)
+    end
+  end
+  def get({"imessage"=name, _} = intent, location) do
     location = Location.get_by_phone(location)
     local_intent = Intent.get_by(name, location.id)
     if local_intent != nil do
@@ -123,8 +142,14 @@ defmodule MainWeb.Intents do
     end
   end
 
-  def get_({:unknown, [{"greetings", _}]}, _location),
+  def get_({"greetings", _}, _location),
     do: @default_greeting
+
+  def get_({"thanks", _}, _location),
+      do: @default_thanks
+
+  def get_({"imessage", _}, _location),
+      do: @default_imessage
 
   def get_({:unknown, _}, location) do
     if location.default_message != "" do

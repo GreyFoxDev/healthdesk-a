@@ -316,6 +316,7 @@ defmodule MainWeb.AdminController do
   end
   defp calculate_automated_percentage(dispositions, automated)do
     total =  Enum.reduce(dispositions,0,fn %{count: x},sum -> x+sum end)
+    automated = Enum.filter(automated, fn auto -> auto.intent not in ["thanks", "imessage", "greetings"] end)
     automated = Enum.reduce(automated,0,fn %{count: x},sum -> x+sum end)
     (automated / if total == 0, do: 1, else: total) * 100
   end
