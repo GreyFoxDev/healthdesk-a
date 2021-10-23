@@ -69,6 +69,16 @@ defmodule Data.Query.Team do
     |> repo.one()
   end
 
+  @spec get_by_location_id(id :: binary(), repo :: Ecto.Repo.t()) :: Team.t() | nil
+  def get_by_location_id(id, repo \\ Read) do
+    from(t in Team,
+      left_join: l in Location,
+      on: t.id == l.team_id,
+      where: l.id == ^id,
+    )
+    |> repo.one()
+  end
+
   @doc """
   Creates a new team
   """
