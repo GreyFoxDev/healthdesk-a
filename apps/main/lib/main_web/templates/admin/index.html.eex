@@ -49,17 +49,18 @@
                 }
                 </style>
             <script>
-                if ($('#locations option').length != 0){
+                if (document.getElementById("locations").options.length != 0){
                 window.addEventListener("load",function(){
                     document.getElementById("selectDiv").style.display = "block";
                 });}
             </script>
             <script>
 
-                $(document).ready(function () {
+                function locationDropdown () {
                     document.getElementById("selectDiv").style.display = "none";
-                    $("#team_id").change(function () {
-                        $("#locations").empty();
+
+                    document.getElementById("team_id").onchange=function () {
+                        document.getElementById('locations').innerText = null;
                         if (document.getElementById("team_id").value == -99) document.getElementById("selectDiv").style.display = "none";
                         else
                             document.getElementById("selectDiv").style.display = "block";
@@ -77,8 +78,9 @@
                             opt.selected = "true";
                         }
                         $('.selectpicker').selectpicker('refresh');
-                    });
-                });
+                    };
+                };
+                locationDropdown()
             </script>
         </div><!-- /metric column -->
         <div class="col-12 col-sm-6 col-lg-3">
