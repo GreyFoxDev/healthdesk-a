@@ -18,6 +18,7 @@
                 <div class="card-header">
                     <nav class="nav nav-tabs flex-column border-0">
                         <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link active">Details</a>
+                        <a href="<%=team_location_automation_path(@conn, :new, location.team_id, location.id)%>" class="nav-link">Answers</a>
                         <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Normal Hours</a>
                         <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Special Hours</a>
                         <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hours</a>
@@ -26,7 +27,6 @@
                         <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Class Schedule Upload</a>
                         <a href="<%= team_location_saved_reply_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Saved Replies</a>
                         <a href="<%= team_location_intent_path(@conn, :new, location.team_id, location.id) %>" class="nav-link ">Intents</a>
-                        <a href="<%=team_location_automation_path(@conn, :new, location.team_id, location.id)%>" class="nav-link">Automations</a>
                     </nav>
                 </div>
             </div>
