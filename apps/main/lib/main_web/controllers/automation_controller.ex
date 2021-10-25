@@ -34,11 +34,11 @@ defmodule MainWeb.AutomationController do
       |> current_user()
       |> Location.get(location_id)
     with {:ok, _} <- Automation.create(params) do
-      body = "A new automation has been added as \n Question: #{question} \n Answer: #{answer} \n at Location: #{location.location_name}"
-      subject="Automation Added"
+      body = "A new answer has been added as \n Question: #{question} \n Answer: #{answer} \n at Location: #{location.location_name}"
+      subject="Answer Added"
       send_email_to_admins(body, subject)
       conn
-      |> put_flash(:success, "Automation created successfully.")
+      |> put_flash(:success, "Answer created successfully.")
       |> redirect(to: team_location_automation_path(conn, :new, location.team_id, location.id))
     else
       {:error, _changeset} ->
@@ -48,7 +48,7 @@ defmodule MainWeb.AutomationController do
           |> Location.get(location_id)
         automations = Automation.get_by_location_id(location_id)
         conn
-        |> put_flash(:error, "Automation failed to create")
+        |> put_flash(:error, "Answer failed to create")
         |> render(
              "new.html",
              changeset: Automation.get_changeset(),
@@ -69,11 +69,11 @@ defmodule MainWeb.AutomationController do
         conn
         |> current_user()
         |> Location.get(location_id)
-      body = "An automation has been edited \n Question: #{result.question} \n Answer: #{result.answer} \n at Location: #{location.location_name}"
-      subject="Automation Edited"
+      body = "An answer has been edited \n Question: #{result.question} \n Answer: #{result.answer} \n at Location: #{location.location_name}"
+      subject="Answer Edited"
       send_email_to_admins(body, subject)
       conn
-      |> put_flash(:success, "Automation updated successfully.")
+      |> put_flash(:success, "Answer updated successfully.")
       |> redirect(to: team_location_automation_path(conn, :new, location.team_id, location.id))    else
       {:error, changeset} ->
         location =
@@ -82,7 +82,7 @@ defmodule MainWeb.AutomationController do
           |> Location.get(location_id)
         intents = Automation.get_by_location_id(location_id)
         conn
-        |> put_flash(:error, "Automation failed to update")
+        |> put_flash(:error, "Answer failed to update")
         |> render(
              "new.html",
              changeset: Automation.get_changeset(),
@@ -104,11 +104,11 @@ defmodule MainWeb.AutomationController do
         conn
         |> current_user()
         |> Location.get(location_id)
-      body = "An automation has been deleted \n Question: #{result.question} \n Answer: #{result.answer} \n at Location: #{location.location_name}"
-      subject="Automation deleted"
+      body = "An answer has been deleted \n Question: #{result.question} \n Answer: #{result.answer} \n at Location: #{location.location_name}"
+      subject="Answer deleted"
       send_email_to_admins(body, subject)
       conn
-      |> put_flash(:success, "Automation deleted successfully.")
+      |> put_flash(:success, "Answer deleted successfully.")
       |> redirect(to: team_location_automation_path(conn, :new, location.team_id, location.id))
     else
       {:error, :no_record_found} ->
@@ -118,7 +118,7 @@ defmodule MainWeb.AutomationController do
           |> Location.get(location_id)
         automations = Automation.get_by_location_id(location_id)
         conn
-        |> put_flash(:error, "failed to delete Automation")
+        |> put_flash(:error, "failed to delete Answer")
         |> render(
              "new.html",
              changeset: Automation.get_changeset(),
