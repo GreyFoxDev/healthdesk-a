@@ -18,6 +18,7 @@
                 <div class="card-header">
                     <nav class="nav nav-tabs flex-column border-0">
                         <a href="<%= team_location_path(@conn, :edit, location.team_id, location.id) %>" class="nav-link">Details</a>
+                        <a href="<%=team_location_automation_path(@conn, :new, location.team_id, location.id)%>" class="nav-link active">Answers</a>
                         <a href="<%= team_location_normal_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Normal Hours</a>
                         <a href="<%= team_location_holiday_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Special Hours</a>
                         <a href="<%= team_location_child_care_hour_path(@conn, :index, location.team_id, location.id) %>" class="nav-link">Child Care Hours</a>
@@ -26,14 +27,13 @@
                         <a href="<%= team_location_class_schedule_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Class Schedule Upload</a>
                         <a href="<%= team_location_saved_reply_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Saved Replies</a>
                         <a href="<%= team_location_intent_path(@conn, :new, location.team_id, location.id) %>" class="nav-link">Intents</a>
-                        <a href="<%=team_location_automation_path(@conn, :new, location.team_id, location.id)%>" class="nav-link active">Automations</a>
                     </nav>
                 </div>
             </div>
         </div>
         <div class="col-lg-8">
             <div class="card card-fluid">
-                <h6 class="card-header"> Automations</h6><!-- .card-body -->
+                <h6 class="card-header"> Answers</h6><!-- .card-body -->
                 <div class="card-body">
                     <%= if get_flash(@conn, :success) do%>
                     <p class="alert alert-info" role="alert"><%= get_flash(@conn, :success) %></p>
@@ -76,7 +76,7 @@
                         <%= text_input f, :question, placeholder: "Question",  class: "form-control" %>
                     </div>
                     <div class="form-group col-lg-5">
-                        <%= text_input f, :answer, placeholder: "answer",  class: "form-control"%>
+                        <%= text_input f, :answer, placeholder: "Answer",  class: "form-control"%>
                     </div>
                     <%= if length(@automations)< @automation_limit do %>
                     <div class="form-group col-lg-2">
