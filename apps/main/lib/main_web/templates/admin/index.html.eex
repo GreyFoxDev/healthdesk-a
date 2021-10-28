@@ -239,7 +239,7 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric">
-                <div class="metric">
+                <div class="metric" data-toggle="modal" data-target="#exampleCallDeflectLong">
                     <h2 class="metric-label"> CALLS DEFLECTED </h2>
                     <p class="metric-value h3">
                     <span class="value">
@@ -288,6 +288,30 @@
             </div><!-- /.metric -->
         </div><!-- /metric column -->
     </div>
+
+    <div class="metric-row">
+        <!-- metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric" data-toggle="modal" data-target="#exampleMissedCallLong">
+                    <h2 class="metric-label"> MISSED CALL TEXTED </h2>
+                    <p class="metric-value h3">
+                    <span class="value">
+                        <%= if @missed_call_texted == 0.0 do %>
+                        0%
+                        <% else %>
+                        <%= @missed_call_texted |> Decimal.from_float() |> Decimal.round(1) %>%
+                        <% end %>
+                    </span>
+                    </p>
+                    <p class="metric-label">
+                        <span>Percentage</span></p>
+                </div>
+            </div><!-- /.metric -->
+        </div>
+    </div>
+
     <div class="metric-row">
         <!-- metric column -->
         <div class="col-12 col-sm-6 col-lg-4">
@@ -468,3 +492,80 @@
     </div>
 </div>
 
+<div class="modal fade" id="exampleCallDeflectLong" tabindex="-1" role="dialog" aria-labelledby="exampleAssistLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Call deflected</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total Response
+                        <span class="badge badge-primary badge-pill"> <%= @call_deflect_response %> </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Response Rate
+                        <span class="badge badge-primary badge-pill"> <%= @call_deflect_response_rate |> Decimal.from_float() |> Decimal.round(1) %>% </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Intents
+                        <span class="badge badge-primary badge-pill"> <%= @intent_after_call_deflect %> </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        New Leads
+                        <span class="badge badge-primary badge-pill"> <%= @new_leads_after_call_deflect %> </span>
+                    </li>
+                </ul>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button"  data-dismiss="modal" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleMissedCallLong" tabindex="-1" role="dialog" aria-labelledby="exampleAssistLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">MISSED CALL TEXTED</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Missed Call Rate
+                        <span class="badge badge-primary badge-pill"> <%= @missed_call_rate %>% </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total Response
+                        <span class="badge badge-primary badge-pill"> <%= @missed_call_response %> </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Connect Rate
+                        <span class="badge badge-primary badge-pill"> <%= @missed_call_response_rate %>% </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Intents
+                        <span class="badge badge-primary badge-pill"> <%= @intent_after_missed_call %> </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        New Leads
+                        <span class="badge badge-primary badge-pill"> <%= @new_leads_after_missed_call %> </span>
+                    </li>
+                </ul>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button"  data-dismiss="modal" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
