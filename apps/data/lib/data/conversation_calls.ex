@@ -13,6 +13,13 @@ defmodule Data.ConversationCall do
     "team-admin"
   ]
 
+  @call_dispositions [
+    "Call deflected",
+    "Missed Call Texted",
+    "Call Transfered",
+    "Call Hung Up"
+  ]
+
   @open %{"status" => "open"}
   @closed %{"status" => "closed"}
   @pending %{"status" => "pending"}
@@ -26,7 +33,7 @@ defmodule Data.ConversationCall do
   Get changesets for conversations.
   """
   def get_changeset(),
-    do: Data.Schema.ConversationCall.changeset(%Data.Schema.ConversationCall{})
+      do: Data.Schema.ConversationCall.changeset(%Data.Schema.ConversationCall{})
 
   def get_changeset(id, %{role: role}) when role in @roles do
     changeset =
@@ -99,10 +106,10 @@ defmodule Data.ConversationCall do
   end
 
   def get(%{role: role}, id) when role in @roles,
-    do: Query.get(id, true)
+      do: Query.get(id, true)
 
   def get(%{role: role}, id, preload_f) when role in @roles,
-    do: Query.get(id, preload_f)
+      do: Query.get(id, preload_f)
 
   def get(_, _), do: {:error, :invalid_permissions}
 
@@ -286,6 +293,14 @@ defmodule Data.ConversationCall do
       _ ->
         {:error, "Unable to close conversation."}
     end
+  end
+
+  def get_response_after_call(disposition,to ,from , loc_ids \\ [])  when disposition in @call_dispositions do
+    Query.calculate_after_call_response(disposition,to ,from ,loc_ids)
+  end
+
+  def get_total_calls(disposition,to ,from ,loc_ids \\ [])  when disposition in @call_dispositions do
+    Query.get_call_time_list(disposition,to ,from ,loc_ids)
   end
 
   defp new_params({member, location_id}) do

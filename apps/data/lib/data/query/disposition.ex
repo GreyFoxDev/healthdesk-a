@@ -529,4 +529,46 @@ defmodule Data.Query.Disposition do
       [%{sessions_per_day: sessions}]
     end
   end
+
+  def get_call_related_by(location_ids, to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+
+    query =
+      from(d in Disposition,
+        join: cd in assoc(d, :conversation_dispositions),
+        join: cc in Data.Schema.ConversationCall, on: cd.conversation_call_id == cc.id
+      )
+
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+             do: query,
+             else: from([_, cd, ...] in query, where: cd.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+             do: query,
+             else: from([_, cd, ...] in query, where: cd.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
+    from([d, cd, cc] in query,
+      group_by: [
+        d.disposition_name,
+        cd.conversation_id,
+        cd.conversation_call_id,
+        cd.disposition_id,
+        cd.inserted_at
+      ],
+      where: cc.location_id in ^location_ids,
+      distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
+      order_by: d.disposition_name,
+      select: %{name: d.disposition_name, count: count(cd.id)}
+    )
+    |> repo.all()
+  end
 end

@@ -4,7 +4,7 @@ defmodule Data.Query.ConversationCall do
   """
   import Ecto.Query, only: [from: 2]
 
-  alias Data.Schema.{ConversationCall, ConversationList, Member}
+  alias Data.Schema.{ConversationCall, Disposition, ConversationList, Member, Conversation, ConversationDisposition, ConversationMessage}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
 
@@ -53,18 +53,18 @@ defmodule Data.Query.ConversationCall do
         select: c.appointment
       )
       |> repo.update_all(
-        set: [
-          appointment: false
-        ]
-      )
+           set: [
+             appointment: false
+           ]
+         )
   end
 
   @doc """
   Return a list of ConversationCalls for a location
   """
   @spec get_by_status(location_id :: [binary()], status :: [binary()], repo :: Ecto.Repo.t()) :: [
-          Conversation.t()
-        ]
+                                                                                                   Conversation.t()
+                                                                                                 ]
   def get_by_status(location_id, status, search_string, repo \\ Read) when is_list(status) do
     time = DateTime.add(DateTime.utc_now(), -1_296_000, :seconds)
     like = "%#{search_string}%"
@@ -79,9 +79,9 @@ defmodule Data.Query.ConversationCall do
       where: m.sent_at >= ^time,
       or_where:
         like(c.original_number, ^like) or like(c.channel_type, ^like) or
-          like(location.location_name, ^like) or
-          like(member.first_name, ^like) or like(member.phone_number, ^like) or
-          like(member.last_name, ^like),
+        like(location.location_name, ^like) or
+        like(member.first_name, ^like) or like(member.phone_number, ^like) or
+        like(member.last_name, ^like),
       # most recent first
       order_by: [desc: m.sent_at],
       preload: [conversation_messages: m, team_member: [:user], location: []],
@@ -178,8 +178,8 @@ defmodule Data.Query.ConversationCall do
       where: c.user_id == ^user_id or is_nil(c.user_id),
       where:
         like(c.original_number, ^like) or like(c.channel_type, ^like) or
-          like(c.location_name, ^like) or
-          like(c.first_name, ^like) or like(c.last_name, ^like)
+        like(c.location_name, ^like) or
+        like(c.first_name, ^like) or like(c.last_name, ^like)
     )
     |> Read.all()
   end
@@ -194,8 +194,8 @@ defmodule Data.Query.ConversationCall do
       where: c.user_id != ^user_id,
       where:
         like(c.original_number, ^like) or like(c.channel_type, ^like) or
-          like(c.location_name, ^like) or
-          like(c.first_name, ^like) or like(c.last_name, ^like)
+        like(c.location_name, ^like) or
+        like(c.first_name, ^like) or like(c.last_name, ^like)
     )
     |> Read.all()
   end
@@ -209,8 +209,8 @@ defmodule Data.Query.ConversationCall do
       where: c.location_id in ^location_id,
       where:
         like(c.original_number, ^like) or like(c.channel_type, ^like) or
-          like(c.location_name, ^like) or
-          like(c.first_name, ^like) or like(c.last_name, ^like)
+        like(c.location_name, ^like) or
+        like(c.first_name, ^like) or like(c.last_name, ^like)
     )
     |> Read.all()
   end
@@ -229,8 +229,8 @@ defmodule Data.Query.ConversationCall do
   end
 
   @spec get_by_location_ids(location_id :: [binary()], repo :: Ecto.Repo.t()) :: [
-          ConversationCall.t()
-        ]
+                                                                                   ConversationCall.t()
+                                                                                 ]
   def get_by_location_ids(location_id, repo \\ Read) do
     from(c in ConversationCall,
       join: m in assoc(c, :conversation_messages),
@@ -247,8 +247,8 @@ defmodule Data.Query.ConversationCall do
   end
 
   @spec get_by_location_id(location_id :: binary(), repo :: Ecto.Repo.t()) :: [
-          ConversationCall.t()
-        ]
+                                                                                ConversationCall.t()
+                                                                              ]
   def get_by_location_id(location_id, repo \\ Read) do
     from(c in ConversationCall,
       join: m in assoc(c, :conversation_messages),
@@ -285,12 +285,12 @@ defmodule Data.Query.ConversationCall do
     %ConversationCall{}
     |> ConversationCall.changeset(params)
     |> case do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        repo.insert(changeset)
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.insert(changeset)
 
-      changeset ->
-        {:error, changeset}
-    end
+         changeset ->
+           {:error, changeset}
+       end
   end
 
   @doc """
@@ -302,11 +302,164 @@ defmodule Data.Query.ConversationCall do
     original
     |> ConversationCall.changeset(params)
     |> case do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        repo.update(changeset)
+         %Ecto.Changeset{valid?: true} = changeset ->
+           repo.update(changeset)
 
-      changeset ->
-        {:error, changeset}
+         changeset ->
+           {:error, changeset}
+       end
+  end
+
+  def get_call_time_list(disposition,to,from, loc_ids \\ [] ,repo \\ Read)do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+
+    query = if List.first(loc_ids)do
+      from(cd in ConversationDisposition,
+        join: cc in ConversationCall, on: cc.id == cd.conversation_call_id,
+        join: d in Disposition, on: cd .disposition_id == d.id,
+        where: d.disposition_name == ^disposition,
+        where: not is_nil(cd.conversation_call_id),
+        where: cc.location_id in ^loc_ids,
+        distinct: cd.id,
+      )
+    else
+      from(cd in ConversationDisposition,
+        join: d in Disposition, on: cd .disposition_id == d.id,
+        where: d.disposition_name == ^disposition,
+        where: not is_nil(cd.conversation_call_id),
+        distinct: cd.id,
+      )
     end
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+             do: query,
+             else: from([cd, ...] in query, where: cd.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+             do: query,
+             else: from([cd, ...] in query, where: cd.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+    query = from([cd, ...] in query,
+      select: {cd.inserted_at, cd.conversation_call_id},
+      group_by: [cd.inserted_at, cd.conversation_call_id, cd.id]
+    )
+    repo.all(query)
+  end
+
+  def get_messages(disposition,to,from, loc_ids \\ [], repo \\ Read)do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+    query = if List.first(loc_ids)do
+      from( c in Conversation,
+        join: cc in ConversationCall, on: c.original_number == cc.original_number and c.location_id == cc.location_id,
+        join: cd in ConversationDisposition, on: cc.id == cd.conversation_call_id,
+        join: cm in ConversationMessage,on: cm.conversation_id == c.id,
+        where: cm.phone_number == c.original_number,
+        where: cc.location_id in ^loc_ids,
+        join: d in Disposition, on: d.id == cd.disposition_id,
+        where: d.disposition_name == ^disposition,
+        distinct: cm.id
+      )
+    else
+      from( c in Conversation,
+        join: cc in ConversationCall, on: c.original_number == cc.original_number and c.location_id == cc.location_id,
+        join: cd in ConversationDisposition, on: cc.id == cd.conversation_call_id,
+        join: cm in ConversationMessage,on: cm.conversation_id == c.id,
+        where: cm.phone_number == c.original_number,
+        join: d in Disposition, on: d.id == cd.disposition_id,
+        where: d.disposition_name == ^disposition,
+        distinct: cm.id
+      )
+    end
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+             do: query,
+             else: from([_,cc, _,cm, ...] in query, where: cm.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+             do: query,
+             else: from([_,cc, _,cm, ...] in query, where: cm.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
+    query = from([_,cc, _,cm, ...] in query,
+      select: {cm.inserted_at, cm.message ,cc.id})
+
+    repo.all(query)
+  end
+
+  def calculate_after_call_response(disposition,to,from, loc_ids)do
+    #    time_list = Enum.sort_by(get_deflected_time_list(), & elem(&1, 0), DateTime)
+    time_list = get_call_time_list(disposition,to, from, loc_ids)
+    msgs = get_messages(disposition,to,from, loc_ids)
+
+    if List.first(time_list) && List.first(msgs)do
+      time_list = Enum.chunk_by(time_list, &(elem(&1, 1)))
+      time_list = Enum.map(time_list, fn x ->
+        Enum.sort_by(x, & elem(&1, 0), DateTime)
+      end) |> List.flatten()
+      {_, _,count} = Enum.reduce(time_list, {nil, msgs, 0}, fn next, acc ->
+        {prev, msg_list, count} = acc
+        if prev ==  nil do
+          {next, msg_list, count}
+        else
+          {prev_date, prev_call_id} = prev
+          {next_date, next_call_id} = next
+          if prev_call_id == next_call_id do
+            if Timex.between?(next_date, prev_date, Timex.shift(prev_date, hours: 24)) do
+              res = Enum.filter(msg_list, fn {t, _, id} -> Timex.between?(DateTime.from_naive!(t, "Etc/UTC"), prev_date, next_date) && id == prev_call_id end) |> Enum.count()
+              if res > 0 do
+                {next, msg_list, count=count+1}
+              else
+                {next, msg_list, count}
+              end
+            else
+              res = Enum.filter(msg_list, fn {t, _, id} -> Timex.between?(DateTime.from_naive!(t, "Etc/UTC"), prev_date, Timex.shift(prev_date, hours: 24)) && id == prev_call_id end) |> Enum.count()
+              if res > 0 do
+                {next, msg_list, count=count+1}
+              else
+                {next, msg_list, count}
+              end
+            end
+          else
+            if (Enum.filter(msg_list, fn {t , _, id} -> Timex.between?(DateTime.from_naive!(t, "Etc/UTC"), prev_date, Timex.shift(prev_date, hours: 24)) && prev_call_id == id end)) |>  Enum.count() > 0 do
+              {next, msg_list, count= count+1}
+            else
+              {next, msg_list, count}
+            end
+          end
+        end
+
+        #     {t1, count} = acc
+        #     {time, call_id} = t
+        #      if (Enum.filter(t1, fn {x , _, id} -> DateTime.from_naive!(x, "Etc/UTC") > time && call_id == id end)) |>  Enum.count() > 0 do
+        #        {msgs , count = count + 1}
+        #        else
+        #        acc
+        #     end
+      end)
+      {prev_date, prev_call_id} = List.last(time_list)
+      if (Enum.filter(msgs, fn {t , _, id} -> Timex.between?(DateTime.from_naive!(t, "Etc/UTC"), prev_date, Timex.shift(prev_date, hours: 24)) && prev_call_id == id end)) |>  Enum.count() > 0 do
+        count = count + 1
+      else
+        count
+      end
+
+    else
+      0
+    end
+
   end
 end

@@ -2,6 +2,15 @@ defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
   alias Data.{Campaign, Disposition, Location, Team ,TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
 
+  @new_leads [
+  "salesQuestion",
+  "getTour",
+  "getTrialPass",
+  "getGuestPass",
+  "getMonthPass",
+  "getDayPass",
+  "getWeekPass",
+  ]
 #  def index(conn, %{"team_id" => team_id} = params) do
 #    IO.inspect("++++++++++++++inside team_id++++++++++++++++")
 #    params=if(!is_nil(params["filters"])) do
@@ -128,12 +137,25 @@ defmodule MainWeb.AdminController do
       else
       Location.get_by_team_id(current_user, team_id)
     end
+    call_deflect_response = Data.ConversationCall.get_response_after_call("Call deflected", params["to"], params["from"], location_ids)
+    missed_call_response = Data.ConversationCall.get_response_after_call("Missed Call Texted",params["to"], params["from"], location_ids)
+    missed_call_texted = calculate_percentage("Missed Call Texted", dispositions)
     params=Map.merge(params, filter)
     render(conn, "index.html",
       dispositions: dispositions,
       automated_data: automated,
       automated: calculate_automated_percentage(dispositions, automated),
       call_deflected: calculate_percentage("Call deflected", dispositions),
+      call_deflect_response: call_deflect_response,
+      intent_after_call_deflect: Data.IntentUsage.get_intent_count_after_call_disposition("Call deflected", params["to"], params["from"], location_ids),
+      new_leads_after_call_deflect: Data.IntentUsage.get_leads_count_after_call_disposition("Call deflected", params["to"], params["from"], location_ids),
+      call_deflect_response_rate: calculate_response_rate_after_call("Call deflected",dispositions, call_deflect_response),
+      missed_call_texted: missed_call_texted.total_percentage,
+      missed_call_response: missed_call_response,
+      intent_after_missed_call: Data.IntentUsage.get_intent_count_after_call_disposition("Missed Call Texted", params["to"], params["from"], location_ids),
+      new_leads_after_missed_call: Data.IntentUsage.get_leads_count_after_call_disposition("Missed Call Texted", params["to"], params["from"], location_ids),
+      missed_call_response_rate: calculate_response_rate_after_call("Missed Call Texted",dispositions, missed_call_response),
+      missed_call_rate: missed_call_texted.missed_call_rate,
       appointments: appointments,
       campaigns: Campaign.get_by_location_ids(location_ids),
       dispositions_per_day: dispositions_per_day,
@@ -155,9 +177,13 @@ defmodule MainWeb.AdminController do
       from: params["from"],
       to: params["to"],
       location: nil,
-      role: current_user.role)
+      role: current_user.role,
+      new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.count() || 0,
+      new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads))
+    )
   end
   def index(conn, params) do
+
     params= if (!is_nil(params["filters"])), do: change_params(params), else: params
     current_user = current_user(conn)
     if current_user.role in ["team-admin", "teammate"] do
@@ -194,7 +220,11 @@ defmodule MainWeb.AdminController do
         [dispositions_per_day] = Disposition.average_per_day(params)
         locations = Location.all()
         location_ids=Enum.map(locations, & &1.id)
-#        response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id,params["to"] != "" && params["to"] || nil,params["from"] != "" && params["from"] || nil).median_response_time||0 end)
+        call_deflect_response = Data.ConversationCall.get_response_after_call("Call deflected", params["to"], params["from"])
+        missed_call_response = Data.ConversationCall.get_response_after_call("Missed Call Texted", params["to"], params["from"])
+        missed_call_texted = calculate_percentage("Missed Call Texted", dispositions)
+
+        #        response_times = Enum.map(locations, fn x -> ConversationMessages.count_by_location_id(x.id,params["to"] != "" && params["to"] || nil,params["from"] != "" && params["from"] || nil).median_response_time||0 end)
 #        middle_index = response_times |> length() |> div(2)
 #        response_time = response_times |> Enum.sort |> Enum.at(middle_index)
 
@@ -209,6 +239,16 @@ defmodule MainWeb.AdminController do
           automated_data: automated,
           automated: calculate_automated_percentage(dispositions ,automated),
           call_deflected: calculate_percentage("Call deflected", dispositions),
+          call_deflect_response: call_deflect_response,
+          intent_after_call_deflect: Data.IntentUsage.get_intent_count_after_call_disposition("Call deflected", params["to"], params["from"]),
+          new_leads_after_call_deflect: Data.IntentUsage.get_leads_count_after_call_disposition("Call deflected", params["to"], params["from"]),
+          call_deflect_response_rate: calculate_response_rate_after_call("Call deflected",dispositions ,call_deflect_response),
+          missed_call_texted: missed_call_texted.total_percentage,
+          missed_call_response: missed_call_response,
+          intent_after_missed_call: Data.IntentUsage.get_intent_count_after_call_disposition("Missed Call Texted", params["to"], params["from"]),
+          new_leads_after_missed_call: Data.IntentUsage.get_leads_count_after_call_disposition("Missed Call Texted", params["to"], params["from"]),
+          missed_call_response_rate: calculate_response_rate_after_call("Missed Call Texted",dispositions ,missed_call_response),
+          missed_call_rate: missed_call_texted.missed_call_rate,
           appointments: appointments,
           dispositions_per_day: dispositions_per_day,
           response_time: response_time,
@@ -228,7 +268,11 @@ defmodule MainWeb.AdminController do
           to: params["to"],
           location_ids: [],
           team_id: TeamMember.get_by_user_id(%{role: current_user.role},current_user.id),
-          role: current_user.role)
+          role: current_user.role,
+          new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.count() || 0,
+          new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads))
+
+        )
       else
         location_ids = Location.get_location_ids_by_team_id(current_user, current_user.team_member.team_id)
         dispositions = Disposition.count_by(%{"location_ids" => location_ids, "to" => convert_values(params["filter"]["to"]), "from" => convert_values(params["filter"]["from"])})
@@ -252,6 +296,9 @@ defmodule MainWeb.AdminController do
           end)
           |> List.flatten()
         end
+        call_deflect_response = Data.ConversationCall.get_response_after_call("Call deflected", params["to"], params["from"], location_ids)
+        missed_call_response = Data.ConversationCall.get_response_after_call("Missed Call Texted",params["to"], params["from"], location_ids)
+        missed_call_texted = calculate_percentage("Missed Call Texted", dispositions)
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
@@ -260,6 +307,16 @@ defmodule MainWeb.AdminController do
           automated_data: automated,
           automated: calculate_automated_percentage(dispositions, automated),
           call_deflected: calculate_percentage("Call deflected", dispositions),
+          call_deflect_response: call_deflect_response,
+          intent_after_call_deflect: Data.IntentUsage.get_intent_count_after_call_disposition("Call deflected",params["to"] ,params["from"], location_ids),
+          new_leads_after_call_deflect: Data.IntentUsage.get_leads_count_after_call_disposition("Call deflected", params["to"], params["from"], location_ids),
+          call_deflect_response_rate: calculate_response_rate_after_call("Call deflected",dispositions, call_deflect_response),
+          missed_call_texted: missed_call_texted.total_percentage,
+          missed_call_response: missed_call_response,
+          intent_after_missed_call: Data.IntentUsage.get_intent_count_after_call_disposition("Missed Call Texted", params["to"], params["from"], location_ids),
+          new_leads_after_missed_call: Data.IntentUsage.get_leads_count_after_call_disposition("Missed Call Texted", params["to"], params["from"], location_ids),
+          missed_call_response_rate: calculate_response_rate_after_call("Missed Call Texted",dispositions, missed_call_response),
+          missed_call_rate: missed_call_texted.missed_call_rate,
           dispositions_per_day: dispositions_per_day,
           response_time: response_time.median_response_time||0,
           web_totals: ConversationDisposition.count_channel_type_by_location_ids("WEB", location_ids, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"])),
@@ -279,7 +336,11 @@ defmodule MainWeb.AdminController do
           from: params["from"],
           to: params["to"],
           team_id: nil,
-          role: current_user.role)
+          role: current_user.role,
+          new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.count() || 0,
+          new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads))
+
+        )
       end
     end
   end
@@ -298,6 +359,10 @@ defmodule MainWeb.AdminController do
       "Call deflected" ->
         call_deflected = call_deflected + call_Deflected
         (call_deflected  / (if (call_transferred + call_deflected + call_hung_up + missed_call_texted)==0.0,do: 1,else: (call_transferred + call_deflected + call_hung_up + missed_call_texted))) * 100
+      "Missed Call Texted" ->
+        total_percentage = ( missed_call_texted / (if (call_transferred + call_deflected + call_hung_up + missed_call_texted)==0.0,do: 1,else: (call_transferred + call_deflected + call_hung_up + missed_call_texted))) * 100
+        missed_call_rate = (missed_call_texted / (if call_transferred == 0,do: 1, else: call_transferred)) * 100
+        %{total_percentage: total_percentage, missed_call_rate: missed_call_rate}
     end
   end
 
@@ -319,5 +384,12 @@ defmodule MainWeb.AdminController do
     automated = Enum.filter(automated, fn auto -> auto.intent not in ["thanks", "imessage", "greetings"] end)
     automated = Enum.reduce(automated,0,fn %{count: x},sum -> x+sum end)
     (automated / if total == 0, do: 1, else: total) * 100
+  end
+
+  defp calculate_response_rate_after_call(type, dispositions, res)do
+
+#    total = Data.ConversationCall.get_total_calls(disposition, loc_ids) |> Enum.count()
+    total = Enum.filter(dispositions, &(&1.name == type)) |> Enum.count()
+    (res/(if total == 0, do: 1, else: total)) * 100
   end
 end
