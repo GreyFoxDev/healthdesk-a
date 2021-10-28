@@ -13,6 +13,15 @@ defmodule MainWeb.FacebookController do
 
   alias Ueberauth.Strategy.Helpers
   alias Data.{Location, Team}
+  @new_leads [
+    "salesQuestion",
+    "getTour",
+    "getTrialPass",
+    "getGuestPass",
+    "getMonthPass",
+    "getDayPass",
+    "getWeekPass",
+  ]
 
   def hook(conn, %{"hub.challenge" => challenge}=_params) do
     conn
@@ -73,7 +82,7 @@ defmodule MainWeb.FacebookController do
              )
              reply_to_facebook(response,location,String.replace(convo.original_number,"messenger:",""))
              Main.LiveUpdates.notify_live_view({convo.id, struct})
-             close_conversation(convo.id, location)
+             close_conversation(convo.id, location, intent)
            {:unknown, response} ->
              CM.create(
                %{
@@ -123,12 +132,18 @@ defmodule MainWeb.FacebookController do
         {:unknown, location.default_message}
     end
   end
-  defp close_conversation(convo_id, location) do
+  defp close_conversation(convo_id, location, intent \\ "") do
 
     disposition =
-      %{role: "system"}
-      |> Data.Disposition.get_by_team_id(location.team_id)
-      |> Enum.find(&(&1.disposition_name == "Automated"))
+      if intent in @new_leads do
+        %{role: "system"}
+        |> Data.Disposition.get_by_team_id(location.team_id)
+        |> Enum.find(&(&1.disposition_name == "New Lead"))
+      else
+        %{role: "system"}
+        |> Data.Disposition.get_by_team_id(location.team_id)
+        |> Enum.find(&(&1.disposition_name == "Automated"))
+      end
 
     if disposition do
       Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})

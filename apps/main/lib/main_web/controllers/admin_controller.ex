@@ -2,6 +2,15 @@ defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
   alias Data.{Campaign, Disposition, Location, Team ,TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
 
+  @new_leads [
+  "salesQuestion",
+  "getTour",
+  "getTrialPass",
+  "getGuestPass",
+  "getMonthPass",
+  "getDayPass",
+  "getWeekPass",
+  ]
 #  def index(conn, %{"team_id" => team_id} = params) do
 #    IO.inspect("++++++++++++++inside team_id++++++++++++++++")
 #    params=if(!is_nil(params["filters"])) do
@@ -168,7 +177,10 @@ defmodule MainWeb.AdminController do
       from: params["from"],
       to: params["to"],
       location: nil,
-      role: current_user.role)
+      role: current_user.role,
+      new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.count() || 0,
+      new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads))
+    )
   end
   def index(conn, params) do
 
@@ -256,7 +268,11 @@ defmodule MainWeb.AdminController do
           to: params["to"],
           location_ids: [],
           team_id: TeamMember.get_by_user_id(%{role: current_user.role},current_user.id),
-          role: current_user.role)
+          role: current_user.role,
+          new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.count() || 0,
+          new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads))
+
+        )
       else
         location_ids = Location.get_location_ids_by_team_id(current_user, current_user.team_member.team_id)
         dispositions = Disposition.count_by(%{"location_ids" => location_ids, "to" => convert_values(params["filter"]["to"]), "from" => convert_values(params["filter"]["from"])})
@@ -320,7 +336,11 @@ defmodule MainWeb.AdminController do
           from: params["from"],
           to: params["to"],
           team_id: nil,
-          role: current_user.role)
+          role: current_user.role,
+          new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.count() || 0,
+          new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads))
+
+        )
       end
     end
   end

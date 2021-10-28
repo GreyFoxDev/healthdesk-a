@@ -310,6 +310,23 @@
                 </div>
             </div><!-- /.metric -->
         </div>
+
+        <!-- metric column -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric" data-toggle="modal" data-target="#exampleNewLeadsLong">
+                    <h2 class="metric-label"> NEW LEADS </h2>
+                    <p class="metric-value h3">
+                    <span class="value">
+                        <%= @new_leads%>
+                    </span>
+                    </p>
+                    <p class="metric-label">
+                        <span>Percentage</span></p>
+                </div>
+            </div><!-- /.metric -->
+        </div>
     </div>
 
     <div class="metric-row">
@@ -561,6 +578,64 @@
                         <span class="badge badge-primary badge-pill"> <%= @new_leads_after_missed_call %> </span>
                     </li>
                 </ul>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button"  data-dismiss="modal" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleNewLeadsLong" tabindex="-1" role="dialog" aria-labelledby="exampleAssistLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">NEW LEADS</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <%= if List.first(@new_leads_data) do%>
+                <ul class="list-group">
+                    <%= for lead <- @new_leads_data do%>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <%= case lead.intent do %>
+                        <% "salesQuestion" ->  %>
+                        Sales Question
+                        <span class="badge badge-primary badge-pill"> <%= lead.count %> </span>
+                        <% "getTour" ->  %>
+                        Tour Request
+                        <span class="badge badge-primary badge-pill"> <%= lead.count %> </span>
+                        <% "getTrialPass" ->  %>
+                        Trial Request
+                        <span class="badge badge-primary badge-pill"> <%= lead.count %> </span>
+                        <% "getGuestPass" ->  %>
+                        Guest Request
+                        <span class="badge badge-primary badge-pill"> <%= lead.count %> </span>
+                        <% "getMonthPass" ->  %>
+                        Month Pass
+                        <span class="badge badge-primary badge-pill"> <%= lead.count %> </span>
+                        <% "getDayPass" ->  %>
+                        Day Pass
+                        <span class="badge badge-primary badge-pill"> <%= lead.count %> </span>
+                        <% "getWeekPass" ->  %>
+                        Week Pass
+                        <span class="badge badge-primary badge-pill"> <%= lead.count %> </span>
+                        <% end %>
+                    </li>
+                    <% end %>
+                </ul>
+                    <% else %>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    No New Leads Yet
+                    </li>
+                </ul>
+                    <% end %>
+
 
             </div>
             <div class="modal-footer">
