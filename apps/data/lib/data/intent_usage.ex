@@ -24,6 +24,15 @@ defmodule Data.IntentUsage do
 
   def get_intent_count_after_call_disposition(disposition,to ,from ,loc_ids \\ []) when disposition in @call_dispositions do
     Query.get_intent_after_call(disposition,to ,from ,loc_ids)
+#    calls = Data.Query.ConversationCall.get_call_time_list(disposition, to, from, loc_ids)
+#    {l, count}= Enum.reduce(calls, {msgs, 0}, fn {call_time, id}, acc ->
+#      {msgs, count} = acc
+#      c = Enum.filter(msgs, fn {message_time, m_id} -> m_id == id && Timex.between?(message_time, call_time, Timex.shift(call_time, hours: 24)) end)
+#          |> Enum.count()
+#      {msgs, count = count + c}
+#    end)
+#
+#    count
   end
 
   def get_leads_count_after_call_disposition(disposition,to ,from ,loc_ids \\ []) when disposition in @call_dispositions do
