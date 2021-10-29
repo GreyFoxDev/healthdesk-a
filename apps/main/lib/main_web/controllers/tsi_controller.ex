@@ -23,6 +23,16 @@ defmodule MainWeb.TsiController do
   @chatbot Application.get_env(:session, :chatbot, Chatbot)
   @endpoint Application.get_env(:main, :endpoint)
 
+  @new_leads [
+    "salesQuestion",
+    "getTour",
+    "getTrialPass",
+    "getGuestPass",
+    "getMonthPass",
+    "getDayPass",
+    "getWeekPass",
+  ]
+
   def new(conn, %{"phone-number" => phone_number, "api_key" => api_key, "ticket" => "new"} = params) do
     location = conn.assigns.location
     phone = "APP:#{format_phone(phone_number)}"
@@ -211,7 +221,7 @@ defmodule MainWeb.TsiController do
                }
                )
 
-               close_conversation(convo_id, location)
+               close_conversation(convo_id, location, intent)
              {:unknown, response} ->
 
                _ = CM.create(
@@ -308,11 +318,18 @@ defmodule MainWeb.TsiController do
         {:unknown, location.default_message}
     end
   end
-  defp close_conversation(convo_id, location) do
+  defp close_conversation(convo_id, location, intent \\ "") do
     disposition =
+    if intent in @new_leads do
       %{role: "system"}
       |> Data.Disposition.get_by_team_id(location.team_id)
-      |> Enum.find(&(&1.disposition_name == "Automated"))
+      |> Enum.find(&(&1.disposition_name == "New Lead"))
+      else
+        %{role: "system"}
+        |> Data.Disposition.get_by_team_id(location.team_id)
+        |> Enum.find(&(&1.disposition_name == "Automated"))
+    end
+
 
     if disposition do
       Data.ConversationDisposition.create(%{"conversation_id" => convo_id, "disposition_id" => disposition.id})

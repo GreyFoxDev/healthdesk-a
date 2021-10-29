@@ -9,6 +9,16 @@ defmodule MainWeb.Plug.CloseConversation do
   alias Data.{Member, Location}
   alias MainWeb.Notify
 
+  @new_leads [
+    "salesQuestion",
+    "getTour",
+    "getTrialPass",
+    "getGuestPass",
+    "getMonthPass",
+    "getDayPass",
+    "getWeekPass",
+  ]
+
   @spec init(list()) :: list()
   def init(opts), do: opts
 
@@ -118,6 +128,7 @@ defmodule MainWeb.Plug.CloseConversation do
   def call(%{assigns: %{convo: id, location: location} = _assigns} = conn, _opts) do
     loc = Location.get_by_phone(location)
     datetime = DateTime.utc_now()
+    intent = elem(conn.assigns[:intent], 0)
     {:ok, saved_message} = CM.create(%{
           "conversation_id" => id,
           "phone_number" => location,
@@ -125,10 +136,11 @@ defmodule MainWeb.Plug.CloseConversation do
           "sent_at" => DateTime.add(datetime, 1)})
 
     if conn.assigns[:response] != loc.default_message  do
+
       Data.Query.IntentUsage.create(
         %{
           "message_id" => saved_message.id,
-          "intent" => elem(conn.assigns[:intent], 0)
+          "intent" => intent
         }
       )
     end
@@ -138,7 +150,12 @@ defmodule MainWeb.Plug.CloseConversation do
     dispositions = Data.Disposition.get_by_team_id(%{role: "system"}, location.team_id)
 
     if conn.assigns[:response] != "No sweat!" do
-      disposition = Enum.find(dispositions, &(&1.disposition_name == "Automated"))
+      disposition =
+      if intent in @new_leads do
+        Enum.find(dispositions, &(&1.disposition_name == "New Lead"))
+        else
+          Enum.find(dispositions, &(&1.disposition_name == "Automated"))
+      end
 
       Data.ConversationDisposition.create(%{"conversation_id" => id, "disposition_id" => disposition.id})
 

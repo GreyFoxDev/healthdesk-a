@@ -9,6 +9,16 @@ defmodule MainWeb.Api.ConversationController do
   alias MainWeb.{Notify, Intents}
   @role %{role: "admin"}
 
+  @new_leads [
+    "salesQuestion",
+    "getTour",
+    "getTrialPass",
+    "getGuestPass",
+    "getMonthPass",
+    "getDayPass",
+    "getWeekPass",
+  ]
+
   def create_(conn,params)do
     create(conn,params)
   end
@@ -99,7 +109,7 @@ defmodule MainWeb.Api.ConversationController do
                        "intent" => intent
                      }
                    )
-                   close_conversation(convo.id, location)
+                   close_conversation(convo.id, location, intent)
                    from
                    |> Main.Email.generate_reply_email(response, subj,location.phone_number)
                    |> Main.Mailer.deliver_now()
@@ -197,7 +207,7 @@ defmodule MainWeb.Api.ConversationController do
                        "intent" => intent
                      }
                    )
-                   close_conversation(convo.id, location)
+                   close_conversation(convo.id, location, intent)
                    from
                    |> Main.Email.generate_reply_email(response, subj,location.phone_number)
                    |> Main.Mailer.deliver_now()
@@ -381,11 +391,17 @@ defmodule MainWeb.Api.ConversationController do
         {:unknown, location.default_message}
     end
   end
-  defp close_conversation(convo_id, location) do
+  defp close_conversation(convo_id, location, intent \\ "") do
     disposition =
-      %{role: "system"}
-      |> Data.Disposition.get_by_team_id(location.team_id)
-      |> Enum.find(&(&1.disposition_name == "Automated"))
+      if intent in @new_leads do
+        %{role: "system"}
+        |> Data.Disposition.get_by_team_id(location.team_id)
+        |> Enum.find(&(&1.disposition_name == "New Lead"))
+      else
+        %{role: "system"}
+        |> Data.Disposition.get_by_team_id(location.team_id)
+        |> Enum.find(&(&1.disposition_name == "Automated"))
+      end
 
     if disposition do
       Data.ConversationDisposition.create(
