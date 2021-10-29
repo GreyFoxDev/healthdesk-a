@@ -199,10 +199,13 @@ defmodule Data.Query.IntentUsage do
         _, query ->
           query
       end)
-    query = from([t, ...] in query,
-      select: t.id)
-
+#    query = from([t,cm,c,cc,cd, ...] in query,
+#      select: {cm.inserted_at, cd.conversation_call_id})
+      query = from([t, ...] in query,
+      select: t.id
+      )
     repo.all(query) |> Enum.count()
+
   end
 
   def get_new_leads(disposition,to,from, loc_ids ,repo \\ Read) when disposition in @call_dispositions do
