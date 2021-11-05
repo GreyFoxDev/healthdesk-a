@@ -904,12 +904,15 @@ defmodule MainWeb.Live.ConversationsView do
 
   end
   def handle_event("new_msg", %{"conversation" => _c_params, "location_id" => location_id} = params, socket)do
-
+    map0= Map.merge(params["conversation"],%{"original_number"=> params["original_number"]})
+    new_params=%{params | "conversation"=> map0}
+    final_params=Map.delete(new_params, "original_number")
+    IO.inspect(final_params)
     user = socket.assigns.user
     location = user
                |> Location.get(location_id)
 
-    open_convo = MainWeb.ConversationController.create_convo(params, location, user)
+    open_convo = MainWeb.ConversationController.create_convo(final_params, location, user)
     open_convo = user
                  |> Conversations.get(open_convo.id)
                  |> fetch_member()
