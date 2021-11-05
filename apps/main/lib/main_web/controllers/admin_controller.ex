@@ -1,6 +1,6 @@
 defmodule MainWeb.AdminController do
   use MainWeb.SecuredContoller
-  alias Data.{Campaign, Disposition, Location, Team ,TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket}
+  alias Data.{Campaign, Disposition, Location, Team ,TeamMember, ConversationDisposition, ConversationMessages, Appointments, Ticket, Member}
 
   @new_leads [
   "salesQuestion",
@@ -160,6 +160,9 @@ defmodule MainWeb.AdminController do
     call_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("CALL", location_ids, convert_values(params["to"]), convert_values(params["from"]))
     call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
 
+    new_user = Data.Member.count_new_member_by(params["to"], params["from"], location_ids)
+    active_user= Data.Member.count_active_user_by(location_ids)
+
     render(conn, "index.html",
       dispositions: dispositions,
       bar_graph: bar_graph_data,
@@ -209,7 +212,9 @@ defmodule MainWeb.AdminController do
       location: nil,
       role: current_user.role,
       new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.count() || 0,
-      new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads))
+      new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads)),
+      new_user: new_user,
+      active_user: active_user
     )
   end
   def index(conn, params) do
@@ -283,6 +288,8 @@ defmodule MainWeb.AdminController do
         from = Data.Disposition.convert_string_to_date(params["from"]) |> IO.inspect(label: "from date")
         %{bar_graph_data: bar_graph_data, start_date: bar_graph_start_date}=get_bar_graph_data(dispositions, to, from)
 
+        new_user = Data.Member.count_all_new_member(params["to"], params["from"])
+        active_user = Data.Member.count_active_user()
 
         render(conn, "index.html",
           metrics: [],
@@ -332,8 +339,9 @@ defmodule MainWeb.AdminController do
           team_id: TeamMember.get_by_user_id(%{role: current_user.role},current_user.id),
           role: current_user.role,
           new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.count() || 0,
-          new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads))
-
+          new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads)),
+          new_user: new_user,
+          active_user: active_user
         )
       else
         location_ids = Location.get_location_ids_by_team_id(current_user, current_user.team_member.team_id)
@@ -377,6 +385,9 @@ defmodule MainWeb.AdminController do
         to = Data.Disposition.convert_string_to_date(params["to"])
         from = Data.Disposition.convert_string_to_date(params["from"])
         %{bar_graph_data: bar_graph_data, start_date: bar_graph_start_date}=get_bar_graph_data(dispositions, to, from)
+
+        new_user = Data.Member.count_new_member_by(params["to"], params["from"], location_ids)
+        active_user= Data.Member.count_active_user_by(location_ids)
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
@@ -426,8 +437,9 @@ defmodule MainWeb.AdminController do
           team_id: nil,
           role: current_user.role,
           new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.count() || 0,
-          new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads))
-
+          new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads)),
+          new_user: new_user,
+          active_user: active_user
         )
       end
     end

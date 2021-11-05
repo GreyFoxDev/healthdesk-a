@@ -46,6 +46,22 @@ defmodule Data.Member do
     Query.get_by_phone(phone_number)
   end
 
+  def count_all_new_member(to, from)do
+    Query.count_all_new_member(to, from)
+  end
+
+  def count_new_member_by(to, from, loc_ids)do
+    Query.count_all_new_member_by(to, from, loc_ids)
+  end
+
+  def count_active_user()do
+    Query.count_active_users()
+  end
+
+  def count_active_user_by(loc_ids)do
+    Query.count_active_users_by(loc_ids)
+  end
+
   def update(id, params) do
     id
     |> Query.get()
