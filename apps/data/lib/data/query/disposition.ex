@@ -65,7 +65,7 @@ defmodule Data.Query.Disposition do
       ],
       distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
-      select: %{name: d.disposition_name, count: count(cd.id)}
+      select: %{name: d.disposition_name, count: count(cd.id), date: fragment("?::date", cd.inserted_at)}
     )
     |> repo.all()
   end
@@ -109,7 +109,8 @@ defmodule Data.Query.Disposition do
       ],
       distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
-      select: %{name: d.disposition_name, count: count(cd.id)}
+      select: %{name: d.disposition_name, count: count(cd.id), date: fragment("?::date", cd.inserted_at)
+      }
     )
     |> repo.all()
   end
@@ -245,6 +246,57 @@ defmodule Data.Query.Disposition do
           if is_nil(from),
             do: query,
             else: from([_, cd, ...] in query, where: cd.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
+    from([d, cd, c] in query,
+      group_by: [
+        d.disposition_name,
+        cd.conversation_id,
+        cd.conversation_call_id,
+        cd.disposition_id,
+        cd.inserted_at
+      ],
+      where: c.location_id in ^location_ids,
+      distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
+      order_by: d.disposition_name,
+      select: %{name: d.disposition_name, count: count(cd.id), date: fragment("?::date", cd.inserted_at) }
+    )
+    |> repo.all()
+  end
+
+  @doc """
+  Return a list of dispositions  dates
+  """
+  @spec get_by1(
+          location_id :: binary(),
+          to :: String.t(),
+          from :: String.t(),
+          repo :: Ecto.Repo.t()
+        ) :: [map()]
+  def get_by1(location_ids, to, from, repo \\ Read) do
+    to = Data.Disposition.convert_string_to_date(to)
+    from = Data.Disposition.convert_string_to_date(from)
+
+    query =
+      from(d in Disposition,
+        join: cd in assoc(d, :conversation_dispositions),
+        join: c in assoc(cd, :conversation)
+      )
+
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+             do: query,
+             else: from([_, cd, ...] in query, where: cd.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+             do: query,
+             else: from([_, cd, ...] in query, where: cd.inserted_at >= ^from)
 
         _, query ->
           query
@@ -567,7 +619,7 @@ defmodule Data.Query.Disposition do
       where: cc.location_id in ^location_ids,
       distinct: [cd.conversation_id, cd.conversation_call_id, cd.disposition_id, cd.inserted_at],
       order_by: d.disposition_name,
-      select: %{name: d.disposition_name, count: count(cd.id)}
+      select: %{name: d.disposition_name, count: count(cd.id), date: fragment("?::date", cd.inserted_at) }
     )
     |> repo.all()
   end
