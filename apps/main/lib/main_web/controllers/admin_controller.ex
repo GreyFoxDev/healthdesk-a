@@ -96,6 +96,9 @@ defmodule MainWeb.AdminController do
     current_user = current_user(conn)
     team_members = TeamMember.get_by_location_ids(current_user, location_ids)
     dispositions = Disposition.count_by(params)
+    to = Data.Disposition.convert_string_to_date(params["to"])
+    from = Data.Disposition.convert_string_to_date(params["from"])
+    %{bar_graph_data: bar_graph_data, start_date: bar_graph_start_date}=get_bar_graph_data(dispositions, to, from)
     automated = Data.IntentUsage.count_intent_by(params)
     appointments = Appointments.count_by_location_ids(location_ids, convert_values(params["to"]), convert_values(params["from"]))
     response_time = count_total_response_time(params)
@@ -156,8 +159,11 @@ defmodule MainWeb.AdminController do
     mail_totals_by_day=Enum.map(mail_totals_by_day, fn x -> List.last(x) end)
     call_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("CALL", location_ids, convert_values(params["to"]), convert_values(params["from"]))
     call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
+
     render(conn, "index.html",
       dispositions: dispositions,
+      bar_graph: bar_graph_data,
+      bar_graph_start_date: bar_graph_start_date,
       automated_data: automated,
       automated: calculate_automated_percentage(dispositions, automated),
       call_deflected: calculate_percentage("Call deflected", dispositions),
@@ -238,6 +244,9 @@ defmodule MainWeb.AdminController do
           index(conn, %{"filters" => %{"from" => params["from"],"location_ids" => location_ids, "to" =>params["to"]}, "team_id" => params["team_id"]})
 
         end
+        IO.inspect("------params-----------")
+        IO.inspect(params)
+        IO.inspect("------params----------")
         dispositions = Disposition.count_all_by(params)
         automated = Data.IntentUsage.count_intent_by(params)
         appointments = Appointments.count_all(convert_values(params["to"]), convert_values(params["from"]))
@@ -270,12 +279,17 @@ defmodule MainWeb.AdminController do
         mail_totals_by_day=Enum.map(mail_totals_by_day, fn x -> List.last(x) end)
         call_totals_by_day=ConversationDisposition.count_all_by_channel_type_and_days("CALL", convert_values(params["to"]), convert_values(params["from"]))
         call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
+        to = Data.Disposition.convert_string_to_date(params["to"])|> IO.inspect(label: "to datae")
+        from = Data.Disposition.convert_string_to_date(params["from"]) |> IO.inspect(label: "from date")
+        %{bar_graph_data: bar_graph_data, start_date: bar_graph_start_date}=get_bar_graph_data(dispositions, to, from)
 
 
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
           dispositions: dispositions,
+          bar_graph: bar_graph_data,
+          bar_graph_start_date: bar_graph_start_date,
           automated_data: automated,
           automated: calculate_automated_percentage(dispositions ,automated),
           call_deflected: calculate_percentage("Call deflected", dispositions),
@@ -360,10 +374,15 @@ defmodule MainWeb.AdminController do
         call_deflect_response = Data.ConversationCall.get_response_after_call("Call deflected", params["to"], params["from"], location_ids)
         missed_call_response = Data.ConversationCall.get_response_after_call("Missed Call Texted",params["to"], params["from"], location_ids)
         missed_call_texted = calculate_percentage("Missed Call Texted", dispositions)
+        to = Data.Disposition.convert_string_to_date(params["to"])
+        from = Data.Disposition.convert_string_to_date(params["from"])
+        %{bar_graph_data: bar_graph_data, start_date: bar_graph_start_date}=get_bar_graph_data(dispositions, to, from)
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
           dispositions: dispositions,
+          bar_graph: bar_graph_data,
+          bar_graph_start_date: bar_graph_start_date,
           appointments: appointments,
           automated_data: automated,
           automated: calculate_automated_percentage(dispositions, automated),
@@ -477,4 +496,55 @@ defmodule MainWeb.AdminController do
     total = Enum.filter(dispositions, &(&1.name == type)) |> Enum.count()
     (res/(if total == 0, do: 1, else: total)) * 100
   end
+  defp get_bar_graph_data(dispositions, to, from)do
+    all_dispositions = Enum.map(Enum.uniq_by(dispositions, fn x -> x.name end), fn x -> x.name end)
+    dispositions = Enum.frequencies(dispositions)
+    days = case %{to: to, from: from} do
+      %{to: nil, from: nil} ->
+        Enum.map(0..-6, &Date.add(DateTime.utc_now(), &1))
+      %{to: nil, from: from} ->
+        range = Date.range(from, DateTime.utc_now())
+        Enum.map(range, fn (x) -> x end)|> IO.inspect(label: "my label")
+      %{to: to, from: nil} ->
+        oldest=Enum.min_by(dispositions, fn {x,_} -> x.date end, Date)
+        range = Date.range(oldest, to)
+        Enum.map(range, fn (x) -> x end)
+      %{to: to, from: from} ->
+        range = Date.range(from, to)
+        Enum.map(range, fn (x) -> x end)
+    end
+    result=Enum.reduce(
+      all_dispositions,
+      [],
+      fn x, acc ->
+        result=Enum.reduce(
+          days,
+          [],
+          fn y, acc1 ->
+            if (
+                 t = Enum.find(
+                   dispositions,
+                   fn {map, count} -> map.date == y && map.name == x end
+                 ))
+              do
+              acc1 ++ [elem(t,1)]
+            else
+              acc1 ++ [0]
+            end
+          end
+        )
+        acc++[result]
+      end
+    )
+    result=Enum.reduce(
+      0..length(all_dispositions),
+      %{},
+      fn x, acc -> Map.merge(acc, %{Enum.at(all_dispositions, x) => Enum.at(result, x)}) end
+    )
+    result=Poison.encode!(result)
+    %{bar_graph_data: result, start_date: List.first(days)}
+
+
+  end
+
 end
