@@ -501,7 +501,7 @@ defmodule MainWeb.AdminController do
     dispositions = Enum.frequencies(dispositions)
     days = case %{to: to, from: from} do
       %{to: nil, from: nil} ->
-        Enum.map(0..-6, &Date.add(DateTime.utc_now(), &1))
+        Enum.map(-6..-0, &Date.add(DateTime.utc_now(), &1))
       %{to: nil, from: from} ->
         range = Date.range(from, DateTime.utc_now())
         Enum.map(range, fn (x) -> x end)|> IO.inspect(label: "my label")
