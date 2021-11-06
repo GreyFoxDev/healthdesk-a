@@ -360,6 +360,25 @@
         <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     </div>
     <div class="metric-row">
+        <!-- metric column -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <!-- .metric -->
+            <div class="card-metric">
+                <div class="metric">
+                    <h2 class="metric-label"> USER ACIVITY </h2>
+                    <p class="metric-label">
+                        <canvas id="canvas-user-activity" class="chartjs chartjs-render-monitor" style="display: block; height: 270px; width: 500px;"></canvas>
+                    </p>
+                </div>
+            </div><!-- /.metric -->
+        </div><!-- /metric column -->
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/series-label.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/export-data.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    </div>
+    <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-8">
             <!-- .metric -->
             <div class="card-metric">
@@ -650,7 +669,7 @@
                         <%= @app_totals %>,
                         <%= @call_totals%>
                     ],
-                    borderWidth: 5,
+                    borderWidth: 6,
                     backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40','#ff973d', '#ff1000'],
                     hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70','#ff973d', '#D33311'],
                 }],
@@ -723,6 +742,37 @@
                 },
             });
         </script>
+
+    <script>
+        const gtx = document.getElementById('canvas-user-activity').getContext('2d');
+        const chartData1 = {
+            labels: [
+                'New Users',
+                'Active Users'
+            ],
+            datasets: [{
+                data: [
+                    <%= @new_user %>,
+                    <%= @active_user %>
+                ],
+                borderWidth: 2,
+                backgroundColor: ['#F75159', '#29F31B'],
+                hoverBackgroundColor: ['#F75159', '#29F31B']
+            }],
+        };
+        new Chart(gtx, {
+            type: 'pie',
+            data: chartData1,
+            maintainAspectRatio: false,
+            responsive: true,
+            options: {
+                legend: {
+                    display: true,
+                    position: 'left'
+                },
+            },
+        });
+    </script>
 
 </div> </div>
 <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
