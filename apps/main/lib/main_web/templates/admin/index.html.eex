@@ -495,88 +495,6 @@
 
             });
         </script>
-    <!--
-<div id = "chart1">
-</div>
-    <script>
-        <% IO.inspect("112212132131321321321654654674984651321231354654651321321321321") %>
-        sample="<%= @bar_graph %>".replace(/&quot;/g,'"');
-        const data = JSON.parse(sample);
-
-        function createSeries () {
-            let list = [];
-            for (const key in data){
-                if (key != "") list.push({name: key, data: data[key]});
-            }
-            return list;
-        }
-
-        let dates=[]
-        d= new Date("<%=@line_graph_start_date%>");
-        for (let i = 0; i < 150; i++) {
-            dates.push((new Date(d.setDate(d.getDate()+1))).getDate())
-        }
-        console.log(createSeries())
-        const options = {
-            series: createSeries(),
-            chart: {
-                type: 'bar',
-                height: 350,
-                stacked: true,
-                toolbar: {
-                    show: true
-                },
-                zoom: {
-                    enabled: true
-                }
-            },
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    legend: {
-                        position: 'bottom',
-                        offsetX: -10,
-                        offsetY: 0
-                    }
-                }
-            }],
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    borderRadius: 10
-                },
-            },
-            xaxis: {
-                type: 'datetime',
-                categories: dates ,
-            },
-            legend: {
-                position: 'right',
-                offsetY: 40
-            },
-            tooltip: {
-                y: {
-                    formatter: function (value, opts) {
-                        const sum = opts.series[0].reduce((a, b) => a + b, 0);
-                        const percent = (value / sum) * 100;
-                        return value + ' (' + percent.toFixed(0) + '%' + ')'
-                    },
-                },
-            },
-            fill: {
-                opacity: 1
-            }
-        };
-
-        var chart = new ApexCharts(document.querySelector("#chart1"), options);
-        chart.render();
-
-
-
-    </script>
-
--->
-    <!-- /test graph test graph test graph test graph -->
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-8" >
   <div class="card-metric ">
@@ -684,7 +602,7 @@
                 shadow: false
             },
             tooltip: {
-                pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                pointFormat: '<span style="color:{series.color};" />{series.name} </span>:<b>{point.y} ({point.percentage:.1f}%)</b><br/>Total: {point.stackTotal}'
             },
             plotOptions: {
                 series: {
