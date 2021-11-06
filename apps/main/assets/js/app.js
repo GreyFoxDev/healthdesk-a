@@ -19,8 +19,10 @@ import LineSpaceHook from "./line_space_hooks";
 import CsvUpload from "./csv_upload";
 import ReloadTable from "./reload_table";
 import LiveViewHook from "./live_view_hooks";
+import Phone from './phone';
 
-let Hooks = {LineSpaceHook, NotificationHook, CsvUpload, ReloadTable, LiveViewHook };
+
+let Hooks = {LineSpaceHook, NotificationHook, CsvUpload, ReloadTable, LiveViewHook,Phone};
 
 
 let scrollAt = () => {

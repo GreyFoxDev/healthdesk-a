@@ -6,7 +6,7 @@
 
 <% end %>
 
-<div class="page has-sidebar has-sidebar-fluid has-sidebar-expand-xl" phx-hook ="ReloadTable" id="sidebar_hook">
+<div class="page has-sidebar has-sidebar-fluid has-sidebar-expand-xl" phx-hook="ReloadTable" id="sidebar_hook">
     <!-- Message List -->
     <%= if assigns[:open_conversation] || assigns[:searching]  do %>
     <div class="page-inner page-inner-fill position-relative" >
@@ -158,17 +158,22 @@
                         </select>
                     </div>
                     <div class="form-group">
+
                         <label for="unknown">To</label>
-                        <%= text_input f, :original_number, class: "form-control" %>
+                        <input type="tel" id="phone" name="original_number"  phx-hook="Phone" class="form-control">
+
+
                     </div>
                     <div class="form-group">
                         <label for="tf6">Message</label>
                         <%= textarea f, :message, class: "form-control", place_holder: "Type a message", rows: 5, id: "tf6" %>
                     </div>
+
                 </fieldset>
 
                 <button type="submit" class="btn btn-primary float-right" >Send</button>
                 <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Cancel</button>
+
             </div>
         </div>
     </div>
