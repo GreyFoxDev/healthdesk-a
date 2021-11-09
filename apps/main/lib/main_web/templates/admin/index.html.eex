@@ -162,6 +162,12 @@
                    style = "position: absolute;top: 10px;
                     right: 16px;z-index: 100;color:#666;"><i class="fas fa-edit"></i></a>
                 <% end %>
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "Dispositions"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric" data-toggle="modal" data-target="#exampleModalLong">
 
                     <h2 class="metric-label"> DISPOSITIONS </h2>
@@ -176,6 +182,12 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "Avg. Per Day"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric">
                     <h2 class="metric-label"> AVG. PER DAY </h2>
                     <p class="metric-value h3">
@@ -189,6 +201,12 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "Responsiveness"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric">
                     <h2 class="metric-label"> RESPONSIVENESS </h2>
                     <p class="metric-value h3">
@@ -197,7 +215,7 @@
                     </span>
                     </p>
                     <p class="metric-label">
-                        <span>Median Response Time</span></p>
+                        <span>MEDIAN RESPONSE TIME</span></p>
                 </div>
             </div><!-- /.metric -->
         </div><!-- /metric column -->
@@ -206,6 +224,12 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "Calls Deflected Percentage"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric" data-toggle="modal" data-target="#exampleCallDeflectLong">
                     <h2 class="metric-label"> CALLS DEFLECTED </h2>
                     <p class="metric-value h3">
@@ -218,13 +242,19 @@
                     </span>
                     </p>
                     <p class="metric-label">
-                        <span>Percentage</span></p>
+                        <span>PERCENTAGE</span></p>
                 </div>
             </div><!-- /.metric -->
         </div><!-- /metric column -->
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "Assisted Percentage"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric" data-toggle="modal" data-target="#exampleAssistLong">
                     <h2 class="metric-label"> ASSISTED </h2>
                     <p class="metric-value h3">
@@ -237,13 +267,19 @@
                     </span>
                     </p>
                     <p class="metric-label">
-                        <span>Percentage</span></p>
+                        <span>PERCENTAGE</span></p>
                 </div>
             </div><!-- /.metric -->
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "Tickets"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric">
                     <h2 class="metric-label"> TICKETS </h2>
                     <p class="metric-value h3">
@@ -261,6 +297,12 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "Missed Calls Texted"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric" data-toggle="modal" data-target="#exampleMissedCallLong">
                     <h2 class="metric-label"> MISSED CALL TEXTED </h2>
                     <p class="metric-value h3">
@@ -273,7 +315,7 @@
                     </span>
                     </p>
                     <p class="metric-label">
-                        <span>Percentage</span></p>
+                        <span>PERCENTAGE</span></p>
                 </div>
             </div><!-- /.metric -->
         </div>
@@ -282,6 +324,12 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "New Leads"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric" data-toggle="modal" data-target="#exampleNewLeadsLong">
                     <h2 class="metric-label"> NEW LEADS </h2>
                     <p class="metric-value h3">
@@ -289,8 +337,6 @@
                         <%= @new_leads%>
                     </span>
                     </p>
-                    <p class="metric-label">
-                        <span>Percentage</span></p>
                 </div>
             </div><!-- /.metric -->
         </div>
@@ -301,6 +347,12 @@
         <div class="col-12 col-sm-6 col-lg-4">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "Sessions By Channel"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric">
                     <h2 class="metric-label"> SESSIONS BY CHANNEL </h2>
                     <p class="metric-label">
@@ -312,6 +364,12 @@
         <div class="col-12 col-sm-6 col-lg-4">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "Appointments"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric">
                     <h2 class="metric-label"> APPOINTMENTS </h2>
                     <p class="metric-label">
@@ -327,6 +385,12 @@
         <div class="col-12 col-sm-6 col-lg-4">
             <!-- .metric -->
             <div class="card-metric">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true"
+                   data-tile = "User Activity"
+                   data-toggle="modal" data-target="#infoModal"
+                   style = "position: absolute;top: 14px;
+                   left: 16px;z-index: 100;">
+                </i>
                 <div class="metric">
                     <h2 class="metric-label"> USER ACIVITY </h2>
                     <p class="metric-label">
@@ -967,7 +1031,8 @@
 
         document.getElementById("team_id").onchange=function () {
             document.getElementById('locations').innerText = null;
-            if (document.getElementById("team_id").value == -99) document.getElementById("selectDiv").style.display = "none";
+            if (document.getElementById("team_id").value 
+                -99) document.getElementById("selectDiv").style.display = "none";
             else
                 document.getElementById("selectDiv").style.display = "block";
             document.getElementById("locations").disabled = false;
@@ -987,4 +1052,81 @@
         };
     };
     locationDropdown()
+
+
+<div class="modal" id = "infoModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Info</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id = "infoPara">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#infoModal').on('show.bs.modal', function(e) {
+        //get data-id attribute of the clicked element
+        var tileName = $(e.relatedTarget).data('tile');
+        switch(tileName){
+            case "Dispositions":
+                $(e.currentTarget).find(".modal-body").append('<p> The breakdown of what customers are asking about ("Trending Topics").</p>');
+                break;
+            case "Avg. Per Day":
+                $(e.currentTarget).find(".modal-body").append('<p> The average number of daily customer inquiries.</p>');
+                break;
+            case "Responsiveness":
+                $(e.currentTarget).find(".modal-body").append('<p> The time it takes for your staff to respond to customers.</p>');
+                break;
+            case "Calls Deflected Percentage":
+                $(e.currentTarget).find(".modal-body").append('<p> The number of calls deflected divided by total inbound calls.</p>');
+                break;
+            case "Assisted Percentage":
+                $(e.currentTarget).find(".modal-body").append('<p> The number of times the Ai assistant responded to a customer message divided by total inbound customer messages.</p>');
+                break;
+            case "Tickets":
+                $(e.currentTarget).find(".modal-body").append('<p> The number of New, Open, and Pending tickets in your queue.</p>');
+                break;
+            case "Missed Calls Texted":
+                $(e.currentTarget).find(".modal-body").append('<p> The number of times the Ai Assistant texted a missed caller.</p>');
+                break;
+            case "New Leads":
+                $(e.currentTarget).find(".modal-body").append('<p> The sum of users who qualified by asking a sales-related question.</p>');
+                break;
+            case "Sessions By Channel":
+                $(e.currentTarget).find(".modal-body").append('<p> The breakdown of where your conversations are happening.</p>');
+                break;
+            case "Appointments":
+                $(e.currentTarget).find(".modal-body").append('<p> The number of customers who started to book an appointment with you versus total confirmed bookings.</p>');
+                break;
+            case "User Activity":
+                $(e.currentTarget).find(".modal-body").append('<p> The number of new users versus total active users.</p>');
+                break;
+            case "Trending Channels":
+                $(e.currentTarget).find(".modal-body").append('<p> The breakdown of where your conversations are happening.</p>');
+                break;
+            case "Trending Topics":
+                $(e.currentTarget).find(".modal-body").append('<p> The breakdown of what customers are asking about ("Dispositions").</p>');
+                break;
+
+            default:
+                $(e.currentTarget).find(".modal-body").append('<p> Information</p>');
+                break;
+
+        };
+
+        //populate the textbox
+    });
+
+    $('#infoModal').on('hidden.bs.modal', function () {
+        $("#infoPara").children().remove()
+    })
 </script>
