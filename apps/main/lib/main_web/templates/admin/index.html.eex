@@ -1053,7 +1053,7 @@
     };
     locationDropdown()
 
-
+</script>
 <div class="modal" id = "infoModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
