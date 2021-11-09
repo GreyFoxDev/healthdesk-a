@@ -318,7 +318,7 @@ defmodule Data.Query.ConversationCall do
       from(cd in ConversationDisposition,
         join: cc in ConversationCall, on: cc.id == cd.conversation_call_id,
         join: d in Disposition, on: cd .disposition_id == d.id,
-        where: d.disposition_name == ^disposition,
+        where: d.disposition_name in ^disposition,
         where: not is_nil(cd.conversation_call_id),
         where: cc.location_id in ^loc_ids,
         distinct: cd.id,
@@ -326,7 +326,7 @@ defmodule Data.Query.ConversationCall do
     else
       from(cd in ConversationDisposition,
         join: d in Disposition, on: cd .disposition_id == d.id,
-        where: d.disposition_name == ^disposition,
+        where: d.disposition_name in ^disposition,
         where: not is_nil(cd.conversation_call_id),
         distinct: cd.id,
       )
@@ -364,7 +364,7 @@ defmodule Data.Query.ConversationCall do
         where: cm.phone_number == c.original_number,
         where: cc.location_id in ^loc_ids,
         join: d in Disposition, on: d.id == cd.disposition_id,
-        where: d.disposition_name == ^disposition,
+        where: d.disposition_name in ^disposition,
         distinct: cm.id
       )
     else
@@ -374,7 +374,7 @@ defmodule Data.Query.ConversationCall do
         join: cm in ConversationMessage,on: cm.conversation_id == c.id,
         where: cm.phone_number == c.original_number,
         join: d in Disposition, on: d.id == cd.disposition_id,
-        where: d.disposition_name == ^disposition,
+        where: d.disposition_name in ^disposition,
         distinct: cm.id
       )
     end

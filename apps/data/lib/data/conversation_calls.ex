@@ -13,13 +13,6 @@ defmodule Data.ConversationCall do
     "team-admin"
   ]
 
-  @call_dispositions [
-    "Call deflected",
-    "Missed Call Texted",
-    "Call Transfered",
-    "Call Hung Up"
-  ]
-
   @open %{"status" => "open"}
   @closed %{"status" => "closed"}
   @pending %{"status" => "pending"}
@@ -295,11 +288,11 @@ defmodule Data.ConversationCall do
     end
   end
 
-  def get_response_after_call(disposition,to ,from , loc_ids \\ [])  when disposition in @call_dispositions do
+  def get_response_after_call(disposition,to ,from , loc_ids \\ [])do
     Query.calculate_after_call_response(disposition,to ,from ,loc_ids)
   end
 
-  def get_total_calls(disposition,to ,from ,loc_ids \\ [])  when disposition in @call_dispositions do
+  def get_total_calls(disposition,to ,from ,loc_ids \\ [])do
     Query.get_call_time_list(disposition,to ,from ,loc_ids)
   end
 

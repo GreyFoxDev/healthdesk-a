@@ -14,13 +14,6 @@ defmodule Data.Query.IntentUsage do
     "getDayPass",
     "getWeekPass"]
 
-  @call_dispositions [
-    "Call deflected",
-    "Missed Call Texted",
-    "Call Transfered",
-    "Call Hung Up"
-  ]
-
   def create(params, repo \\ Write)do
     %IntentUsage{}
     |> IntentUsage.changeset(params)
@@ -42,7 +35,7 @@ defmodule Data.Query.IntentUsage do
       join: c in Conversation, on: cm.conversation_id == c.id,
       join: l in Location, on: c.location_id == l.id,
       join: te in Team, on: l.team_id == te.id,
-      where: is_nil(l.deleted_at) and is_nil(te.deleted_at),
+      where: is_nil(l.deleted_at) and is_nil(te.deleted_at)
     )
 
     query = Enum.reduce(%{to: to, from: from}, query, fn
@@ -103,7 +96,7 @@ defmodule Data.Query.IntentUsage do
               order_by: [desc: count(t.id)]
               #        group_by: t.intent
             )
-            |> repo.all()
+             repo.all(query)
   end
 
   def count_by_location_ids(location_ids, to, from, repo \\ Read)do
@@ -165,7 +158,7 @@ defmodule Data.Query.IntentUsage do
         join: cc in Data.Schema.ConversationCall, on: c.original_number == cc.original_number and c.location_id == cc.location_id,
         join: cd in Data.Schema.ConversationDisposition, on: cd.conversation_call_id == cc.id,
         join: d in Data.Schema.Disposition, on: d.id == cd.disposition_id,
-        where: d.disposition_name == ^disposition,
+        where: d.disposition_name in ^disposition,
         where: cc.location_id in ^loc_ids,
         where: cm.inserted_at > cd.inserted_at,
         distinct: t.id
@@ -178,7 +171,7 @@ defmodule Data.Query.IntentUsage do
         join: cc in Data.Schema.ConversationCall, on: c.original_number == cc.original_number and c.location_id == cc.location_id,
         join: cd in Data.Schema.ConversationDisposition, on: cd.conversation_call_id == cc.id,
         join: d in Data.Schema.Disposition, on: d.id == cd.disposition_id,
-        where: d.disposition_name == ^disposition,
+        where: d.disposition_name in ^disposition,
         where: cm.inserted_at > cd.inserted_at,
         distinct: t.id
         #          group_by: [ t.id],
@@ -208,7 +201,7 @@ defmodule Data.Query.IntentUsage do
 
   end
 
-  def get_new_leads(disposition,to,from, loc_ids ,repo \\ Read) when disposition in @call_dispositions do
+  def get_new_leads(disposition,to,from, loc_ids ,repo \\ Read)do
     to = Data.Disposition.convert_string_to_date(to)
     from = Data.Disposition.convert_string_to_date(from)
     query = if List.first(loc_ids)do
@@ -218,7 +211,7 @@ defmodule Data.Query.IntentUsage do
         join: cc in Data.Schema.ConversationCall, on: c.original_number == cc.original_number and c.location_id == cc.location_id,
         join: cd in Data.Schema.ConversationDisposition, on: cd.conversation_call_id == cc.id,
         join: d in Data.Schema.Disposition, on: d.id == cd.disposition_id,
-        where: d.disposition_name == ^disposition,
+        where: d.disposition_name in ^disposition,
         where: cc.location_id in ^loc_ids,
         where: cm.inserted_at > cd.inserted_at and t.intent in @new_leads_intents,
         distinct: t.id
@@ -231,7 +224,7 @@ defmodule Data.Query.IntentUsage do
         join: cc in Data.Schema.ConversationCall, on: c.original_number == cc.original_number and c.location_id == cc.location_id,
         join: cd in Data.Schema.ConversationDisposition, on: cd.conversation_call_id == cc.id,
         join: d in Data.Schema.Disposition, on: d.id == cd.disposition_id,
-        where: d.disposition_name == ^disposition,
+        where: d.disposition_name in ^disposition,
         where: cm.inserted_at > cd.inserted_at and t.intent in @new_leads_intents,
         distinct: t.id
         #    group_by: t.id,
