@@ -139,7 +139,7 @@ defmodule MainWeb.InstagramController do
       if intent in @new_leads do
         %{role: "system"}
         |> Data.Disposition.get_by_team_id(location.team_id)
-        |> Enum.find(&(&1.disposition_name == "New Lead"))
+        |> Enum.find(&(&1.disposition_name == "New Leads"))
       else
         %{role: "system"}
         |> Data.Disposition.get_by_team_id(location.team_id)
