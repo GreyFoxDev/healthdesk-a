@@ -48,40 +48,7 @@
                     margin-top: 20px;
                 }
                 </style>
-            <script>
-                if (document.getElementById("locations").options.length != 0){
-                window.addEventListener("load",function(){
-                    document.getElementById("selectDiv").style.display = "block";
-                });}
-            </script>
-            <script>
 
-                function locationDropdown () {
-                    document.getElementById("selectDiv").style.display = "none";
-
-                    document.getElementById("team_id").onchange=function () {
-                        document.getElementById('locations').innerText = null;
-                        if (document.getElementById("team_id").value == -99) document.getElementById("selectDiv").style.display = "none";
-                        else
-                            document.getElementById("selectDiv").style.display = "block";
-                        document.getElementById("locations").disabled = false;
-                        var arr = document.getElementById("team_id").value.split("--");
-                        var locationDropdown=  document.getElementById("locations");
-                        var val = $(this).val();
-                        for (var i = 0; i < arr.length-1; i++) {
-                            var arr2=arr[i].split(",")
-                            console.log(arr2[0])
-                            var opt = document.createElement('option');
-                            opt.value = arr2[0];
-                            opt.innerHTML = arr2[1];
-                            locationDropdown.appendChild(opt);
-                            opt.selected = "true";
-                        }
-                        $('.selectpicker').selectpicker('refresh');
-                    };
-                };
-                locationDropdown()
-            </script>
         </div><!-- /metric column -->
         <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="metric-label"> From </h2>
@@ -353,11 +320,7 @@
                 </div>
             </div><!-- /.metric -->
         </div><!-- /metric column -->
-        <script src="https://code.highcharts.com/highcharts.js"></script>
-        <script src="https://code.highcharts.com/modules/series-label.js"></script>
-        <script src="https://code.highcharts.com/modules/exporting.js"></script>
-        <script src="https://code.highcharts.com/modules/export-data.js"></script>
-        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
     </div>
     <div class="metric-row">
         <!-- metric column -->
@@ -372,11 +335,7 @@
                 </div>
             </div><!-- /.metric -->
         </div><!-- /metric column -->
-        <script src="https://code.highcharts.com/highcharts.js"></script>
-        <script src="https://code.highcharts.com/modules/series-label.js"></script>
-        <script src="https://code.highcharts.com/modules/exporting.js"></script>
-        <script src="https://code.highcharts.com/modules/export-data.js"></script>
-        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
     </div>
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-8">
@@ -439,81 +398,7 @@
 
 
         </style>
-        <script>
-            var startDate = new Date("<%=@line_graph_start_date%>");
 
-            Highcharts.chart('container', {
-
-                title: {
-                    text: 'Sessions by Day and Channels'
-                },
-
-                yAxis: {
-                    title: {
-                        text: 'No. of Sessions'
-                    }
-                },
-
-                xAxis: {
-                    type: 'datetime'
-                },
-
-                legend: {
-                    layout: 'vertical',
-                    align: 'right',
-                    verticalAlign: 'middle'
-                },
-
-
-                plotOptions: {
-                    series: {
-                        pointStart: startDate.getTime(),
-                        pointInterval: 24 * 3600 * 1000 // one day
-                    }
-                },
-
-                series: [{
-                    name: 'SMS',
-                    data: [<%= Enum.join(@sms_totals_by_day, ",") %>]
-                }, {
-                    name: 'Average',
-                    data: [<%= Enum.join(@avg_totals_by_day, ",") %>]
-                }, {
-                    name: 'Web',
-                    data: [<%= Enum.join(@web_totals_by_day, ",") %>]
-                }, {
-                    name: 'App',
-                    data: [<%= Enum.join(@app_totals_by_day, ",") %>]
-                }, {
-                    name: 'Facebook',
-                    data: [<%= Enum.join(@facebook_totals_by_day, ",") %>]
-                },
-                    {
-                    name: 'Phone',
-                    data: [<%= Enum.join(@call_totals_by_day, ",") %>]
-                },
-                    {
-                        name: 'Email',
-                        data: [<%= Enum.join(@mail_totals_by_day, ",") %>]
-                    }],
-
-                responsive: {
-                    rules: [{
-                        condition: {
-                            maxWidth: 500
-                        },
-                        chartOptions: {
-                            legend: {
-                                layout: 'horizontal',
-                                align: 'center',
-                                verticalAlign: 'bottom'
-                            }
-                        }
-                    }]
-                },
-
-            });
-        </script>
     <div class="metric-row">
         <div class="col-12 col-sm-6 col-lg-8" >
   <div class="card-metric ">
@@ -525,6 +410,7 @@
         #container {
             height: 400px;
         }
+
 
         .highcharts-figure,
         .highcharts-data-table table {
@@ -570,209 +456,9 @@
         }
 
     </style>
-    <script>
-        sample="<%= @bar_graph %>".replace(/&quot;/g,'"');
-        const data = JSON.parse(sample);
-        function createSeries () {
-            let list = [];
-            for (const key in data){
-                if (key != "") list.push({name: key, data: data[key]});
-            }
-            return list;
-        }
-        startDate = new Date("<%=@bar_graph_start_date%>");
-        console.log(startDate)
-        Highcharts.chart('container1', {
-            chart: {
-                type: 'column'
-            },
-            title: {
-                text: 'Disposition per day'
-            },
-
-            xAxis: {
-                type: 'datetime'  },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: 'Total Dispositions'
-                },
-                stackLabels: {
-                    enabled: true,
-                    style: {
-                        fontWeight: 'bold',
-                        color: ( // theme
-                            Highcharts.defaultOptions.title.style &&
-                            Highcharts.defaultOptions.title.style.color
-                        ) || 'gray'
-                    }
-                }
-            },
-            legend: {
-                align: 'right',
-                x: -30,
-                verticalAlign: 'top',
-                y: 25,
-                floating: false,
-                backgroundColor:
-                    Highcharts.defaultOptions.legend.backgroundColor || 'white',
-                borderColor: '#CCC',
-                borderWidth: 1,
-                shadow: false
-            },
-            tooltip: {
-                pointFormat: '<span style="color:{series.color};" />{series.name} </span>:<b>{point.y} ({point.percentage:.1f}%)</b><br/>Total: {point.stackTotal}'
-            },
-            plotOptions: {
-                series: {
-                    pointStart: startDate.getTime(),
-                    pointInterval: 24 * 3600 * 1000 // one day
-                },
-                column: {
-                    stacking: 'normal',
-                    dataLabels: {
-                        enabled: true
-                    }
-                }
-            },
-            series: createSeries()
-        });
-        </script>
-
-
-    <!-- /test graph test graph test graph test graph -->
-
-
-
-
 
         <% confirmed = Enum.reduce(@appointments,0, fn %{confirmed: f, count: c}, acc ->  if f,do: acc+c , else: acc end) %>
     <% pending = Enum.reduce(@appointments,0, fn %{confirmed: f, count: c}, acc ->  if !f,do: acc+c , else: acc end) %>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-        <script>
-            const ctx = document.getElementById('canvas-sessions-by-channel').getContext('2d');
-            const chartData = {
-                labels: [
-                    'SMS',
-                    'Email',
-                    'Facebook',
-                    'Web',
-                    'App',
-                    'Phone'
-                ],
-                datasets: [{
-                    data: [
-                        <%= @sms_totals %>,
-                        <%= @email_totals %>,
-                        <%= @facebook_totals %>,
-                        <%= @web_totals %>,
-                        <%= @app_totals %>,
-                        <%= @call_totals%>
-                    ],
-                    borderWidth: 6,
-                    backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40','#ff973d', '#ff1000'],
-                    hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70','#ff973d', '#D33311'],
-                }],
-            };
-            new Chart(ctx, {
-                type: 'pie',
-                data: chartData,
-                maintainAspectRatio: false,
-                responsive: true,
-                options: {
-                    legend: {
-                        display: true,
-                        position: 'left'
-                    },
-                },
-            });
-        </script>
-        <script>
-            const ctx2 = document.getElementById('canvas-appointments').getContext('2d');
-            const chartData2 = {
-                labels: [
-                    'Confirmed',
-                    'Pending'
-                ],
-                datasets: [{
-                    data: [
-                        <%= confirmed %>,
-                        <%= pending %>,
-                    ],
-                    borderWidth: 5,
-                    backgroundColor: [ '#2ECC40','#ff973d'],
-                    hoverBackgroundColor: [ '#01FF70','#ff973d'],
-                }],
-            };
-            new Chart(ctx2, {
-                type: 'pie',
-                data: chartData2,
-                maintainAspectRatio: false,
-                responsive: true,
-                options: {
-                    legend: {
-                        display: true,
-                        position: 'left'
-                    },
-                    tooltips: {
-                        custom: function(tooltip) {
-                            tooltip.displayColors = false;
-                        },
-                        callbacks: {
-                            label: function (tooltipItem, data) {
-                                var labels = data.labels;
-                                var values = data.datasets[tooltipItem.datasetIndex].data;
-                                var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                                var colour = data.datasets[tooltipItem.datasetIndex].backgroundColor
-                                var total = 0;
-                                for (var i in values) {
-                                    total += values[i];
-                                }
-                                var totally = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                var label = [];
-                                for (var j in labels) {
-                                    var percentage = Math.round((values[j] / total) * 100);
-                                    label.push (labels[j] + " : " + values[j].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' (' + percentage + '%)');
-                                }
-                                label.push("Total : " + totally)
-                                return label;
-                            }
-                        }
-                    }
-                },
-            });
-        </script>
-
-    <script>
-        const gtx = document.getElementById('canvas-user-activity').getContext('2d');
-        const chartData1 = {
-            labels: [
-                'New Users',
-                'Active Users'
-            ],
-            datasets: [{
-                data: [
-                    <%= @new_user %>,
-                    <%= @active_user %>
-                ],
-                borderWidth: 2,
-                backgroundColor: ['#F75159', '#29F31B'],
-                hoverBackgroundColor: ['#F75159', '#29F31B']
-            }],
-        };
-        new Chart(gtx, {
-            type: 'pie',
-            data: chartData1,
-            maintainAspectRatio: false,
-            responsive: true,
-            options: {
-                legend: {
-                    display: true,
-                    position: 'left'
-                },
-            },
-        });
-    </script>
 
 </div> </div>
 <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
@@ -968,3 +654,337 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+<script>
+    const ctx = document.getElementById('canvas-sessions-by-channel').getContext('2d');
+    const chartData = {
+        labels: [
+            'SMS',
+            'Email',
+            'Facebook',
+            'Web',
+            'App',
+            'Phone'
+        ],
+        datasets: [{
+            data: [
+                <%= @sms_totals %>,
+                <%= @email_totals %>,
+                <%= @facebook_totals %>,
+                <%= @web_totals %>,
+                <%= @app_totals %>,
+                <%= @call_totals%>
+            ],
+            borderWidth: 6,
+            backgroundColor: ['#2098d4', '#f8da50', '#9D17FA', '#2ECC40','#ff973d', '#ff1000'],
+            hoverBackgroundColor: ['#148fb5', '#f2d02b', '#C069FC', '#01FF70','#ff973d', '#D33311'],
+        }],
+    };
+    new Chart(ctx, {
+        type: 'pie',
+        data: chartData,
+        maintainAspectRatio: false,
+        responsive: true,
+        options: {
+            legend: {
+                display: true,
+                position: 'left'
+            },
+        },
+    });
+</script>
+<script>
+    const ctx2 = document.getElementById('canvas-appointments').getContext('2d');
+    const chartData2 = {
+        labels: [
+            'Confirmed',
+            'Pending'
+        ],
+        datasets: [{
+            data: [
+                <%= confirmed %>,
+                <%= pending %>,
+            ],
+            borderWidth: 5,
+            backgroundColor: [ '#2ECC40','#ff973d'],
+            hoverBackgroundColor: [ '#01FF70','#ff973d'],
+        }],
+    };
+    new Chart(ctx2, {
+        type: 'pie',
+        data: chartData2,
+        maintainAspectRatio: false,
+        responsive: true,
+        options: {
+            legend: {
+                display: true,
+                position: 'left'
+            },
+            tooltips: {
+                custom: function(tooltip) {
+                    tooltip.displayColors = false;
+                },
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        var labels = data.labels;
+                        var values = data.datasets[tooltipItem.datasetIndex].data;
+                        var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                        var colour = data.datasets[tooltipItem.datasetIndex].backgroundColor
+                        var total = 0;
+                        for (var i in values) {
+                            total += values[i];
+                        }
+                        var totally = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        var label = [];
+                        for (var j in labels) {
+                            var percentage = Math.round((values[j] / total) * 100);
+                            label.push (labels[j] + " : " + values[j].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' (' + percentage + '%)');
+                        }
+                        label.push("Total : " + totally)
+                        return label;
+                    }
+                }
+            }
+        },
+    });
+</script>
+<script>
+    const gtx = document.getElementById('canvas-user-activity').getContext('2d');
+    const chartData1 = {
+        labels: [
+            'New Users',
+            'Active Users'
+        ],
+        datasets: [{
+            data: [
+                <%= @new_user %>,
+                <%= @active_user %>
+            ],
+            borderWidth: 2,
+            backgroundColor: ['#F75159', '#29F31B'],
+            hoverBackgroundColor: ['#F75159', '#29F31B']
+        }],
+    };
+    new Chart(gtx, {
+        type: 'pie',
+        data: chartData1,
+        maintainAspectRatio: false,
+        responsive: true,
+        options: {
+            legend: {
+                display: true,
+                position: 'left'
+            },
+        },
+    });
+</script>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/boost.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script>
+    var startDate = new Date("<%=@line_graph_start_date%>");
+
+    Highcharts.chart('container', {
+
+        title: {
+            text: 'Sessions by Day and Channels'
+        },
+        exporting: {
+            buttons: {
+                contextButton: {
+                    menuItems: [
+                        'viewFullscreen',
+                        'printChart'
+                    ]
+                }
+            }
+        },
+
+        yAxis: {
+            title: {
+                text: 'No. of Sessions'
+            }
+        },
+
+        xAxis: {
+            type: 'datetime'
+        },
+
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+
+
+        plotOptions: {
+            series: {
+                pointStart: startDate.getTime(),
+                pointInterval: 24 * 3600 * 1000 // one day
+            }
+        },
+
+        series: [{
+            name: 'SMS',
+            data: [<%= Enum.join(@sms_totals_by_day, ",") %>]
+        }, {
+            name: 'Average',
+            data: [<%= Enum.join(@avg_totals_by_day, ",") %>]
+        }, {
+            name: 'Web',
+            data: [<%= Enum.join(@web_totals_by_day, ",") %>]
+        }, {
+            name: 'App',
+            data: [<%= Enum.join(@app_totals_by_day, ",") %>]
+        }, {
+            name: 'Facebook',
+            data: [<%= Enum.join(@facebook_totals_by_day, ",") %>]
+        },
+            {
+                name: 'Phone',
+                data: [<%= Enum.join(@call_totals_by_day, ",") %>]
+            },
+            {
+                name: 'Email',
+                data: [<%= Enum.join(@email_totals_by_day, ",") %>]
+            }],
+
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom'
+                    }
+                }
+            }]
+        },
+
+    });
+</script>
+<script>
+    sample="<%= @bar_graph %>".replace(/&quot;/g,'"');
+    const data = JSON.parse(sample);
+    function createSeries () {
+        let list = [];
+        for (const key in data){
+            if (key != "") list.push({name: key, data: data[key]});
+        }
+        return list;
+    }
+    startDate = new Date("<%=@bar_graph_start_date%>");
+    var seconds = (new Date()).getSeconds();
+    console.log(seconds);
+    Highcharts.chart('container1', {
+        chart: {
+            type: 'column'
+        },
+        boost: {
+            useGPUTranslations: true,
+            seriesThreshold: 0
+        },
+        title: {
+            text: 'Disposition per day'
+        },
+        xAxis: {
+            type: 'datetime'  },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Total Dispositions'
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: ( // theme
+                        Highcharts.defaultOptions.title.style &&
+                        Highcharts.defaultOptions.title.style.color
+                    ) || 'gray'
+                }
+            }
+        },
+        exporting: {
+            buttons: {
+                contextButton: {
+                    menuItems: [
+                        'viewFullscreen',
+                        'printChart'
+                    ]
+                }
+            }
+        },
+        legend: {
+            align: 'right',
+            x: -30,
+            verticalAlign: 'top',
+            y: 25,
+            floating: false,
+            backgroundColor:
+                Highcharts.defaultOptions.legend.backgroundColor || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            shared: true
+    },
+        plotOptions: {
+            series: {
+                pointStart: startDate.getTime(),
+                pointInterval: 24 * 3600 * 1000 // one day
+            },
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        series: createSeries()
+    });
+    seconds = (new Date()).getSeconds();
+    console.log(seconds);
+</script>
+
+
+<script>
+    if (document.getElementById("locations").options.length != 0){
+        window.addEventListener("load",function(){
+            document.getElementById("selectDiv").style.display = "block";
+        });}
+</script>
+<script>
+
+    function locationDropdown () {
+        document.getElementById("selectDiv").style.display = "none";
+
+        document.getElementById("team_id").onchange=function () {
+            document.getElementById('locations').innerText = null;
+            if (document.getElementById("team_id").value == -99) document.getElementById("selectDiv").style.display = "none";
+            else
+                document.getElementById("selectDiv").style.display = "block";
+            document.getElementById("locations").disabled = false;
+            var arr = document.getElementById("team_id").value.split("--");
+            var locationDropdown=  document.getElementById("locations");
+            var val = $(this).val();
+            for (var i = 0; i < arr.length-1; i++) {
+                var arr2=arr[i].split(",")
+                console.log(arr2[0])
+                var opt = document.createElement('option');
+                opt.value = arr2[0];
+                opt.innerHTML = arr2[1];
+                locationDropdown.appendChild(opt);
+                opt.selected = "true";
+            }
+            $('.selectpicker').selectpicker('refresh');
+        };
+    };
+    locationDropdown()
+</script>
