@@ -187,7 +187,7 @@ defmodule MainWeb.AdminController do
       to: params["to"],
       location: nil,
       role: current_user.role,
-      new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.sum() || 0,
+      new_leads: Enum.filter(dispositions, &(&1.name == "New Leads")) |> Enum.map(&(&1.count)) |> Enum.sum() || 0,
       new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads)),
       new_user: new_user,
       active_user: active_user
@@ -356,7 +356,7 @@ defmodule MainWeb.AdminController do
           location_ids: [],
           team_id: TeamMember.get_by_user_id(%{role: current_user.role},current_user.id),
           role: current_user.role,
-          new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.sum() || 0,
+          new_leads: Enum.filter(dispositions, &(&1.name == "New Leads")) |> Enum.map(&(&1.count)) |> Enum.sum() || 0,
           new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads)),
           new_user: new_user,
           active_user: active_user
@@ -510,7 +510,7 @@ defmodule MainWeb.AdminController do
           to: params["to"],
           team_id: nil,
           role: current_user.role,
-          new_leads: Enum.filter(dispositions, &(&1.name == "New Lead")) |> Enum.map(&(&1.count)) |> Enum.sum() || 0,
+          new_leads: Enum.filter(dispositions, &(&1.name == "New Leads")) |> Enum.map(&(&1.count)) |> Enum.sum() || 0,
           new_leads_data: Enum.filter(automated, &(&1.intent in @new_leads)),
           new_user: new_user,
           active_user: active_user

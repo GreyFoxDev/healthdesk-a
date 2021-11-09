@@ -152,7 +152,7 @@ defmodule MainWeb.Plug.CloseConversation do
     if conn.assigns[:response] != "No sweat!" do
       disposition =
       if intent in @new_leads do
-        Enum.find(dispositions, &(&1.disposition_name == "New Lead"))
+        Enum.find(dispositions, &(&1.disposition_name == "New Leads"))
         else
           Enum.find(dispositions, &(&1.disposition_name == "Automated"))
       end
