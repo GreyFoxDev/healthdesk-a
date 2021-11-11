@@ -17,6 +17,10 @@ defmodule Data.ConversationMessages do
   defdelegate count_by_location_id(location_id, to, from), to: Query
   defdelegate count_by_team_id(team_id, to, from), to: Query
   defdelegate mark_read(msg), to: Query
+  defdelegate count_incoming_messages_per_day_by_location_ids(location_ids, channel_type, to, from), to: Query
+  defdelegate count_outgoing_messages_per_day_by_location_ids(location_ids, channel_type, to, from), to: Query
+  defdelegate count_incoming_messages_per_day(channel_type, to, from), to: Query
+  defdelegate count_outgoing_messages_per_day(channel_type, to, from), to: Query
 
   def get_changeset(),
     do: Schema.changeset(%Schema{})

@@ -11,6 +11,7 @@ defmodule MainWeb.AdminController do
   "getDayPass",
   "getWeekPass",
   ]
+  @channels ["WEB","SMS","APP","FACEBOOK","MAIL","CALL"]
   def index(conn, %{"filters" => %{"location_ids" => location_ids}} = params) do
     params=if(!is_nil(params["filters"])) do
       change_params(params)
@@ -124,20 +125,53 @@ defmodule MainWeb.AdminController do
       convert_values(params["filter"]["to"]),
       convert_values(params["filter"]["from"])
     )
+    IO.inspect("------graph_days-----------")
+    IO.inspect(graph_days)
+    IO.inspect("------graph_days----------")
 
     web_totals_by_day=get_line_graph_data(web_totals,graph_days, to,from)
-    oldest = List.first(Enum.min_by(web_totals_by_day, fn x -> List.first(x) end, Date))
-    web_totals_by_day=Enum.map(web_totals_by_day, fn x -> List.last(x) end)
+#    web_totals_by_day=Enum.map(web_totals_by_day, fn x -> List.last(x) end)
     sms_totals_by_day=get_line_graph_data(sms_totals,graph_days, to, from)
-    sms_totals_by_day=Enum.map(sms_totals_by_day, fn x -> List.last(x) end)
+#    sms_totals_by_day=Enum.map(sms_totals_by_day, fn x -> List.last(x) end)
     app_totals_by_day=get_line_graph_data(app_totals,graph_days, to, from)
-    app_totals_by_day=Enum.map(app_totals_by_day, fn x -> List.last(x) end)
+#    app_totals_by_day=Enum.map(app_totals_by_day, fn x -> List.last(x) end)
     facebook_totals_by_day=get_line_graph_data(facebook_totals,graph_days, to, from)
-    facebook_totals_by_day=Enum.map(facebook_totals_by_day, fn x -> List.last(x) end)
+#    facebook_totals_by_day=Enum.map(facebook_totals_by_day, fn x -> List.last(x) end)
     email_totals_by_day=get_line_graph_data(email_totals,graph_days, to, from)
-    email_totals_by_day=Enum.map(email_totals_by_day, fn x -> List.last(x) end)
+#    email_totals_by_day=Enum.map(email_totals_by_day, fn x -> List.last(x) end)
     call_totals_by_day=get_line_graph_data(call_totals,graph_days,to, from)
-    call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
+#    call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
+#    incoming_web_msg=get_line_graph_data_for_incoming_messages(location_ids,"WEB",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    incoming_sms_msg=get_line_graph_data_for_incoming_messages(location_ids,"SMS",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    incoming_app_msg=get_line_graph_data_for_incoming_messages(location_ids,"APP",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    incoming_facebook_msg=get_line_graph_data_for_incoming_messages(location_ids,"FACEBOOK",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    incoming_email_msg=get_line_graph_data_for_incoming_messages(location_ids,"MAIL",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    incoming_call_msg=get_line_graph_data_for_incoming_messages(location_ids,"CALL",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    outgoing_web_msg=get_line_graph_data_for_outgoing_messages(location_ids,"WEB",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    outgoing_sms_msg=get_line_graph_data_for_outgoing_messages(location_ids,"SMS",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    outgoing_app_msg=get_line_graph_data_for_outgoing_messages(location_ids,"APP",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    outgoing_facebook_msg=get_line_graph_data_for_outgoing_messages(location_ids,"FACEBOOK",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    outgoing_email_msg=get_line_graph_data_for_outgoing_messages(location_ids,"MAIL",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    outgoing_call_msg=get_line_graph_data_for_outgoing_messages(location_ids,"CALL",graph_days, convert_values(params["filter"]["to"]), convert_values(params["filter"]["from"]) )
+#    incoming_msg=get_bar_graph_data_for_incoming_messages(location_ids,graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#    incoming_msg_bar_graph_data=Enum.reduce(
+#      0..length(@channels),
+#      %{},
+#      fn x, acc -> Map.merge(acc, %{Enum.at(@channels, x) => Enum.at(incoming_msg, x)}) end
+#    )|> IO.inspect(label: "tayyab")
+
+    incoming_msg=get_bar_graph_data_for_incoming_messages(location_ids,graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+    incoming_msg_bar_graph_data=Enum.reduce(
+      0..length(@channels),
+      %{},
+      fn x, acc -> Map.merge(acc, %{Enum.at(@channels, x) => Enum.at(incoming_msg, x)}) end
+    )
+    outgoing_msg=get_bar_graph_data_for_outgoing_messages(location_ids,graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+    outgoing_msg_bar_graph_data=Enum.reduce(
+      0..length(@channels),
+      %{},
+      fn x, acc -> Map.merge(acc, %{Enum.at(@channels, x) => Enum.at(outgoing_msg, x)}) end
+    )
 
     render(conn, "index.html",
       dispositions: dispositions,
@@ -168,13 +202,16 @@ defmodule MainWeb.AdminController do
       email_totals_by_day: email_totals_by_day,
       call_totals_by_day: call_totals_by_day,
       avg_totals_by_day: get_average_for_line_graph(web_totals_by_day, sms_totals_by_day, app_totals_by_day, facebook_totals_by_day, email_totals_by_day, call_totals_by_day),
-      line_graph_start_date: Date.to_iso8601(oldest),
+      line_graph_start_date: Date.to_iso8601(List.first(graph_days)),
       web_totals: web_totals |> Enum.count() ,
       app_totals: app_totals|> Enum.count(),
       sms_totals: sms_totals|> Enum.count(),
       facebook_totals: facebook_totals |> Enum.count(),
       email_totals: email_totals |> Enum.count(),
       call_totals: call_totals|> Enum.count(),
+
+      incoming_messages_bar_graph: Poison.encode!(incoming_msg_bar_graph_data),
+      outgoing_messages_bar_graph: Poison.encode!(outgoing_msg_bar_graph_data),
       team_admin_count: team_admin_count,
       tickets_count: Ticket.filter(params),
       teammate_count: teammate_count,
@@ -297,18 +334,45 @@ defmodule MainWeb.AdminController do
         )
 
         web_totals_by_day=get_line_graph_data(web_totals,graph_days, to,from)
-        oldest = List.first(Enum.min_by(web_totals_by_day, fn x -> List.first(x) end, Date))
-        web_totals_by_day=Enum.map(web_totals_by_day, fn x -> List.last(x) end)
+#        oldest = List.first(Enum.min_by(web_totals_by_day, fn x -> List.first(x) end, Date))
+#        web_totals_by_day=Enum.map(web_totals_by_day, fn x -> List.last(x) end)
         sms_totals_by_day=get_line_graph_data(sms_totals,graph_days, to, from)
-        sms_totals_by_day=Enum.map(sms_totals_by_day, fn x -> List.last(x) end)
+#        sms_totals_by_day=Enum.map(sms_totals_by_day, fn x -> List.last(x) end)
         app_totals_by_day=get_line_graph_data(app_totals,graph_days, to, from)
-        app_totals_by_day=Enum.map(app_totals_by_day, fn x -> List.last(x) end)
+#        app_totals_by_day=Enum.map(app_totals_by_day, fn x -> List.last(x) end)
         facebook_totals_by_day=get_line_graph_data(facebook_totals,graph_days, to, from)
-        facebook_totals_by_day=Enum.map(facebook_totals_by_day, fn x -> List.last(x) end)
+#        facebook_totals_by_day=Enum.map(facebook_totals_by_day, fn x -> List.last(x) end)
         email_totals_by_day=get_line_graph_data(email_totals,graph_days, to, from)
-        email_totals_by_day=Enum.map(email_totals_by_day, fn x -> List.last(x) end)
+#        email_totals_by_day=Enum.map(email_totals_by_day, fn x -> List.last(x) end)
         call_totals_by_day=get_line_graph_data(call_totals,graph_days,to, from)
-        call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
+#        call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
+
+#        incoming_web_msg=get_line_graph_data_for_incoming_messages("WEB",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        incoming_sms_msg=get_line_graph_data_for_incoming_messages("SMS",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        incoming_app_msg=get_line_graph_data_for_incoming_messages("APP",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        incoming_facebook_msg=get_line_graph_data_for_incoming_messages("FACEBOOK",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        incoming_email_msg=get_line_graph_data_for_incoming_messages("MAIL",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        incoming_call_msg=get_line_graph_data_for_incoming_messages("CALL",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        outgoing_web_msg=get_line_graph_data_for_outgoing_messages("WEB",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        outgoing_sms_msg=get_line_graph_data_for_outgoing_messages("SMS",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        outgoing_app_msg=get_line_graph_data_for_outgoing_messages("APP",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        outgoing_facebook_msg=get_line_graph_data_for_outgoing_messages("FACEBOOK",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        outgoing_email_msg=get_line_graph_data_for_outgoing_messages("MAIL",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+#        outgoing_call_msg=get_line_graph_data_for_outgoing_messages("CALL",graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+
+        incoming_msg=get_bar_graph_data_for_incoming_messages(location_ids,graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+        incoming_msg_bar_graph_data=Enum.reduce(
+          0..length(@channels),
+          %{},
+          fn x, acc -> Map.merge(acc, %{Enum.at(@channels, x) => Enum.at(incoming_msg, x)}) end
+        )
+        outgoing_msg=get_bar_graph_data_for_outgoing_messages(location_ids,graph_days, convert_values(params["filters"]["to"]), convert_values(params["filters"]["from"]) )
+        outgoing_msg_bar_graph_data=Enum.reduce(
+          0..length(@channels),
+          %{},
+          fn x, acc -> Map.merge(acc, %{Enum.at(@channels, x) => Enum.at(outgoing_msg, x)}) end
+        )
+
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
@@ -338,13 +402,15 @@ defmodule MainWeb.AdminController do
           email_totals_by_day: email_totals_by_day,
           call_totals_by_day: call_totals_by_day,
           avg_totals_by_day: get_average_for_line_graph(web_totals_by_day, sms_totals_by_day, app_totals_by_day, facebook_totals_by_day, email_totals_by_day, call_totals_by_day),
-          line_graph_start_date: Date.to_iso8601(oldest),
+          line_graph_start_date: Date.to_iso8601(List.first(graph_days)),
           web_totals: web_totals |> Enum.count(),
           sms_totals: sms_totals |> Enum.count(),
           app_totals: app_totals |> Enum.count(),
           facebook_totals: facebook_totals |> Enum.count(),
           email_totals: email_totals |> Enum.count(),
           call_totals: call_totals |> Enum.count(),
+          incoming_messages_bar_graph: Poison.encode!(incoming_msg_bar_graph_data),
+          outgoing_messages_bar_graph: Poison.encode!(outgoing_msg_bar_graph_data),
           teams: teams,
           team_admin_count: team_admin_count,
           tickets_count: Ticket.filter(params),
@@ -384,31 +450,25 @@ defmodule MainWeb.AdminController do
           end)
           |> List.flatten()
         end
-        web_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("WEB", location_ids, convert_values(params["to"]), convert_values(params["from"]))
-        web_totals_by_day=Enum.map(web_totals_by_day, fn x -> List.last(x) end)
-        sms_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("SMS", location_ids, convert_values(params["to"]), convert_values(params["from"]))
-        sms_totals_by_day=Enum.map(sms_totals_by_day, fn x -> List.last(x) end)
-        app_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("APP", location_ids, convert_values(params["to"]), convert_values(params["from"]))
-        app_totals_by_day=Enum.map(app_totals_by_day, fn x -> List.last(x) end)
-        facebook_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("FACEBOOK", location_ids, convert_values(params["to"]), convert_values(params["from"]))
-        facebook_totals_by_day=Enum.map(facebook_totals_by_day, fn x -> List.last(x) end)
-        mail_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("MAIL", location_ids, convert_values(params["to"]), convert_values(params["from"]))
-        mail_totals_by_day=Enum.map(mail_totals_by_day, fn x -> List.last(x) end)
-        call_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("CALL", location_ids, convert_values(params["to"]), convert_values(params["from"]))
-        call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
+#        web_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("WEB", location_ids, convert_values(params["to"]), convert_values(params["from"]))
+#        web_totals_by_day=Enum.map(web_totals_by_day, fn x -> List.last(x) end)
+#        sms_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("SMS", location_ids, convert_values(params["to"]), convert_values(params["from"]))
+#        sms_totals_by_day=Enum.map(sms_totals_by_day, fn x -> List.last(x) end)
+#        app_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("APP", location_ids, convert_values(params["to"]), convert_values(params["from"]))
+#        app_totals_by_day=Enum.map(app_totals_by_day, fn x -> List.last(x) end)
+#        facebook_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("FACEBOOK", location_ids, convert_values(params["to"]), convert_values(params["from"]))
+#        facebook_totals_by_day=Enum.map(facebook_totals_by_day, fn x -> List.last(x) end)
+#        mail_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("MAIL", location_ids, convert_values(params["to"]), convert_values(params["from"]))
+#        mail_totals_by_day=Enum.map(mail_totals_by_day, fn x -> List.last(x) end)
+#        call_totals_by_day=ConversationDisposition.channel_type_by_location_ids_and_days("CALL", location_ids, convert_values(params["to"]), convert_values(params["from"]))
+#        call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
 
         call_deflect_response = Data.ConversationCall.get_response_after_call(["Call deflected","Call Deflected"], params["to"], params["from"], location_ids)
         missed_call_response = Data.ConversationCall.get_response_after_call(["Missed Call Texted"],params["to"], params["from"], location_ids)
         missed_call_texted = calculate_percentage("Missed Call Texted", dispositions)
         to = Data.Disposition.convert_string_to_date(params["to"])
         from = Data.Disposition.convert_string_to_date(params["from"])
-        IO.inspect("------dispositions-----------")
-        IO.inspect(dispositions)
-        IO.inspect("------dispositions----------")
         graph_days=get_days_for_graph(dispositions, to, from)
-        IO.inspect("------days-----------")
-        IO.inspect(graph_days)
-        IO.inspect("------days----------")
         %{bar_graph_data: bar_graph_data, start_date: bar_graph_start_date}=get_bar_graph_data(dispositions,graph_days, to, from)
         new_user = Data.Member.count_new_member_by(params["to"], params["from"], location_ids)
         active_user= Data.Member.count_active_user_by(location_ids)
@@ -450,17 +510,41 @@ defmodule MainWeb.AdminController do
         )
 
         web_totals_by_day=get_line_graph_data(web_totals, graph_days, convert_values(params["to"]), convert_values(params["from"]))
-        web_totals_by_day=Enum.map(web_totals_by_day, fn x -> List.last(x) end)
+#        web_totals_by_day=Enum.map(web_totals_by_day, fn x -> List.last(x) end)
         sms_totals_by_day=get_line_graph_data(sms_totals,  graph_days,convert_values(params["to"]), convert_values(params["from"]))
-        sms_totals_by_day=Enum.map(sms_totals_by_day, fn x -> List.last(x) end)
+#        sms_totals_by_day=Enum.map(sms_totals_by_day, fn x -> List.last(x) end)
         app_totals_by_day=get_line_graph_data(app_totals, graph_days, convert_values(params["to"]), convert_values(params["from"]))
-        app_totals_by_day=Enum.map(app_totals_by_day, fn x -> List.last(x) end)
+#        app_totals_by_day=Enum.map(app_totals_by_day, fn x -> List.last(x) end)
         facebook_totals_by_day=get_line_graph_data(facebook_totals, graph_days, convert_values(params["to"]), convert_values(params["from"]))
-        facebook_totals_by_day=Enum.map(facebook_totals_by_day, fn x -> List.last(x) end)
+#        facebook_totals_by_day=Enum.map(facebook_totals_by_day, fn x -> List.last(x) end)
         email_totals_by_day=get_line_graph_data(email_totals, graph_days, convert_values(params["to"]), convert_values(params["from"]))
-        email_totals_by_day=Enum.map(email_totals_by_day, fn x -> List.last(x) end)
+#        email_totals_by_day=Enum.map(email_totals_by_day, fn x -> List.last(x) end)
         call_totals_by_day=get_line_graph_data(call_totals, graph_days, convert_values(params["to"]), convert_values(params["from"]))
-        call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
+#        call_totals_by_day=Enum.map(call_totals_by_day, fn x -> List.last(x) end)
+
+        incoming_msg=get_bar_graph_data_for_incoming_messages(location_ids,graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+        incoming_msg_bar_graph_data=Enum.reduce(
+          0..length(@channels),
+          %{},
+          fn x, acc -> Map.merge(acc, %{Enum.at(@channels, x) => Enum.at(incoming_msg, x)}) end
+        )
+        outgoing_msg=get_bar_graph_data_for_outgoing_messages(location_ids,graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+        outgoing_msg_bar_graph_data=Enum.reduce(
+          0..length(@channels),
+          %{},
+          fn x, acc -> Map.merge(acc, %{Enum.at(@channels, x) => Enum.at(outgoing_msg, x)}) end
+        )
+        #        incoming_sms_msg=get_line_graph_data_for_incoming_messages(location_ids,"SMS",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        incoming_app_msg=get_line_graph_data_for_incoming_messages(location_ids,"APP",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        incoming_facebook_msg=get_line_graph_data_for_incoming_messages(location_ids,"FACEBOOK",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        incoming_email_msg=get_line_graph_data_for_incoming_messages(location_ids,"MAIL",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        incoming_call_msg=get_line_graph_data_for_incoming_messages(location_ids,"CALL",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        outgoing_web_msg=get_line_graph_data_for_outgoing_messages(location_ids,"WEB",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        outgoing_sms_msg=get_line_graph_data_for_outgoing_messages(location_ids,"SMS",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        outgoing_app_msg=get_line_graph_data_for_outgoing_messages(location_ids,"APP",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        outgoing_facebook_msg=get_line_graph_data_for_outgoing_messages(location_ids,"FACEBOOK",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        outgoing_email_msg=get_line_graph_data_for_outgoing_messages(location_ids,"MAIL",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
+#        outgoing_call_msg=get_line_graph_data_for_outgoing_messages(location_ids,"CALL",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
 
         render(conn, "index.html",
           metrics: [],
@@ -491,13 +575,15 @@ defmodule MainWeb.AdminController do
           email_totals_by_day: email_totals_by_day,
           call_totals_by_day: call_totals_by_day,
           avg_totals_by_day: get_average_for_line_graph(web_totals_by_day, sms_totals_by_day, app_totals_by_day, facebook_totals_by_day, email_totals_by_day, call_totals_by_day),
-          line_graph_start_date: Date.to_iso8601(Date.add(DateTime.utc_now, -6)),
+          line_graph_start_date: Date.to_iso8601(List.first(graph_days)),
           web_totals: web_totals|>Enum.count(),
           sms_totals: sms_totals|>Enum.count(),
           app_totals: app_totals|>Enum.count(),
           facebook_totals: facebook_totals|>Enum.count(),
           email_totals: email_totals|>Enum.count(),
           call_totals: call_totals|>Enum.count(),
+          incoming_messages_bar_graph: Poison.encode!(incoming_msg_bar_graph_data),
+          outgoing_messages_bar_graph: Poison.encode!(outgoing_msg_bar_graph_data),
           teams: teams,
           team_admin_count: team_admin_count,
           tickets_count: Ticket.filter(params),
@@ -624,9 +710,9 @@ defmodule MainWeb.AdminController do
       days,
       fn y ->
         if(t = Enum.find(results, fn x -> elem(x, 0) == y end)) do
-          [y,elem(t, 1)]
+          elem(t, 1)
         else
-          [y,0]
+          0
         end
       end
     )
@@ -646,6 +732,45 @@ defmodule MainWeb.AdminController do
         range = Date.range(from, to)
                 |> Enum.to_list()
     end
+  end
+  defp get_bar_graph_data_for_incoming_messages(location_ids  \\ nil,days, to, from) do
+    Enum.map(@channels, fn channel_type->
+    results=case location_ids do
+      nil -> ConversationMessages.count_incoming_messages_per_day(channel_type,to,from)
+      _ -> ConversationMessages.count_incoming_messages_per_day_by_location_ids(location_ids,channel_type,to,from)
+    end
+    results = Enum.map(
+      days,
+      fn y ->
+        if(t = Enum.find(results, fn [date: x, count: _] -> x == y end)) do
+          [date: date, count: count]=t
+          [y,count]
+        else
+          [y,0]
+        end
+      end
+    ) end
+  )
+  end
+  defp get_bar_graph_data_for_outgoing_messages(location_ids \\ nil,days, to, from) do
+    Enum.map(@channels, fn channel_type ->
+    results=case location_ids do
+      nil -> ConversationMessages.count_outgoing_messages_per_day(channel_type,to,from)
+      _ -> ConversationMessages.count_outgoing_messages_per_day_by_location_ids(location_ids,channel_type,to,from)
+    end
+    results = Enum.map(
+      days,
+      fn y ->
+        if(t = Enum.find(results, fn [date: x, count: _] -> x == y end)) do
+          [date: date, count: count]=t
+          [y,count]
+        else
+          [y,0]
+        end
+      end
+    )
+    end
+    )
   end
 
 end

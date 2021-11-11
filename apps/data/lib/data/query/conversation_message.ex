@@ -4,7 +4,7 @@ defmodule Data.Query.ConversationMessage do
   """
   import Ecto.Query, only: [from: 2]
 
-  alias Data.Schema.ConversationMessage
+  alias Data.Schema.{ConversationMessage, Conversation, Location}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
   alias Ecto.Adapters.SQL
@@ -157,6 +157,164 @@ defmodule Data.Query.ConversationMessage do
     end
   end
 
+  @doc """
+  Returns a conversations per day by location_id
+  """
+  @spec count_incoming_messages_per_day_by_location_ids(id :: binary(),channel_type :: binary(),to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: Location.t() | nil
+  def count_incoming_messages_per_day_by_location_ids(ids, channel_type,to, from, repo \\ Read) do
+    query = from(l in Location,
+      left_join: c in Conversation,
+      on: c.location_id==l.id,
+      left_join: cm in ConversationMessage,
+      on: c.id==cm.conversation_id,
+      where: l.id in ^ids and cm.phone_number == c.original_number and c.channel_type==^channel_type
+    )
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+             do: query,
+             else: from([_, _, cm] in query, where: cm.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+             do: query,
+             else: from([_, _, cm] in query, where: cm.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
+    query = from(
+              [_, _, cm] in query,
+              group_by: [fragment("?::date", cm.inserted_at)],
+              select: [
+                date: fragment("?::date", cm.inserted_at),
+                count: count(fragment("?::date", cm.inserted_at))
+              ]
+            )
+            |> repo.all()
+  end
+
+  @doc """
+  Returns a conversations per day by location_id
+  """
+  @spec count_outgoing_messages_per_day_by_location_ids(id :: binary(),channel_type :: binary(),to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: Location.t() | nil
+  def count_outgoing_messages_per_day_by_location_ids(ids, channel_type,to, from, repo \\ Read) do
+    query = from(l in Location,
+      left_join: c in Conversation,
+      on: c.location_id==l.id,
+      left_join: cm in ConversationMessage,
+      on: c.id==cm.conversation_id,
+      where: l.id in ^ids and cm.phone_number != c.original_number and c.channel_type==^channel_type
+    )
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+             do: query,
+             else: from([_, _, cm] in query, where: cm.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+             do: query,
+             else: from([_, _, cm] in query, where: cm.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
+    query = from(
+              [_, _, cm] in query,
+              group_by: [fragment("?::date", cm.inserted_at)],
+              select: [
+                date: fragment("?::date", cm.inserted_at),
+                count: count(fragment("?::date", cm.inserted_at))
+              ]
+            )
+            |> repo.all()
+  end
+
+ @doc """
+  Returns a conversations per day
+  """
+  @spec count_incoming_messages_per_day(channel_type :: binary(),to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: Location.t() | nil
+  def count_incoming_messages_per_day(channel_type,to, from, repo \\ Read) do
+    query = from(l in Location,
+      left_join: c in Conversation,
+      on: c.location_id==l.id,
+      left_join: cm in ConversationMessage,
+      on: c.id==cm.conversation_id,
+      where: is_nil(l.deleted_at) and cm.phone_number == c.original_number and c.channel_type==^channel_type
+    )
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+             do: query,
+             else: from([_, _, cm] in query, where: cm.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+             do: query,
+             else: from([_, _, cm] in query, where: cm.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
+    query = from(
+              [_, _, cm] in query,
+              group_by: [fragment("?::date", cm.inserted_at)],
+              select: [
+                date: fragment("?::date", cm.inserted_at),
+                count: count(fragment("?::date", cm.inserted_at))
+              ]
+            )
+            |> repo.all()
+  end
+
+  @doc """
+  Returns a conversations per day
+  """
+  @spec count_outgoing_messages_per_day(channel_type :: binary(),to :: String.t(), from :: String.t(), repo :: Ecto.Repo.t()) :: Location.t() | nil
+  def count_outgoing_messages_per_day(channel_type,to, from, repo \\ Read) do
+    query = from(l in Location,
+      left_join: c in Conversation,
+      on: c.location_id==l.id,
+      left_join: cm in ConversationMessage,
+      on: c.id==cm.conversation_id,
+      where: is_nil(l.deleted_at) and cm.phone_number != c.original_number and c.channel_type==^channel_type
+    )
+    query =
+      Enum.reduce(%{to: to, from: from}, query, fn
+        {:to, to}, query ->
+          if is_nil(to),
+             do: query,
+             else: from([_, _, cm] in query, where: cm.inserted_at <= ^to)
+
+        {:from, from}, query ->
+          if is_nil(from),
+             do: query,
+             else: from([_, _, cm] in query, where: cm.inserted_at >= ^from)
+
+        _, query ->
+          query
+      end)
+
+    query = from(
+              [_, _, cm] in query,
+              group_by: [fragment("?::date", cm.inserted_at)],
+              select: [
+                date: fragment("?::date", cm.inserted_at),
+                count: count(fragment("?::date", cm.inserted_at))
+              ]
+            )
+            |> repo.all()
+  end
+
+
+
   def mark_read(%{read: true} = msg, _repo) do
     {:ok, msg}
   end
@@ -171,4 +329,6 @@ defmodule Data.Query.ConversationMessage do
     Enum.map(results.rows, fn row -> Map.new(Enum.zip(cols, row)) end)
     |> List.first()
   end
+
+
 end
