@@ -4,7 +4,7 @@ defmodule Data.Query.Location do
   """
   import Ecto.Query, only: [from: 2]
 
-  alias Data.Schema.Location
+  alias Data.Schema.{Location,Conversation, ConversationMessage}
   alias Data.Repo, as: Read
   alias Data.Repo, as: Write
 
@@ -29,6 +29,8 @@ defmodule Data.Query.Location do
     from(t in Location, where: is_nil(t.deleted_at), where: t.id == ^id)
     |> repo.one()
   end
+
+
 
   @doc """
   Returns a locations by ids

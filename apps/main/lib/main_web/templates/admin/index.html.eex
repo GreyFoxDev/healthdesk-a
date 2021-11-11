@@ -470,6 +470,20 @@
     </div>
         </div>
     </div>
+    <div class="metric-row">
+        <div class="col-12 col-sm-6 col-lg-8" >
+            <div class="card-metric ">
+                <div id="incomingMessageBar"></div>
+            </div>
+        </div>
+    </div>
+    <div class="metric-row">
+        <div class="col-12 col-sm-6 col-lg-8" >
+            <div class="card-metric ">
+                <div id="outgoingMessageBar"></div>
+            </div>
+        </div>
+    </div>
     <style>
         #container {
             height: 400px;
@@ -934,6 +948,7 @@
 </script>
 <script>
     sample="<%= @bar_graph %>".replace(/&quot;/g,'"');
+    console.log(sample)
     const data = JSON.parse(sample);
     function createSeries () {
         let list = [];
@@ -949,10 +964,7 @@
         chart: {
             type: 'column'
         },
-        boost: {
-            useGPUTranslations: true,
-            seriesThreshold: 0
-        },
+
         title: {
             text: 'Disposition per day'
         },
@@ -1017,6 +1029,169 @@
     console.log(seconds);
 </script>
 
+<script>
+    incomingData="<%= @incoming_messages_bar_graph %>".replace(/&quot;/g,'"');
+    incomingData = JSON.parse(incomingData);
+    function createSeries (data) {
+        let list = [];
+        for (const key in data){
+            if (key != "") list.push({name: key, data: data[key]});
+        }
+        console.log(list)
+        return list;
+    }
+    startDate = new Date("<%=@bar_graph_start_date%>");
+    var seconds = (new Date()).getSeconds();
+    Highcharts.chart('incomingMessageBar', {
+        chart: {
+            type: 'column'
+        },
+
+        title: {
+            text: 'Incoming Messages per Day'
+        },
+        xAxis: {
+            type: 'datetime'  },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Total Messages'
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: ( // theme
+                        Highcharts.defaultOptions.title.style &&
+                        Highcharts.defaultOptions.title.style.color
+                    ) || 'gray'
+                }
+            }
+        },
+        exporting: {
+            buttons: {
+                contextButton: {
+                    menuItems: [
+                        'viewFullscreen',
+                        'printChart'
+                    ]
+                }
+            }
+        },
+        legend: {
+            align: 'right',
+            x: -30,
+            verticalAlign: 'top',
+            y: 25,
+            floating: false,
+            backgroundColor:
+                Highcharts.defaultOptions.legend.backgroundColor || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            shared: true
+        },
+        plotOptions: {
+            series: {
+                pointStart: startDate.getTime(),
+                pointInterval: 24 * 3600 * 1000 // one day
+            },
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        series: createSeries(incomingData)
+    });
+    seconds = (new Date()).getSeconds();
+    console.log(seconds);
+</script>
+
+<script>
+    outgoingData="<%= @outgoing_messages_bar_graph %>".replace(/&quot;/g,'"');
+    outgoingData = JSON.parse(outgoingData);
+    function createSeries (data) {
+        let list = [];
+        for (const key in data){
+            if (key != "") list.push({name: key, data: data[key]});
+        }
+        console.log(list)
+        return list;
+    }
+    startDate = new Date("<%=@bar_graph_start_date%>");
+    var seconds = (new Date()).getSeconds();
+    Highcharts.chart('outgoingMessageBar', {
+        chart: {
+            type: 'column'
+        },
+
+        title: {
+            text: 'outgoing Messages per Day'
+        },
+        xAxis: {
+            type: 'datetime'  },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Total Messages'
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: ( // theme
+                        Highcharts.defaultOptions.title.style &&
+                        Highcharts.defaultOptions.title.style.color
+                    ) || 'gray'
+                }
+            }
+        },
+        exporting: {
+            buttons: {
+                contextButton: {
+                    menuItems: [
+                        'viewFullscreen',
+                        'printChart'
+                    ]
+                }
+            }
+        },
+        legend: {
+            align: 'right',
+            x: -30,
+            verticalAlign: 'top',
+            y: 25,
+            floating: false,
+            backgroundColor:
+                Highcharts.defaultOptions.legend.backgroundColor || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            shared: true
+        },
+        plotOptions: {
+            series: {
+                pointStart: startDate.getTime(),
+                pointInterval: 24 * 3600 * 1000 // one day
+            },
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        series: createSeries(outgoingData)
+    });
+    seconds = (new Date()).getSeconds();
+    console.log(seconds);
+</script>
 
 <script>
     if (document.getElementById("locations").options.length != 0){
@@ -1031,7 +1206,7 @@
 
         document.getElementById("team_id").onchange=function () {
             document.getElementById('locations').innerText = null;
-            if (document.getElementById("team_id").value 
+            if (document.getElementById("team_id").value
                 -99) document.getElementById("selectDiv").style.display = "none";
             else
                 document.getElementById("selectDiv").style.display = "block";
