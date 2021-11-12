@@ -948,18 +948,30 @@
 </script>
 <script>
     sample="<%= @bar_graph %>".replace(/&quot;/g,'"');
-    console.log(sample)
-    const data = JSON.parse(sample);
+
+    var data = JSON.parse(sample);
+    function changeZeroToNull(data){
+        var data2=[];
+        for (var j = 0; j < data.length; j++) {
+            if (data[j] == 0) {
+                data2[j] = null;
+            }
+            else{
+                data2[j] = data[j];
+            }
+        }
+    return data2;
+    }
     function createSeries () {
         let list = [];
         for (const key in data){
-            if (key != "") list.push({name: key, data: data[key]});
+            if (key != "") list.push({name: key, data: changeZeroToNull(data[key])});
         }
+        console.log(list)
         return list;
     }
     startDate = new Date("<%=@bar_graph_start_date%>");
     var seconds = (new Date()).getSeconds();
-    console.log(seconds);
     Highcharts.chart('container1', {
         chart: {
             type: 'column'
@@ -969,7 +981,8 @@
             text: 'Disposition per day'
         },
         xAxis: {
-            type: 'datetime'  },
+            type: 'datetime'
+        },
         yAxis: {
             min: 0,
             title: {
@@ -1009,8 +1022,13 @@
             shadow: false
         },
         tooltip: {
-            shared: true
-    },
+            useHTML:true,
+            headerFormat: '<strong>{point.key}</strong><br>',
+            pointFormat: '<span style="color:{series.color};font-weight:bold;">{series.name}</span>: {point.y:,.0f}     ({point.percentage:.1f}%)<br>',
+            footerFormat: 'Total :{point.total}',
+            shared: true,
+            followPointer: true
+        },
         plotOptions: {
             series: {
                 pointStart: startDate.getTime(),
@@ -1026,16 +1044,29 @@
         series: createSeries()
     });
     seconds = (new Date()).getSeconds();
-    console.log(seconds);
+
 </script>
 
 <script>
-    incomingData="<%= @incoming_messages_bar_graph %>".replace(/&quot;/g,'"');
-    incomingData = JSON.parse(incomingData);
-    function createSeries (data) {
+    data="<%= @incoming_messages_bar_graph %>".replace(/&quot;/g,'"');
+    data = JSON.parse(data);
+
+    function changeZeroToNull(data){
+        var data2=[];
+        for (var j = 0; j < data.length; j++) {
+            if (data[j] == 0) {
+                data2[j] = null;
+            }
+            else{
+                data2[j] = data[j];
+            }
+        }
+        return data2;
+    }
+    function createSeries () {
         let list = [];
         for (const key in data){
-            if (key != "") list.push({name: key, data: data[key]});
+            if (key != "") list.push({name: key, data: changeZeroToNull(data[key])});
         }
         console.log(list)
         return list;
@@ -1091,7 +1122,12 @@
             shadow: false
         },
         tooltip: {
-            shared: true
+            useHTML:true,
+            headerFormat: '<strong>{point.key}</strong><br>',
+            pointFormat: '<span style="color:{series.color};font-weight:bold;">{series.name}</span>: {point.y:,.0f}     ({point.percentage:.1f}%)<br>',
+            footerFormat: 'Total :{point.total}',
+            shared: true,
+            followPointer: true
         },
         plotOptions: {
             series: {
@@ -1105,19 +1141,32 @@
                 }
             }
         },
-        series: createSeries(incomingData)
+        series: createSeries()
+
     });
     seconds = (new Date()).getSeconds();
-    console.log(seconds);
+
 </script>
 
 <script>
-    outgoingData="<%= @outgoing_messages_bar_graph %>".replace(/&quot;/g,'"');
-    outgoingData = JSON.parse(outgoingData);
-    function createSeries (data) {
+    data ="<%= @outgoing_messages_bar_graph %>".replace(/&quot;/g,'"');
+    data = JSON.parse(data);
+    function changeZeroToNull(data){
+        var data2=[];
+        for (var j = 0; j < data.length; j++) {
+            if (data[j] == 0) {
+                data2[j] = null;
+            }
+            else{
+                data2[j] = data[j];
+            }
+        }
+        return data2;
+    }
+    function createSeries () {
         let list = [];
         for (const key in data){
-            if (key != "") list.push({name: key, data: data[key]});
+            if (key != "") list.push({name: key, data: changeZeroToNull(data[key])});
         }
         console.log(list)
         return list;
@@ -1130,7 +1179,7 @@
         },
 
         title: {
-            text: 'outgoing Messages per Day'
+            text: 'Outgoing Messages per Day'
         },
         xAxis: {
             type: 'datetime'  },
@@ -1173,7 +1222,12 @@
             shadow: false
         },
         tooltip: {
-            shared: true
+            useHTML:true,
+            headerFormat: '<strong>{point.key}</strong><br>',
+            pointFormat: '<span style="color:{series.color};font-weight:bold;">{series.name}</span>: {point.y:,.0f}    ({point.percentage:.1f}%)<br>',
+            footerFormat: 'Total :{point.total}',
+            shared: true,
+            followPointer: true
         },
         plotOptions: {
             series: {
@@ -1187,10 +1241,10 @@
                 }
             }
         },
-        series: createSeries(outgoingData)
+        series: createSeries()
     });
     seconds = (new Date()).getSeconds();
-    console.log(seconds);
+
 </script>
 
 <script>
@@ -1216,7 +1270,7 @@
             var val = $(this).val();
             for (var i = 0; i < arr.length-1; i++) {
                 var arr2=arr[i].split(",")
-                console.log(arr2[0])
+
                 var opt = document.createElement('option');
                 opt.value = arr2[0];
                 opt.innerHTML = arr2[1];

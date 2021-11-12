@@ -744,9 +744,9 @@ defmodule MainWeb.AdminController do
       fn y ->
         if(t = Enum.find(results, fn [date: x, count: _] -> x == y end)) do
           [date: date, count: count]=t
-          [y,count]
+          count
         else
-          [y,0]
+          0
         end
       end
     ) end
@@ -763,9 +763,9 @@ defmodule MainWeb.AdminController do
       fn y ->
         if(t = Enum.find(results, fn [date: x, count: _] -> x == y end)) do
           [date: date, count: count]=t
-          [y,count]
+          count
         else
-          [y,0]
+            0
         end
       end
     )
