@@ -1248,29 +1248,33 @@
 </script>
 
 <script>
-    if (document.getElementById("locations").options.length != 0){
-        window.addEventListener("load",function(){
-            document.getElementById("selectDiv").style.display = "block";
-        });}
+    $(document).ready(function() {
+        if (document.getElementById("locations") != null) {
+            if (document.getElementById("locations").options.length != 0) {
+
+                window.addEventListener("load", function() {
+                    document.getElementById("selectDiv").style.display = "block";
+                });
+            }
+        }});
 </script>
 <script>
 
-    function locationDropdown () {
+    function locationDropdown() {
         document.getElementById("selectDiv").style.display = "none";
 
-        document.getElementById("team_id").onchange=function () {
+        document.getElementById("team_id").onchange = function () {
             document.getElementById('locations').innerText = null;
-            if (document.getElementById("team_id").value
-                -99) document.getElementById("selectDiv").style.display = "none";
+            if (document.getElementById("team_id").value == -99) document.getElementById("selectDiv").style.display = "none";
             else
                 document.getElementById("selectDiv").style.display = "block";
             document.getElementById("locations").disabled = false;
             var arr = document.getElementById("team_id").value.split("--");
-            var locationDropdown=  document.getElementById("locations");
+            var locationDropdown = document.getElementById("locations");
             var val = $(this).val();
-            for (var i = 0; i < arr.length-1; i++) {
-                var arr2=arr[i].split(",")
-
+            for (var i = 0; i < arr.length - 1; i++) {
+                var arr2 = arr[i].split(",")
+                console.log(arr2[0])
                 var opt = document.createElement('option');
                 opt.value = arr2[0];
                 opt.innerHTML = arr2[1];
@@ -1280,8 +1284,11 @@
             $('.selectpicker').selectpicker('refresh');
         };
     };
-    locationDropdown()
-
+    $(document).ready(function() {
+        if (document.getElementById("selectDiv") != null){
+            locationDropdown()
+        }
+    });
 </script>
 <div class="modal" id = "infoModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
