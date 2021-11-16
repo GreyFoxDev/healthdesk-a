@@ -195,9 +195,9 @@ defmodule Data.Query.IntentUsage do
 #    query = from([t,cm,c,cc,cd, ...] in query,
 #      select: {cm.inserted_at, cd.conversation_call_id})
       query = from([t, ...] in query,
-      select: t.id
+      select: [id: t.id, name: t.intent]
       )
-    repo.all(query) |> Enum.count()
+    repo.all(query)
 
   end
 

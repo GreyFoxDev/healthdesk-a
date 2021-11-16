@@ -601,7 +601,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Call deflected</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Call Deflected ROI</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -609,20 +609,34 @@
             <div class="modal-body">
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Total Response
+                        Calls Deflected
+                        <span class="badge badge-primary badge-pill"> <%= @total_call_deflected %> </span>
+                    </li><li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total Responses
                         <span class="badge badge-primary badge-pill"> <%= @call_deflect_response %> </span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Response Rate
                         <span class="badge badge-primary badge-pill"> <%= @call_deflect_response_rate |> Decimal.from_float() |> Decimal.round(1) %>% </span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Intents
-                        <span class="badge badge-primary badge-pill"> <%= @intent_after_call_deflect %> </span>
+                    <li data-toggle="collapse" data-target="#demo" class="list-group-item d-flex justify-content-between align-items-center">
+                        Assisted
+                        <span class="badge badge-primary badge-pill"> <%= Enum.reduce(@intent_after_call_deflect, 0, fn  x, acc -> acc+elem(x,1) end) %> </span>
                     </li>
+                    <div id="demo" class="collapse lstbx">
+                       <%= for intent_after_call_deflect <- @intent_after_call_deflect do%>
+                        <p><%=elem(intent_after_call_deflect,0)%><span class="badge badge-primary badge-pill " style="float: right;"> <%= elem(intent_after_call_deflect,1) %> </span></p>
+                        <% end %>
+                    </div>
+                    <style>
+                        .lstbx p {
+                            margin-bottom: 0;
+                            padding: 5px 17px 5px 25px;
+                        }
+                    </style>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         New Leads
-                        <span class="badge badge-primary badge-pill"> <%= @new_leads_after_call_deflect %> </span>
+                        <span class="badge badge-primary badge-pill"> <%= @new_leads_after_call_deflect %> (<%= if (@total_call_deflected != 0) do @new_leads_after_call_deflect*100/@total_call_deflected else 0  end %>%) </span>
                     </li>
                 </ul>
 

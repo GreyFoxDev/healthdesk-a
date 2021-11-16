@@ -11,7 +11,7 @@ defmodule MainWeb.AdminController do
   "getDayPass",
   "getWeekPass",
   ]
-  @channels ["WEB","SMS","APP","FACEBOOK","MAIL","CALL"]
+  @channels ["WEB","SMS","APP","FACEBOOK","EMAIL","PHONE"]
   def index(conn, %{"filters" => %{"location_ids" => location_ids}} = params) do
     params=if(!is_nil(params["filters"])) do
       change_params(params)
@@ -172,6 +172,11 @@ defmodule MainWeb.AdminController do
       %{},
       fn x, acc -> Map.merge(acc, %{Enum.at(@channels, x) => Enum.at(outgoing_msg, x)}) end
     )
+    IO.inspect("------dispositions-----------")
+    IO.inspect(Enum.frequencies_by(dispositions, fn %{name: name } -> name=="Call Deflected" || name=="Call deflected" end))
+    IO.inspect("------dispositions----------")
+    total_call_deflected=Enum.frequencies_by(dispositions, fn %{name: name } -> name=="Call Deflected" || name=="Call deflected" end)[true] || 0
+    intent_after_call_deflected=Enum.frequencies_by(Data.IntentUsage.get_intent_count_after_call_disposition(["Call deflected","Call Deflected"],params["to"] ,params["from"], location_ids), fn [id: id, name: name]-> name end)
 
     render(conn, "index.html",
       dispositions: dispositions,
@@ -180,8 +185,9 @@ defmodule MainWeb.AdminController do
       automated_data: automated,
       automated: calculate_automated_percentage(dispositions, automated),
       call_deflected: calculate_percentage("Call deflected", dispositions),
+      total_call_deflected: total_call_deflected,
       call_deflect_response: call_deflect_response,
-      intent_after_call_deflect: Data.IntentUsage.get_intent_count_after_call_disposition(["Call deflected","Call Deflected"], params["to"], params["from"], location_ids),
+      intent_after_call_deflect: intent_after_call_deflected,
       new_leads_after_call_deflect: Data.IntentUsage.get_leads_count_after_call_disposition(["Call deflected","Call Deflected"], params["to"], params["from"], location_ids),
       call_deflect_response_rate: calculate_response_rate_after_call(["Call deflected","Call Deflected"],dispositions, call_deflect_response),
       missed_call_texted: missed_call_texted.total_percentage,
@@ -209,7 +215,6 @@ defmodule MainWeb.AdminController do
       facebook_totals: facebook_totals |> Enum.count(),
       email_totals: email_totals |> Enum.count(),
       call_totals: call_totals|> Enum.count(),
-
       incoming_messages_bar_graph: Poison.encode!(incoming_msg_bar_graph_data),
       outgoing_messages_bar_graph: Poison.encode!(outgoing_msg_bar_graph_data),
       team_admin_count: team_admin_count,
@@ -372,7 +377,11 @@ defmodule MainWeb.AdminController do
           %{},
           fn x, acc -> Map.merge(acc, %{Enum.at(@channels, x) => Enum.at(outgoing_msg, x)}) end
         )
-
+        total_call_deflected=Enum.frequencies_by(dispositions, fn %{name: name } -> name=="Call Deflected" || name=="Call deflected" end)[true] || 0
+        intent_after_call_deflected=Enum.frequencies_by(Data.IntentUsage.get_intent_count_after_call_disposition(["Call deflected","Call Deflected"], params["to"], params["from"]), fn [id: id, name: name]-> name end)
+        IO.inspect("------intent_after_call_deflected-----------")
+        IO.inspect(intent_after_call_deflected)
+        IO.inspect("------intent_after_call_deflected----------")
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
@@ -382,8 +391,9 @@ defmodule MainWeb.AdminController do
           automated_data: automated,
           automated: calculate_automated_percentage(dispositions ,automated),
           call_deflected: calculate_percentage("Call deflected", dispositions),
+          total_call_deflected: total_call_deflected,
           call_deflect_response: call_deflect_response,
-          intent_after_call_deflect: Data.IntentUsage.get_intent_count_after_call_disposition(["Call deflected","Call Deflected"], params["to"], params["from"]),
+          intent_after_call_deflect: intent_after_call_deflected,
           new_leads_after_call_deflect: Data.IntentUsage.get_leads_count_after_call_disposition(["Call deflected","Call Deflected"], params["to"], params["from"]),
           call_deflect_response_rate: calculate_response_rate_after_call(["Call deflected","Call Deflected"],dispositions ,call_deflect_response),
           missed_call_texted: missed_call_texted.total_percentage,
@@ -545,7 +555,8 @@ defmodule MainWeb.AdminController do
 #        outgoing_facebook_msg=get_line_graph_data_for_outgoing_messages(location_ids,"FACEBOOK",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
 #        outgoing_email_msg=get_line_graph_data_for_outgoing_messages(location_ids,"MAIL",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
 #        outgoing_call_msg=get_line_graph_data_for_outgoing_messages(location_ids,"CALL",graph_days, convert_values(params["to"]), convert_values(params["from"]) )
-
+        total_call_deflected=Enum.frequencies_by(dispositions, fn %{name: name } -> name=="Call Deflected" || name=="Call deflected" end)[true] || 0
+        intent_after_call_deflected=Enum.frequencies_by(Data.IntentUsage.get_intent_count_after_call_disposition(["Call deflected","Call Deflected"],params["to"] ,params["from"], location_ids), fn [id: id, name: name]-> name end)
         render(conn, "index.html",
           metrics: [],
           campaigns: campaigns,
@@ -556,8 +567,9 @@ defmodule MainWeb.AdminController do
           automated_data: automated,
           automated: calculate_automated_percentage(dispositions, automated),
           call_deflected: calculate_percentage("Call deflected", dispositions),
+          total_call_deflected: total_call_deflected,
           call_deflect_response: call_deflect_response,
-          intent_after_call_deflect: Data.IntentUsage.get_intent_count_after_call_disposition(["Call deflected","Call Deflected"],params["to"] ,params["from"], location_ids),
+          intent_after_call_deflect: intent_after_call_deflected,
           new_leads_after_call_deflect: Data.IntentUsage.get_leads_count_after_call_disposition(["Call deflected","Call Deflected"], params["to"], params["from"], location_ids),
           call_deflect_response_rate: calculate_response_rate_after_call(["Call deflected","Call Deflected"],dispositions, call_deflect_response),
           missed_call_texted: missed_call_texted.total_percentage,
